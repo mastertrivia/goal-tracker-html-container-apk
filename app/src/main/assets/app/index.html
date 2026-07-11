@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Goal Tracker Shell</title>
+<style>
+  :root {
+    --bg: #10201a;
+    --card: #1b2f27;
+    --text: #e8f0ec;
+    --muted: #9db5aa;
+    --primary: #2e8b6d;
+    --accent: #e8a33d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    padding: 16px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 1.3rem; margin-bottom: 4px; }
+  p.sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 16px; }
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .card h2 { font-size: 1rem; margin-bottom: 8px; color: var(--accent); }
+  button {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    margin: 4px 4px 4px 0;
+  }
+  button:active { opacity: 0.8; }
+  input, textarea {
+    width: 100%;
+    background: #0d1a14;
+    color: var(--text);
+    border: 1px solid #33503f;
+    border-radius: 8px;
+    padding: 8px;
+    margin: 4px 0;
+    font-size: 0.9rem;
+  }
+  #log {
+    background: #0d1a14;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    min-height: 60px;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .warn { color: var(--accent); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+  <h1>Goal Tracker Shell</h1>
+  <p class="sub">This is the bundled test app. Use the menu (top-right) &rarr; &ldquo;Import HTML / ZIP&rdquo; to load your real app. Your app can use every button below via <code>window.AndroidBridge</code>.</p>
+
+  <div class="card" id="bridge-status">
+    <h2>Bridge status</h2>
+    <div id="status-text">Checking&hellip;</div>
+  </div>
+
+  <div class="card">
+    <h2>Toast</h2>
+    <button onclick="AndroidBridge.showToast('Hello from JS!')">Show toast</button>
+  </div>
+
+  <div class="card">
+    <h2>Data (JSON files in internal storage)</h2>
+    <textarea id="data-input" rows="2">{"goals":["Learn Kotlin","Ship the app"]}</textarea>
+    <button onclick="saveDemo()">Save key &ldquo;demo&rdquo;</button>
+    <button onclick="loadDemo()">Load key &ldquo;demo&rdquo;</button>
+    <button onclick="log(AndroidBridge.listDataKeys())">List keys</button>
+  </div>
+
+  <div class="card">
+    <h2>Backup</h2>
+    <button onclick="AndroidBridge.exportBackup()">Export backup</button>
+    <button onclick="AndroidBridge.importBackup()">Import backup</button>
+  </div>
+
+  <div class="card">
+    <h2>Notifications</h2>
+    <button onclick="AndroidBridge.requestNotificationPermission()">Request permission</button>
+    <button onclick="AndroidBridge.showNotification(1, 'Goal Tracker', 'Instant notification works!')">Notify now</button>
+    <button onclick="scheduleDemo()">Schedule in 15s (close the app to test)</button>
+  </div>
+
+  <div class="card">
+    <h2>Foreground timer</h2>
+    <button onclick="startTimerDemo()">Start 60s timer</button>
+    <button onclick="stopTimerDemo()">Stop timer</button>
+  </div>
+
+  <div class="card">
+    <h2>Log</h2>
+    <div id="log">Ready.</div>
+  </div>
+
+<script>
+  function log(msg) {
+    document.getElementById('log').textContent =
+      new Date().toLocaleTimeString() + '  ' + msg + '\n' +
+      document.getElementById('log').textContent;
+  }
+
+  // The shell calls this for events (permission results, backup restored, ...)
+  window.onAndroidEvent = function (name, payload) {
+    log('event: ' + name + ' -> ' + JSON.stringify(payload));
+    if (name === 'backupRestored') {
+      log('Data restored - re-reading storage now would happen here.');
+    }
+  };
+
+  // --- Bridge detection: your real app should use this same guard ---
+  var hasBridge = typeof window.AndroidBridge !== 'undefined';
+  document.getElementById('status-text').innerHTML = hasBridge
+    ? 'AndroidBridge connected (shell v' + AndroidBridge.getShellVersion() + ')'
+    : '<span class="warn">AndroidBridge NOT found - running in a normal browser?</span>';
+
+  function saveDemo() {
+    var ok = AndroidBridge.saveData('demo', document.getElementById('data-input').value);
+    log(ok ? 'Saved.' : 'Save FAILED');
+  }
+
+  function loadDemo() {
+    var v = AndroidBridge.loadData('demo');
+    log(v === '' ? '(key not found)' : v);
+  }
+
+  function scheduleDemo() {
+    // Times are absolute epoch millis: Date.now() + delay
+    AndroidBridge.scheduleAlarm(42, Date.now() + 15000, 'Scheduled reminder', 'This fired 15s later, even if the app was closed.');
+    log('Alarm #42 scheduled for +15s. Close the app and wait.');
+  }
+
+  var timerInterval = null;
+  function startTimerDemo() {
+    var remaining = 60;
+    AndroidBridge.startTimer('Pomodoro running', remaining + 's remaining');
+    timerInterval = setInterval(function () {
+      remaining--;
+      if (remaining <= 0) {
+        stopTimerDemo();
+        AndroidBridge.showNotification(2, 'Timer done', 'Your 60s timer finished.');
+        return;
+      }
+      AndroidBridge.updateTimer('Pomodoro running', remaining + 's remaining');
+    }, 1000);
+    log('Foreground timer started.');
+  }
+
+  function stopTimerDemo() {
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    AndroidBridge.stopTimer();
+    log('Timer stopped.');
+  }
+</script>
+</body>
+</html>

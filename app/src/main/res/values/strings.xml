@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Goal Tracker</string>
+    <string name="menu_import_html">Import HTML / ZIP</string>
+    <string name="menu_export_backup">Export data backup</string>
+    <string name="menu_import_backup">Import data backup</string>
+    <string name="menu_reload">Reload app</string>
+    <string name="menu_reset">Reset to bundled app</string>
+</resources>
