@@ -33,7 +33,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private val appDir: File get() = File(filesDir, "app")
-    private val dataDir: File get() = File(filesDir, "data").apply { mkdirs() }
+    // Named appDataDir (not dataDir) to avoid clashing with Android's
+    // built-in Context.getDataDir(), which causes a duplicate JVM signature.
+    private val appDataDir: File get() = File(filesDir, "data").apply { mkdirs() }
 
     // ---------- File picker launchers ----------
 
@@ -206,7 +208,7 @@ class MainActivity : AppCompatActivity() {
     private fun writeBackupTo(uri: Uri) {
         try {
             val data = JSONObject()
-            dataDir.listFiles()?.filter { it.extension == "json" }?.forEach { f ->
+            appDataDir.listFiles()?.filter { it.extension == "json" }?.forEach { f ->
                 data.put(f.nameWithoutExtension, f.readText())
             }
             val backup = JSONObject()
@@ -229,7 +231,7 @@ class MainActivity : AppCompatActivity() {
             val backup = JSONObject(text)
             val data = backup.getJSONObject("data")
             for (key in data.keys()) {
-                File(dataDir, "$key.json").writeText(data.getString(key))
+                File(appDataDir, "$key.json").writeText(data.getString(key))
             }
             toast("Backup restored")
             // Tell the HTML app so it can re-read its data
