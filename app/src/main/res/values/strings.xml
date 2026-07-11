@@ -6,4 +6,6 @@
     <string name="menu_import_backup">Import data backup</string>
     <string name="menu_reload">Reload app</string>
     <string name="menu_reset">Reset to bundled app</string>
+    <string name="menu_system_check">System check</string>
+    <string name="menu_factory_reset">Factory reset</string>
 </resources>

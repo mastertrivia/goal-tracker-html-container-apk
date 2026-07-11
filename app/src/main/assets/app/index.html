@@ -42,7 +42,7 @@
     margin: 4px 4px 4px 0;
   }
   button:active { opacity: 0.8; }
-  input, textarea {
+  input[type="text"], textarea {
     width: 100%;
     background: #0d1a14;
     color: var(--text);
@@ -52,6 +52,13 @@
     margin: 4px 0;
     font-size: 0.9rem;
   }
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    margin: 6px 0;
+  }
   #log {
     background: #0d1a14;
     border-radius: 8px;
@@ -60,6 +67,8 @@
     font-size: 0.78rem;
     color: var(--muted);
     min-height: 60px;
+    max-height: 240px;
+    overflow-y: auto;
     white-space: pre-wrap;
     word-break: break-all;
   }
@@ -67,7 +76,7 @@
 </style>
 </head>
 <body>
-  <h1>Goal Tracker Shell</h1>
+  <h1>Goal Tracker Shell v2</h1>
   <p class="sub">This is the bundled test app. Use the menu (top-right) &rarr; &ldquo;Import HTML / ZIP&rdquo; to load your real app. Your app can use every button below via <code>window.AndroidBridge</code>.</p>
 
   <div class="card" id="bridge-status">
@@ -98,13 +107,34 @@
     <h2>Notifications</h2>
     <button onclick="AndroidBridge.requestNotificationPermission()">Request permission</button>
     <button onclick="AndroidBridge.showNotification(1, 'Goal Tracker', 'Instant notification works!')">Notify now</button>
-    <button onclick="scheduleDemo()">Schedule in 15s (close the app to test)</button>
+    <button onclick="scheduleDemo()">Schedule alarm in 15s (close the app to test)</button>
   </div>
 
   <div class="card">
-    <h2>Foreground timer</h2>
+    <h2>Foreground timer (with Pause/Resume/Stop buttons)</h2>
     <button onclick="startTimerDemo()">Start 60s timer</button>
     <button onclick="stopTimerDemo()">Stop timer</button>
+  </div>
+
+  <div class="card">
+    <h2>Time safety (v2)</h2>
+    <button onclick="log(AndroidBridge.currentTimeInfo())">Time info</button>
+    <button onclick="log('monotonic ms: ' + AndroidBridge.elapsedRealtime())">Monotonic clock</button>
+  </div>
+
+  <div class="card">
+    <h2>Settings flags (v2 - your settings screen lives in HTML)</h2>
+    <label><input type="checkbox" id="f-notif"> notificationsEnabled</label>
+    <label><input type="checkbox" id="f-alarm"> alarmsEnabled</label>
+    <label><input type="checkbox" id="f-timer"> timerNotificationEnabled</label>
+    <label><input type="checkbox" id="f-sound"> soundEnabled</label>
+  </div>
+
+  <div class="card">
+    <h2>Diagnostics (v2)</h2>
+    <button onclick="log(AndroidBridge.getDiagnostics())">System info</button>
+    <button onclick="log(AndroidBridge.getErrorLog())">Error log</button>
+    <button onclick="AndroidBridge.clearErrorLog(); log('Error log cleared.')">Clear log</button>
   </div>
 
   <div class="card">
@@ -119,11 +149,29 @@
       document.getElementById('log').textContent;
   }
 
-  // The shell calls this for events (permission results, backup restored, ...)
+  var timerInterval = null;
+  var remaining = 0;
+  var timerPaused = false;
+
+  // The shell calls this for events (permission results, backup restored,
+  // notification button taps, ...)
   window.onAndroidEvent = function (name, payload) {
     log('event: ' + name + ' -> ' + JSON.stringify(payload));
     if (name === 'backupRestored') {
       log('Data restored - re-reading storage now would happen here.');
+    }
+    if (name === 'timerAction') {
+      if (payload === 'pause') {
+        timerPaused = true;
+        AndroidBridge.pauseTimer('Pomodoro paused', formatRemaining());
+      }
+      if (payload === 'resume') {
+        timerPaused = false;
+        AndroidBridge.updateTimer('Pomodoro running', formatRemaining());
+      }
+      if (payload === 'stop') {
+        stopTimerDemo();
+      }
     }
   };
 
@@ -149,26 +197,63 @@
     log('Alarm #42 scheduled for +15s. Close the app and wait.');
   }
 
-  var timerInterval = null;
+  function formatRemaining() {
+    return remaining + 's remaining';
+  }
+
   function startTimerDemo() {
-    var remaining = 60;
-    AndroidBridge.startTimer('Pomodoro running', remaining + 's remaining');
+    remaining = 60;
+    timerPaused = false;
+    AndroidBridge.startTimer('Pomodoro running', formatRemaining());
+    if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(function () {
+      if (timerPaused) return;
       remaining--;
       if (remaining <= 0) {
         stopTimerDemo();
         AndroidBridge.showNotification(2, 'Timer done', 'Your 60s timer finished.');
+        AndroidBridge.playCompletionSound(); // silent no-op unless a sound is set
         return;
       }
-      AndroidBridge.updateTimer('Pomodoro running', remaining + 's remaining');
+      AndroidBridge.updateTimer('Pomodoro running', formatRemaining());
     }, 1000);
-    log('Foreground timer started.');
+    log('Foreground timer started. Try the notification buttons.');
   }
 
   function stopTimerDemo() {
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     AndroidBridge.stopTimer();
     log('Timer stopped.');
+  }
+
+  // --- v2 startup: drain queued events + reflect flags into checkboxes ---
+  if (hasBridge) {
+    try {
+      var pending = JSON.parse(AndroidBridge.getPendingEvents());
+      pending.forEach(function (ev) {
+        window.onAndroidEvent(ev.name, JSON.parse(ev.payload));
+      });
+      if (pending.length) log(pending.length + ' queued event(s) delivered.');
+    } catch (e) { log('pending events error: ' + e.message); }
+
+    try {
+      var flags = JSON.parse(AndroidBridge.getAllFlags());
+      var boxes = {
+        'f-notif': 'notificationsEnabled',
+        'f-alarm': 'alarmsEnabled',
+        'f-timer': 'timerNotificationEnabled',
+        'f-sound': 'soundEnabled'
+      };
+      Object.keys(boxes).forEach(function (id) {
+        var el = document.getElementById(id);
+        var key = boxes[id];
+        el.checked = flags[key] !== false; // default true
+        el.addEventListener('change', function () {
+          AndroidBridge.setFlag(key, el.checked);
+          log(key + ' = ' + el.checked);
+        });
+      });
+    } catch (e) { log('flags error: ' + e.message); }
   }
 </script>
 </body>

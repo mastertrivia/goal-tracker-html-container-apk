@@ -13,6 +13,8 @@
     <!-- Foreground service for the visible running timer -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!-- Vibration for the alarm notification channel -->
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name=".ShellApp"
@@ -35,6 +37,10 @@
 
         <receiver
             android:name=".AlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".TimerActionReceiver"
             android:exported="false" />
 
         <receiver

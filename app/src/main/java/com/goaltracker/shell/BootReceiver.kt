@@ -11,7 +11,14 @@ import android.content.Intent
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            AlarmScheduler.rescheduleAll(context)
+            try {
+                // New boot = monotonic clock reset. Refresh the boot id so
+                // the HTML app's time-safety logic can detect the reboot.
+                TimeSafety.refreshBootId(context)
+                AlarmScheduler.rescheduleAll(context)
+            } catch (e: Exception) {
+                ErrorLog.log(context, "BootReceiver", e.message ?: "unknown")
+            }
         }
     }
 }

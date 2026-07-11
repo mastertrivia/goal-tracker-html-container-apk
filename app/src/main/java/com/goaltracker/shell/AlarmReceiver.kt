@@ -9,33 +9,51 @@ import androidx.core.app.NotificationCompat
 
 /**
  * Fires when a scheduled alarm goes off (even if the app is closed).
- * Posts a notification that opens the app when tapped.
+ * Posts a loud alarm-class notification (sound + vibration, from the
+ * dedicated alarm channel) with a Dismiss action.
  */
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        val id = intent.getIntExtra("id", 0)
-        val title = intent.getStringExtra("title") ?: "Reminder"
-        val text = intent.getStringExtra("text") ?: ""
+        try {
+            val id = intent.getIntExtra("id", 0)
+            val title = intent.getStringExtra("title") ?: "Reminder"
+            val text = intent.getStringExtra("text") ?: ""
 
-        AlarmScheduler.markFired(context, id)
+            AlarmScheduler.markFired(context, id)
 
-        val openApp = PendingIntent.getActivity(
-            context, 0,
-            Intent(context, MainActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+            // User can disable alarms from the HTML settings screen.
+            if (!Flags.get(context, "alarmsEnabled")) return
 
-        val notification = NotificationCompat.Builder(context, ShellApp.CHANNEL_ALERTS)
-            .setSmallIcon(android.R.drawable.ic_popup_reminder)
-            .setContentTitle(title)
-            .setContentText(text)
-            .setContentIntent(openApp)
-            .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .build()
+            val openApp = PendingIntent.getActivity(
+                context, 0,
+                Intent(context, MainActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
 
-        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        nm.notify(id, notification)
+            val dismiss = PendingIntent.getBroadcast(
+                context, id,
+                Intent(context, TimerActionReceiver::class.java)
+                    .setAction(TimerActionReceiver.ACTION_DISMISS_ALARM)
+                    .putExtra("id", id),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val notification = NotificationCompat.Builder(context, ShellApp.CHANNEL_ALARM)
+                .setSmallIcon(android.R.drawable.ic_popup_reminder)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setContentIntent(openApp)
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .addAction(0, "Dismiss", dismiss)
+                .build()
+
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            nm.notify(id, notification)
+        } catch (e: Exception) {
+            ErrorLog.log(context, "AlarmReceiver", e.message ?: "unknown")
+        }
     }
 }

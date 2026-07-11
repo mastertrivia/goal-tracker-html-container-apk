@@ -7,13 +7,17 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.webkit.WebResourceErrorCompat
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewClientCompat
 import org.json.JSONObject
@@ -59,6 +63,26 @@ class MainActivity : AppCompatActivity() {
             notifyJs("notificationPermission", if (granted) "\"granted\"" else "\"denied\"")
         }
 
+    private var pendingDiagnostics: String = ""
+
+    private val exportDiagnosticsLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
+            if (uri != null) {
+                try {
+                    contentResolver.openOutputStream(uri)!!.use {
+                        it.write(pendingDiagnostics.toByteArray())
+                    }
+                    toast("Diagnostics exported")
+                } catch (e: Exception) {
+                    ErrorLog.log(this, "exportDiagnostics", e.message ?: "unknown")
+                    toast("Export failed: ${e.message}")
+                }
+            }
+        }
+
+    /** Guards against showing the load-failure dialog repeatedly. */
+    private var recoveryDialogShowing = false
+
     // ---------- Lifecycle ----------
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,6 +114,29 @@ class MainActivity : AppCompatActivity() {
                 view: WebView,
                 request: WebResourceRequest
             ): WebResourceResponse? = assetLoader.shouldInterceptRequest(request.url)
+
+            override fun onReceivedError(
+                view: WebView,
+                request: WebResourceRequest,
+                error: WebResourceErrorCompat
+            ) {
+                // Only react to the main page failing, not sub-resources.
+                if (request.isForMainFrame) {
+                    ErrorLog.log(this@MainActivity, "WebView.onReceivedError", request.url.toString())
+                    showLoadFailureDialog()
+                }
+            }
+
+            override fun onRenderProcessGone(
+                view: WebView,
+                detail: RenderProcessGoneDetail
+            ): Boolean {
+                // The WebView renderer crashed. Log it and recreate the
+                // activity (a fresh WebView) instead of crashing the app.
+                ErrorLog.log(this@MainActivity, "WebView.renderProcessGone", "renderer crashed")
+                recreate()
+                return true
+            }
         }
 
         webView.addJavascriptInterface(JsBridge(this), "AndroidBridge")
@@ -97,8 +144,44 @@ class MainActivity : AppCompatActivity() {
         loadApp()
     }
 
+    override fun onResume() {
+        super.onResume()
+        // While we're visible, notification button taps reach JS instantly.
+        // (If we're not visible, TimerActionReceiver queues them and JS
+        // drains the queue via getPendingEvents() on next load.)
+        TimerActionReceiver.liveDelivery = { action ->
+            notifyJs("timerAction", "\"$action\"")
+        }
+    }
+
+    override fun onPause() {
+        TimerActionReceiver.liveDelivery = null
+        super.onPause()
+    }
+
     private fun loadApp() {
+        recoveryDialogShowing = false
         webView.loadUrl("https://appassets.androidplatform.net/app/index.html")
+    }
+
+    /** Shown when the main page fails to load (e.g. a broken HTML import). */
+    private fun showLoadFailureDialog() {
+        if (recoveryDialogShowing || isFinishing) return
+        recoveryDialogShowing = true
+        AlertDialog.Builder(this)
+            .setTitle("App failed to load")
+            .setMessage(
+                "The current HTML app could not be loaded. You can retry, " +
+                    "or restore the built-in app. Your data is not affected."
+            )
+            .setPositiveButton("Retry") { _, _ -> loadApp() }
+            .setNegativeButton("Restore built-in app") { _, _ ->
+                appDir.deleteRecursively()
+                copyBundledApp()
+                loadApp()
+            }
+            .setOnDismissListener { recoveryDialogShowing = false }
+            .show()
     }
 
     /** First run: copy the bundled fallback app from assets/ to filesDir/app. */
@@ -126,19 +209,119 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_reload -> loadApp()
-            R.id.action_import_html ->
+            R.id.action_import_html -> typedConfirm(
+                "Import HTML/ZIP",
+                "This replaces the current app files. Your data is kept. " +
+                    "Type IMPORT to continue.",
+                "IMPORT"
+            ) {
                 importHtmlLauncher.launch(arrayOf("text/html", "application/zip"))
+            }
             R.id.action_export_backup -> launchExportBackup()
-            R.id.action_import_backup -> launchImportBackup()
-            R.id.action_reset -> {
-                appDir.deleteRecursively()
-                copyBundledApp()
-                loadApp()
-                toast("Restored bundled app (your data was kept)")
+            R.id.action_import_backup -> typedConfirm(
+                "Restore backup",
+                "This overwrites current data with the backup's contents. " +
+                    "Type RESTORE to continue.",
+                "RESTORE"
+            ) {
+                launchImportBackup()
+            }
+            R.id.action_system_check -> showSystemCheck()
+            R.id.action_reset -> AlertDialog.Builder(this)
+                .setTitle("Restore built-in app")
+                .setMessage("Replaces the current HTML app with the bundled one. Your data is kept.")
+                .setPositiveButton("Restore") { _, _ ->
+                    appDir.deleteRecursively()
+                    copyBundledApp()
+                    loadApp()
+                    toast("Restored bundled app (your data was kept)")
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+            R.id.action_factory_reset -> typedConfirm(
+                "Factory reset",
+                "Deletes ALL app data and the imported HTML app. " +
+                    "Tip: export a backup first (menu > Export backup). " +
+                    "A last-chance internal copy is kept at auto-backup-before-reset.json. " +
+                    "Type FACTORY RESET to continue.",
+                "FACTORY RESET"
+            ) {
+                factoryReset()
             }
             else -> return super.onOptionsItemSelected(item)
         }
         return true
+    }
+
+    /** Dialog that requires typing an exact word before a destructive action. */
+    private fun typedConfirm(
+        title: String,
+        message: String,
+        requiredWord: String,
+        onConfirmed: () -> Unit
+    ) {
+        val input = EditText(this).apply { hint = requiredWord }
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setView(input)
+            .setPositiveButton("Confirm") { _, _ ->
+                if (input.text.toString().trim() == requiredWord) {
+                    onConfirmed()
+                } else {
+                    toast("Cancelled: you must type $requiredWord")
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showSystemCheck() {
+        try {
+            val json = JSONObject(JsBridge(this).getDiagnostics())
+            val sb = StringBuilder()
+            for (key in json.keys()) sb.append(key).append(": ").append(json.get(key)).append('\n')
+            val text = sb.toString()
+            AlertDialog.Builder(this)
+                .setTitle("System Check")
+                .setMessage(text)
+                .setPositiveButton("Close", null)
+                .setNeutralButton("Export as file") { _, _ ->
+                    pendingDiagnostics = text
+                    exportDiagnosticsLauncher.launch("goal-tracker-diagnostics.txt")
+                }
+                .show()
+        } catch (e: Exception) {
+            ErrorLog.log(this, "showSystemCheck", e.message ?: "unknown")
+            toast("System check failed: ${e.message}")
+        }
+    }
+
+    private fun factoryReset() {
+        try {
+            // Last-chance internal copy (survives until the next factory reset).
+            val data = JSONObject()
+            appDataDir.listFiles()?.filter { it.extension == "json" }?.forEach { f ->
+                data.put(f.nameWithoutExtension, f.readText())
+            }
+            File(filesDir, "auto-backup-before-reset.json").writeText(
+                JSONObject()
+                    .put("app", "goal-tracker-shell")
+                    .put("exportedAt", System.currentTimeMillis())
+                    .put("data", data)
+                    .toString(2)
+            )
+            appDataDir.deleteRecursively()
+            appDir.deleteRecursively()
+            getSharedPreferences("scheduled_alarms", MODE_PRIVATE).edit().clear().apply()
+            getSharedPreferences("shell_pending_events", MODE_PRIVATE).edit().clear().apply()
+            copyBundledApp()
+            loadApp()
+            toast("Factory reset complete")
+        } catch (e: Exception) {
+            ErrorLog.log(this, "factoryReset", e.message ?: "unknown")
+            toast("Factory reset failed: ${e.message}")
+        }
     }
 
     // ---------- HTML / ZIP import ----------
