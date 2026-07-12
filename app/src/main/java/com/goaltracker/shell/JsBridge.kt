@@ -51,23 +51,40 @@ class JsBridge(private val activity: MainActivity) {
         fallback
     }
 
+    /**
+     * Runs [block] on the UI thread with the try/catch INSIDE the posted
+     * runnable. A plain `safe { runOnUiThread { ... } }` only protects the
+     * posting - the lambda body executes later, outside the try/catch, so
+     * an exception there would crash the app and break the "bridge never
+     * crashes" guarantee. This helper closes that gap.
+     */
+    private fun safeUi(where: String, block: () -> Unit) {
+        try {
+            activity.runOnUiThread {
+                try {
+                    block()
+                } catch (e: Exception) {
+                    ErrorLog.log(activity, where, e.message ?: e.javaClass.simpleName)
+                }
+            }
+        } catch (e: Exception) {
+            ErrorLog.log(activity, where, e.message ?: e.javaClass.simpleName)
+        }
+    }
+
     // ---------------- Toasts ----------------
 
     @JavascriptInterface
     fun showToast(message: String) {
-        safe("showToast", Unit) {
-            activity.runOnUiThread {
-                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
-            }
+        safeUi("showToast") {
+            Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
         }
     }
 
     @JavascriptInterface
     fun showToastLong(message: String) {
-        safe("showToastLong", Unit) {
-            activity.runOnUiThread {
-                Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
-            }
+        safeUi("showToastLong") {
+            Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -108,17 +125,13 @@ class JsBridge(private val activity: MainActivity) {
     /** Opens a "save file" dialog; writes ALL data keys into one JSON file. */
     @JavascriptInterface
     fun exportBackup() {
-        safe("exportBackup", Unit) {
-            activity.runOnUiThread { activity.launchExportBackup() }
-        }
+        safeUi("exportBackup") { activity.launchExportBackup() }
     }
 
     /** Opens a file picker; restores data keys from a backup JSON file. */
     @JavascriptInterface
     fun importBackup() {
-        safe("importBackup", Unit) {
-            activity.runOnUiThread { activity.launchImportBackup() }
-        }
+        safeUi("importBackup") { activity.launchImportBackup() }
     }
 
     // ---------------- Notifications ----------------
@@ -126,8 +139,8 @@ class JsBridge(private val activity: MainActivity) {
     /** Ask for notification permission (needed once on Android 13+). */
     @JavascriptInterface
     fun requestNotificationPermission() {
-        safe("requestNotificationPermission", Unit) {
-            activity.runOnUiThread { activity.requestNotificationPermissionIfNeeded() }
+        safeUi("requestNotificationPermission") {
+            activity.requestNotificationPermissionIfNeeded()
         }
     }
 
@@ -364,5 +377,5 @@ class JsBridge(private val activity: MainActivity) {
     // ---------------- Misc ----------------
 
     @JavascriptInterface
-    fun getShellVersion(): String = "2.0"
+    fun getShellVersion(): String = "2.1"
 }

@@ -1,4 +1,4 @@
-# CAPABILITY_LIST.md — Native Features (Shell v2.0)
+# CAPABILITY_LIST.md — Native Features (Shell v2.1)
 
 > Verified against the actual Kotlin source. Each capability lists the real
 > bridge method(s) that provide it. There is **no `getCapabilities()` method**

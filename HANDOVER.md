@@ -2,9 +2,10 @@
 
 > Paste this entire document into any AI assistant (or hand it to any developer)
 > and they will have the complete context of this project.
-> Last updated: July 2026. Project state: WORKING — shell v2.0 (versionCode 2).
+> Last updated: July 2026. Project state: WORKING — shell v2.1 (versionCode 3).
 > v1 built and ran on device; v2 adds stability + notification actions + time
-> safety + flags (see section 3).
+> safety + flags (see section 3). v2.1 is a stability/bug-fix release
+> (see "New in v2.1" in section 3).
 
 > ### Companion documents (read these for integration work)
 > - **BRIDGE_API.md** — the official, code-verified HTML↔Android contract
@@ -152,10 +153,41 @@ capabilities. Never put business logic (timers, goals, scheduling decisions) in 
   Factory Reset (typed confirmation "FACTORY RESET", makes an internal
   last-chance copy `auto-backup-before-reset.json` before wiping).
 - **Typed confirmations** for destructive actions: Import HTML ("IMPORT"),
-  Restore backup ("RESTORE"), Factory reset ("FACTORY RESET").
+  Restore backup ("RESTORE"), Reset to bundled app ("RESTORE BUNDLED APP", v2.1),
+  Factory reset ("FACTORY RESET").
 - **Diagnostics**: `getDiagnostics()` returns shell version, Android version,
   device, notification/exact-alarm permission state, data key count, error log
   count, custom sound state, boot id, and all flags.
+
+### New in v2.1 (stability / bug-fix release, verified against source)
+- **Export-backup crash FIXED (root cause)**: launching the system file picker
+  (`CreateDocument("application/json")`) threw an uncaught
+  `ActivityNotFoundException` on devices whose documents provider rejects that
+  MIME type — an immediate crash. All picker launches now go through a
+  `safeLaunch()` guard in `MainActivity`; export additionally retries with a
+  generic `*/*` CreateDocument fallback before reporting a clear error toast.
+- **Bridge never-crash guarantee actually enforced**: `safe { runOnUiThread { … } }`
+  only protected the *posting* of the runnable — the lambda body ran later,
+  outside the try/catch. New `safeUi()` helper in `JsBridge` puts the try/catch
+  INSIDE the posted runnable (used by `showToast`, `showToastLong`,
+  `exportBackup`, `importBackup`, `requestNotificationPermission`).
+  `notifyJs` in `MainActivity` is similarly guarded.
+- **"Reset to bundled app" now requires typing `RESTORE BUNDLED APP`**
+  (previously a plain OK/Cancel dialog — inconsistent with the other
+  destructive actions and confusable with Factory Reset).
+- **HTML/ZIP import is now validate-then-swap**: imports are staged into
+  `filesDir/app_import_tmp`, validated (`index.html` must exist), and only then
+  swapped into `filesDir/app/`. A broken or invalid file can no longer destroy
+  the currently working HTML app (previously the app dir was wiped BEFORE
+  validation, and a bad ZIP silently reverted you to the bundled test app).
+- **Factory reset completeness**: now also cancels alarms already registered
+  with AlarmManager (previously only the prefs list was cleared, so pending
+  alarms still fired), stops a running timer notification, clears feature
+  flags, and deletes the custom completion sound. The error log is
+  intentionally kept for post-reset diagnostics.
+- `getShellVersion()` now returns `"2.1"`; versionCode 3.
+- No bridge methods were added, renamed, or removed — full backward
+  compatibility with all v2.0 HTML apps.
 
 ### Explicitly REJECTED features (do not re-add without owner approval)
 | Feature | Why rejected |
@@ -198,7 +230,7 @@ capabilities. Never put business logic (timers, goals, scheduling decisions) in 
 | `AndroidBridge.playCompletionSound()` → boolean | v2: play it (false = no sound/failed, always silent-safe) |
 | `AndroidBridge.stopCompletionSound()` | v2: stop playback |
 | `AndroidBridge.clearSoundFile()` → boolean | v2: remove the stored sound |
-| `AndroidBridge.getShellVersion()` → "2.0" | Shell version string |
+| `AndroidBridge.getShellVersion()` → "2.1" | Shell version string |
 
 ### APK build process (GitHub Actions — no PC needed)
 - Repo is PRIVATE on GitHub. Workflow: `.github/workflows/build-apk.yml`
@@ -421,7 +453,7 @@ Your data is kept automatically.
    download `goal-tracker-apk` → unzip → install `app-release.apk`
 4. Android installs it as an UPDATE (same key + id) — nothing is lost
 
-**If the build fails**: open the failed run → click the red step → read the last
+**If the build fails**: open the failed run → click the red step ��� read the last
 ~30 lines of the log — that is the actual error. Common past issues: missing
 gradle wrapper files (now committed), Kotlin name clash with Context methods
 (see `appDataDir` note in section 4).

@@ -53,6 +53,15 @@ class MainActivity : AppCompatActivity() {
             if (uri != null) writeBackupTo(uri)
         }
 
+    // Fallback for devices whose documents provider does not accept the
+    // "application/json" MIME type (launching the picker then throws an
+    // ActivityNotFoundException - this was the "export crashes immediately"
+    // bug). The generic type is accepted everywhere DocumentsUI exists.
+    private val exportBackupFallbackLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
+            if (uri != null) writeBackupTo(uri)
+        }
+
     private val importBackupLauncher =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             if (uri != null) restoreBackupFrom(uri)
@@ -215,7 +224,10 @@ class MainActivity : AppCompatActivity() {
                     "Type IMPORT to continue.",
                 "IMPORT"
             ) {
-                importHtmlLauncher.launch(arrayOf("text/html", "application/zip"))
+                val ok = safeLaunch("launchImportHtml") {
+                    importHtmlLauncher.launch(arrayOf("text/html", "application/zip"))
+                }
+                if (!ok) toast("Import failed: no file picker available on this device")
             }
             R.id.action_export_backup -> launchExportBackup()
             R.id.action_import_backup -> typedConfirm(
@@ -227,17 +239,18 @@ class MainActivity : AppCompatActivity() {
                 launchImportBackup()
             }
             R.id.action_system_check -> showSystemCheck()
-            R.id.action_reset -> AlertDialog.Builder(this)
-                .setTitle("Restore built-in app")
-                .setMessage("Replaces the current HTML app with the bundled one. Your data is kept.")
-                .setPositiveButton("Restore") { _, _ ->
-                    appDir.deleteRecursively()
-                    copyBundledApp()
-                    loadApp()
-                    toast("Restored bundled app (your data was kept)")
-                }
-                .setNegativeButton("Cancel", null)
-                .show()
+            R.id.action_reset -> typedConfirm(
+                "Reset to bundled app",
+                "Replaces the current imported HTML app with the built-in one. " +
+                    "Your data is kept. " +
+                    "Type RESTORE BUNDLED APP to continue.",
+                "RESTORE BUNDLED APP"
+            ) {
+                appDir.deleteRecursively()
+                copyBundledApp()
+                loadApp()
+                toast("Restored bundled app (your data was kept)")
+            }
             R.id.action_factory_reset -> typedConfirm(
                 "Factory reset",
                 "Deletes ALL app data and the imported HTML app. " +
@@ -288,7 +301,10 @@ class MainActivity : AppCompatActivity() {
                 .setPositiveButton("Close", null)
                 .setNeutralButton("Export as file") { _, _ ->
                     pendingDiagnostics = text
-                    exportDiagnosticsLauncher.launch("goal-tracker-diagnostics.txt")
+                    val ok = safeLaunch("launchExportDiagnostics") {
+                        exportDiagnosticsLauncher.launch("goal-tracker-diagnostics.txt")
+                    }
+                    if (!ok) toast("Export failed: no file picker available on this device")
                 }
                 .show()
         } catch (e: Exception) {
@@ -311,10 +327,26 @@ class MainActivity : AppCompatActivity() {
                     .put("data", data)
                     .toString(2)
             )
+            // Cancel alarms ALREADY REGISTERED with AlarmManager (clearing
+            // the prefs alone would leave them to fire anyway).
+            getSharedPreferences("scheduled_alarms", MODE_PRIVATE).all.keys.forEach { key ->
+                key.toIntOrNull()?.let { AlarmScheduler.cancel(this, it) }
+            }
+            // Stop a running timer notification, if any.
+            try {
+                startService(
+                    android.content.Intent(this, TimerService::class.java)
+                        .setAction(TimerService.ACTION_STOP)
+                )
+            } catch (_: Exception) {
+            }
             appDataDir.deleteRecursively()
             appDir.deleteRecursively()
+            File(filesDir, "sound").deleteRecursively()
             getSharedPreferences("scheduled_alarms", MODE_PRIVATE).edit().clear().apply()
             getSharedPreferences("shell_pending_events", MODE_PRIVATE).edit().clear().apply()
+            getSharedPreferences("shell_flags", MODE_PRIVATE).edit().clear().apply()
+            // The error log is intentionally KEPT for post-reset diagnostics.
             copyBundledApp()
             loadApp()
             toast("Factory reset complete")
@@ -327,6 +359,10 @@ class MainActivity : AppCompatActivity() {
     // ---------- HTML / ZIP import ----------
 
     private fun importHtmlOrZip(uri: Uri) {
+        // Stage the import into a temp directory and VALIDATE it before
+        // touching the current app. A broken/invalid file therefore can
+        // never destroy the currently working HTML app.
+        val stagingDir = File(filesDir, "app_import_tmp")
         try {
             val type = contentResolver.getType(uri) ?: ""
             val isZip = type.contains("zip") ||
@@ -335,9 +371,8 @@ class MainActivity : AppCompatActivity() {
                     c.moveToFirst() && idx >= 0 && c.getString(idx).endsWith(".zip", true)
                 } == true)
 
-            // Replace the app files, keep the data directory untouched
-            appDir.deleteRecursively()
-            appDir.mkdirs()
+            stagingDir.deleteRecursively()
+            stagingDir.mkdirs()
 
             if (isZip) {
                 contentResolver.openInputStream(uri)!!.use { raw ->
@@ -345,9 +380,9 @@ class MainActivity : AppCompatActivity() {
                         var entry = zip.nextEntry
                         while (entry != null) {
                             if (!entry.isDirectory) {
-                                val out = File(appDir, entry.name)
+                                val out = File(stagingDir, entry.name)
                                 // Protect against zip path traversal
-                                if (out.canonicalPath.startsWith(appDir.canonicalPath)) {
+                                if (out.canonicalPath.startsWith(stagingDir.canonicalPath)) {
                                     out.parentFile?.mkdirs()
                                     out.outputStream().use { zip.copyTo(it) }
                                 }
@@ -357,35 +392,78 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-                if (!File(appDir, "index.html").exists()) {
-                    appDir.deleteRecursively()
-                    copyBundledApp()
-                    toast("ZIP had no index.html - restored previous app")
-                    loadApp()
+                if (!File(stagingDir, "index.html").exists()) {
+                    stagingDir.deleteRecursively()
+                    toast("ZIP had no index.html at its root - current app kept unchanged")
                     return
                 }
             } else {
                 contentResolver.openInputStream(uri)!!.use { input ->
-                    File(appDir, "index.html").outputStream().use { input.copyTo(it) }
+                    File(stagingDir, "index.html").outputStream().use { input.copyTo(it) }
                 }
+            }
+
+            // Validation passed - now swap in the new app files.
+            appDir.deleteRecursively()
+            if (!stagingDir.renameTo(appDir)) {
+                // Rename can fail across some filesystems; fall back to copy.
+                appDir.mkdirs()
+                stagingDir.walkTopDown().filter { it.isFile }.forEach { src ->
+                    val dest = File(appDir, src.relativeTo(stagingDir).path)
+                    dest.parentFile?.mkdirs()
+                    src.copyTo(dest, overwrite = true)
+                }
+                stagingDir.deleteRecursively()
             }
             toast("App updated")
             loadApp()
         } catch (e: Exception) {
-            copyBundledApp()
-            loadApp()
+            ErrorLog.log(this, "importHtmlOrZip", e.message ?: e.javaClass.simpleName)
+            stagingDir.deleteRecursively()
+            // Only restore the bundled app if the current one is actually gone.
+            if (!File(appDir, "index.html").exists()) {
+                copyBundledApp()
+                loadApp()
+            }
             toast("Import failed: ${e.message}")
         }
     }
 
     // ---------- Backup export / import ----------
 
+    /**
+     * Launching a system file picker can throw (ActivityNotFoundException on
+     * devices with a disabled/filtered documents provider). Every .launch()
+     * call in this activity goes through this guard so a missing picker can
+     * never crash the app - it logs and tells the user instead.
+     */
+    private fun safeLaunch(where: String, block: () -> Unit): Boolean = try {
+        block()
+        true
+    } catch (e: Exception) {
+        ErrorLog.log(this, where, e.message ?: e.javaClass.simpleName)
+        false
+    }
+
     fun launchExportBackup() {
-        exportBackupLauncher.launch("goal-tracker-backup.json")
+        // Primary: suggest the JSON MIME type. Fallback: generic type for
+        // pickers that reject "application/json". Never crash.
+        if (safeLaunch("launchExportBackup") {
+                exportBackupLauncher.launch("goal-tracker-backup.json")
+            }
+        ) return
+        if (safeLaunch("launchExportBackup.fallback") {
+                exportBackupFallbackLauncher.launch("goal-tracker-backup.json")
+            }
+        ) return
+        toast("Export failed: no file picker available on this device")
     }
 
     fun launchImportBackup() {
-        importBackupLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
+        val ok = safeLaunch("launchImportBackup") {
+            importBackupLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
+        }
+        if (!ok) toast("Import failed: no file picker available on this device")
     }
 
     private fun writeBackupTo(uri: Uri) {
@@ -403,6 +481,7 @@ class MainActivity : AppCompatActivity() {
             }
             toast("Backup exported")
         } catch (e: Exception) {
+            ErrorLog.log(this, "writeBackupTo", e.message ?: e.javaClass.simpleName)
             toast("Export failed: ${e.message}")
         }
     }
@@ -420,6 +499,7 @@ class MainActivity : AppCompatActivity() {
             // Tell the HTML app so it can re-read its data
             notifyJs("backupRestored", "null")
         } catch (e: Exception) {
+            ErrorLog.log(this, "restoreBackupFrom", e.message ?: e.javaClass.simpleName)
             toast("Restore failed: ${e.message}")
         }
     }
@@ -444,10 +524,14 @@ class MainActivity : AppCompatActivity() {
     /** Fire an event into the HTML app: window.onAndroidEvent(name, payload) */
     private fun notifyJs(event: String, jsonPayload: String) {
         runOnUiThread {
-            webView.evaluateJavascript(
-                "window.onAndroidEvent && window.onAndroidEvent('$event', $jsonPayload);",
-                null
-            )
+            try {
+                webView.evaluateJavascript(
+                    "window.onAndroidEvent && window.onAndroidEvent('$event', $jsonPayload);",
+                    null
+                )
+            } catch (e: Exception) {
+                ErrorLog.log(this, "notifyJs", e.message ?: e.javaClass.simpleName)
+            }
         }
     }
 
