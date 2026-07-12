@@ -19,6 +19,9 @@ class TimerActionReceiver : BroadcastReceiver() {
         const val ACTION_RESUME = "com.goaltracker.shell.TIMER_RESUME"
         const val ACTION_STOP = "com.goaltracker.shell.TIMER_STOP"
         const val ACTION_DISMISS_ALARM = "com.goaltracker.shell.ALARM_DISMISS"
+        // v2.2: "ADD" button on the session-completed notification. Opens the
+        // app and tells the HTML to jump straight to the Reflection popup.
+        const val ACTION_REVIEW_ADD = "com.goaltracker.shell.REVIEW_ADD"
 
         /**
          * Set by MainActivity in onResume, cleared in onPause.
@@ -47,6 +50,21 @@ class TimerActionReceiver : BroadcastReceiver() {
                     val id = intent.getIntExtra("id", 0)
                     val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                     nm.cancel(id)
+                }
+                ACTION_REVIEW_ADD -> {
+                    // v2.2: dismiss the notification, deliver "reviewAdd" to
+                    // the HTML (exactly-once via the pending queue when the
+                    // WebView is dead), then open/foreground the app so the
+                    // Reflection popup can be shown.
+                    val id = intent.getIntExtra("id", 0)
+                    val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    nm.cancel(id)
+                    deliver(context, "reviewAdd")
+                    context.startActivity(
+                        Intent(context, MainActivity::class.java).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        }
+                    )
                 }
             }
         } catch (e: Exception) {

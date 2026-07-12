@@ -13,6 +13,9 @@ import java.util.UUID
  *  - "alarmsEnabled"             gate for scheduleAlarm() + AlarmReceiver
  *  - "timerNotificationEnabled"  gate for startTimer()
  *  - "soundEnabled"              gate for playCompletionSound()
+ *  - "nativeToastsEnabled"       gate for informational native Toasts (hard
+ *                                errors ignore it); mirrors the HTML
+ *                                "Show pop-up messages" preference.
  */
 object Flags {
 

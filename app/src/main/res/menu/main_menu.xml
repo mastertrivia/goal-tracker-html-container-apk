@@ -18,15 +18,15 @@
         android:title="@string/menu_import_backup"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_system_check"
-        android:title="@string/menu_system_check"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_reset"
         android:title="@string/menu_reset"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_factory_reset"
         android:title="@string/menu_factory_reset"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_system_check"
+        android:title="@string/menu_system_check"
         app:showAsAction="never" />
 </menu>

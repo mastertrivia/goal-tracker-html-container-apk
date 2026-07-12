@@ -42,13 +42,21 @@ class AlarmReceiver : BroadcastReceiver() {
             val notification = NotificationCompat.Builder(context, ShellApp.CHANNEL_ALARM)
                 .setSmallIcon(android.R.drawable.ic_popup_reminder)
                 .setContentTitle(title)
-                .setContentText(text)
+                .setContentText(text.substringBefore('\n'))
+                // v2.2: BigTextStyle so multi-line alarm text renders fully.
+                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
                 .setContentIntent(openApp)
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .addAction(0, "Dismiss", dismiss)
                 .build()
+
+            // v2.2 fix for "alarm only plays ~3 seconds": notification sounds
+            // play once by default (typically a short tone). FLAG_INSISTENT
+            // makes the channel's alarm sound LOOP until the user dismisses
+            // or taps the notification - real alarm-clock behavior.
+            notification.flags = notification.flags or android.app.Notification.FLAG_INSISTENT
 
             val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             nm.notify(id, notification)

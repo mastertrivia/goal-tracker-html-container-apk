@@ -76,10 +76,13 @@ class TimerService : Service() {
             Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+        // v2.2: BigTextStyle so multi-line content (e.g. the Bomb line above a
+        // paused activity line) renders fully instead of being cut to one line.
         val builder = NotificationCompat.Builder(this, ShellApp.CHANNEL_TIMER)
             .setSmallIcon(android.R.drawable.ic_menu_recent_history)
             .setContentTitle(title)
-            .setContentText(text)
+            .setContentText(text.substringBefore('\n'))
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .setContentIntent(openApp)
             .setOngoing(true)
             .setOnlyAlertOnce(true)

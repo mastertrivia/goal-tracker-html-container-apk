@@ -1,7 +1,11 @@
 package com.goaltracker.shell
 
 import android.Manifest
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -11,7 +15,6 @@ import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -36,6 +39,13 @@ import java.util.zip.ZipInputStream
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
+    // v2.3: kept so the shell can drive the reliable sound player (preview /
+    // selection) directly from the native sound chooser.
+    private lateinit var jsBridge: JsBridge
+    // Which sound slot the currently-open chooser is editing. Set by a tiny
+    // injected listener on the two known HTML file inputs (see onPageFinished).
+    private var pendingSoundSlot: String = SoundLibrary.SLOT_COMPLETION
+
     private val appDir: File get() = File(filesDir, "app")
     // Named appDataDir (not dataDir) to avoid clashing with Android's
     // built-in Context.getDataDir(), which causes a duplicate JVM signature.
@@ -67,9 +77,61 @@ class MainActivity : AppCompatActivity() {
             if (uri != null) restoreBackupFrom(uri)
         }
 
+    // v2.3: "Choose from device" - the system ringtone/alarm picker. Requires
+    // no storage permission and only returns a stable MediaStore Uri.
+    private val ringtonePickerLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val uri: Uri? = if (Build.VERSION.SDK_INT >= 33) {
+                    result.data?.getParcelableExtra(
+                        RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java
+                    )
+                } else {
+                    @Suppress("DEPRECATION")
+                    result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+                }
+                if (uri != null) {
+                    jsBridge.selectDeviceSound(pendingSoundSlot, uri.toString())
+                    toast("Device sound set", force = true)
+                } else {
+                    // "Silent" or no selection - keep the current sound.
+                    toast("No device sound selected")
+                }
+            }
+        }
+
+    // Fallback for phones with no ringtone picker: pick an audio file via the
+    // document picker and persist read access so the alarm survives reboots.
+    private val deviceAudioFallbackLauncher =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri != null) {
+                try {
+                    contentResolver.takePersistableUriPermission(
+                        uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                } catch (_: Exception) {
+                }
+                jsBridge.selectDeviceSound(pendingSoundSlot, uri.toString())
+                toast("Device sound set", force = true)
+            }
+        }
+
     private val notifPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             notifyJs("notificationPermission", if (granted) "\"granted\"" else "\"denied\"")
+        }
+
+    // ---------- HTML <input type="file"> support (v2.2) ----------
+    // Without a WebChromeClient.onShowFileChooser implementation the WebView
+    // silently ignores every file input - this was why "Choose Sound" in the
+    // HTML settings appeared to be a dummy button. The callback MUST always be
+    // invoked (even with null) or the WebView blocks all future file inputs.
+    private var filePathCallback: android.webkit.ValueCallback<Array<Uri>>? = null
+
+    private val fileChooserLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            filePathCallback?.onReceiveValue(if (uri != null) arrayOf(uri) else null)
+            filePathCallback = null
         }
 
     private var pendingDiagnostics: String = ""
@@ -84,7 +146,7 @@ class MainActivity : AppCompatActivity() {
                     toast("Diagnostics exported")
                 } catch (e: Exception) {
                     ErrorLog.log(this, "exportDiagnostics", e.message ?: "unknown")
-                    toast("Export failed: ${e.message}")
+                    toast("Export failed: ${e.message}", force = true)
                 }
             }
         }
@@ -146,9 +208,84 @@ class MainActivity : AppCompatActivity() {
                 recreate()
                 return true
             }
+
+            override fun onPageFinished(view: WebView, url: String) {
+                // v2.3: The two sound settings in the HTML are plain
+                // <input type="file"> elements (ids "andSoundFile" and
+                // "andBombSoundFile"). We do NOT modify the HTML; we just
+                // tag which one was tapped so the native sound chooser knows
+                // which slot it is editing. Harmless if the ids are absent.
+                view.evaluateJavascript(
+                    """
+                    (function(){
+                      try{
+                        var map={andSoundFile:'completion',andBombSoundFile:'bombwarn'};
+                        Object.keys(map).forEach(function(id){
+                          var el=document.getElementById(id);
+                          if(el && !el.__slotTagged){
+                            el.__slotTagged=true;
+                            el.addEventListener('click',function(){
+                              try{AndroidBridge.noteSoundSlot(map[id]);}catch(e){}
+                            },true);
+                          }
+                        });
+                      }catch(e){}
+                    })();
+                    """.trimIndent(),
+                    null
+                )
+            }
         }
 
-        webView.addJavascriptInterface(JsBridge(this), "AndroidBridge")
+        // v2.2: file chooser support so HTML <input type="file"> works
+        // (custom sounds, future imports). Everything else stays default.
+        webView.webChromeClient = object : android.webkit.WebChromeClient() {
+            override fun onShowFileChooser(
+                view: WebView,
+                callback: android.webkit.ValueCallback<Array<Uri>>,
+                params: FileChooserParams
+            ): Boolean {
+                // Cancel any previous pending chooser (spec requirement).
+                filePathCallback?.onReceiveValue(null)
+                filePathCallback = callback
+
+                // v2.3: audio inputs (the sound settings) open our native
+                // chooser: reliable built-in sounds + "Choose from device".
+                // Native owns the selection, so we release the WebView's file
+                // callback with null and never hand it a file.
+                val types = params.acceptTypes?.joinToString(",") ?: ""
+                if (types.contains("audio")) {
+                    filePathCallback?.onReceiveValue(null)
+                    filePathCallback = null
+                    showSoundChooserDialog()
+                    return true
+                }
+
+                val mime = params.acceptTypes?.firstOrNull()?.takeIf { it.isNotBlank() } ?: "*/*"
+                val ok = try {
+                    fileChooserLauncher.launch(mime)
+                    true
+                } catch (e: Exception) {
+                    ErrorLog.log(this@MainActivity, "onShowFileChooser", e.message ?: "launch failed")
+                    try {
+                        fileChooserLauncher.launch("*/*")
+                        true
+                    } catch (e2: Exception) {
+                        ErrorLog.log(this@MainActivity, "onShowFileChooser.fallback", e2.message ?: "launch failed")
+                        false
+                    }
+                }
+                if (!ok) {
+                    filePathCallback?.onReceiveValue(null)
+                    filePathCallback = null
+                    toast("No file picker available on this device", force = true)
+                }
+                return true
+            }
+        }
+
+        jsBridge = JsBridge(this)
+        webView.addJavascriptInterface(jsBridge, "AndroidBridge")
 
         loadApp()
     }
@@ -171,6 +308,103 @@ class MainActivity : AppCompatActivity() {
     private fun loadApp() {
         recoveryDialogShowing = false
         webView.loadUrl("https://appassets.androidplatform.net/app/index.html")
+    }
+
+    /** Called from the bridge when a specific HTML sound input is tapped. */
+    fun setPendingSoundSlot(slot: String) {
+        pendingSoundSlot =
+            if (slot == SoundLibrary.SLOT_BOMB) SoundLibrary.SLOT_BOMB
+            else SoundLibrary.SLOT_COMPLETION
+    }
+
+    // ---------- v2.3: native sound chooser ----------
+
+    /**
+     * The native "Set sound" dialog reached from the HTML sound settings.
+     * Lists the 10 always-available bundled sounds (tap to preview) plus a
+     * "Choose from device" option. Built-in sounds are the recommended,
+     * permission-free, factory-reset-proof default; the device option is an
+     * optional advanced feature that degrades gracefully when unsupported.
+     */
+    private fun showSoundChooserDialog() {
+        val slot = pendingSoundSlot
+        val builtins = SoundLibrary.BUILTINS
+        val labels = builtins.map { b ->
+            (if (b.isLong) "Alarm - " else "Notification - ") + b.label
+        }.toTypedArray()
+
+        // Preselect the current built-in selection, if any.
+        val current = SoundLibrary.getSelection(this, slot)
+        var checked = if (current.type == SoundLibrary.TYPE_BUILTIN)
+            builtins.indexOfFirst { it.key == current.value }.coerceAtLeast(0)
+        else -1
+
+        val title = if (slot == SoundLibrary.SLOT_BOMB)
+            "Bomb warning sound" else "Completion sound"
+
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setSingleChoiceItems(labels, checked) { _, which ->
+                checked = which
+                // Preview through the reliable player (stops any prior preview).
+                jsBridge.previewBuiltinSound(builtins[which].key)
+            }
+            .setPositiveButton("Use this sound") { d, _ ->
+                jsBridge.stopSound()
+                if (checked in builtins.indices) {
+                    jsBridge.selectBuiltinSound(slot, builtins[checked].key)
+                    toast("Sound set: ${builtins[checked].label}", force = true)
+                }
+                d.dismiss()
+            }
+            .setNeutralButton("Choose from device") { d, _ ->
+                jsBridge.stopSound()
+                d.dismiss()
+                launchDeviceSoundPicker()
+            }
+            .setNegativeButton("Cancel") { d, _ ->
+                jsBridge.stopSound()
+                d.dismiss()
+            }
+            .setOnDismissListener { jsBridge.stopSound() }
+            .show()
+    }
+
+    /**
+     * Opens the system ringtone/alarm picker ("Choose from device"). Falls
+     * back to the document picker, and finally to the built-in chooser, so a
+     * phone with a broken/missing picker never ends up with no way to choose.
+     */
+    private fun launchDeviceSoundPicker() {
+        val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+            putExtra(
+                RingtoneManager.EXTRA_RINGTONE_TYPE,
+                RingtoneManager.TYPE_ALARM or RingtoneManager.TYPE_RINGTONE or
+                    RingtoneManager.TYPE_NOTIFICATION
+            )
+            putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Choose from device")
+            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+            val cur = SoundLibrary.getSelection(this@MainActivity, pendingSoundSlot)
+            if (cur.type == SoundLibrary.TYPE_DEVICE) {
+                putExtra(
+                    RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
+                    Uri.parse(cur.value)
+                )
+            }
+        }
+        try {
+            ringtonePickerLauncher.launch(intent)
+        } catch (e: ActivityNotFoundException) {
+            ErrorLog.log(this, "ringtonePicker", "unavailable, trying document picker")
+            try {
+                deviceAudioFallbackLauncher.launch(arrayOf("audio/*"))
+            } catch (e2: Exception) {
+                ErrorLog.log(this, "deviceAudioFallback", e2.message ?: "unavailable")
+                toast("No device sound picker available - using built-in sounds", force = true)
+                showSoundChooserDialog()
+            }
+        }
     }
 
     /** Shown when the main page fails to load (e.g. a broken HTML import). */
@@ -217,76 +451,119 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_reload -> loadApp()
-            R.id.action_import_html -> typedConfirm(
-                "Import HTML/ZIP",
-                "This replaces the current app files. Your data is kept. " +
-                    "Type IMPORT to continue.",
-                "IMPORT"
+            R.id.action_reload -> ConfirmDialog.show(
+                activity = this,
+                accent = ConfirmDialog.BLUE,
+                icon = "\uD83D\uDD04",
+                heading = "Refresh App",
+                english = "Reload the current app without changing anything.",
+                hinglish = "Current HTML ko sirf refresh karega. Bilkul browser " +
+                    "refresh ki tarah. Kuch bhi delete nahi hoga.",
+                summary = listOf(
+                    ConfirmDialog.SummaryLine("HTML", "Preserved"),
+                    ConfirmDialog.SummaryLine("User Data", "Preserved"),
+                ),
+                confirmLabel = "Refresh Now",
+            ) {
+                loadApp()
+            }
+            R.id.action_import_html -> ConfirmDialog.show(
+                activity = this,
+                accent = ConfirmDialog.BLUE,
+                icon = "\uD83D\uDCE5",
+                heading = "Import App (HTML / ZIP)",
+                english = "Import a new HTML or ZIP package. Your current app will be " +
+                    "replaced while keeping all your existing data.",
+                hinglish = "Nayi HTML ya ZIP file import karega. App update ho jayegi, " +
+                    "lekin Tasks, History, Goals aur baaki Data bilkul safe rahega.",
+                summary = listOf(
+                    ConfirmDialog.SummaryLine("HTML", "Replaced"),
+                    ConfirmDialog.SummaryLine("User Data", "Preserved"),
+                ),
+                confirmLabel = "Import",
+                requiredWord = "IMPORT",
             ) {
                 val ok = safeLaunch("launchImportHtml") {
                     importHtmlLauncher.launch(arrayOf("text/html", "application/zip"))
                 }
-                if (!ok) toast("Import failed: no file picker available on this device")
+                if (!ok) toast("Import failed: no file picker available on this device", force = true)
             }
-            R.id.action_export_backup -> launchExportBackup()
-            R.id.action_import_backup -> typedConfirm(
-                "Restore backup",
-                "This overwrites current data with the backup's contents. " +
-                    "Type RESTORE to continue.",
-                "RESTORE"
+            R.id.action_export_backup -> ConfirmDialog.show(
+                activity = this,
+                accent = ConfirmDialog.GREEN,
+                icon = "\uD83D\uDCBE",
+                heading = "Export Data (Save to Device)",
+                english = "Create a backup of your data and save it to your device.",
+                hinglish = "Aapka poora data phone me Backup File ke roop me save hoga. " +
+                    "Isme HTML include nahi hoti.",
+                summary = listOf(
+                    ConfirmDialog.SummaryLine("HTML", "Not Included"),
+                    ConfirmDialog.SummaryLine("User Data", "Saved"),
+                ),
+                confirmLabel = "Export Now",
+            ) {
+                launchExportBackup()
+            }
+            R.id.action_import_backup -> ConfirmDialog.show(
+                activity = this,
+                accent = ConfirmDialog.GREEN,
+                icon = "\uD83D\uDCC2",
+                heading = "Import Data (Restore Backup)",
+                english = "Restore your previously saved backup file.",
+                hinglish = "Pehle save ki hui Backup File se poora data wapas aa jayega. " +
+                    "HTML bilkul change nahi hogi.",
+                summary = listOf(
+                    ConfirmDialog.SummaryLine("HTML", "Preserved"),
+                    ConfirmDialog.SummaryLine("User Data", "Restored"),
+                ),
+                confirmLabel = "Restore",
+                requiredWord = "RESTORE",
             ) {
                 launchImportBackup()
             }
-            R.id.action_system_check -> showSystemCheck()
-            R.id.action_reset -> typedConfirm(
-                "Reset to bundled app",
-                "Replaces the current imported HTML app with the built-in one. " +
-                    "Your data is kept. " +
-                    "Type RESTORE BUNDLED APP to continue.",
-                "RESTORE BUNDLED APP"
+            R.id.action_reset -> ConfirmDialog.show(
+                activity = this,
+                accent = ConfirmDialog.ORANGE,
+                icon = "\uD83C\uDFE0",
+                heading = "Restore Default App",
+                english = "Restore the default Goal Tracker app bundled inside the APK.",
+                hinglish = "Current HTML hata kar APK wali original Goal Tracker App " +
+                    "wapas aa jayegi. Aapka data safe rahega.",
+                summary = listOf(
+                    ConfirmDialog.SummaryLine("HTML", "Restored"),
+                    ConfirmDialog.SummaryLine("User Data", "Preserved"),
+                ),
+                confirmLabel = "Restore Default",
+                requiredWord = "RESTORE DEFAULT",
             ) {
                 appDir.deleteRecursively()
                 copyBundledApp()
                 loadApp()
-                toast("Restored bundled app (your data was kept)")
+                toast("Restored default app (your data was kept)", force = true)
             }
-            R.id.action_factory_reset -> typedConfirm(
-                "Factory reset",
-                "Deletes ALL app data and the imported HTML app. " +
-                    "Tip: export a backup first (menu > Export backup). " +
-                    "A last-chance internal copy is kept at auto-backup-before-reset.json. " +
-                    "Type FACTORY RESET to continue.",
-                "FACTORY RESET"
+            R.id.action_factory_reset -> ConfirmDialog.show(
+                activity = this,
+                accent = ConfirmDialog.RED,
+                icon = "\uD83D\uDDD1\uFE0F",
+                heading = "Factory Reset",
+                english = "Delete all user data while keeping the current app. " +
+                    "Tip: export a backup first. A last-chance internal copy is kept " +
+                    "at auto-backup-before-reset.json.",
+                hinglish = "Sirf Data delete hoga (Tasks, History, Goals, Timers, " +
+                    "Settings, Streaks, etc.). Current HTML bilkul remove nahi hogi.",
+                summary = listOf(
+                    ConfirmDialog.SummaryLine("HTML", "Preserved"),
+                    ConfirmDialog.SummaryLine("User Data", "Deleted"),
+                ),
+                confirmLabel = "Factory Reset",
+                requiredWord = "FACTORY RESET",
             ) {
                 factoryReset()
             }
+            R.id.action_system_check -> showSystemCheck()
             else -> return super.onOptionsItemSelected(item)
         }
         return true
-    }
-
-    /** Dialog that requires typing an exact word before a destructive action. */
-    private fun typedConfirm(
-        title: String,
-        message: String,
-        requiredWord: String,
-        onConfirmed: () -> Unit
-    ) {
-        val input = EditText(this).apply { hint = requiredWord }
-        AlertDialog.Builder(this)
-            .setTitle(title)
-            .setMessage(message)
-            .setView(input)
-            .setPositiveButton("Confirm") { _, _ ->
-                if (input.text.toString().trim() == requiredWord) {
-                    onConfirmed()
-                } else {
-                    toast("Cancelled: you must type $requiredWord")
-                }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
     }
 
     private fun showSystemCheck() {
@@ -304,12 +581,12 @@ class MainActivity : AppCompatActivity() {
                     val ok = safeLaunch("launchExportDiagnostics") {
                         exportDiagnosticsLauncher.launch("goal-tracker-diagnostics.txt")
                     }
-                    if (!ok) toast("Export failed: no file picker available on this device")
+                    if (!ok) toast("Export failed: no file picker available on this device", force = true)
                 }
                 .show()
         } catch (e: Exception) {
             ErrorLog.log(this, "showSystemCheck", e.message ?: "unknown")
-            toast("System check failed: ${e.message}")
+            toast("System check failed: ${e.message}", force = true)
         }
     }
 
@@ -340,19 +617,29 @@ class MainActivity : AppCompatActivity() {
                 )
             } catch (_: Exception) {
             }
+            // Clear ONLY user-generated data. The active HTML app (appDir) is
+            // deliberately NOT touched: factory reset must never replace or
+            // remove the currently imported HTML. Restoring the bundled HTML
+            // is a separate, explicit action ("Restore bundled app").
             appDataDir.deleteRecursively()
-            appDir.deleteRecursively()
             File(filesDir, "sound").deleteRecursively()
             getSharedPreferences("scheduled_alarms", MODE_PRIVATE).edit().clear().apply()
             getSharedPreferences("shell_pending_events", MODE_PRIVATE).edit().clear().apply()
             getSharedPreferences("shell_flags", MODE_PRIVATE).edit().clear().apply()
             // The error log is intentionally KEPT for post-reset diagnostics.
-            copyBundledApp()
+
+            // Safety net only: if the HTML is somehow missing (e.g. a prior
+            // corrupted state), fall back to the bundled app so the user is
+            // never left with an empty screen. A healthy install keeps its
+            // current HTML exactly as-is.
+            if (!File(appDir, "index.html").exists()) {
+                copyBundledApp()
+            }
             loadApp()
-            toast("Factory reset complete")
+            toast("Factory reset complete - your app was kept, data was cleared", force = true)
         } catch (e: Exception) {
             ErrorLog.log(this, "factoryReset", e.message ?: "unknown")
-            toast("Factory reset failed: ${e.message}")
+            toast("Factory reset failed: ${e.message}", force = true)
         }
     }
 
@@ -394,7 +681,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 if (!File(stagingDir, "index.html").exists()) {
                     stagingDir.deleteRecursively()
-                    toast("ZIP had no index.html at its root - current app kept unchanged")
+                    toast("ZIP had no index.html at its root - current app kept unchanged", force = true)
                     return
                 }
             } else {
@@ -425,7 +712,7 @@ class MainActivity : AppCompatActivity() {
                 copyBundledApp()
                 loadApp()
             }
-            toast("Import failed: ${e.message}")
+            toast("Import failed: ${e.message}", force = true)
         }
     }
 
@@ -446,8 +733,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun launchExportBackup() {
-        // Primary: suggest the JSON MIME type. Fallback: generic type for
-        // pickers that reject "application/json". Never crash.
+        // Primary: suggest the JSON MIME type. Fallback 1: generic type for
+        // pickers that reject "application/json". Fallback 2 (v2.2): no picker
+        // at all - write straight into the public Downloads folder via
+        // MediaStore, which needs no picker and no storage permission on
+        // Android 10+. This makes export work even on devices whose
+        // documents provider is disabled (the "no file picker" case).
         if (safeLaunch("launchExportBackup") {
                 exportBackupLauncher.launch("goal-tracker-backup.json")
             }
@@ -456,33 +747,70 @@ class MainActivity : AppCompatActivity() {
                 exportBackupFallbackLauncher.launch("goal-tracker-backup.json")
             }
         ) return
-        toast("Export failed: no file picker available on this device")
+        exportBackupToDownloads()
+    }
+
+    /** Picker-free export path: writes the backup into public Downloads. */
+    private fun exportBackupToDownloads() {
+        try {
+            val name = "goal-tracker-backup-${System.currentTimeMillis()}.json"
+            val uri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val values = android.content.ContentValues().apply {
+                    put(android.provider.MediaStore.Downloads.DISPLAY_NAME, name)
+                    put(android.provider.MediaStore.Downloads.MIME_TYPE, "application/json")
+                }
+                contentResolver.insert(
+                    android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, values
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                val dir = android.os.Environment.getExternalStoragePublicDirectory(
+                    android.os.Environment.DIRECTORY_DOWNLOADS
+                ).apply { mkdirs() }
+                Uri.fromFile(File(dir, name))
+            }
+            if (uri == null) {
+                toast("Export failed: no file picker and Downloads unavailable", force = true)
+                return
+            }
+            contentResolver.openOutputStream(uri)!!.use {
+                it.write(buildBackupJson().toString(2).toByteArray())
+            }
+            toast("Saved to Downloads: $name")
+        } catch (e: Exception) {
+            ErrorLog.log(this, "exportBackupToDownloads", e.message ?: e.javaClass.simpleName)
+            toast("Export failed: ${e.message}", force = true)
+        }
     }
 
     fun launchImportBackup() {
         val ok = safeLaunch("launchImportBackup") {
             importBackupLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
         }
-        if (!ok) toast("Import failed: no file picker available on this device")
+        if (!ok) toast("Import failed: no file picker available on this device", force = true)
+    }
+
+    /** Collects every stored data key into the single backup JSON document. */
+    private fun buildBackupJson(): JSONObject {
+        val data = JSONObject()
+        appDataDir.listFiles()?.filter { it.extension == "json" }?.forEach { f ->
+            data.put(f.nameWithoutExtension, f.readText())
+        }
+        return JSONObject()
+            .put("app", "goal-tracker-shell")
+            .put("exportedAt", System.currentTimeMillis())
+            .put("data", data)
     }
 
     private fun writeBackupTo(uri: Uri) {
         try {
-            val data = JSONObject()
-            appDataDir.listFiles()?.filter { it.extension == "json" }?.forEach { f ->
-                data.put(f.nameWithoutExtension, f.readText())
-            }
-            val backup = JSONObject()
-                .put("app", "goal-tracker-shell")
-                .put("exportedAt", System.currentTimeMillis())
-                .put("data", data)
             contentResolver.openOutputStream(uri)!!.use {
-                it.write(backup.toString(2).toByteArray())
+                it.write(buildBackupJson().toString(2).toByteArray())
             }
             toast("Backup exported")
         } catch (e: Exception) {
             ErrorLog.log(this, "writeBackupTo", e.message ?: e.javaClass.simpleName)
-            toast("Export failed: ${e.message}")
+            toast("Export failed: ${e.message}", force = true)
         }
     }
 
@@ -500,7 +828,7 @@ class MainActivity : AppCompatActivity() {
             notifyJs("backupRestored", "null")
         } catch (e: Exception) {
             ErrorLog.log(this, "restoreBackupFrom", e.message ?: e.javaClass.simpleName)
-            toast("Restore failed: ${e.message}")
+            toast("Restore failed: ${e.message}", force = true)
         }
     }
 
@@ -535,7 +863,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun toast(msg: String) {
+    /**
+     * Informational toasts respect the HTML "Show pop-up messages" preference,
+     * mirrored into the "nativeToastsEnabled" flag (default true). Hard errors and
+     * failures MUST always be visible, so those callers pass force = true.
+     */
+    private fun toast(msg: String, force: Boolean = false) {
+        if (!force && !Flags.get(this, "nativeToastsEnabled", true)) return
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
