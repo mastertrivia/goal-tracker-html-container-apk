@@ -46,6 +46,13 @@ class MainActivity : AppCompatActivity() {
     // injected listener on the two known HTML file inputs (see onPageFinished).
     private var pendingSoundSlot: String = SoundLibrary.SLOT_COMPLETION
 
+    // True once the WebView has finished loading the app at least once. Used to
+    // tell a COLD start (page not loaded yet -> JS boot drains the pending-event
+    // queue itself) apart from a WARM resume (page already live -> JS boot does
+    // NOT run again, so we must drain + replay queued notification taps here).
+    @Volatile
+    private var pageEverFinished = false
+
     private val appDir: File get() = File(filesDir, "app")
     // Named appDataDir (not dataDir) to avoid clashing with Android's
     // built-in Context.getDataDir(), which causes a duplicate JVM signature.
@@ -210,6 +217,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onPageFinished(view: WebView, url: String) {
+                // The app HTML is now live; a subsequent onResume is a warm
+                // resume and must replay any queued notification taps itself.
+                pageEverFinished = true
                 // v2.3: The two sound settings in the HTML are plain
                 // <input type="file"> elements (ids "andSoundFile" and
                 // "andBombSoundFile"). We do NOT modify the HTML; we just
@@ -318,7 +328,38 @@ class MainActivity : AppCompatActivity() {
                 ErrorLog.log(this, "MainActivity.onResume", e.message ?: "webView resume failed")
             }
         }
+        // WARM resume only: replay notification taps (Pause/Resume/Stop) that
+        // were queued while we were backgrounded. On a COLD start the page is
+        // not loaded yet (pageEverFinished == false); JS boot drains the queue
+        // via getPendingEvents(), so we must NOT drain here too (double drain).
+        // We replay BEFORE appResumed so the user's intent is applied first,
+        // then gtResumeResync() reconciles + re-renders on top of it. HTML stays
+        // the single source of truth for every timer action.
+        if (::webView.isInitialized && pageEverFinished) {
+            replayPendingEvents()
+        }
         notifyJs("appResumed", "true")
+    }
+
+    /**
+     * Drains the native pending-event queue and replays each event into the
+     * live HTML via window.onAndroidEvent(...). The HTML handlers are idempotent
+     * (e.g. pause is a no-op if already paused), so this is safe. This is purely
+     * a DELIVERY mechanism; it adds no timer logic of its own.
+     */
+    private fun replayPendingEvents() {
+        try {
+            val arr = org.json.JSONArray(PendingEvents.drain(this))
+            for (i in 0 until arr.length()) {
+                val ev = arr.getJSONObject(i)
+                val name = ev.optString("name")
+                // payload is stored as a raw JSON literal, e.g. "pause".
+                val payload = ev.optString("payload", "null")
+                if (name.isNotEmpty()) notifyJs(name, payload)
+            }
+        } catch (e: Exception) {
+            ErrorLog.log(this, "MainActivity.replayPendingEvents", e.message ?: "drain failed")
+        }
     }
 
     override fun onPause() {

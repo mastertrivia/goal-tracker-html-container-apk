@@ -43,6 +43,16 @@ class TimerService : Service() {
         const val ACTION_PAUSE = "pause"
         const val ACTION_STOP = "stop"
         const val ACTION_SYNC = "sync"
+
+        // v2.5 - TEMPORARY notification-presentation feedback for notification
+        // button taps. These let the shade react instantly (freeze the numbers,
+        // flip the Pause/Resume button, keep a ticking bomb alive) even while
+        // the WebView is dead in the background. They are PRESENTATION ONLY and
+        // are NOT authoritative: HTML remains the single source of truth and
+        // overwrites this the moment it is alive again (andSyncNotification).
+        const val ACTION_NOTIF_PAUSE = "notif_pause"
+        const val ACTION_NOTIF_RESUME = "notif_resume"
+        const val ACTION_NOTIF_STOP = "notif_stop"
         const val NOTIFICATION_ID = 9001
 
         private const val PREFS = "timer_engine"
@@ -99,6 +109,11 @@ class TimerService : Service() {
                     applyState(legacyState(intent, paused = true))
                 }
                 ACTION_STOP -> stopEngine()
+                // Temporary presentation feedback (see constants above). Never
+                // authoritative — HTML reconciles/overwrites on resume.
+                ACTION_NOTIF_PAUSE -> nativePauseResumeFeedback(paused = true)
+                ACTION_NOTIF_RESUME -> nativePauseResumeFeedback(paused = false)
+                ACTION_NOTIF_STOP -> nativeStopFeedback()
                 null -> {
                     // START_STICKY restart after being killed: restore ourselves.
                     val saved = loadState()
@@ -165,6 +180,65 @@ class TimerService : Service() {
         clearState()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
+    }
+
+    // ---------------- Temporary presentation feedback (NOT authoritative) ----------------
+    //
+    // These give the notification an INSTANT reaction to a button tap while the
+    // WebView is backgrounded/dead. They only mutate the already-pushed render
+    // state (freeze/unfreeze clocks, flip the paused flag, keep a bomb alive).
+    // They deliberately contain NO timer/bomb business logic: the same tap is
+    // ALSO delivered to the HTML, which owns all timer semantics and re-pushes
+    // the authoritative state via setTimerState the instant it is alive again,
+    // overwriting whatever we show here.
+
+    /**
+     * A "bomb-only" notification is the one built by the HTML's andBuildBombState:
+     * a single ticking bomb clock and no session clock. HTML ignores Pause/
+     * Resume/Stop for the bomb, so we mirror that here to stay consistent.
+     */
+    private fun isBombOnly(s: State): Boolean {
+        val hasBomb = s.clocks.any { it.fmt == "bomb" }
+        val hasNonBomb = s.clocks.any { it.fmt != "bomb" }
+        return hasBomb && !hasNonBomb
+    }
+
+    private fun nativePauseResumeFeedback(paused: Boolean) {
+        val s = state ?: loadState() ?: return
+        if (!s.running) return
+        // Mirror HTML: the bomb notification does not pause/resume.
+        if (isBombOnly(s)) return
+        val nowElapsed = SystemClock.elapsedRealtime()
+        val nowWall = System.currentTimeMillis()
+        val newClocks = s.clocks.map { c ->
+            when {
+                // The bomb line keeps ticking while a session is paused; never
+                // freeze it (matches andBuildSessionState).
+                c.fmt == "bomb" -> c
+                paused -> c.copy(ticking = false, frozenMs = remainingMs(c))
+                else -> {
+                    val rem = if (c.ticking) remainingMs(c) else c.frozenMs
+                    c.copy(
+                        ticking = true,
+                        endElapsed = nowElapsed + rem,
+                        endWall = nowWall + rem,
+                        frozenMs = rem
+                    )
+                }
+            }
+        }
+        applyState(s.copy(paused = paused, clocks = newClocks))
+    }
+
+    private fun nativeStopFeedback() {
+        val s = state ?: loadState()
+        // Mirror HTML, which ignores "stop" for the bomb: keep the bomb-only
+        // notification alive (re-render current state) instead of destroying it.
+        if (s != null && s.running && isBombOnly(s)) {
+            applyState(s)
+        } else {
+            stopEngine()
+        }
     }
 
     /** Substitute every {id} token with its live, formatted remaining time. */

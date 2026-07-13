@@ -34,16 +34,26 @@ class TimerActionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         try {
             when (intent.action) {
-                ACTION_PAUSE -> deliver(context, "pause")
-                ACTION_RESUME -> deliver(context, "resume")
+                // Each tap does TWO things:
+                //  1. Ask the service for INSTANT, temporary notification
+                //     feedback (freeze/flip the shade, keep a bomb alive) so
+                //     the button feels responsive even when the WebView is dead.
+                //  2. Deliver the semantic action to the HTML — the single
+                //     source of truth — either live (Activity visible) or via
+                //     the pending-event queue, replayed on resume. HTML always
+                //     reconciles and overwrites the temporary native state.
+                ACTION_PAUSE -> {
+                    forwardToService(context, TimerService.ACTION_NOTIF_PAUSE)
+                    deliver(context, "pause")
+                }
+                ACTION_RESUME -> {
+                    forwardToService(context, TimerService.ACTION_NOTIF_RESUME)
+                    deliver(context, "resume")
+                }
                 ACTION_STOP -> {
-                    // Stopping the notification is native (safe); the timer
-                    // state change itself is still delivered to JS.
-                    context.startService(
-                        Intent(context, TimerService::class.java).apply {
-                            action = TimerService.ACTION_STOP
-                        }
-                    )
+                    // Bomb-aware: the service keeps a ticking bomb notification
+                    // alive instead of destroying it; otherwise it stops.
+                    forwardToService(context, TimerService.ACTION_NOTIF_STOP)
                     deliver(context, "stop")
                 }
                 ACTION_DISMISS_ALARM -> {
@@ -69,6 +79,22 @@ class TimerActionReceiver : BroadcastReceiver() {
             }
         } catch (e: Exception) {
             ErrorLog.log(context, "TimerActionReceiver", e.message ?: "unknown")
+        }
+    }
+
+    /**
+     * Sends a command to the (already-running, foreground) TimerService for
+     * temporary notification-presentation feedback. This never creates timer
+     * state on its own — it only nudges the notification the service already
+     * owns. Safe from the background because the service is in the foreground.
+     */
+    private fun forwardToService(context: Context, serviceAction: String) {
+        try {
+            context.startService(
+                Intent(context, TimerService::class.java).setAction(serviceAction)
+            )
+        } catch (e: Exception) {
+            ErrorLog.log(context, "TimerActionReceiver.forward", e.message ?: "startService failed")
         }
     }
 
