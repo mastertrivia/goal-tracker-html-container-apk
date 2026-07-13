@@ -298,6 +298,27 @@ class MainActivity : AppCompatActivity() {
         TimerActionReceiver.liveDelivery = { action ->
             notifyJs("timerAction", "\"$action\"")
         }
+        // ---- Freeze-on-resume fix (v2.4 regression) ----
+        // The HTML UI is driven entirely by setInterval timers. While the app
+        // is backgrounded, Android/Chromium freezes the WebView renderer and
+        // coalesces those timers, so on return they can take several seconds to
+        // wake up - the UI looks frozen, then jumps and updates all at once.
+        // The native timer engine no longer needs the WebView alive in the
+        // background, which lets the OS freeze it more aggressively, making the
+        // stall more visible. We fix it deterministically here: resume the
+        // renderer and push an "appResumed" event. evaluateJavascript runs on
+        // the next renderer loop turn regardless of setTimeout/setInterval
+        // throttling, so the HTML reconciles state and re-renders immediately
+        // instead of waiting for a throttled timer to fire.
+        if (::webView.isInitialized) {
+            try {
+                webView.onResume()
+                webView.resumeTimers()
+            } catch (e: Exception) {
+                ErrorLog.log(this, "MainActivity.onResume", e.message ?: "webView resume failed")
+            }
+        }
+        notifyJs("appResumed", "true")
     }
 
     override fun onPause() {

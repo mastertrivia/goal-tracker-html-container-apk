@@ -740,5 +740,5 @@ class JsBridge(private val activity: MainActivity) {
     // ---------------- Misc ----------------
 
     @JavascriptInterface
-    fun getShellVersion(): String = "2.5"
+    fun getShellVersion(): String = "2.6"
 }

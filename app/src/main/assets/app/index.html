@@ -6579,9 +6579,48 @@ function andOpenReflection(target){
   }catch(e){ console.warn('[android] andOpenReflection failed', e); }
 }
 
+// ---- Foreground / resume reconciliation (v2.4 freeze-on-resume fix) ----
+// The whole HTML UI is driven by setInterval timers (500ms countdown, 1s
+// header, 3s recovery, 1s Android observer). When the app is backgrounded the
+// WebView renderer is frozen and those timers are coalesced/throttled by
+// Android + Chromium, so on return they can take several seconds to wake up:
+// the Current Activity card, Pomodoro countdown and live timers appear frozen,
+// then suddenly jump and update together. The native timer engine keeps the
+// NOTIFICATION correct throughout (it ticks on its own clock), so only the
+// HTML falls behind. The native shell now calls this the instant the Activity
+// resumes (window.onAndroidEvent('appResumed')). Because that event is
+// injected via evaluateJavascript - which is NOT subject to timer throttling -
+// we can reconcile state and re-render IMMEDIATELY rather than waiting for a
+// throttled timer to fire. render() also re-arms the per-second countdown
+// interval, so the UI stays live afterwards. Idempotent + guarded, so the
+// duplicate visibilitychange/pageshow safety-net calls below are harmless.
+let gtResumeBusy = false;
+async function gtResumeResync(){
+  if(RESETTING || gtResumeBusy) return;
+  gtResumeBusy = true;
+  try{
+    STATE = await recoverState();
+    await maybeWakePromotion();
+    await ensureTomorrow(STATE);
+    await maybeSendEndOfDayReport();
+    render();                      // re-arms the 500ms countdown tick + refreshes every card
+    try{ andSyncNotification(); }catch(e){ console.warn('[resume] notif sync failed', e); }
+    try{ andSyncAlarms(); }catch(e){ console.warn('[resume] alarm sync failed', e); }
+  }catch(e){
+    console.warn('[resume] resync failed, timers will catch up', e);
+  }finally{
+    gtResumeBusy = false;
+  }
+}
+
 // ---- Native -> HTML event sink (notification buttons, permission, backup) ----
 window.onAndroidEvent = function(name, payload){
   try{
+    if(name==='appResumed'){
+      // Activity returned to the foreground — reconcile + re-render right now.
+      gtResumeResync();
+      return;
+    }
     if(name==='timerAction'){
       // ADD button on the session-complete notification → open the SAME Pomodoro-Log reflection
       // "+" popup used in History → Study Task Progress, pre-targeted at the completed session.
@@ -6842,6 +6881,15 @@ async function boot(){
   retryPendingReports();
   render();
   andInit(); // Android shell integration — a safe no-op when running in a normal browser
+  // Browser-native safety net for the freeze-on-resume fix: the moment the page
+  // becomes visible again (or is restored from the bfcache), reconcile + re-render
+  // immediately instead of waiting for the throttled setInterval timers to wake up.
+  // The native shell also pushes an 'appResumed' event; gtResumeResync() is guarded
+  // and idempotent, so firing from both paths is harmless.
+  try{
+    document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) gtResumeResync(); });
+    window.addEventListener('pageshow', ()=> gtResumeResync());
+  }catch(e){ console.warn('[resume] could not attach visibility listeners', e); }
   setInterval(()=>{ renderHeader(); }, 1000);
   setInterval(async ()=>{ if(RESETTING) return; try { STATE = await recoverState(); await maybeWakePromotion(); await ensureTomorrow(STATE); await maybeSendEndOfDayReport(); render(); } catch(e){ console.warn('recovery cycle failed, will retry next tick', e); } }, 3000);
 }
