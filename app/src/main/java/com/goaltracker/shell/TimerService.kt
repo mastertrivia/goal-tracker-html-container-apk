@@ -78,7 +78,13 @@ class TimerService : Service() {
         val paused: Boolean,
         val title: String,
         val template: String,
-        val clocks: List<Clock>
+        val clocks: List<Clock>,
+        // INERT presentation data supplied by HTML (the single source of truth).
+        // Lets background Pause feedback show the bomb line with a value HTML
+        // already computed. NOT authoritative and involves NO native bomb math.
+        // bombPreviewMs < 0 means "no bomb line available".
+        val bombPreviewMs: Long = -1L,
+        val bombPreviewLine: String = ""
     )
 
     private val handler = Handler(Looper.getMainLooper())
@@ -210,24 +216,47 @@ class TimerService : Service() {
         if (isBombOnly(s)) return
         val nowElapsed = SystemClock.elapsedRealtime()
         val nowWall = System.currentTimeMillis()
-        val newClocks = s.clocks.map { c ->
-            when {
-                // The bomb line keeps ticking while a session is paused; never
-                // freeze it (matches andBuildSessionState).
-                c.fmt == "bomb" -> c
-                paused -> c.copy(ticking = false, frozenMs = remainingMs(c))
-                else -> {
-                    val rem = if (c.ticking) remainingMs(c) else c.frozenMs
-                    c.copy(
-                        ticking = true,
-                        endElapsed = nowElapsed + rem,
-                        endWall = nowWall + rem,
-                        frozenMs = rem
-                    )
-                }
+
+        // Freeze (pause) or unfreeze (resume) the SESSION clocks only. The bomb
+        // line is managed separately below from the inert data HTML gave us — we
+        // never compute bomb timing here.
+        val sessionClocks = s.clocks.filter { it.fmt != "bomb" }.map { c ->
+            if (paused) {
+                c.copy(ticking = false, frozenMs = remainingMs(c))
+            } else {
+                val rem = if (c.ticking) remainingMs(c) else c.frozenMs
+                c.copy(ticking = true, endElapsed = nowElapsed + rem, endWall = nowWall + rem, frozenMs = rem)
             }
         }
-        applyState(s.copy(paused = paused, clocks = newClocks))
+
+        // Base (session-only) template with any previously-appended bomb line
+        // stripped, so pause/resume toggles are idempotent.
+        val baseTemplate =
+            if (s.bombPreviewLine.isNotEmpty()) s.template.replace(s.bombPreviewLine, "") else s.template
+
+        val newClocks: List<Clock>
+        val newTemplate: String
+        if (paused && s.bombPreviewMs >= 0 && s.bombPreviewLine.isNotEmpty()) {
+            // Show the bomb line using the remaining time HTML already computed.
+            // The bomb ticks through a paused session (HTML's rule), so render
+            // it ticking down from that value. This is a plain countdown render,
+            // not bomb business logic.
+            val bombClock = Clock(
+                id = "c2",
+                fmt = "bomb",
+                ticking = true,
+                endElapsed = nowElapsed + s.bombPreviewMs,
+                endWall = nowWall + s.bombPreviewMs,
+                frozenMs = s.bombPreviewMs
+            )
+            newClocks = sessionClocks + bombClock
+            newTemplate = baseTemplate + s.bombPreviewLine
+        } else {
+            // Resume (or no bomb data): show the session only.
+            newClocks = sessionClocks
+            newTemplate = baseTemplate
+        }
+        applyState(s.copy(paused = paused, template = newTemplate, clocks = newClocks))
     }
 
     private fun nativeStopFeedback() {
@@ -328,7 +357,16 @@ class TimerService : Service() {
                 )
             }
         }
-        return State(running, paused, title, template, clocks)
+        // Inert bomb-preview presentation data (optional). Used only by the
+        // background Pause feedback; never for any live rendering or timing.
+        var bombPreviewMs = -1L
+        var bombPreviewLine = ""
+        val bp = o.optJSONObject("bombPreview")
+        if (bp != null) {
+            bombPreviewMs = bp.optDouble("remainMs", -1.0).toLong()
+            bombPreviewLine = bp.optString("line", "")
+        }
+        return State(running, paused, title, template, clocks, bombPreviewMs, bombPreviewLine)
     }
 
     private fun legacyState(intent: Intent, paused: Boolean): State {
@@ -360,6 +398,8 @@ class TimerService : Service() {
                 arr.put(co)
             }
             o.put("clocks", arr)
+            o.put("bombPreviewMs", s.bombPreviewMs)
+            o.put("bombPreviewLine", s.bombPreviewLine)
             getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(KEY_STATE, o.toString()).apply()
         } catch (_: Exception) {
         }
@@ -391,7 +431,9 @@ class TimerService : Service() {
                 paused = o.optBoolean("paused", false),
                 title = o.optString("title", "Timer running"),
                 template = o.optString("template", ""),
-                clocks = clocks
+                clocks = clocks,
+                bombPreviewMs = o.optLong("bombPreviewMs", -1L),
+                bombPreviewLine = o.optString("bombPreviewLine", "")
             )
         } catch (_: Exception) {
             null

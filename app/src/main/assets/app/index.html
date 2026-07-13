@@ -6324,9 +6324,19 @@ function andSyncNotification(){
 function andSyncNotificationNative(){
   const at = STATE.activeTimer;
   const cfg = andCfg();
-  let running=false, paused=false, st=null;
+  let running=false, paused=false, st=null, bombPreview=null;
   if(at && at.type!=='bomb' && at.state!=='REVIEW_PENDING' && !isSleepActive()){
     running=true; paused=!!at.pausedAt; st=andBuildSessionState(at);
+    // INERT presentation data (not authoritative). The native layer needs the
+    // bomb's remaining time + its exact line text so that, while the app is
+    // backgrounded (HTML asleep), a Pause tap can render the bomb line and a
+    // Resume tap can strip it again — instantly, without waiting for HTML.
+    // Provided for every session (paused or not) so the line is always
+    // available to add/remove. HTML stays the single source of truth: it
+    // computes this and re-pushes/overwrites on resume. Native does NO bomb math.
+    if(bombModeOn(STATE) && !isSleepActive()){
+      bombPreview = { id:'c2', fmt:'bomb', remainMs:Math.max(0,bombLiveRemainingMs(STATE)), line:'\n🔴 Bomb Ticking 💣 — {c2} remaining' };
+    }
   } else if(at && at.type==='bomb' && cfg.bombNotif && bombModeOn(STATE) && !isSleepActive()){
     running=true; paused=false; st=andBuildBombState(at);
   }
@@ -6340,7 +6350,7 @@ function andSyncNotificationNative(){
   const sig = st.title+'|'+st.template+'|'+paused+'|'+
     st.clocks.map(c=>c.id+':'+c.fmt+':'+c.ticking+':'+(c.ticking?'~':c.remainMs)).join(',');
   if(sig!==andLastSig){
-    AND.call('setTimerState', JSON.stringify({ running:true, paused:paused, title:st.title, template:st.template, clocks:st.clocks }));
+    AND.call('setTimerState', JSON.stringify({ running:true, paused:paused, title:st.title, template:st.template, clocks:st.clocks, bombPreview:bombPreview }));
     andLastSig = sig; andNotifState = 'running';
   }
 }

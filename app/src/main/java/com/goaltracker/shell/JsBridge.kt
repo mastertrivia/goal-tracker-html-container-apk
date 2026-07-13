@@ -332,7 +332,11 @@ class JsBridge(private val activity: MainActivity) {
      *     {"id":"c0","fmt":"mmss","remainMs":1475000,"ticking":true},
      *     {"id":"c1","fmt":"left","remainMs":4320000,"ticking":true},
      *     {"id":"c2","fmt":"bomb","remainMs":275000,"ticking":true}
-     *   ]
+     *   ],
+     *   // Optional INERT presentation data (v3.1). Lets background Pause
+     *   // feedback show the bomb line using a value HTML already computed;
+     *   // native does NO bomb math and HTML overwrites this on resume.
+     *   "bombPreview": {"id":"c2","fmt":"bomb","remainMs":275000,"line":"\n🔴 Bomb Ticking 💣 — {c2} remaining"}
      * }
      * running:false stops the foreground service.
      */
@@ -740,5 +744,5 @@ class JsBridge(private val activity: MainActivity) {
     // ---------------- Misc ----------------
 
     @JavascriptInterface
-    fun getShellVersion(): String = "3.0"
+    fun getShellVersion(): String = "3.1"
 }
