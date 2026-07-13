@@ -313,6 +313,44 @@ class JsBridge(private val activity: MainActivity) {
         }
     }
 
+    /**
+     * v2.4 - native timer engine (single source of truth for the notification).
+     *
+     * JS calls this ONLY when the notification state changes (start / pause /
+     * resume / stop / subject or bomb change) - NOT every second. The service
+     * then ticks the countdown on its own clock, so the notification keeps
+     * counting even when the WebView's JS timers are throttled/suspended in
+     * the background. This replaces the old per-second startTimer/updateTimer
+     * heartbeat that froze after ~30s.
+     *
+     * json shape:
+     * {
+     *   "running": true, "paused": false,
+     *   "title": "🟢 Study — Math",
+     *   "template": "{c0} — 2/4 —— Left {c1}\n🔴 Bomb Ticking 💣 — {c2} remaining",
+     *   "clocks": [
+     *     {"id":"c0","fmt":"mmss","remainMs":1475000,"ticking":true},
+     *     {"id":"c1","fmt":"left","remainMs":4320000,"ticking":true},
+     *     {"id":"c2","fmt":"bomb","remainMs":275000,"ticking":true}
+     *   ]
+     * }
+     * running:false stops the foreground service.
+     */
+    @JavascriptInterface
+    fun setTimerState(json: String) {
+        safe("setTimerState", Unit) {
+            // Respect the same gate as the legacy path: if the user disabled the
+            // timer notification, a running state must not start the service.
+            val running = try { org.json.JSONObject(json).optBoolean("running", true) } catch (_: Exception) { true }
+            if (running && !Flags.get(activity, "timerNotificationEnabled")) return@safe
+            val i = Intent(activity, TimerService::class.java).apply {
+                action = TimerService.ACTION_SYNC
+                putExtra("json", json)
+            }
+            if (running) activity.startForegroundService(i) else activity.startService(i)
+        }
+    }
+
     /** Update the notification and mark it paused (shows Resume button). */
     @JavascriptInterface
     fun pauseTimer(title: String, text: String) {
@@ -702,5 +740,5 @@ class JsBridge(private val activity: MainActivity) {
     // ---------------- Misc ----------------
 
     @JavascriptInterface
-    fun getShellVersion(): String = "2.4"
+    fun getShellVersion(): String = "2.5"
 }
