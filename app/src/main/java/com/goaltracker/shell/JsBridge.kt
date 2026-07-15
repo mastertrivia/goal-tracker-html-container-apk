@@ -744,5 +744,37 @@ class JsBridge(private val activity: MainActivity) {
     // ---------------- Misc ----------------
 
     @JavascriptInterface
-    fun getShellVersion(): String = "3.1"
+    fun getShellVersion(): String = "4.0"
+
+    // ---------------- Manual fallback ----------------
+
+    /**
+     * Returns the raw text content of manuals.js so the HTML can display
+     * the Goal Section Manual even when the <script src="manuals.js"> tag
+     * silently failed (e.g. after a single-HTML import without the side-car file).
+     *
+     * Strategy (in priority order):
+     *  1. Read manuals.js from the live app directory (filesDir/app/manuals.js).
+     *     This is the user's current version and is always preferred.
+     *  2. Fall back to the copy bundled inside the APK's assets/ folder.
+     *     This always exists and cannot be lost.
+     *
+     * The returned string is the raw JS source (the whole file). The HTML
+     * extracts window.GOAL_SECTION_MANUAL from it via a controlled eval so
+     * only the template-literal value is rendered — no arbitrary execution.
+     *
+     * Returns "" on any failure so the HTML can distinguish "bridge absent"
+     * (AndroidBridge undefined) from "bridge returned nothing" (empty string).
+     */
+    @JavascriptInterface
+    fun getManualText(): String = safe("getManualText", "") {
+        // 1. Live app directory copy (preferred — always up to date).
+        val liveFile = File(File(activity.filesDir, "app"), "manuals.js")
+        if (liveFile.exists()) {
+            val text = liveFile.readText()
+            if (text.isNotBlank()) return@safe text
+        }
+        // 2. Bundled APK asset (guaranteed present).
+        activity.assets.open("app/manuals.js").use { it.reader().readText() }
+    }
 }

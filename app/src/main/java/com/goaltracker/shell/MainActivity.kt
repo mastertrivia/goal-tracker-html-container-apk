@@ -491,7 +491,14 @@ class MainActivity : AppCompatActivity() {
 
     /** First run: copy the bundled fallback app from assets/ to filesDir/app. */
     private fun copyBundledAppIfNeeded() {
-        if (File(appDir, "index.html").exists()) return
+        if (File(appDir, "index.html").exists()) {
+            // index.html already exists — full copy is skipped to preserve any user-imported HTML.
+            // However, side-car assets bundled in the APK (e.g. manuals.js) may be missing if the
+            // user installed an update over an older version that didn't ship them yet.
+            // copyBundledAssetsIfMissing never overwrites existing files, so this is always safe.
+            copyBundledAssetsIfMissing(appDir)
+            return
+        }
         copyBundledApp()
     }
 
@@ -501,6 +508,28 @@ class MainActivity : AppCompatActivity() {
             assets.open("app/$name").use { input ->
                 File(appDir, name).outputStream().use { output -> input.copyTo(output) }
             }
+        }
+    }
+
+    /**
+     * Copies every file from assets/app/ into [targetDir] that does NOT already
+     * exist there. This is used after an HTML-only import to ensure side-car
+     * assets like manuals.js are present alongside the imported HTML.
+     * Existing files are never overwritten so a ZIP that ships its own
+     * manuals.js keeps its version.
+     */
+    private fun copyBundledAssetsIfMissing(targetDir: File) {
+        try {
+            assets.list("app")?.forEach { name ->
+                val dest = File(targetDir, name)
+                if (!dest.exists()) {
+                    assets.open("app/$name").use { input ->
+                        dest.outputStream().use { output -> input.copyTo(output) }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            ErrorLog.log(this, "copyBundledAssetsIfMissing", e.message ?: "unknown")
         }
     }
 
@@ -750,6 +779,10 @@ class MainActivity : AppCompatActivity() {
                 contentResolver.openInputStream(uri)!!.use { input ->
                     File(stagingDir, "index.html").outputStream().use { input.copyTo(it) }
                 }
+                // Single-HTML import: ensure bundled side-car assets (manuals.js, etc.)
+                // are copied into the staging dir so they are available alongside the HTML.
+                // A ZIP import is expected to carry its own copies; we only fill gaps here.
+                copyBundledAssetsIfMissing(stagingDir)
             }
 
             // Validation passed - now swap in the new app files.
@@ -764,6 +797,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 stagingDir.deleteRecursively()
             }
+            // For ZIP imports that did not include manuals.js, fill the gap from assets.
+            copyBundledAssetsIfMissing(appDir)
             toast("App updated")
             loadApp()
         } catch (e: Exception) {
