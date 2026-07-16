@@ -18,7 +18,7 @@ android {
         minSdk 26          // Android 8.0
         targetSdk 34
         versionCode 18
-        versionName "5.5.0"
+        versionName "4.8"
     }
 
     signingConfigs {

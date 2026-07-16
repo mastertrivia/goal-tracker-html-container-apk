@@ -4,30 +4,15 @@
 
 ---
 
-## v5.5.0 — 2026-07-16
+## v4.8 — 2026-07-16
 
-**Background notification-button synchronization (Pause / Stop with Bomb Mode)**
+**Bomb Challenge Mode — Wake-up Trigger Behaviour Fix**
 
-- **Paused status now shown while backgrounded:** When the app is backgrounded and the user taps
-  **Pause** on the ongoing-session notification, the native presentation feedback now shows the
-  paused status dot (🟡) instead of leaving the running dot (🟢 study / 🔵 non-study). Previously the
-  notification title kept the running dot until the app was reopened and the HTML re-synced. The fix
-  swaps ONLY the leading status dot on a paused session and is a deliberate no-op for running states,
-  HTML-synced paused titles, bomb titles, and legacy titles.
-- **Stop no longer destroys the notification when Bomb Mode is ON:** When the app is backgrounded and
-  the user taps **Stop** while Bomb Mode is on, the ongoing notification now transitions in place into
-  the bomb-only notification (same notification ID/channel/actions) instead of being removed. When Bomb
-  Mode is OFF, Stop behaves exactly as before (the notification is dismissed). The transition reuses the
-  inert `bombPreview` data the HTML already provides — the native layer performs NO bomb math, and the
-  HTML overwrites this with its authoritative bomb notification the moment it wakes on resume.
-- **Scope:** Presentation-only changes confined to `TimerService.kt` (`nativeStopFeedback()` and the
-  notification builder's title). No changes to the JS↔Kotlin payload contract, `recoverState()`,
-  Pomodoro/Bomb logic, IndexedDB, session progression, Telegram, alarm scheduling, or notification
-  IDs/channels. Both transient states are self-healing — overwritten by the HTML's authoritative
-  `andBuildSessionState`/`andBuildBombState` on the next resume.
-- **Native/version:** `versionName "5.5.0"`, `versionCode 18`,
-  `JsBridge.getShellVersion()` → `"5.5.0"`. The standalone HTML and the bundled
-  `assets/app/index.html` remain byte-for-byte identical (no HTML changes this release).
+- **Both modes now always restore the full Bomb Duration at Wake-up.** In all previous builds, if yesterday's Bomb had time remaining, that leftover value carried into the new day. From v4.8 onward, the very first step at every day rollover is unconditionally resetting `bombRemainingMs` to the full configured Bomb Duration, regardless of which trigger mode is selected.
+- **Mode 1 (Start at Wake-up Time):** After restoring the full clock, the Bomb arms live immediately at Wake-up and the replay orchestrator feeds the elapsed budget (time since Wake-up) through the existing engine — consuming Lifelines and exploding at each cycle boundary exactly as designed.
+- **Mode 2 (Start After First Activity):** After restoring the full clock, the Bomb enters a `bombDormant` state — `activeTimer = null`, no countdown, no red background, no wobble. The timer displays the full duration and waits. The moment the user starts their first Study session (regular or Extra Study), `bombDormant` is cleared and the normal Bomb engine takes over for the rest of the day without any further interference from Mode 2.
+- **Idle UI label (Mode 2):** While dormant, the Bomb card now shows "Starts after your first activity" instead of the misleading "Bomb Paused".
+- **Native/version:** `versionName "4.8"`, `versionCode 18`. HTML-only change; the standalone HTML and the bundled `assets/app/index.html` are identical.
 
 ---
 

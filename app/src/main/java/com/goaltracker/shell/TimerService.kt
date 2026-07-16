@@ -265,45 +265,9 @@ class TimerService : Service() {
         // notification alive (re-render current state) instead of destroying it.
         if (s != null && s.running && isBombOnly(s)) {
             applyState(s)
-            return
+        } else {
+            stopEngine()
         }
-        // Bomb Mode ON while stopping a SESSION: HTML would arm the bomb and
-        // push a bomb-only notification (andBuildBombState). While the app is
-        // backgrounded HTML is asleep, so reproduce that transition here from
-        // the INERT data HTML already supplied. bombPreviewMs >= 0 exists ONLY
-        // when Bomb Mode is on (HTML gates bombPreview on bombModeOn); when it
-        // is off, bombPreviewMs stays -1 and we fall through to stopEngine() —
-        // exactly today's behavior. NO native bomb math: we render a value HTML
-        // computed, and HTML overwrites this with andBuildBombState on resume.
-        if (s != null && s.running && s.bombPreviewMs >= 0 && s.bombPreviewLine.isNotEmpty()) {
-            val nowElapsed = SystemClock.elapsedRealtime()
-            val nowWall = System.currentTimeMillis()
-            // Do NOT parse or depend on the wording of bombPreviewLine. HTML built
-            // that string (already localized/worded) and it already contains the
-            // "{c2}" clock token, so pass it through verbatim as the template and
-            // let the existing renderText() substitute the token. The only value we
-            // consume is bombPreviewMs (a number). Keep the existing title as-is
-            // rather than fabricating a new (English/hardcoded) one. HTML overwrites
-            // all of this with andBuildBombState the moment it wakes on resume.
-            val bombClock = Clock(
-                id = "c2",
-                fmt = "bomb",
-                ticking = true,
-                endElapsed = nowElapsed + s.bombPreviewMs,
-                endWall = nowWall + s.bombPreviewMs,
-                frozenMs = s.bombPreviewMs
-            )
-            applyState(
-                s.copy(
-                    paused = false,
-                    template = s.bombPreviewLine.trimStart('\n'),
-                    clocks = listOf(bombClock)
-                )
-            )
-            return
-        }
-        // Bomb Mode OFF (or no bomb data): behave exactly as today.
-        stopEngine()
     }
 
     /** Substitute every {id} token with its live, formatted remaining time. */
@@ -493,30 +457,6 @@ class TimerService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-    /**
-     * PRESENTATION ONLY (native Pause feedback). When a SESSION notification is
-     * showing background Pause feedback, HTML's *running* title is still stored
-     * (it leads with the green 🟢 / blue 🔵 running dot) but the state is now
-     * paused. Swap ONLY that leading running dot for the paused (yellow 🟡) dot
-     * so the shade matches the paused state HTML would have rendered.
-     *
-     * This is a deliberate no-op for every other notification:
-     *   - running states (not paused) -> returned unchanged,
-     *   - HTML-synced paused states -> title already leads with 🟡 (no dot to swap),
-     *   - bomb notifications -> title leads with 🔴 (no dot to swap),
-     *   - legacy titles -> no leading dot.
-     * Only the leading dot is ever touched, so titles are otherwise untouched.
-     */
-    private fun pausedDisplayTitle(s: State): String {
-        if (!s.paused) return s.title
-        val t = s.title
-        return when {
-            t.startsWith("\uD83D\uDFE2") -> "\uD83D\uDFE1" + t.substring(2) // 🟢 -> 🟡
-            t.startsWith("\uD83D\uDD35") -> "\uD83D\uDFE1" + t.substring(2) // 🔵 -> 🟡
-            else -> t
-        }
-    }
-
     private fun buildNotification(s: State, text: String): Notification {
         val openApp = PendingIntent.getActivity(
             this, 0,
@@ -525,7 +465,7 @@ class TimerService : Service() {
         )
         val builder = NotificationCompat.Builder(this, ShellApp.CHANNEL_TIMER)
             .setSmallIcon(android.R.drawable.ic_menu_recent_history)
-            .setContentTitle(pausedDisplayTitle(s))
+            .setContentTitle(s.title)
             .setContentText(text.substringBefore('\n'))
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .setContentIntent(openApp)
