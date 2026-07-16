@@ -479,13 +479,13 @@ body.bomb-danger{background-color:#EF4444;}
 /* Reflection popup — small premium modal */
 .pomo-pop{position:fixed;inset:0;background:rgba(27,23,64,0.42);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:60;}
 .pomo-pop.show{display:flex;}
-.pomo-pop-card{background:var(--card,#fff);border-radius:16px;padding:14px;width:min(280px,84vw);box-shadow:0 16px 40px rgba(27,23,64,0.22);}
-.pomo-pop-card h4{margin:0 0 8px;font-size:12px;font-weight:800;color:var(--text);}
-.pomo-pop-card textarea{width:100%;border:1.5px solid var(--line,#E7E5F2);border-radius:9px;padding:7px 8px;font-size:11px;font-family:inherit;resize:none;height:52px;box-sizing:border-box;}
-.pomo-moods{display:flex;gap:8px;justify-content:center;margin:9px 0;}
-.pomo-mood-btn{border:1.5px solid transparent;background:rgba(139,135,166,0.09);border-radius:9px;padding:5px 10px;display:flex;align-items:center;justify-content:center;}
+.pomo-pop-card{background:var(--card,#fff);border-radius:17px;padding:15px;width:min(302px,88vw);box-shadow:0 16px 40px rgba(27,23,64,0.22);}
+.pomo-pop-card h4{margin:0 0 9px;font-size:13px;font-weight:800;color:var(--text);}
+.pomo-pop-card textarea{width:100%;border:1.5px solid var(--line,#E7E5F2);border-radius:10px;padding:8px 9px;font-size:12px;font-family:inherit;resize:none;height:106px;box-sizing:border-box;overflow-y:auto;}
+.pomo-moods{display:flex;gap:9px;justify-content:center;margin:10px 0;}
+.pomo-mood-btn{border:1.5px solid transparent;background:rgba(139,135,166,0.09);border-radius:10px;padding:6px 11px;display:flex;align-items:center;justify-content:center;}
 .pomo-mood-btn.sel{border-color:var(--primary);background:var(--primary-light,#EEECFE);}
-.pomo-pop-save{width:100%;border:none;background:var(--primary);color:#fff;border-radius:9px;padding:8px;font-size:11.5px;font-weight:800;}
+.pomo-pop-save{width:100%;border:none;background:var(--primary);color:#fff;border-radius:10px;padding:9px;font-size:12.5px;font-weight:800;}
   .hist-status-row{display:flex;gap:8px;margin-bottom:10px;}
   .hist-status-btn{flex:1;border:1.5px solid var(--border);background:var(--card);border-radius:12px;padding:10px 0;font-weight:700;font-size:12.5px;color:var(--text-dim);cursor:pointer;transition:all .15s cubic-bezier(.4,0,.2,1);}
   .hist-status-btn:active{transform:scale(0.96);}
@@ -531,26 +531,48 @@ body.bomb-danger{background-color:#EF4444;}
   /* Display-only green tick shown once an activity is Completed (normally or early) — replaces the red View/Info button and is intentionally non-interactive */
   .icon-btn.done-tick{background:var(--green-light);color:var(--green-dark);cursor:default;}
   .icon-btn.done-tick:active{transform:none;}
-  /* Compact "Mark as Complete" early popup */
-  .ec-dialog{max-width:390px;text-align:center;padding:14px;}
-  /* Header: eye icon + heading vertically centered, less internal padding, stronger heading */
-  .ec-header{display:flex;align-items:center;justify-content:center;gap:12px;background:var(--red-light);border-radius:16px;padding:11px 14px;margin-bottom:12px;}
-  .ec-eye{flex:none;width:48px;height:48px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;}
+  /* ── Mark-as-Complete-Early popup ── */
+  .ec-dialog{max-width:390px !important;text-align:left !important;padding:14px !important;}
+
+  /* ── Header card: eye-circle | vertical divider | title + desc ── */
+  /* Eye = 58px. Text block is sized to exactly fill that height:
+     title (22px × 1.1lh ≈ 24px) + gap 2px + desc (11px × 1.32lh × 2 lines ≈ 29px) = ~55px */
+  .ec-header{display:flex;align-items:center;gap:0;background:var(--red-light);border-radius:16px;padding:11px 14px;margin-bottom:10px;}
+  .ec-eye{flex:none;width:58px !important;height:58px !important;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;}
   .ec-eye svg{width:28px;height:28px;}
-  .ec-title{margin:0;font-size:29px;font-weight:900;color:var(--red);letter-spacing:.5px;line-height:1;}
-  /* Task card: everything horizontally centered, name/subject/progress form one compact block */
-  .ec-card{background:var(--primary-light);border-radius:16px;padding:12px 14px;margin-bottom:12px;text-align:center;}
-  .ec-task{font-size:17px;font-weight:800;color:var(--text);display:flex;align-items:center;justify-content:center;gap:8px;}
-  .ec-subject{font-size:12.5px;font-weight:600;color:var(--text-dim);margin-top:1px;}
-  .ec-prog{font-size:17px;font-weight:800;color:var(--text);margin-top:5px;font-variant-numeric:tabular-nums;}
-  .ec-prog .dim{color:var(--text-dim);font-weight:700;}
-  /* Release note: smaller, muted, centered, kept to at most two lines */
-  .ec-note{font-size:11.5px;color:var(--text-dim);margin:9px auto 0;line-height:1.45;max-width:30ch;text-wrap:balance;}
-  .ec-instruct{text-align:center;font-size:12px;color:var(--text-dim);margin:0 0 7px;}
-  .ec-instruct b{color:var(--text);}
-  .ec-input{text-align:center;letter-spacing:6px;text-indent:6px;font-weight:800;padding-top:10px;padding-bottom:10px;margin-bottom:11px;}
-  /* Cancel button gets a light-red tint; both buttons already share equal width/height via .d-btn */
-  .dialog .ec-dialog .d-btn.cancel,.ec-dialog .d-btn.cancel{background:var(--red-light);color:var(--red);}
+  /* Vertical divider: subtle, same height as eye icon only — not full card height */
+  .ec-divider-v{width:2px;height:42px;background:var(--red);opacity:.4;margin:0 12px;flex:none;border-radius:2px;}
+  .ec-head-text{display:flex;flex-direction:column;gap:4px;min-width:0;justify-content:center;}
+  /* Title: 22px / weight 700 — starts at top of eye, occupies upper ~half */
+  .ec-title{margin:0 !important;font-size:22px !important;font-weight:700;color:var(--text);letter-spacing:-0.015em;line-height:1.1 !important;}
+  .ec-desc{margin:0 !important;font-size:11px !important;color:var(--text-dim);line-height:1.32 !important;font-weight:500;}
+
+  /* ── Activity card: icon-square | text block, then divider + release note ── */
+  .ec-card{background:var(--primary-light);border-radius:16px;padding:11px 14px 11px 14px;margin-bottom:10px;text-align:left;}
+  .ec-card-top{display:flex;align-items:center;gap:11px;}
+  .ec-icon-box{flex:none;width:46px;height:46px;border-radius:12px;background:rgba(91,79,232,.13);display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;}
+  .ec-card-info{display:flex;flex-direction:column;gap:1px;min-width:0;}
+  .ec-task{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ec-task-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ec-subject{font-size:11.5px;font-weight:600;color:var(--text-dim);margin-top:0;}
+  .ec-prog{font-size:13.5px;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums;margin-top:3px;flex-wrap:nowrap;}
+  .ec-prog .dim{color:var(--text-dim);font-weight:600;}
+  .ec-prog .sep{color:var(--text-dim);font-weight:400;margin:0 4px;opacity:.6;}
+  .ec-prog .remain-lbl{color:var(--text-dim);font-weight:600;}
+  .ec-prog .remain-val{color:var(--primary);font-weight:800;}
+  /* Divider rendered as top-border on the note block — avoids overflow/width hacks */
+  .ec-card-divider{display:none;}
+  .ec-note{font-size:12px !important;color:var(--text-dim);margin:0;line-height:1.32;text-wrap:balance;border-top:1.5px solid rgba(91,79,232,.28);padding-top:9px;margin-top:9px;}
+  .ec-note .hl{color:var(--primary);font-weight:700;}
+
+  /* ��─ Confirm section ── */
+  .ec-instruct{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-dim);margin:0 0 6px;}
+  .ec-instruct-icon{width:22px;height:22px;flex:none;color:var(--primary);display:flex;align-items:center;justify-content:center;}
+  .ec-instruct-icon svg{width:20px;height:20px;}
+  .ec-instruct b{color:var(--primary);}
+  .ec-input{text-align:center;letter-spacing:6px;text-indent:6px;font-weight:800;padding-top:10px;padding-bottom:10px;margin-bottom:10px;}
+  /* Cancel button — light bg */
+  .dialog .ec-dialog .d-btn.cancel,.ec-dialog .d-btn.cancel{background:var(--bg);color:var(--text);}
   .icon-btn:active{transform:scale(0.92);}
   .icon-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
   /* Category tab strip (Study/Routine/Health) used on the Tasks screen */
@@ -685,6 +707,15 @@ body.bomb-danger{background-color:#EF4444;}
   /* Small toast notification for brief status messages (save confirmations, errors) */
   .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:11px 20px;border-radius:13px;font-size:13px;font-weight:600;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:0 10px 28px rgba(27,23,64,0.28);}
   .toast.show{opacity:1;}
+  /* In-app session-complete review banner — slides down from the top, dismisses after 8s or on ADD */
+  .review-banner{position:fixed;top:0;left:0;right:0;z-index:190;transform:translateY(-110%);transition:transform .35s cubic-bezier(.4,0,.2,1);pointer-events:none;}
+  .review-banner.show{transform:translateY(0);pointer-events:auto;}
+  .review-banner-inner{background:var(--primary);color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 18px rgba(27,23,64,0.22);}
+  .review-banner-text{flex:1;min-width:0;}
+  .review-banner-title{font-size:13px;font-weight:700;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .review-banner-sub{font-size:11px;font-weight:500;opacity:.82;margin-top:1px;}
+  .review-banner-add{flex:none;background:#fff;color:var(--primary);border:none;border-radius:8px;padding:6px 13px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;}
+  .review-banner-dismiss{flex:none;background:none;border:none;color:#fff;opacity:.7;font-size:18px;line-height:1;cursor:pointer;padding:2px 4px;}
 
   /* ================================================================================
      GOALS SCREEN — an independent study-goal tracking system (see JS "GOALS ENGINE"
@@ -1384,6 +1415,28 @@ body.bomb-danger{background-color:#EF4444;}
         <div class="field" style="margin-top:12px;"><label>One Lifeline = Extra Minutes</label><input type="number" id="setLifelineExtra" min="1" step="5"></div>
         <div class="subtext">You start each day with the number of free Lifelines set above (0-3, hard maximum 3). Each interval of cumulative Study Pomodoro time (hours set above) earns 1 more. The maximum is permanently fixed at 3 Lifelines per day. Consuming one Lifeline adds the extra minutes above to the Bomb Timer. Everything resets at the start of each new day.</div>
       </div>
+      <!-- Bomb Trigger: when the bomb arms at the start of each Study Day -->
+      <div class="plain-card">
+        <h3>Wake-up Bomb Trigger Behaviour</h3>
+        <p style="font-size:13px;color:var(--text-dim);margin:4px 0 12px;line-height:1.4;">Choose when Bomb Mode should become active after your Wake-up Time.</p>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <label for="setBombTriggerWake" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:12px;background:var(--primary-light);border:1.5px solid var(--primary);cursor:pointer;">
+            <input type="radio" name="bombWakeTrigger" id="setBombTriggerWake" value="wake-time" style="margin-top:3px;flex-shrink:0;accent-color:var(--primary);width:16px;height:16px;">
+            <span style="display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Start at Wake-up Time <span style="font-size:11px;font-weight:500;color:var(--primary);">(Default)</span></span>
+              <span style="font-size:11px;color:var(--text-dim);line-height:1.45;">Best for building discipline. Bomb starts automatically at your configured Wake-up Time, encouraging you to wake up and begin your first activity on time to stay on track with your daily goals and protect your Hour Streak.</span>
+            </span>
+          </label>
+          <label for="setBombTriggerFirst" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:12px;background:var(--bg);border:1.5px solid var(--border);cursor:pointer;">
+            <input type="radio" name="bombWakeTrigger" id="setBombTriggerFirst" value="first-activity" style="margin-top:3px;flex-shrink:0;accent-color:var(--primary);width:16px;height:16px;">
+            <span style="display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:14px;font-weight:500;color:var(--text-dim);line-height:1.2;">Start After First Activity</span>
+              <span style="font-size:11px;color:var(--text-dim);line-height:1.45;font-style:italic;">(More flexible if you don&apos;t always wake up on time)</span>
+              <span style="font-size:11px;color:var(--text-dim);line-height:1.45;">Bomb remains idle until your first activity begins, then behaves normally for the rest of the day.</span>
+            </span>
+          </label>
+        </div>
+      </div>
       <!-- Informational only — how Bomb Challenge Mode works -->
       <div class="plain-card">
         <h3>About Bomb Challenge Mode</h3>
@@ -1565,8 +1618,12 @@ body.bomb-danger{background-color:#EF4444;}
             <label class="tg-switch"><input type="checkbox" id="andFlagAlarms"><span class="slider"></span></label>
           </div>
           <div class="and-row">
-            <div class="ar-txt"><div class="ar-t1">Session End Alarm</div><div class="ar-t2">Ring when the running task&apos;s time is up — even if the app was killed mid-session</div></div>
+            <div class="ar-txt"><div class="ar-t1">Pomodoro Session End Alarm</div><div class="ar-t2">Ring after every completed Pomodoro session (1/5, 2/5, etc.).</div></div>
             <label class="tg-switch"><input type="checkbox" id="andSetSessionAlarm"><span class="slider"></span></label>
+          </div>
+          <div class="and-row">
+            <div class="ar-txt"><div class="ar-t1">Task Completion Alarm</div><div class="ar-t2">Ring only once when the entire task is completed. Intermediate Pomodoro sessions remain silent.</div></div>
+            <label class="tg-switch"><input type="checkbox" id="andSetTaskCompletionAlarm"><span class="slider"></span></label>
           </div>
           <div class="and-row">
             <div class="ar-txt"><div class="ar-t1">Bomb Explosion Alarm</div><div class="ar-t2">Ring when the Bomb reaches 00:00 so an explosion never happens silently</div></div>
@@ -2092,19 +2149,36 @@ body.bomb-danger{background-color:#EF4444;}
      Requires typing DONE. -->
 <div class="overlay center-modal" id="earlyCompleteDialog">
   <div class="dialog ec-dialog">
+
+    <!-- Header: eye icon | vertical divider | title + desc -->
     <div class="ec-header">
-      <span class="ec-eye"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
-      <h3 class="ec-title">MARK AS COMPLETE ?</h3>
+      <span class="ec-eye"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+      <span class="ec-divider-v"></span>
+      <div class="ec-head-text">
+        <h3 class="ec-title">Mark as Complete?</h3>
+        <p class="ec-desc">You are about to mark this activity as complete before the timer finishes.</p>
+      </div>
     </div>
 
+    <!-- Activity card: icon-square | name + progress, then divider + release note -->
     <div class="ec-card">
-      <div class="ec-task"><span id="ecName">—</span></div>
-      <div class="ec-subject" id="ecSubject" style="display:none;">—</div>
-      <div class="ec-prog" id="ecProgress">—</div>
+      <div class="ec-card-top">
+        <div class="ec-icon-box" id="ecIconBox">📖</div>
+        <div class="ec-card-info">
+          <div class="ec-task"><span class="ec-task-name" id="ecName">—</span></div>
+          <div class="ec-subject" id="ecSubject" style="display:none;">—</div>
+          <div class="ec-prog" id="ecProgress">—</div>
+        </div>
+      </div>
+      <div class="ec-card-divider"></div>
       <div class="ec-note" id="ecReleaseNote">—</div>
     </div>
 
-    <div class="ec-instruct">Type <b>DONE</b> to confirm.</div>
+    <!-- Confirm section -->
+    <div class="ec-instruct">
+      <span class="ec-instruct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><polyline points="9 12 11.5 14.5 15.5 10"/></svg></span>
+      <span>Type <b>DONE</b> to confirm.</span>
+    </div>
     <input type="text" class="gdel-input ec-input" id="earlyCompleteCode" placeholder="DONE" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false">
     <div class="d-btn-row">
       <button class="d-btn cancel" id="earlyCompleteCancel">Cancel</button>
@@ -2254,6 +2328,18 @@ body.bomb-danger{background-color:#EF4444;}
 <!-- Toast - Brief status message popup (save confirmations, validation errors) -->
 <div class="toast" id="toast"></div>
 
+<!-- In-app review banner: slides down after a Pomodoro session completes, ADD opens reflection popup -->
+<div class="review-banner" id="reviewBanner">
+  <div class="review-banner-inner">
+    <div class="review-banner-text">
+      <div class="review-banner-title" id="reviewBannerTitle">✓ Session completed</div>
+      <div class="review-banner-sub">Add your Reflection Comment.</div>
+    </div>
+    <button class="review-banner-add" id="reviewBannerAdd">ADD</button>
+    <button class="review-banner-dismiss" id="reviewBannerDismiss" aria-label="Dismiss">✕</button>
+  </div>
+</div>
+
 <!-- Bomb Exploded reset confirmation — reuses the app's shared confirmation dialog shell (same as Reset All Data / Restart Task), slightly larger -->
 <div class="overlay center-modal" id="breachScreen">
   <div class="dialog" style="max-width:400px;">
@@ -2322,7 +2408,7 @@ function todayStr(d){ d=d||new Date(); return d.getFullYear()+'-'+String(d.getMo
    The app's "new day starts here" moment is a single configurable setting
    (Settings → Day Boundary → dayResetHour, default 0 = 12:00 AM). Every place in the
    app that needs to know "which day does this moment belong to" — daily hours/hearts
-   resets, the Study Timeline's day grouping, and the entire Goals engine — must go
+   resets, the Study Timeline's day grouping, and the entire Goals engine ��� must go
    through appDayKey()/appDayStart() below instead of raw calendar dates, so changing
    this one setting instantly and consistently affects the whole app. */
 function getDayResetHour(){ return (STATE && STATE.settings && STATE.settings.dayResetHour!=null) ? STATE.settings.dayResetHour : DEFAULT_SETTINGS.dayResetHour; }
@@ -2435,7 +2521,7 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
   const DEFAULT_REPORT_TEMPLATE = `━━━━━━━━━━━━━━━━━━━━━━
 📅 Daily Study Report
 • Date : {date}
-━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━��━━━━━━━━━━━━
 
 📊 Today's Activity
 
@@ -2474,6 +2560,7 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
   pomodoroDuration: 30*60,
   bombDuration: 20*60,
   bombChallengeMode: true, // When OFF: hides lifelines, disables the bomb countdown/explosion/streak-reset, and switches the Home streak card to the Goal Day Streak
+  bombWakeTrigger: 'wake-time', // When to arm the Bomb at the start of each Study Day: 'wake-time' (default) arms at Wake-up; 'first-activity' arms only after the first productive session begins
   heartsMaxPerDay: 3,
   dailyFreeLifelines: 1, // free Lifelines (hearts) granted at each new day (0-3, hard max 3). resetDailyLifelines() uses this instead of a hardcoded 1.
   lifelineEveryHours: 4, // cumulative Study hours needed to earn each bonus Lifeline (configurable in Settings)
@@ -2706,6 +2793,7 @@ async function getState(){
   if(s.settings.wakeHour===undefined) s.settings.wakeHour = DEFAULT_SETTINGS.wakeHour;
   if(s.settings.lockTodayEditing===undefined) s.settings.lockTodayEditing = DEFAULT_SETTINGS.lockTodayEditing;
   if(s.settings.bombChallengeMode===undefined) s.settings.bombChallengeMode = DEFAULT_SETTINGS.bombChallengeMode;
+  if(s.settings.bombWakeTrigger===undefined) s.settings.bombWakeTrigger = DEFAULT_SETTINGS.bombWakeTrigger;
  if(!s.settings.subjects) s.settings.subjects = [...DEFAULT_SETTINGS.subjects];
  if(!s.settings.timeSlots) s.settings.timeSlots = JSON.parse(JSON.stringify(DEFAULT_SETTINGS.timeSlots));
   if(s.streakPomodoros===undefined) s.streakPomodoros = (s.currentStreakHours||0)*2;
@@ -2948,7 +3036,7 @@ async function getTimelineSecondsByCat(dayKey){
   for(const e of all){ if(e.date===dayKey && out[e.category]!=null) out[e.category] += (e.duration||0); }
   return out;
 }
-// ── STUDY PROGRESS — SINGLE SOURCE OF TRUTH (History → Study Task Progress) ────────────────────
+// ���������─ STUDY PROGRESS — SINGLE SOURCE OF TRUTH (History → Study Task Progress) ────────────────────
 // Everything Telegram reports about Study reads THROUGH this one reader, which mirrors exactly what
 // the History → Study Task Progress tab shows (same "started" filter, same clamped consumed time via
 // getEffectiveConsumedSec, same Pomodoro split via activitySplit, same STATE.pomoLogs reflections).
@@ -3132,7 +3220,7 @@ async function retryPendingReports(){
   renderHome();
   setTgStatus(remaining.length ? (remaining.length+' report(s) still pending.') : '✓ All pending reports sent.');
 }
-// ── ReportScheduler (item 1) ───────────────────────────────────────────────────────────────────
+// ── ReportScheduler (item 1) ──────────────��────��──────���────────────────────────────────────────
 // Centralized owner of WHEN the automatic Daily Study Report is sent. Two mutually-exclusive modes,
 // chosen by settings.reportTiming (default 'sleep'):
 //   'sleep' → generated the moment Sleep begins (the Sleep-Start / End-of-Day boundary).
@@ -3142,33 +3230,40 @@ async function retryPendingReports(){
 // campaign systems. The finished study-day is captured at the Sleep-Start crossing and remembered for a
 // 'wake'-mode send, so both modes always report the exact same day. MUST run before maybeWakePromotion()
 // so a 'wake' report still sees the finished day's Study tasks before Tomorrow→Today rotation clears them.
+let _sendingScheduledReport = false; // re-entrancy guard: boot + visibilitychange/pageshow + 3s poll all call this simultaneously → Night report sent multiple times
 async function maybeSendScheduledReport(){
-  const state = STATE; if(!state) return;
-  const timing = state.settings.reportTiming === 'wake' ? 'wake' : 'sleep';
-  const sleepKey = appDayKey();    // flips at Sleep Start (End of Day)
-  const wakeKey  = studyDayKey();  // flips at Wake-up
-  let dirty = false;
-  // First-run baselines — adopt the current keys; never send retroactively.
-  if(state.lastSleepReportKey == null){ state.lastSleepReportKey = sleepKey; dirty = true; }
-  if(state.lastWakeReportKey  == null){ state.lastWakeReportKey  = wakeKey;  dirty = true; }
-  // (A) Sleep-Start crossed → the app-day that just ended is the finished study-day.
-  if(state.lastSleepReportKey !== sleepKey){
-    const finishedKey = state.lastSleepReportKey;
-    state.pendingWakeReportKey = finishedKey; // remembered for a 'wake'-mode send at the next Wake
-    if(timing === 'sleep' && state.settings.telegramEnabled){ await sendDailyReport(state, finishedKey); }
-    state.lastSleepReportKey = sleepKey;
-    dirty = true;
-  }
-  // (B) Wake crossed → in 'wake' mode, send the report for the day captured at Sleep Start (+ Sleep Duration).
-  if(state.lastWakeReportKey !== wakeKey){
-    if(timing === 'wake' && state.pendingWakeReportKey != null && state.settings.telegramEnabled){
-      await sendDailyReport(state, state.pendingWakeReportKey, {includeSleep:true});
+  if(_sendingScheduledReport) return;
+  _sendingScheduledReport = true;
+  try{
+    const state = STATE; if(!state) return;
+    const timing = state.settings.reportTiming === 'wake' ? 'wake' : 'sleep';
+    const sleepKey = appDayKey();    // flips at Sleep Start (End of Day)
+    const wakeKey  = studyDayKey();  // flips at Wake-up
+    let dirty = false;
+    // First-run baselines — adopt the current keys; never send retroactively.
+    if(state.lastSleepReportKey == null){ state.lastSleepReportKey = sleepKey; dirty = true; }
+    if(state.lastWakeReportKey  == null){ state.lastWakeReportKey  = wakeKey;  dirty = true; }
+    // (A) Sleep-Start crossed → the app-day that just ended is the finished study-day.
+    if(state.lastSleepReportKey !== sleepKey){
+      const finishedKey = state.lastSleepReportKey;
+      state.pendingWakeReportKey = finishedKey; // remembered for a 'wake'-mode send at the next Wake
+      if(timing === 'sleep' && state.settings.telegramEnabled){ await sendDailyReport(state, finishedKey); }
+      state.lastSleepReportKey = sleepKey;
+      dirty = true;
     }
-    state.pendingWakeReportKey = null;
-    state.lastWakeReportKey = wakeKey;
-    dirty = true;
+    // (B) Wake crossed → in 'wake' mode, send the report for the day captured at Sleep Start (+ Sleep Duration).
+    if(state.lastWakeReportKey !== wakeKey){
+      if(timing === 'wake' && state.pendingWakeReportKey != null && state.settings.telegramEnabled){
+        await sendDailyReport(state, state.pendingWakeReportKey, {includeSleep:true});
+      }
+      state.pendingWakeReportKey = null;
+      state.lastWakeReportKey = wakeKey;
+      dirty = true;
+    }
+    if(dirty) await saveState(state);
+  }finally{
+    _sendingScheduledReport = false;
   }
-  if(dirty) await saveState(state);
 }
 
 // Optional auto-log for Routine/Health, gated by settings.autoLogNonStudy
@@ -3754,7 +3849,8 @@ async function recoverState(){
     if(state.homeDayStreakLastAward !== state.lastActiveDate) state.homeDayStreak = 0;
     state.completedPomodorosToday = 0; state.lastActiveDate = today;
     state.pomoLogs = {}; // Pomodoro Log follows the same daily lifecycle — fresh empty log each new day
-    BombEngine.armForNewDay(state); // fresh full Bomb clock + re-arm — new Study Day starts clean (single owner)
+    // 'first-activity' mode: leave the bomb disarmed at day-start; armBomb() fires naturally after the first session ends
+    if(state.settings.bombWakeTrigger === 'first-activity'){ state.activeTimer = null; } else { BombEngine.armForNewDay(state); } // fresh full Bomb clock + re-arm — new Study Day starts clean (single owner)
     BombEngine.resetDailyLifelines(state); // hearts→1, dailyLifelinesEarned→0 (single lifeline authority)
     state.bombLocked = false;         // Task 6.5: day-rollover clears the persisted flag; syncFreezeReasons() exits BOMB_LOCK on next poll
     state.bombExplodedToday = 0;      // fresh explosion counter for the new Study Day
@@ -4580,6 +4676,7 @@ function renderHome(){
         updateBombCardLive();
       }
       document.getElementById('pomoTime').textContent = fmtClock(remain/1000);
+      const _prc = document.getElementById('pomoRunCountdown'); if(_prc) _prc.textContent = fmtClock(remain/1000); // live History Log countdown — reuses this tick, no extra timer
       tickCurrentActivity(at); // keeps the Current Activity card's segments/chips/Time Left live
       hsUpdateRunningProgress(at); // keeps the picker's running-task progress live
     };
@@ -4732,7 +4829,7 @@ function sleepIntervalsInWindow(windowStart, now){
 //   • IDLE    — only when the Bomb countdown is NOT running: the stretch right after Wake-up before the
 //               very first task starts, the frozen period after an explosion (BOMB_LOCK) until reset,
 //               and (Bomb Mode off) any awake gap with nothing running.
-// ─────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────��─────────────
 
 // Returns the timestamp of the most recent Wake-up moment (getWakeHour()) on or before `now`.
 function todayWakeTs(now){
@@ -5095,7 +5192,7 @@ async function renderHistTasks(){
           const mCell = saved ? (en.mood ? pomoMoodSvg(en.mood) : '<span class="empty" style="color:var(--text-dim);font-size:10px;">—</span>') : `<button class="pomo-add" data-pomoadd="${t.id}" data-pomoidx="${i}">+</button>`;
           rowsHtml += `<div class="pomo-row"><span class="pomo-n">${n}</span><span class="pomo-c ${saved&&en.comment?'':'empty'}">${cCell}</span><span class="pomo-m">${mCell}</span></div>`;
         } else if(i===cur-1 && r.isRunning && !isDone){
-          rowsHtml += `<div class="pomo-row"><span class="pomo-n">${n}</span><span class="pomo-c"><span class="pomo-run-badge">Running</span></span><span class="pomo-run-time">${fmtClock(runRemain)}</span></div>`;
+          rowsHtml += `<div class="pomo-row"><span class="pomo-n">${n}</span><span class="pomo-c"><span class="pomo-run-badge">Running</span></span><span class="pomo-run-time" id="pomoRunCountdown">${fmtClock(runRemain)}</span></div>`;
         }
         // Future sessions render nothing — their rows are revealed automatically once they start
       }
@@ -5173,14 +5270,21 @@ async function promoteTomorrow(state){
   state.lastWakeKey=studyDayKey();
   await saveState(state);
 }
+let _promotingWake = false; // re-entrancy guard: boot + visibilitychange/pageshow + 3s poll all call this simultaneously at wake-up boundary → promoteTomorrow() ran multiple times → duplicate tasks
 // Runs on the background loop: promotes Tomorrow→Today the first time each Wake-up boundary is crossed
 async function maybeWakePromotion(){
-  const state=STATE; if(!state) return;
-  const k=studyDayKey();
-  if(state.lastWakeKey===undefined){ state.lastWakeKey=k; await saveState(state); return; }
-  if(state.lastWakeKey===k) return;
-  if(!state.tomorrow){ state.lastWakeKey=k; await saveState(state); return; }
-  await promoteTomorrow(state);
+  if(_promotingWake) return;
+  _promotingWake = true;
+  try{
+    const state=STATE; if(!state) return;
+    const k=studyDayKey();
+    if(state.lastWakeKey===undefined){ state.lastWakeKey=k; await saveState(state); return; }
+    if(state.lastWakeKey===k) return;
+    if(!state.tomorrow){ state.lastWakeKey=k; await saveState(state); return; }
+    await promoteTomorrow(state);
+  }finally{
+    _promotingWake = false;
+  }
 }
 // A Today task is edit-locked once its Pomodoro has started (any consumed time / active / finalized)
 function isTaskStarted(t){
@@ -5389,6 +5493,8 @@ function renderSettings(){
   document.getElementById('setToastsEnabled').checked = STATE.settings.toastsEnabled !== false;
   document.getElementById('setBomb').value = Math.round(STATE.settings.bombDuration/60);
   document.getElementById('setBombMode').checked = bombModeOn(STATE);
+  document.getElementById(STATE.settings.bombWakeTrigger === 'first-activity' ? 'setBombTriggerFirst' : 'setBombTriggerWake').checked = true;
+  updateBombTriggerUI();
   document.getElementById('setDailyFree').value = (STATE.settings.dailyFreeLifelines != null ? STATE.settings.dailyFreeLifelines : 1);
   document.getElementById('setHeartsEvery').value = STATE.settings.lifelineEveryHours || 4;
   document.getElementById('setLifelineExtra').value = STATE.settings.lifelineExtraMinutes || 10;
@@ -6605,7 +6711,11 @@ function openEarlyCompleteDialog(id){
   const consumed = Math.min(task.duration, getEffectiveConsumedSec(task));
   const remaining = Math.max(0, task.duration - consumed);
   // One compact info card: category-icon + task name, optional subject, consumed / assigned, muted release note.
-  document.getElementById('ecName').innerHTML = `${task.icon||CAT_ICON[task.category]||''} ${escapeHtml(task.name)}`;
+  // Icon box — use the task's own icon; fall back to category default
+  const iconBox = document.getElementById('ecIconBox');
+  if(iconBox) iconBox.textContent = task.icon||CAT_ICON[task.category]||'📋';
+  // Task name (no icon prefix — icon is now in its own box)
+  document.getElementById('ecName').innerHTML = escapeHtml(task.name);
   const subjEl = document.getElementById('ecSubject');
   if(task.category==='others'){
     subjEl.textContent = `(${othersLabel(task)})`; // Others task — show "Others" or "Others - X"
@@ -6616,8 +6726,15 @@ function openEarlyCompleteDialog(id){
   } else {
     subjEl.style.display = 'none';
   }
-  document.getElementById('ecProgress').innerHTML = `${fmtHMu(consumed)} <span class="dim">/</span> ${fmtHMu(task.duration)}`;
-  document.getElementById('ecReleaseNote').innerHTML = `The remaining ${fmtHMu(remaining)} will be released, allowing you to create another task.`;
+  // Progress row: clock icon + consumed / total | Remaining Xm
+  document.getElementById('ecProgress').innerHTML =
+    `<svg style="width:13px;height:13px;flex:none;margin-right:1px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>`+
+    `<span style="white-space:nowrap;">${fmtHMu(consumed)}</span>`+
+    `<span class="dim" style="margin:0 1px;">/</span>`+
+    `<span style="white-space:nowrap;">${fmtHMu(task.duration)}</span>`+
+    `<span class="sep" style="margin:0 5px;">|</span>`+
+    `<span style="white-space:nowrap;"><span class="remain-lbl">Remaining </span><span class="remain-val">${fmtHMu(remaining)}</span></span>`;
+  document.getElementById('ecReleaseNote').innerHTML = `The remaining <span class="hl">${fmtHMu(remaining)}</span> will be released, allowing you to create another task.`;
   const code = document.getElementById('earlyCompleteCode');
   const btn = document.getElementById('earlyCompleteConfirm');
   code.value = '';
@@ -6764,6 +6881,7 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
   state.settings.pomodoroDuration = (pomo>0?pomo:30)*60;
   state.settings.bombDuration = (bomb>0?bomb:20)*60;
   state.settings.bombChallengeMode = document.getElementById('setBombMode').checked;
+  state.settings.bombWakeTrigger = document.querySelector('input[name="bombWakeTrigger"]:checked')?.value || DEFAULT_SETTINGS.bombWakeTrigger;
   // If bomb mode was just turned OFF and a bomb timer is still sitting as activeTimer,
   // clear it immediately so no stale bomb object survives in IDB after the user disables the feature.
   if(!state.settings.bombChallengeMode && state.activeTimer && state.activeTimer.type === 'bomb'){
@@ -6954,6 +7072,22 @@ document.getElementById('tgsetBackBtn').onclick = ()=>{
   document.getElementById('screen-settings').classList.add('active');
   renderSettings();
 };
+function updateBombTriggerUI(){
+  const wakeLabel  = document.getElementById('setBombTriggerWake').closest('label');
+  const firstLabel = document.getElementById('setBombTriggerFirst').closest('label');
+  const wakeSelected = document.getElementById('setBombTriggerWake').checked;
+  // Wake-time card
+  wakeLabel.style.background  = wakeSelected ? 'var(--primary-light)' : 'var(--bg)';
+  wakeLabel.style.border      = '1.5px solid ' + (wakeSelected ? 'var(--primary)' : 'var(--border)');
+  wakeLabel.querySelector('span > span:first-child').style.fontWeight = wakeSelected ? '700' : '500';
+  wakeLabel.querySelector('span > span:first-child').style.color      = wakeSelected ? 'var(--text)' : 'var(--text-dim)';
+  // First-activity card
+  firstLabel.style.background  = wakeSelected ? 'var(--bg)' : 'var(--primary-light)';
+  firstLabel.style.border      = '1.5px solid ' + (wakeSelected ? 'var(--border)' : 'var(--primary)');
+  firstLabel.querySelector('span > span:first-child').style.fontWeight = wakeSelected ? '500' : '700';
+  firstLabel.querySelector('span > span:first-child').style.color      = wakeSelected ? 'var(--text-dim)' : 'var(--text)';
+}
+document.querySelectorAll('input[name="bombWakeTrigger"]').forEach(r => r.addEventListener('change', updateBombTriggerUI));
 document.getElementById('tgsetEnabled').addEventListener('change', applyTgEnabledUI);
 document.getElementById('setReportTiming').addEventListener('change', updateTgScheduleCard);
 document.getElementById('setTgTemplate').addEventListener('input', function(){ autogrowTA(this); });
@@ -7206,7 +7340,7 @@ const AND = {
 
 // HTML-side Android preferences (native flags cover the rest). Stored inside
 // STATE.settings.android so they ride along with normal state persistence + backup.
-const AND_CFG_DEFAULTS = { bombNotif:true, sessionAlarm:true, bombAlarm:true, vibrate:false, soundDurationSec:60 };
+const AND_CFG_DEFAULTS = { bombNotif:true, sessionAlarm:true, taskCompletionAlarm:false, bombAlarm:true, vibrate:false, soundDurationSec:60 };
 const SOUND_DURATION_CHOICES = [5, 10, 15, 30, 60];
 function andCfg(){
   if(!STATE) return {...AND_CFG_DEFAULTS};
@@ -7418,7 +7552,7 @@ function andBuildBombNotif(at){
 function andBuildSessionState(at){
   const v = caComputeView(at);
   const paused = !!at.pausedAt;
-  const emoji = paused ? '🟡' : (v.isStudy ? '🟢' : '🔵');
+  const emoji = paused ? '🟡' : (v.isStudy ? '��' : '🔵');
   const title = emoji + ' ' + v.activity + (v.subject ? ' — ' + v.subject : '');
   const clocks = [];
   let tmpl;
@@ -7544,8 +7678,17 @@ function andSyncAlarms(){
   if(!AND.on || !STATE || !AND.has('scheduleAlarm')) return;
   const at = STATE.activeTimer;
   const cfg = andCfg();
-  // Session end alarm — only while actively running (paused sessions can't predict their end)
-  if(cfg.sessionAlarm && at && at.type!=='bomb' && !at.pausedAt && at.state!=='REVIEW_PENDING' && !isSleepActive()){
+  // Session end alarm — only while actively running (paused sessions can't predict their end).
+  // Fires for every Pomodoro when sessionAlarm is on.
+  // When taskCompletionAlarm is on (and sessionAlarm is off), fires ONLY on the final Pomodoro
+  // so the alarm doesn't ring on intermediate sessions.
+  const alarmActive = at && at.type!=='bomb' && !at.pausedAt && at.state!=='REVIEW_PENDING' && !isSleepActive();
+  const isFinalSession = (()=>{
+    if(!at || at.type!=='study') return true; // non-study tasks have one session — always "final"
+    try{ const v = caComputeView(at); return v && v.cur >= v.total; }catch(e){ return true; }
+  })();
+  const shouldAlarm = alarmActive && (cfg.sessionAlarm || (cfg.taskCompletionAlarm && isFinalSession));
+  if(shouldAlarm){
     const remain = msRemaining(at);
     if(remain > 3000){
       const icon = CAT_ICON[at.type]||'📖';
@@ -7611,7 +7754,7 @@ function andDetectEvents(){
   // 1) Session finished NATURALLY (remaining was nearly zero when it ended).
   //    Manual stops (remaining still large) stay silent — the in-app toast covers those.
   if(wasSession && sessionGone && p.remaining!==null && p.remaining < 2500){
-    const icon = CAT_ICON[p.type]||'���';
+    const icon = CAT_ICON[p.type]||'📖';
     if(p.type==='study' && now.review){
       // Pomodoro finished and is awaiting its review → offer a native ADD button that opens the
       // exact Pomodoro-Log reflection "+" popup for the completed session (see "reviewAdd" below).
@@ -7619,15 +7762,36 @@ function andDetectEvents(){
       //                  Topic Name — Subject
       const at = STATE && STATE.activeTimer;
       const v = at ? caComputeView(at) : null;
+      const cfg = andCfg();
+      const isFinalPomo = v && (v.cur >= v.total); // final Pomodoro also completes the task
+      // Sound logic: sessionAlarm → play on every Pomodoro end; taskCompletionAlarm → only play on final
+      // (sound for the final session is deferred to event #3 to avoid double-playing).
+      // If neither alarm is set, still send the notification/banner (just no sound).
+      const playNow = cfg.sessionAlarm && !cfg.taskCompletionAlarm;
       if(v){
         andSaveReviewTarget({ taskId: at.taskId, idx: Math.max(0, v.cur - 1) });
-        andNotifyReview(AND_NOTIF_REVIEW,
-          '✔️ ' + v.cur + '/' + v.total + ' completed — Add Reflection 🥳',
-          v.activity + (v.subject ? ' — ' + v.subject : ''));
+        const title = '✔️ ' + v.cur + '/' + v.total + ' completed — Add Reflection 🥳';
+        const body  = v.activity + (v.subject ? ' — ' + v.subject : '');
+        // Native notification (Android bridge)
+        if(AND.on){
+          if(playNow || (isFinalPomo && cfg.taskCompletionAlarm)){
+            andNotifyReview(AND_NOTIF_REVIEW, title, body);
+          } else if(AND.has('showReviewNotification')){
+            AND.call('showReviewNotification', AND_NOTIF_REVIEW, title, body); // notification only, no sound
+          } else {
+            AND.call('showNotification', AND_NOTIF_REVIEW, title, body);
+          }
+        }
+        // In-app banner (always shown, even without Android bridge)
+        showReviewBanner('✓ ' + v.cur + '/' + v.total + ' – ' + v.activity + ' session completed.',
+          { taskId: at.taskId, idx: Math.max(0, v.cur - 1) });
       } else {
         andSaveReviewTarget(null);
-        andNotifyReview(AND_NOTIF_REVIEW, '✔️ Session completed — Add Reflection 🥳', (p.task||'Session'));
+        if(AND.on){ andNotifyReview(AND_NOTIF_REVIEW, '✔️ Session completed — Add Reflection 🥳', (p.task||'Session')); }
+        showReviewBanner('✓ Session completed.', null);
       }
+      // If neither flag is set, still play once as neutral feedback (original behavior)
+      if(playNow && !AND.on) SoundController.play('completion');
     } else {
       andNotifyCompletion(AND_NOTIF_REVIEW, icon+' Session complete', (p.task||'Session')+' finished.');
     }
@@ -7642,6 +7806,8 @@ function andDetectEvents(){
     (CACHED_TASKS||[]).forEach(t=>{
       if(t.completedAt && !prevSet.has(String(t.id))){
         AND.call('showNotification', 3, '✅ Task complete', (CAT_ICON[t.category]||'')+' '+t.name+' reached 100%.');
+        // Task Completion Alarm: play sound once when the entire task finishes (not on intermediate Pomodoros)
+        if(andCfg().taskCompletionAlarm) SoundController.play('completion');
       }
     });
   }
@@ -7711,6 +7877,38 @@ async function andRestoreFromNative(){
 // completed session: navigate to History → Study Task Progress, expand that task's log,
 // then show #pomoPop pre-targeted at {taskId, idx}. Creating the row (if missing) is handled
 // by the popup's own Save handler, so an as-yet-unrendered session still works.
+// ---- In-app review banner (shows after Pomodoro completes, ADD opens reflection popup) ----
+let _reviewBannerTimer = null;
+let _reviewBannerTarget = null;
+function showReviewBanner(titleText, target){
+  const banner = document.getElementById('reviewBanner');
+  const titleEl = document.getElementById('reviewBannerTitle');
+  if(!banner || !titleEl) return;
+  _reviewBannerTarget = target || null;
+  titleEl.textContent = titleText;
+  // Show ADD button only when there's a reflection target
+  const addBtn = document.getElementById('reviewBannerAdd');
+  if(addBtn) addBtn.style.display = target ? '' : 'none';
+  banner.classList.add('show');
+  clearTimeout(_reviewBannerTimer);
+  _reviewBannerTimer = setTimeout(()=>{ banner.classList.remove('show'); }, 8000);
+}
+function hideReviewBanner(){
+  const banner = document.getElementById('reviewBanner');
+  if(banner) banner.classList.remove('show');
+  clearTimeout(_reviewBannerTimer);
+}
+// Wire up ADD and dismiss buttons (runs once at startup)
+(function(){
+  const addBtn = document.getElementById('reviewBannerAdd');
+  const dismissBtn = document.getElementById('reviewBannerDismiss');
+  if(addBtn) addBtn.addEventListener('click', ()=>{
+    hideReviewBanner();
+    if(_reviewBannerTarget) andOpenReflection(_reviewBannerTarget);
+  });
+  if(dismissBtn) dismissBtn.addEventListener('click', hideReviewBanner);
+})();
+
 function andOpenReflection(target){
   try{
     // 1) Switch to the History screen via the real nav item (keeps all screen state consistent).
@@ -7846,6 +8044,7 @@ function andRenderSettings(){
   document.getElementById('andSetBombNotif').checked = !!cfg.bombNotif;
   document.getElementById('andSetVibrate').checked = !!cfg.vibrate;
   document.getElementById('andSetSessionAlarm').checked = !!cfg.sessionAlarm;
+  document.getElementById('andSetTaskCompletionAlarm').checked = !!cfg.taskCompletionAlarm;
   document.getElementById('andSetBombAlarm').checked = !!cfg.bombAlarm;
   const durSel = document.getElementById('andSoundDuration');
   if(durSel){ const s = cfg.soundDurationSec; durSel.value = String(SOUND_DURATION_CHOICES.indexOf(s) === -1 ? 60 : s); }
@@ -7885,7 +8084,19 @@ function andBindSettings(){
   const bindCfg = (id, key)=>{ el(id).onchange = async (e)=>{ andCfg()[key] = !!e.target.checked; await saveState(STATE); if(key==='bombNotif' && !e.target.checked && andNotifState!=='none' && STATE.activeTimer && STATE.activeTimer.type==='bomb'){ AND.call('stopTimer'); andNotifState='none'; andLastSig=''; andLastNotifText=''; } }; };
   bindCfg('andSetBombNotif', 'bombNotif');
   bindCfg('andSetVibrate', 'vibrate');
-  bindCfg('andSetSessionAlarm', 'sessionAlarm');
+  // Pomodoro Session End Alarm & Task Completion Alarm are mutually exclusive — enabling one disables the other.
+  el('andSetSessionAlarm').onchange = async (e)=>{
+    const cfg = andCfg();
+    cfg.sessionAlarm = !!e.target.checked;
+    if(cfg.sessionAlarm){ cfg.taskCompletionAlarm = false; el('andSetTaskCompletionAlarm').checked = false; }
+    await saveState(STATE);
+  };
+  el('andSetTaskCompletionAlarm').onchange = async (e)=>{
+    const cfg = andCfg();
+    cfg.taskCompletionAlarm = !!e.target.checked;
+    if(cfg.taskCompletionAlarm){ cfg.sessionAlarm = false; el('andSetSessionAlarm').checked = false; }
+    await saveState(STATE);
+  };
   bindCfg('andSetBombAlarm', 'bombAlarm');
   // Toast master switch — writes the same STATE.settings.toastsEnabled used everywhere, keeps the
   // General settings checkbox in sync, and mirrors the preference into the native shell.

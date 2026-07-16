@@ -4,6 +4,33 @@
 
 ---
 
+## v5.5.0 — 2026-07-16
+
+**Background notification-button synchronization (Pause / Stop with Bomb Mode)**
+
+- **Paused status now shown while backgrounded:** When the app is backgrounded and the user taps
+  **Pause** on the ongoing-session notification, the native presentation feedback now shows the
+  paused status dot (🟡) instead of leaving the running dot (🟢 study / 🔵 non-study). Previously the
+  notification title kept the running dot until the app was reopened and the HTML re-synced. The fix
+  swaps ONLY the leading status dot on a paused session and is a deliberate no-op for running states,
+  HTML-synced paused titles, bomb titles, and legacy titles.
+- **Stop no longer destroys the notification when Bomb Mode is ON:** When the app is backgrounded and
+  the user taps **Stop** while Bomb Mode is on, the ongoing notification now transitions in place into
+  the bomb-only notification (same notification ID/channel/actions) instead of being removed. When Bomb
+  Mode is OFF, Stop behaves exactly as before (the notification is dismissed). The transition reuses the
+  inert `bombPreview` data the HTML already provides — the native layer performs NO bomb math, and the
+  HTML overwrites this with its authoritative bomb notification the moment it wakes on resume.
+- **Scope:** Presentation-only changes confined to `TimerService.kt` (`nativeStopFeedback()` and the
+  notification builder's title). No changes to the JS↔Kotlin payload contract, `recoverState()`,
+  Pomodoro/Bomb logic, IndexedDB, session progression, Telegram, alarm scheduling, or notification
+  IDs/channels. Both transient states are self-healing — overwritten by the HTML's authoritative
+  `andBuildSessionState`/`andBuildBombState` on the next resume.
+- **Native/version:** `versionName "5.5.0"`, `versionCode 18`,
+  `JsBridge.getShellVersion()` → `"5.5.0"`. The standalone HTML and the bundled
+  `assets/app/index.html` remain byte-for-byte identical (no HTML changes this release).
+
+---
+
 ## v3.9 — 2026-07-15
 
 **Mark Activity As Completed Early (Today's activity View/Info action)**
