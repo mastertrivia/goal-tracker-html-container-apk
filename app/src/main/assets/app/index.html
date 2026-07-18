@@ -45,7 +45,7 @@ body.bomb-danger{background-color:#EF4444;}
   .num{font-family:'Poppins',sans-serif;font-weight:700;}
   svg{shape-rendering:geometricPrecision;}
 
-  /* HEADER — top bar showing date, clock, and Lifelines (hearts) */
+  /* HEADER — top bar showing goal finish time widget and Lifelines (hearts) */
   .topbar{background:var(--card);border:var(--card-border);border-radius:20px;box-shadow:var(--shadow);padding:10px 16px;display:flex;flex-direction:column;align-items:stretch;gap:0;margin-bottom:16px;}
   /* First row: Date, Time, Lifeline — ALWAYS one line. nowrap makes wrapping impossible; items shrink proportionally instead. */
   .hdr-row{display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:10px;width:100%;min-width:0;}
@@ -63,7 +63,7 @@ body.bomb-danger{background-color:#EF4444;}
   .hearts-row{display:flex;gap:3px;}
   .heart-icon{width:17px;height:17px;}
   .hdr-hearts .lbl{font-size:9.5px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;}
-  .divider{width:1px;height:30px;background:var(--border);}
+  .divider{width:1.5px;height:30px;background:var(--border);opacity:0.85;}
 
   /* SCREENS — only one of Home/History/Tasks/Settings is visible at a time */
   .screen{display:none;}
@@ -223,10 +223,47 @@ body.bomb-danger{background-color:#EF4444;}
   .section-title{font-size:19px;font-weight:800;margin:2px 0 14px;font-family:'Poppins',sans-serif;letter-spacing:-0.01em;}
 
   /* AGE BAR — slim info strip showing the user's live-computed age, just below the top bar */
-  /* PROFILE CARD — dedicated name + live-computed age card near the bottom of Home */
-  .profile-card{display:flex;flex-direction:column;align-items:center;gap:3px;padding:13px 18px;text-align:center;}
-  .profile-card #ageLbl{font-family:'Poppins',sans-serif;font-weight:700;font-size:15.5px;color:var(--text);letter-spacing:-0.01em;}
-  .profile-card #ageVal{font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;color:var(--text-dim);letter-spacing:0.05em;font-variant-numeric:tabular-nums;}
+  /* PROFILE CARD — name + live age on left | date on right — row layout, ultra-premium */
+  .profile-card{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:0;padding:13px 18px;}
+  .profile-card .pc-left{display:flex;flex-direction:column;align-items:flex-start;gap:2px;flex:1 1 0;min-width:0;}
+  .profile-card #ageLbl{font-family:'Poppins',sans-serif;font-weight:700;font-size:16px;color:var(--text);letter-spacing:-0.01em;line-height:1.2;}
+  .profile-card #ageVal{font-size:12px;font-weight:600;color:var(--text-dim);letter-spacing:0.03em;font-variant-numeric:tabular-nums;line-height:1.2;}
+  /* Divider — positioned slightly left of centre so the date side has more room */
+  .profile-card .pc-divider{width:1.5px;height:34px;background:var(--border);flex-shrink:0;margin:0 16px 0 10px;opacity:0.8;}
+  .profile-card .pc-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:0 0 auto;}
+  .profile-card #pcDateD1{font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;color:var(--text);letter-spacing:-0.01em;text-align:right;line-height:1.2;}
+  .profile-card #pcDateD2{font-size:12px;color:var(--text-dim);font-weight:500;text-align:right;line-height:1.2;}
+
+  /* HDR GOAL FINISH — replaces the old calendar+clock in the topbar on Home screen */
+  .hdr-goal{display:flex;align-items:center;gap:10px;min-width:0;flex:1;padding-right:4px;position:relative;}
+  /* Clock badge — refined backgrounds with improved icon contrast */
+  .hdr-goal-badge{width:37px;height:37px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .hdr-goal-badge.green{background:#D4F8E8;box-shadow:0 2px 8px rgba(0,180,70,0.15);}
+  .hdr-goal-badge.red{background:#FFDADA;box-shadow:0 2px 8px rgba(220,38,38,0.15);}
+  .hdr-goal-badge.neutral{background:var(--bg-light);box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+  .hdr-goal-badge svg{width:19px;height:19px;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+  .hdr-goal-badge.green svg{stroke:#0BA94D;}
+  .hdr-goal-badge.red svg{stroke:#DD3333;}
+  .hdr-goal-badge.neutral svg{stroke:var(--text-dim);}
+  /* Text stack — tighter label-to-value spacing; use margin-top for precise control */
+  .hdr-goal-text{display:flex;flex-direction:column;gap:0px;min-width:0;}
+  /* Label line wrapper — flex to hold label + info button inline */
+  .hdr-goal-label-row{display:flex;align-items:center;gap:4px;min-width:0;}
+  /* Label line — bold, coloured, matches reference */
+  .hdr-goal-label{font-size:11.5px;font-weight:800;letter-spacing:0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;flex:1;min-width:0;}
+  .hdr-goal-label.green{color:#0EAA4B;}
+  .hdr-goal-label.red{color:#DC2626;}
+  .hdr-goal-label.neutral{color:var(--text);}
+  /* Value line — Poppins semi-bold, 5% smaller (19px → 18px), softer color */
+  .hdr-goal-value{font-family:'Poppins',sans-serif;font-weight:600;font-size:18px;color:var(--text-dim);letter-spacing:-0.02em;white-space:nowrap;line-height:1.15;display:flex;align-items:baseline;gap:4px;margin-top:2px;}
+  .hdr-goal-muted{font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--text-dim);margin-left:2px;}
+  .hdr-goal-none{display:none;}
+  /* Helper text — matches .hdr-hearts .lbl typography: ultra-compact, bold, uppercase, tight spacing */
+  .hdr-goal-helper{font-size:9.5px;font-weight:700;color:var(--text-dim);line-height:1.2;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;letter-spacing:0.05em;opacity:0.9;}
+  /* Info button on the study widget — inline with label, 20% smaller, subtle grey */
+  .hdr-goal-info{width:14px;height:14px;padding:0;border:none;background:transparent;color:var(--text-dim);cursor:pointer;opacity:0.5;display:flex;align-items:center;justify-content:center;transition:opacity .15s;flex-shrink:0;}
+  .hdr-goal-info:hover{opacity:0.85;}
+  .hdr-goal-info svg{width:12px;height:12px;}
   /* CURRENT ACTIVITY CARD — live session overview with auto Pomodoro split progress */
   .ca-card{margin-bottom:16px;padding-top:9px;padding-bottom:7px;position:relative;z-index:2;overflow:visible;}
   /* STATE 3 (No Task) & STATE 4 (Sleep) — compact, full-width status card (no left/right shrink) */
@@ -245,10 +282,7 @@ body.bomb-danger{background-color:#EF4444;}
   .ca-card.idle.sleep .ca-status-title{color:var(--primary);}
   .ca-status-sub{font-size:13px;font-weight:500;color:var(--text-dim);margin-top:4px;line-height:1.4;}
   .ca-status-sub b{font-weight:700;color:inherit;}
-  /* TIME INCONSISTENCY idle state — identical shell/size/typography to Sleep Mode, amber palette */
-  .ca-card.idle.timewarn .ca-status{background:#FFF4E5;border-color:rgba(245,166,35,0.20);}
-  .ca-card.idle.timewarn .ca-status-ic{background:rgba(245,166,35,0.16);}
-  .ca-card.idle.timewarn .ca-status-title{color:var(--orange-dark);}
+
   .ca-verify-btn{margin-top:11px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(155deg,#FFB84D 0%,var(--orange) 100%);color:#fff;border:none;font-family:'Poppins',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.01em;padding:9px 18px;border-radius:12px;cursor:pointer;box-shadow:0 6px 16px rgba(245,166,35,0.30);transition:transform .12s;}
   .ca-verify-btn:active{transform:scale(0.95);}
   /* BOMB EXPLOSION lock state — identical card shell to Time Inconsistency, red Bomb-danger palette */
@@ -565,7 +599,7 @@ body.bomb-danger{background-color:#EF4444;}
   .ec-note{font-size:12px !important;color:var(--text-dim);margin:0;line-height:1.32;text-wrap:balance;border-top:1.5px solid rgba(91,79,232,.28);padding-top:9px;margin-top:9px;}
   .ec-note .hl{color:var(--primary);font-weight:700;}
 
-  /* ����─ Confirm section ── */
+  /* �����─ Confirm section ── */
   .ec-instruct{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-dim);margin:0 0 6px;}
   .ec-instruct-icon{width:22px;height:22px;flex:none;color:var(--primary);display:flex;align-items:center;justify-content:center;}
   .ec-instruct-icon svg{width:20px;height:20px;}
@@ -832,17 +866,7 @@ body.bomb-danger{background-color:#EF4444;}
   .gform-body{font-size:12px;color:var(--text-dim);line-height:1.6;margin-top:10px;}
   .gform-body b{color:var(--text);}
   .gform-body .gf-h{font-weight:700;color:var(--primary);margin:10px 0 2px;font-size:12px;}
-  /* Goal Section Manual — text loaded from the external manuals.js file (window.GOAL_SECTION_MANUAL) */
-  .goal-manual-text{white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.6;color:var(--text-dim);font-family:'Inter',sans-serif;}
-  .goal-manual-text b{color:var(--text);font-weight:700;}
-  /* Fallback card shown only when manuals.js could not be loaded */
-  .gm-fallback{display:flex;flex-direction:column;gap:10px;padding:4px 0;}
-  .gm-fallback-msg{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;line-height:1.6;color:var(--text-dim);}
-  .gm-fallback-msg .gm-warn-icon{font-size:15px;flex-shrink:0;margin-top:1px;}
-  .gm-fallback-msg p{margin:0;}
-  .gm-fallback-msg p span{display:block;color:var(--text);font-weight:600;margin-bottom:3px;}
-  .gm-wrapper-btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:12px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;background:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.15);transition:opacity .15s,transform .12s;align-self:flex-start;}
-  .gm-wrapper-btn:active{opacity:.85;transform:scale(0.97);}
+
 
   /* Extra Study Timer card — lavender premium card, icon+text left, solid CTA right */
   .goal-extra-card{background:var(--gp-lav) !important;border:1px solid rgba(75,47,224,0.05) !important;border-radius:22px !important;box-shadow:var(--gp-shadow) !important;padding:16px !important;}
@@ -1002,22 +1026,45 @@ body.bomb-danger{background-color:#EF4444;}
   .dur-box input{width:100%;text-align:center;letter-spacing:0.08em;padding-right:34px;}
   .dur-sub{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.06em;pointer-events:none;}
   .dur-colon{font-weight:800;font-size:18px;color:var(--text-dim);flex-shrink:0;}
+
+  /* ── Live Formula Debugging Card — Accordion Pattern ────────────────────── */
+  .dbg-card{display:flex;flex-direction:column;}
+  .dbg-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;padding:0;}
+  .dbg-chevron{font-size:18px;color:var(--text-dim);transition:transform 0.2s ease;}
+  .dbg-card.expanded .dbg-chevron{transform:rotate(90deg);}
+  .dbg-body{max-height:0;overflow:hidden;margin-top:0;transition:max-height 0.3s ease, margin-top 0.3s ease;}
+  .dbg-card.expanded .dbg-body{max-height:2000px;margin-top:16px;}
+  
+  .dbg-section{margin-bottom:2px;}
+  .dbg-label{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:5px;line-height:1.4;}
+  .dbg-eq{font-size:13px;line-height:1.7;padding-left:12px;font-variant-numeric:tabular-nums;}
+  .dbg-formula{color:var(--text-dim);}
+  .dbg-intermediate{color:var(--text-dim);opacity:0.75;}
+  .dbg-val{font-weight:700;color:var(--primary);}
+  .dbg-dim{color:var(--text-dim);}
+  .dbg-result-val{font-size:14px;font-weight:800;}
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- Top Bar - Shows today's date, the current clock time, and Lifeline (hearts) status -->
+  <!-- Top Bar - Shows goal finish time and Lifeline (hearts) status -->
   <div class="topbar">
     <div class="hdr-row">
-      <div class="hdr-block">
-        <div class="icon-badge"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></div>
-        <div class="hdr-date"><div class="d1" id="hdrD1">—</div><div class="d2" id="hdrD2">—</div></div>
-      </div>
-      <div class="divider" id="clockDivider"></div>
-      <div class="hdr-block" id="hdrClockSection">
-        <div class="icon-badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
-        <div class="hdr-time"><div class="t1" id="hdrTime">--:--</div></div>
+      <!-- Goal Finish / Max Possible widget — replaces old calendar+clock -->
+      <div class="hdr-goal" id="hdrGoalSection">
+        <div class="hdr-goal-badge green" id="hdrGoalBadge">
+          <svg id="hdrGoalClockIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          <svg id="hdrGoalCheckIcon" viewBox="0 0 24 24" style="display:none;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke:#0BA94D;"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="hdr-goal-text">
+          <div class="hdr-goal-label-row">
+            <div class="hdr-goal-label green" id="hdrGoalLabel">Study Complete By</div>
+            <button class="hdr-goal-info" id="hdrGoalInfoBtn" style="display:none;" aria-label="Study widget info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></button>
+          </div>
+          <div class="hdr-goal-value" id="hdrGoalValue"><span class="hdr-goal-none">—</span></div>
+          <div class="hdr-goal-helper" id="hdrGoalHelper" style="display:none;"></div>
+        </div>
       </div>
       <div class="divider" id="heartsDivider"></div>
       <div class="hdr-hearts" id="hdrHeartsSection">
@@ -1106,7 +1153,7 @@ body.bomb-danger{background-color:#EF4444;}
       <div class="task-tabs" id="taskTabsHome" style="margin-bottom:10px;">
         <div class="task-tab active" data-cat="study"><span class="ic">📖</span><span id="tabLabelStudy">STUDY</span><div class="task-tab-count" id="countStudy">0 out of 0</div></div>
         <div class="task-tab" data-cat="routine"><span class="ic">☕</span><span id="tabLabelRoutine">ROUTINE</span><div class="task-tab-count" id="countRoutine">0 out of 0</div></div>
-        <div class="task-tab" data-cat="health"><span class="ic">❤️</span><span id="tabLabelHealth">HEALTH</span><div class="task-tab-count" id="countHealth">0 out of 0</div></div>
+        <div class="task-tab" data-cat="health"><span class="ic">���️</span><span id="tabLabelHealth">HEALTH</span><div class="task-tab-count" id="countHealth">0 out of 0</div></div>
         <div class="task-tab" data-cat="others"><span class="ic">⋯</span><span id="tabLabelOthers">OTHERS</span><div class="task-tab-count" id="countOthers">0 out of 0</div></div>
       </div>
       <!-- Compact expandable task picker — reuses the Tasks list logic in a highly compact, one-tap-play form -->
@@ -1152,10 +1199,17 @@ body.bomb-danger{background-color:#EF4444;}
       </div>
     </div>
 
-    <!-- Profile Card - User name + live-computed age (moved out of the top bar) -->
+    <!-- Profile Card - User name + live-computed age on left, today's date on right -->
     <div class="card profile-card" style="margin-bottom:14px;">
-      <div id="ageLbl">You</div>
-      <div id="ageVal" class="num">—</div>
+      <div class="pc-left">
+        <div id="ageLbl">You</div>
+        <div id="ageVal" class="num">—</div>
+      </div>
+      <div class="pc-divider"></div>
+      <div class="pc-right">
+        <div id="pcDateD1">—</div>
+        <div id="pcDateD2">—</div>
+      </div>
     </div>
   </div>
 
@@ -1348,8 +1402,273 @@ body.bomb-danger{background-color:#EF4444;}
           <div class="gl-chev">›</div>
         </div>
       </div>
+      <!-- 9. Live Formula Debugging -->
+      <div class="plain-card">
+        <div class="goal-settings-launch" data-sub="subFormulaDebug">
+          <div class="gl-ic" style="background:linear-gradient(155deg,#30B0C7 0%,#1A8FA8 100%);box-shadow:0 6px 14px rgba(26,143,168,0.28);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg></div>
+          <div class="gl-txt"><div class="gl-t1">Live Formula Debugging</div><div class="gl-t2" id="debugFolderSub">Home Widget &amp; Goal Engine — live computation</div></div>
+          <div class="gl-chev">›</div>
+        </div>
+      </div>
       <button class="btn-full danger" id="resetDataBtn">Reset All Data</button>
     </div>
+
+    <!-- Sub-page: Live Formula Debugging -->
+    <div class="set-sub" id="subFormulaDebug" style="display:none;">
+      <div class="gset-header">
+        <button class="gset-back set-sub-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div class="gset-title">Live Formula Debugging</div>
+        <div style="width:34px;"></div>
+      </div>
+
+      <!-- Home Widget debugging card — uses standard accordion pattern -->
+      <div class="plain-card dbg-card" id="dbgHomeCard">
+        <!-- Header — always visible, click to toggle expand/collapse -->
+        <div class="dbg-header">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);">Home Widget</div>
+            <div id="dbgHomeSubtitle" style="font-size:12px;color:var(--text-dim);margin-top:2px;">—</div>
+          </div>
+          <div class="dbg-chevron">›</div>
+        </div>
+
+        <!-- Body — hidden by default, shown when .expanded class is present -->
+        <div class="dbg-body" id="dbgHomeBody">
+          <div class="subtext" style="margin-top:0;margin-bottom:14px;">The Home Widget projects whether today's planned study can be completed before the study day ends.</div>
+          <div style="height:1px;background:var(--border);margin-bottom:16px;opacity:0.6;"></div>
+
+          <!-- §1 Planned Study -->
+          <div class="dbg-section">
+            <div class="dbg-label">§1 &nbsp; Today's Study Target</div>
+            <div class="dbg-eq">= <span id="dbgPlanned" class="dbg-val">—</span></div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:12px 0;opacity:0.35;"></div>
+
+          <!-- §2 Completed -->
+          <div class="dbg-section">
+            <div class="dbg-label">§2 &nbsp; Study Completed Today</div>
+            <div class="dbg-eq">= <span id="dbgCompleted" class="dbg-val">—</span></div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:12px 0;opacity:0.35;"></div>
+
+          <!-- §3 Remaining Study -->
+          <div class="dbg-section">
+            <div class="dbg-label">§3 &nbsp; Today's Remaining Study</div>
+            <div class="dbg-eq">= Today's Study Target &minus; Study Completed Today</div>
+            <div class="dbg-eq">= <span id="dbgPlanned2" class="dbg-dim">—</span> &minus; <span id="dbgCompleted2" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">= <span id="dbgRemStudy" class="dbg-val">—</span></div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:12px 0;opacity:0.35;"></div>
+
+          <!-- §4 Non-Study -->
+          <div class="dbg-section">
+            <div class="dbg-label">§4 &nbsp; Remaining Non-Study Tasks</div>
+            <div class="dbg-eq">= <span id="dbgNonStudy" class="dbg-val">—</span></div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
+
+          <!-- §5 Remaining Day (renumbered from §6) -->
+          <div class="dbg-section">
+            <div class="dbg-label">§5 &nbsp; Remaining Day</div>
+            <div class="dbg-eq dbg-formula">= Study Day Ends &minus; Current Time</div>
+            <div class="dbg-eq dbg-intermediate">= <span id="dbgDayEnd" class="dbg-dim">—</span> &minus; <span id="dbgNow" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">= <span id="dbgRemDay" class="dbg-val">—</span></div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
+
+          <!-- §6 Free Capacity (renumbered from §7) -->
+          <div class="dbg-section">
+            <div class="dbg-label">§6 &nbsp; Available Study Time Today</div>
+            <div class="dbg-eq dbg-formula">= Remaining Day &minus; Remaining Non-Study Tasks</div>
+            <div class="dbg-eq dbg-intermediate">= <span id="dbgRemDay2" class="dbg-dim">—</span> &minus; <span id="dbgNonStudy2" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">= <span id="dbgFree" class="dbg-val">—</span></div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
+
+          <!-- §7 Max Study Today (renumbered from §8) -->
+          <div class="dbg-section">
+            <div class="dbg-label">§7 &nbsp; Maximum Study Possible Today</div>
+            <div class="dbg-eq dbg-formula">= Study Completed Today + Available Study Time Today</div>
+            <div class="dbg-eq dbg-intermediate">= <span id="dbgCompleted3" class="dbg-dim">—</span> + <span id="dbgFree2" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">= <span id="dbgMaxStudy" class="dbg-val">—</span></div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
+
+          <!-- §8 Verdict (renumbered from §9) -->
+          <div class="dbg-section">
+            <div class="dbg-label">§8 &nbsp; Comparison</div>
+            <div class="dbg-eq dbg-formula">&there4; &nbsp; Available Study Time Today <span id="dbgCmpOp" class="dbg-dim">—</span> Today's Remaining Study</div>
+            <div class="dbg-eq dbg-intermediate">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="dbgFree3" class="dbg-dim">—</span> <span id="dbgCmpOp2" class="dbg-dim">—</span> <span id="dbgRemStudy2" class="dbg-dim">—</span></div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
+
+          <!-- §9 Result (renumbered from §10) -->
+          <div class="dbg-section">
+            <div class="dbg-label">§9 &nbsp; <span id="dbgWidgetLabel" style="font-weight:700;">—</span></div>
+            <div class="dbg-eq">= <span id="dbgResult" class="dbg-val dbg-result-val">—</span></div>
+          </div>
+
+          <!-- Manual Refresh — the only way to update; no background polling -->
+          <div style="margin-top:18px;text-align:right;">
+            <button onclick="renderHomeWidgetDebugCard()" style="font-size:12px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;">Refresh</button>
+          </div>
+
+        </div><!-- /dbgHomeBody -->
+      </div><!-- /dbgHomeCard -->
+
+      <!-- Goal Widget debugging card — uses standard accordion pattern -->
+      <div class="plain-card dbg-card" id="dbgGoalCard">
+        <!-- Header — always visible, click to toggle expand/collapse -->
+        <div class="dbg-header">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);">Goal Widget</div>
+            <div id="dbgGoalSubtitle" style="font-size:12px;color:var(--text-dim);margin-top:2px;">—</div>
+          </div>
+          <div class="dbg-chevron">›</div>
+        </div>
+
+        <!-- Body — hidden by default, shown when .expanded class is present -->
+        <div class="dbg-body" id="dbgGoalBody">
+          <div class="subtext" style="margin-top:0;margin-bottom:14px;">The Goal Widget explains how your goal progress, current status, required daily study, and projected finish date are calculated.</div>
+          <div style="height:1px;background:var(--border);margin-bottom:16px;opacity:0.6;"></div>
+
+          <!-- §1 Total Days in Goal -->
+          <div class="dbg-section">
+            <div class="dbg-label">§1 &nbsp; Total Days in Goal</div>
+            <div class="dbg-eq dbg-formula">= End Date − Start Date + 1</div>
+            <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalEndDate" class="dbg-dim">—</span> − <span id="dbgGoalStartDate" class="dbg-dim">—</span> + 1</div>
+            <div class="dbg-eq">= <span id="dbgGoalTotalDays" class="dbg-val">—</span> Days</div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
+
+          <!-- §2 Total Goal Target Hours -->
+          <div class="dbg-section">
+            <div class="dbg-label">§2 &nbsp; Total Goal Target Hours</div>
+            <div class="dbg-eq dbg-formula">= Total Days × Daily Target</div>
+            <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalTotalDays2" class="dbg-dim">—</span> × <span id="dbgGoalDailyTarget" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">= <span id="dbgGoalTotalTarget" class="dbg-val">—</span></div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
+
+          <!-- §3 Goal Total Progress Till Now -->
+          <div class="dbg-section">
+            <div class="dbg-label">§3 &nbsp; Goal Total Progress Till Now</div>
+            <div class="dbg-eq dbg-formula">= Previous Study + Today's Live Study</div>
+            <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalPrevious" class="dbg-dim">—</span> + <span id="dbgGoalToday" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">= <span id="dbgGoalStudyTillNow" class="dbg-val">—</span></div>
+            <div style="margin-top:8px;"></div>
+            <div class="dbg-label">Goal Progress %</div>
+            <div class="dbg-eq dbg-formula">= Goal Study Till Now ÷ Total Goal Target</div>
+            <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalStudyTillNow2" class="dbg-dim">—</span> ÷ <span id="dbgGoalTotalTarget2" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">= <span id="dbgGoalProgressPct" class="dbg-val">—</span></div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
+
+          <!-- §4 Expected Progress upto Today -->
+          <div class="dbg-section">
+            <div class="dbg-label">§4 &nbsp; Expected Progress upto Today</div>
+            <div class="dbg-eq dbg-formula">= Days Passed × Daily Target</div>
+            <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalDaysPassed" class="dbg-dim">—</span> × <span id="dbgGoalDailyTarget2" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">= <span id="dbgGoalExpectedProgress" class="dbg-val">—</span></div>
+            <div style="margin-top:8px;font-size:11px;color:var(--text-dim);">Note: Days Passed includes today.</div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
+
+          <!-- §5 Progress Difference (Offset) -->
+          <div class="dbg-section">
+            <div class="dbg-label">§5 &nbsp; Progress Difference (Offset)</div>
+            <div class="dbg-eq dbg-formula">= Goal Study Till Now − Expected Progress</div>
+            <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalStudyTillNow3" class="dbg-dim">—</span> − <span id="dbgGoalExpectedProgress2" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">= <span id="dbgGoalOffset" class="dbg-val">—</span></div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
+
+          <!-- §6 Goal Status -->
+          <div class="dbg-section">
+            <div class="dbg-label">§6 &nbsp; Goal Status</div>
+            <div class="dbg-eq dbg-formula">∵ Offset <span id="dbgGoalOffsetCmp" class="dbg-dim">—</span> 0</div>
+            <div class="dbg-eq dbg-intermediate"><span id="dbgGoalOffsetVal" class="dbg-dim">—</span> <span id="dbgGoalOffsetCmp2" class="dbg-dim">—</span> 0</div>
+            <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Status</div>
+            <div class="dbg-eq">= <span id="dbgGoalStatusText" class="dbg-val">—</span></div>
+            <div style="margin-top:8px;font-size:10px;color:var(--text-dim);">
+              Offset &lt; 0 → Behind Schedule<br>Offset = 0 → On Track<br>Offset &gt; 0 → Ahead of Schedule
+            </div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
+
+          <!-- §7 Required Study Now -->
+          <div class="dbg-section">
+            <div class="dbg-label">§7 &nbsp; Required Study Now</div>
+            <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Extra Study Per Day</div>
+            <div class="dbg-eq dbg-formula">= Offset ÷ Effective Days Left</div>
+            <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalOffset2" class="dbg-dim">—</span> ÷ <span id="dbgGoalEffectiveDays" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">= <span id="dbgGoalExtraPerDay" class="dbg-val">—</span> / Day</div>
+            <div style="margin-top:8px;"></div>
+            <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Helper</div>
+            <div class="dbg-eq" style="color:var(--warn,#FF9F0A);">= <span id="dbgGoalHelperText" class="dbg-val">—</span></div>
+            <div style="margin-top:8px;"></div>
+            <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Required Study Every Day</div>
+            <div class="dbg-eq dbg-formula">= Daily Target − Extra Study Per Day</div>
+            <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalDailyTarget3" class="dbg-dim">—</span> − (<span id="dbgGoalExtraPerDay2" class="dbg-dim">—</span>)</div>
+            <div class="dbg-eq dbg-intermediate" id="dbgGoalReqStep2" style="display:none;">= <span id="dbgGoalDailyTarget3b" class="dbg-dim">—</span> + <span id="dbgGoalExtraPerDay2b" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">= <span id="dbgGoalRequiredNow" class="dbg-val">—</span> / Day</div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
+
+          <!-- §8 Projected Finish -->
+          <div class="dbg-section">
+            <div class="dbg-label">§8 &nbsp; Projected Finish</div>
+            <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Step 1) Convert Offset into Goal Days</div>
+            <div class="dbg-eq dbg-formula">= Offset ÷ Daily Target</div>
+            <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalOffset3" class="dbg-dim">—</span> ÷ <span id="dbgGoalDailyTarget4" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">= <span id="dbgGoalOffsetDays" class="dbg-val">—</span></div>
+            <div style="margin-top:8px;"></div>
+            <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Projected Finish</div>
+            <div class="dbg-eq dbg-formula">= Deadline − Offset Days</div>
+            <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalDeadline" class="dbg-dim">—</span> − (<span id="dbgGoalOffsetDays2" class="dbg-dim">—</span>)</div>
+            <div class="dbg-eq dbg-intermediate" id="dbgGoalProjStep2" style="display:none;">= <span id="dbgGoalDeadlineB" class="dbg-dim">—</span> + <span id="dbgGoalOffsetDaysAbs" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">= <span id="dbgGoalProjectedFinish" class="dbg-val">—</span></div>
+            <div style="margin-top:8px;"></div>
+            <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Final Day Study</div>
+            <div class="dbg-eq">= <span id="dbgGoalFinalDay" class="dbg-val">—</span></div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
+
+          <!-- §9 Live Completion Check -->
+          <div class="dbg-section">
+            <div class="dbg-label">§9 &nbsp; Live Completion Check</div>
+            <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Current Offset</div>
+            <div class="dbg-eq">= <span id="dbgGoalOffset4" class="dbg-val">—</span></div>
+            <div style="margin-top:8px;"></div>
+            <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Today's Available Study Time</div>
+            <div class="dbg-eq">= <span id="dbgGoalAvailableTime" class="dbg-val">—</span></div>
+            <div style="margin-top:8px;"></div>
+            <div class="dbg-eq dbg-formula">|<span id="dbgGoalOffset5" class="dbg-dim">—</span>| <span id="dbgGoalCmpOp" class="dbg-dim">—</span> <span id="dbgGoalAvailableTime2" class="dbg-dim">—</span></div>
+            <div class="dbg-eq dbg-intermediate"><span id="dbgGoalAbsOffset" class="dbg-dim">—</span> <span id="dbgGoalCmpOp2" class="dbg-dim">—</span> <span id="dbgGoalAvailableTime3" class="dbg-dim">—</span></div>
+            <div style="margin-top:8px;"></div>
+            <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Result</div>
+            <div class="dbg-eq">= <span id="dbgGoalLiveStatus" class="dbg-val">—</span></div>
+            <div style="margin-top:12px;font-size:10px;color:var(--text-dim);">
+              Logic<br><br>
+              • If Offset ≥ 0<br>
+              → 🟢 On Time<br><br>
+              • If Offset &lt; 0<br><br>
+              |Negative Offset| ≤ Today's Available Study Time<br>
+              → 🟡 Can Recover Today<br><br>
+              |Negative Offset| &gt; Today's Available Study Time<br>
+              → 🔴 Delayed
+            </div>
+          </div>
+
+          <!-- Manual Refresh -->
+          <div style="margin-top:18px;text-align:right;">
+            <button onclick="renderGoalWidgetDebugCard()" style="font-size:12px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;">Refresh</button>
+          </div>
+
+        </div><!-- /dbgGoalBody -->
+      </div><!-- /dbgGoalCard -->
+
+    </div><!-- /subFormulaDebug -->
 
     <!-- Sub-page 1: Home Section -->
     <div class="set-sub" id="subHome" style="display:none;">
@@ -1516,6 +1835,7 @@ body.bomb-danger{background-color:#EF4444;}
         </label>
         <div class="subtext">Small confirmation pop-ups like "Settings saved." When OFF, these are hidden in the app and, inside the Android shell, informational native pop-ups are suppressed too. Critical error messages always appear.</div>
       </div>
+
       <!-- Customizable UI text labels shown throughout the app — placed last so it doesn't interrupt the primary settings flow -->
       <div class="plain-card">
         <h3>Labels &amp; Headings</h3>
@@ -1979,16 +2299,6 @@ body.bomb-danger{background-color:#EF4444;}
       <div class="subtext">Purely for motivation — this text is never used in any calculation.</div>
     </div>
 
-    <!-- Formula & Calculation Logic — collapsible explanation of every Goal formula -->
-    <div class="plain-card gform-card">
-      <details>
-        <summary>Formula &amp; Calculation Logic</summary>
-        <div class="gform-body" id="goalManualBody">
-          <!-- Content is loaded automatically from the external manuals.js file (window.GOAL_SECTION_MANUAL). Do not hardcode text here. -->
-        </div>
-      </details>
-    </div>
-
     <!-- Live read-only preview, recalculated on every keystroke -->
     <div class="gset-preview">
       <div class="gp-title">Automatic Preview</div>
@@ -2105,7 +2415,7 @@ body.bomb-danger{background-color:#EF4444;}
 <!-- Reset All Data confirmation — reuses the Goal-delete dialog shell; requires typing 123456789 -->
 <div class="overlay center-modal" id="resetConfirmDialog">
   <div class="dialog">
-    <div class="d-icon warn">⚠️</div>
+    <div class="d-icon warn">⚠�����</div>
     <h3>Reset All Data</h3>
     <p>This action will permanently delete all tasks, history, goals, settings, streaks, statistics, and every saved value.<br><br>This action cannot be undone.</p>
     <input type="text" inputmode="numeric" class="gdel-input" id="resetConfirmCode" placeholder="123456789" maxlength="9" autocomplete="off">
@@ -2116,19 +2426,6 @@ body.bomb-danger{background-color:#EF4444;}
   </div>
 </div>
 
-<!-- Time Inconsistency confirmation — reuses the same typed-confirm shell as Reset/Restart -->
-<div class="overlay center-modal" id="timeWarnDialog">
-  <div class="dialog">
-    <div class="d-icon warn">⏰</div>
-    <h3>Time Inconsistency Detected</h3>
-    <p>All timers are frozen because a significant device time change was detected.<br><br>To verify your time is correct and resume, type:<br><b>123</b></p>
-    <input type="text" class="gdel-input" id="timeWarnCode" placeholder="TIME WRONG 123" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false">
-    <div class="d-btn-row">
-      <button class="d-btn cancel" id="timeWarnCancel">Cancel</button>
-      <button class="d-btn danger" id="timeWarnConfirm">Resume</button>
-    </div>
-  </div>
-</div>
 
 <!-- Restart Task Progress confirmation — same compact shell as Reset All Data; requires typing 123 -->
 <div class="overlay center-modal" id="taskRestartDialog">
@@ -2354,21 +2651,6 @@ body.bomb-danger{background-color:#EF4444;}
   </div>
 </div>
 
-<!-- External Goal Section Manual (bundled offline asset).
-     Loaded via dynamic injection so we get a reliable onerror callback on both desktop browsers and
-     Android WebView. Defines window.GOAL_SECTION_MANUAL, which is rendered into the card below.
-     The renderGoalManual() function at the bottom of the file reads this flag. -->
-<script>
-(function(){
-  var s = document.createElement('script');
-  s.src = 'manuals.js';
-  s.async = false; // keep synchronous-like ordering before DOMContentLoaded
-  s.onload  = function(){ window.__manualsLoaded = true;  };
-  s.onerror = function(){ window.__manualsLoaded = false; };
-  document.head.appendChild(s);
-})();
-</script>
-
 <script>
 (function(){
 "use strict";
@@ -2433,7 +2715,7 @@ function isSleepActive(now){
    defining a reason and calling enter/exit — no consumer needs to change.
    NOTE: this centralizes the freeze REASONS only; it does not change WHEN anything freezes or how
    any timer computes its value, so existing behaviour is preserved exactly. */
-const FREEZE = { SLEEP:'SLEEP', TIME_INCONSISTENCY:'TIME_INCONSISTENCY', BOMB_LOCK:'BOMB_LOCK' };
+const FREEZE = { SLEEP:'SLEEP', BOMB_LOCK:'BOMB_LOCK' };
 const FreezeManager = (function(){
   const reasons = new Set();
   return {
@@ -2445,14 +2727,13 @@ const FreezeManager = (function(){
     list(){ return Array.from(reasons); }
   };
 })();
-// Recomputes the freeze reason-set from live app state. Sleep is time-window driven, Time
-// Inconsistency is a latched state flag, Bomb-Lock is the post-explosion "Chain Broken" overlay
-// (registered/cleared where that overlay shows/hides). Kept equivalent to the previous inline
-// checks so existing behaviour is preserved; returns the manager for convenience.
+// Recomputes the freeze reason-set from live app state. Sleep is time-window driven,
+// Bomb-Lock is the post-explosion "Chain Broken" overlay (registered/cleared where that overlay
+// shows/hides). Kept equivalent to the previous inline checks so existing behaviour is preserved;
+// returns the manager for convenience.
 function syncFreezeReasons(state){
   const st = state || STATE;
   if(isSleepActive()) FreezeManager.enter(FREEZE.SLEEP); else FreezeManager.exit(FREEZE.SLEEP);
-  if(st && st.timeInconsistency) FreezeManager.enter(FREEZE.TIME_INCONSISTENCY); else FreezeManager.exit(FREEZE.TIME_INCONSISTENCY);
   // bombLocked is persisted on state so BOMB_LOCK survives a force-kill and app restart.
   // syncFreezeReasons is the ONLY place that mirrors state.bombLocked into FreezeManager,
   // keeping a single source of truth: the persisted flag drives the in-memory Set, never the reverse.
@@ -2519,7 +2800,7 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
   // Default Daily Study Report template (item 9). Used automatically until the user customizes it,
   // and restored by the "Reset to Default" button on the Telegram Settings page.
   const DEFAULT_REPORT_TEMPLATE = `━━━━━━━━━━━━━━━━━━━━━━
-📅 Daily Study Report
+�� Daily Study Report
 • Date : {date}
 ━━━━━━━━━━━━━━━━━━━━━━
 
@@ -2552,7 +2833,7 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
 • Campaign : {campaignProgress} ({goalPercent})
 • Status : {status}
 
-━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━��━
 💜 Never break the consistency`;
 
   // Factory-default settings — used on first launch and as fallback for missing settings fields
@@ -2580,6 +2861,7 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
   telegramEnabled: true, // Master switch (item 1). OFF hides the Home Telegram card + disables the auto Daily Report.
   telegramOnBomb: true, // When ON (and Telegram is enabled), a message is sent to Telegram whenever the Bomb explodes.
   toastsEnabled: true, // Master switch for in-app pop-up messages (toasts). Also mirrored to the native shell so Android toasts respect it.
+
   telegramReportTemplate: DEFAULT_REPORT_TEMPLATE, // The Daily Study Report body (item 9); preserved once customized.
   reportTiming: 'sleep', // When the automatic Daily Study Report is sent: 'sleep' (default) or 'wake' (item 1).
   defaultDurations: { study: 30*60, routine: 20*60, health: 15*60, others: 15*60 },
@@ -2609,11 +2891,11 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
 const CAT_COLOR_DEFAULT = {study:'#5B4FE8', routine:'#22C55E', health:'#EF4444', others:'#8B87A6'}; // Default dot/accent color per task category
 const CAT_NAME = {study:'Study', routine:'Routine', health:'Health', others:'Others'}; // Human-readable category name (for the "Count as" info popup)
 
-// ── "Others → Count this Activity as" ────────────────────────────────────────────
+// ── "Others → Count this Activity as" ─────────────────────��──���───────────────────
 // An Others task may be CREDITED to another category (Study / Routine / Health) for every
 // time-based calculation, while remaining STORED and DISPLAYED only under Others.
 //   • creditCat(t)   → the category this task's TIME should be credited to.
-//   • isCreditProxy(t) → true only for an Others task carrying a non-Others credit category.
+//   ��� isCreditProxy(t) → true only for an Others task carrying a non-Others credit category.
 // The task's stored `category` is never changed, so it always lives in the Others list; only the
 // running session's type (and therefore its Timeline entries / Study stats) follows the credit category.
 function creditCat(t){
@@ -2738,6 +3020,13 @@ let RESETTING = false; // True while a Factory Reset is in progress — pauses t
 let CACHED_TASKS = []; // In-memory cache of all user-defined tasks, avoids re-reading IndexedDB on every render
 let selectedCategory = 'study'; // Which task category tab is active on the Home screen picker
 let selectedTaskId = null; // Which task is currently selected in the Home screen dropdown
+let cachedFinishByText = 'LOADING'; // Home-screen-owned cache of the "Finishing By / Max Study Today" widget text.
+let cachedGoalLabels = { planned: '—', completed: '—' }; // Formatted helper-text labels for the widget.
+let widgetWasFrozen = false; // Tracks freeze state to detect transitions (freeze → unfreeze at day rollover).
+                                   // Initialized as 'LOADING' (not '') to prevent rendering incomplete/blank state
+                                   // before the first updateFinishByCache() cycle. On startup, renderHeader() will skip
+                                   // rendering incomplete data. Updated by updateFinishByCache() on every render() cycle
+                                   // (every 3s), independently of whether the Goals screen has ever been opened.
 
 // Loads app state from IndexedDB, creating sane defaults on first run and
 // backfilling any fields added by later app versions (so old saves keep working)
@@ -2844,7 +3133,7 @@ async function factoryReset(){
   };
   // Clear user-generated data only (history sessions, timeline, tasks)
   await idbClear('sessions');
-  await idbClear('timeline');
+  await idbClear('timeline'); invalidateTimelineCache();
   await idbClear('tasks');
   // Restore the default configuration record
   await idbPut('meta', fresh);
@@ -2925,14 +3214,29 @@ async function ensureDefaultTasks(){
   CACHED_TASKS = await loadTasks();
 }
 
+// ── Timeline read cache ─────────────────────────────────────────────────────
+// idbAll('timeline') is called both inside addTimelineEntry (duplicate check) AND inside
+// computeStudyCompletionWidget on every 3-second render cycle.  On Android Chrome this means
+// TWO full IndexedDB table scans per cycle, which stalls the JS thread noticeably.
+// This thin cache stores the last result and is invalidated whenever a write actually occurs,
+// so the 3-second widget read is effectively free when no session is in progress.
+let _tlCache = null;   // cached Array of timeline entries (or null when stale)
+async function getTimelineEntries(){
+  if(_tlCache !== null) return _tlCache;
+  _tlCache = await idbAll('timeline');
+  return _tlCache;
+}
+function invalidateTimelineCache(){ _tlCache = null; }
+
 // Timeline stores every completed activity (Study/Routine/Health) for the History screen and daily Summary
 async function addTimelineEntry(entry){
   entry.date = appDayKey(new Date(entry.startTs));
   // DUPLICATE PROTECTION (data level): a completed session creates exactly ONE record.
   // If an entry with the same task + start + end already exists, silently skip the write.
-  const existing = await idbAll('timeline');
+  const existing = await getTimelineEntries();
   if(existing.some(e=> e.task===entry.task && e.category===entry.category && e.startTs===entry.startTs && Math.abs((e.endTs||0)-(entry.endTs||0))<1000 )) return;
   await idbPut('timeline', entry);
+  invalidateTimelineCache(); // new entry written — next read must go to IDB
 }
 
 /* ============ TELEGRAM ============ */
@@ -3141,7 +3445,7 @@ function buildTodayTasksBlock(){
     if(t.completionStatus==='completed') s='✅ Completed';
     else if(t.completionStatus==='not_completed') s='❌ Not Completed';
     else if((t.consumedSec||0) >= (t.duration||1)) s='🟡 Awaiting Review';
-    else s='⏳ Incomplete';
+    else s='�� Incomplete';
     return `${icon} ${t.name} — ${s}`;
   }).join('\n');
 }
@@ -3243,7 +3547,7 @@ async function maybeSendScheduledReport(){
     // First-run baselines — adopt the current keys; never send retroactively.
     if(state.lastSleepReportKey == null){ state.lastSleepReportKey = sleepKey; dirty = true; }
     if(state.lastWakeReportKey  == null){ state.lastWakeReportKey  = wakeKey;  dirty = true; }
-    // (A) Sleep-Start crossed → the app-day that just ended is the finished study-day.
+    // (A) Sleep-Start crossed �� the app-day that just ended is the finished study-day.
     if(state.lastSleepReportKey !== sleepKey){
       const finishedKey = state.lastSleepReportKey;
       state.pendingWakeReportKey = finishedKey; // remembered for a 'wake'-mode send at the next Wake
@@ -3272,7 +3576,7 @@ async function maybeLogNonStudy(entry, state){
   const token = state.settings.telegramBotToken, chatId = state.settings.telegramChatId;
   const text = buildNonStudyLogMessage(entry, state);
   showTgMessage(text);
-  setTgStatus('Sending activity log to Telegram…');
+  setTgStatus('Sending activity log to Telegram���');
   if(!token || !chatId){ setTgStatus('Telegram not configured — add Bot Token & Chat ID in Settings.'); return; }
   try{
     const ok = await telegramApiSend(token, chatId, text);
@@ -3295,7 +3599,7 @@ async function sendManualTelegramMessage(text){
 /* ============ CORE ENGINE ============ */
 // Calculates how much time has actually passed on a timer, accounting for any pauses
 function effectiveElapsedMs(at){
-  const now = at.pausedAt || Date.now();
+  const now = at.pausedAt || monotonicNow();
   return now - at.startTs - (at.accumulatedPause||0);
 }
 // Calculates remaining time on any active timer (Pomodoro or Bomb) using timestamps, not a live counter
@@ -3333,6 +3637,21 @@ function sessionElapsedSec(at){
   const cap = Math.max(0, at.duration || 0);
   const raw = Math.max(0, effectiveElapsedMs(at)/1000);
   return Math.min(cap, raw);
+}
+// (1a) Canonical live "today's total study seconds": committed sessions already banked in
+// dailyStudySeconds, plus the running session delta if a study timer is active right now.
+// Pure/read-only — never writes state, never touches IDB. Safe to call from any render path.
+// This is the single function computeGoalMetrics (and any future caller) should use for
+// "how much have I studied today including the current session", replacing the old pattern
+// of reading only committed IDB timeline data which missed the live running session.
+function liveTodayStudySec(state){
+  const st = state || STATE;
+  const at = st && st.activeTimer;
+  // Only count study/activity timers that are actively accumulating time.
+  // Exclude: bomb timers (type==='bomb'), sessions pending review, null/missing timers.
+  const live = (at && at.type!=='bomb' && at.subject && at.state!=='REVIEW_PENDING')
+    ? sessionElapsedSec(at) : 0;
+  return (st.dailyStudySeconds||0) + live;
 }
 // (2) Strict commit gate for any study-seconds value about to be written to persistent stats.
 // Clamps to the session's physically-possible maximum and logs the correction in full detail.
@@ -3403,9 +3722,9 @@ const BombEngine = {
   isTicking(state){
     const st = state || STATE;
     if(!this.isEnabled(st) || isSleepActive()) return false;
-    // BOMB_LOCK (post-explosion freeze) and Time Inconsistency are hard freezes: the countdown must
+    // BOMB_LOCK (post-explosion freeze) is a hard freeze: the countdown must
     // NOT advance and the explosion must NOT re-fire while the app is frozen waiting to be unlocked.
-    if(st && (st.bombLocked || st.timeInconsistency)) return false;
+    if(st && st.bombLocked) return false;
     // Mode 2 (Start After First Activity): while the Bomb is DORMANT it must never tick — no
     // countdown, no red background, no wobble — regardless of what activeTimer holds. Defensive:
     // dormancy normally keeps activeTimer=null (which already returns false below), but this makes
@@ -3425,7 +3744,7 @@ const BombEngine = {
     const at = st.activeTimer;
     if(at && at.type==='bomb') return this.clampToFull(msRemaining(at), st);
     if(at && at.pausedAt && at.bombTickTs!=null && this.isEnabled(st) && !isSleepActive()){
-      const elapsed = Math.max(0, Date.now() - at.bombTickTs); // future-timestamp guard
+      const elapsed = Math.max(0, monotonicNow() - at.bombTickTs); // future-timestamp guard
       return this.clampToFull(this.baseMs(st) - elapsed, st);
     }
     return this.baseMs(st); // running productive session → bomb frozen at its stored value
@@ -3443,7 +3762,7 @@ const BombEngine = {
   arm(state){
     const st = state || STATE;
     const remainMs = Math.max(0, this.baseMs(st));
-    st.activeTimer = { type:'bomb', startTs: Date.now(), duration: remainMs/1000 };
+    st.activeTimer = { type:'bomb', startTs: monotonicNow(), duration: remainMs/1000 };
   },
   // 2.2 ARM FOR NEW DAY: one of the only two places the Bomb clock is refilled to a fresh FULL
   // duration (the other is an explosion). Called from the day-rollover reconciliation. Refills the
@@ -3487,7 +3806,7 @@ const BombEngine = {
   async explodePaused(state){
     const st = state || STATE; const at = st.activeTimer;
     if(this.consumeLifeline(st)){
-      if(at) at.bombTickTs = Date.now(); // survived — re-baseline the paused bomb tick from now
+      if(at) at.bombTickTs = monotonicNow(); // survived — re-baseline the paused bomb tick from now
     } else {
       // FREEZE-FIRST FLOW (mandatory order): raise the central freeze (BOMB_LOCK) and record the current
       // streak for display ONLY. The paused productive session is preserved untouched. NO reset here —
@@ -3527,7 +3846,7 @@ const BombEngine = {
     const at = st.activeTimer;
     if(at && at.type !== 'bomb'){
       st.bombRemainingMs = this.fullClockMs(st);  // paused session preserved — just refill the bomb clock
-      if(at.bombTickTs != null) at.bombTickTs = Date.now(); // re-baseline any live paused tick from now
+      if(at.bombTickTs != null) at.bombTickTs = monotonicNow(); // re-baseline any live paused tick from now
     } else {
       this.armForNewDay(st);                       // idle — fresh full clock + a freshly re-armed bomb
     }
@@ -3567,7 +3886,7 @@ const BombEngine = {
     ms = Math.max(0, ms);
     if(ms === 0) return { consumedMs: 0, terminal: false };
     // Terminal guards: time cannot be replayed into a disabled / locked / frozen bomb.
-    if(!this.isEnabled(st) || st.bombLocked || st.timeInconsistency || isSleepActive()){
+    if(!this.isEnabled(st) || st.bombLocked || isSleepActive()){
       return { consumedMs: 0, terminal: true };
     }
     const at = st.activeTimer;
@@ -3606,9 +3925,9 @@ const BombEngine = {
     const st = state || STATE;
     if(!this.isEnabled(st)) return;
     if(!st.settings || st.settings.bombWakeTrigger !== 'wake-time') return; // Mode 1 only
-    // Never during a freeze (Sleep / Time-Inconsistency / Bomb-Lock): wait until awake & trusted.
+    // Never during a freeze (Sleep / Bomb-Lock): wait until awake & unlocked.
     // We deliberately do NOT set the marker here, so replay can still run once the freeze lifts.
-    if(frozen || isSleepActive() || st.bombLocked || st.timeInconsistency) return;
+    if(frozen || isSleepActive() || st.bombLocked) return;
     // Once per STUDY day. `wakeReplayDate` is a dedicated marker owned solely by replay —
     // it is intentionally independent of the day-rollover's `lastActiveDate`.
     const sdk = studyDayKey();
@@ -3641,14 +3960,14 @@ const BombEngine = {
   // stay with the session code, and Study Time math is untouched.
   onSessionPause(state){
     const st = state || STATE; const at = st.activeTimer;
-    if(at && this.isEnabled(st) && !isSleepActive()){ at.bombTickTs = Date.now(); }
+    if(at && this.isEnabled(st) && !isSleepActive()){ at.bombTickTs = monotonicNow(); }
   },
   bankPausedElapsed(state){
     const st = state || STATE; const at = st.activeTimer;
     if(at && at.bombTickTs!=null && this.isEnabled(st) && !isSleepActive()){
       // Future-timestamp guard: elapsed can never be negative (would otherwise resurrect burned time),
       // and the banked result is clamped to the legitimate ceiling. Prevents the item #7 leak.
-      const elapsed = Math.max(0, Date.now() - at.bombTickTs);
+      const elapsed = Math.max(0, monotonicNow() - at.bombTickTs);
       st.bombRemainingMs = this.clampToFull(this.baseMs(st) - elapsed, st);
     }
   },
@@ -3807,89 +4126,7 @@ async function handleBombExpiredPaused(state){ await BombEngine.explodePaused(st
        through for forward jumps.
      • A persisted "last trusted wall time" (state.lastSeenWall) is also kept as a backstop for
        BACKWARD jumps across a full app restart (when performance.now() resets to 0). */
-const TIME_JUMP_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes: minimum SUDDEN wall-clock shift (either direction) treated as suspicious
-const TIME_JUMP_CONFIRM = 2;                   // consecutive suspicious readings required before latching the freeze (multi-stage confirmation)
 
-// ── TimeConsistencyEngine ─────────────────────────────────────────────────────────────────────
-// Dedicated owner of clock-jump detection. Design goals:
-//  • NO new timers — piggybacks on the existing 3s recovery poll (analyzeClock is called from recoverState()).
-//  • MULTI-STAGE CONFIRMATION — a single abnormal reading (a WebView/lifecycle glitch) can NEVER freeze the app.
-//    It takes TIME_JUMP_CONFIRM consecutive suspicious readings to latch; a single clean reading clears suspicion.
-//  • PER-INTERVAL MONOTONIC CHECK — pairs performance.now() (real elapsed time, keeps advancing across
-//    backgrounding) with the wall clock. Each CLEAN poll REFRESHES the anchor, so slow/benign NTP drift never
-//    accumulates into a false trip; only a SUDDEN shift between readings is flagged. Symmetric forward/backward:
-//      drift > 0  →  clock jumped FORWARD      drift < 0  →  clock jumped BACKWARD
-//  • ANCHOR SURVIVES RESUME — app/WebView resume performs only a SOFT reset (clears the confirmation counter),
-//    never the trusted anchor, so a clock change made WHILE the app was backgrounded is still caught within a
-//    few seconds of returning (see TimeConsistencyEngine.onResume(), called from gtResumeResync()).
-//  • BACKWARD RESTART BACKSTOP — a persisted "last trusted wall" (state.lastSeenWall) still catches a backward
-//    jump across a FULL restart, where performance.now() has reset to 0 and the in-memory anchor is gone.
-//  • LIGHTWEIGHT DIAGNOSTICS — a small ring buffer (window.__timeGuardLog) records recent readings/decisions.
-// When a jump is CONFIRMED it flips the SAME freeze the Sleep engine already uses, at the corrected pre-jump time.
-const TimeConsistencyEngine = (() => {
-  let anchorPerf = null, anchorWall = null;   // trusted monotonic anchor (refreshed on every CLEAN reading)
-  let suspicion = 0;                           // consecutive suspicious readings (the confirmation counter)
-  let pendingGoodNow = null;                   // pre-jump wall time captured at the FIRST suspicious reading
-  const logRing = [];                          // diagnostics ring buffer (last 50 events)
-  function diag(evt){
-    const row = Object.assign({ ts: Date.now() }, evt);
-    logRing.push(row); if(logRing.length > 50) logRing.shift();
-    try{ window.__timeGuardLog = logRing; }catch(e){}
-    try{ console.debug('[TimeGuard]', row); }catch(e){}
-  }
-  // FULL reset — discard the anchor so a brand-new trusted baseline is established on the next poll.
-  // Used AFTER the user verifies the clock (resumeFromTimeInconsistency), so the old jump can never re-fire.
-  function reset(){ anchorPerf = null; anchorWall = null; suspicion = 0; pendingGoodNow = null; diag({ ev:'reset' }); }
-  // SOFT reset — called on app/WebView RESUME. Clears ONLY the confirmation counter so a transient resume glitch
-  // is absorbed, while PRESERVING the surviving anchor so a background clock change stays detectable.
-  function onResume(){ suspicion = 0; pendingGoodNow = null; diag({ ev:'resume', anchorPerf, anchorWall }); }
-  // Inspects the clock. Returns { jump, goodNow } where goodNow is the best estimate of the true current time
-  // (used to freeze the timer at its correct pre-jump value).
-  function analyze(state){
-    const now = Date.now();
-    const perf = (typeof performance !== 'undefined' && performance.now) ? performance.now() : null;
-    const at = state && state.activeTimer;
-    const running = !!(at && (!at.pausedAt || at.bombTickTs != null)); // only guard while a timer is actually live
-    if(!(running && !isSleepActive())){
-      // No live timer (or sleeping): pin the anchor to the trusted "now" and drop any in-flight suspicion so the
-      // next running poll starts from a clean baseline.
-      if(perf != null){ anchorPerf = perf; anchorWall = now; }
-      suspicion = 0; pendingGoodNow = null;
-      return { jump: false, goodNow: now };
-    }
-    let jump = false, goodNow = now;
-    // (1) MONOTONIC PER-INTERVAL CHECK — catches BOTH directions, even across backgrounding.
-    if(perf != null){
-      if(anchorPerf == null){ anchorPerf = perf; anchorWall = now; diag({ ev:'anchor-init', now }); }
-      else {
-        const expectedWall = anchorWall + (perf - anchorPerf); // where the clock SHOULD be since the last trusted reading
-        const drift = now - expectedWall;
-        if(Math.abs(drift) > TIME_JUMP_THRESHOLD_MS){
-          // SUSPICIOUS — do NOT advance the anchor (keep comparing against the last trusted point), capture the
-          // pre-jump time once, and require confirmation before latching the freeze.
-          suspicion++;
-          if(pendingGoodNow == null) pendingGoodNow = expectedWall;
-          diag({ ev:'suspicious', dir: drift>0?'forward':'backward', driftMs: Math.round(drift), suspicion, need: TIME_JUMP_CONFIRM });
-          if(suspicion >= TIME_JUMP_CONFIRM){ jump = true; goodNow = pendingGoodNow; diag({ ev:'CONFIRMED', goodNow }); }
-        } else {
-          // CLEAN — refresh the anchor and clear suspicion (absorbs one-off glitches, ignores slow drift).
-          if(suspicion > 0) diag({ ev:'cleared', afterSuspicion: suspicion });
-          anchorPerf = perf; anchorWall = now; suspicion = 0; pendingGoodNow = null;
-        }
-      }
-    }
-    // (2) BACKWARD restart backstop — survives a full restart (in-memory anchor gone) via the persisted trusted
-    // wall. This compares against a PERSISTED checkpoint (not a glitch-prone live reading), so it latches directly.
-    if(!jump && state.lastSeenWall != null && now < state.lastSeenWall - TIME_JUMP_THRESHOLD_MS){
-      jump = true; goodNow = state.lastSeenWall; diag({ ev:'backstop-backward', goodNow });
-    }
-    return { jump, goodNow };
-  }
-  return { analyze, reset, onResume, get log(){ return logRing.slice(); } };
-})();
-// Thin delegates keep the rest of the app (recoverState / resumeFromTimeInconsistency) unchanged.
-function resetClockBaseline(){ TimeConsistencyEngine.reset(); } // establish a brand-new trusted anchor next poll
-function analyzeClock(state){ return TimeConsistencyEngine.analyze(state); }
 
 let _recovering = false; // re-entrancy guard: overlapping polls were each completing the SAME expired timer → duplicate history entries
 async function recoverState(){
@@ -3898,58 +4135,41 @@ async function recoverState(){
   try{
   let state = await getState();
   const today = appDayKey(); // global day-boundary key — NOT raw midnight, respects Settings → Day Boundary
-  // TIME INCONSISTENCY GUARD — detect a suspicious clock jump and, if found, latch the same
-  // freeze the Sleep engine uses. Runs on boot and on every 3s poll. The freeze uses the
-  // CORRECTED time (goodNow) so a wrong clock can never inflate/deflate the timer value.
-  if(!state.timeInconsistency){
-    const ck = analyzeClock(state);
-    if(ck.jump){
-      state.timeInconsistency = true;
-      if(state.activeTimer){
-        // Remember whether the timer was actively RUNNING (vs already user-paused) at the moment of
-        // the freeze, so verification can restore the correct state with a fresh baseline.
-        state.activeTimer._frozenWasRunning = !state.activeTimer.pausedAt;
-        if(!state.activeTimer.pausedAt){ state.activeTimer.pausedAt = ck.goodNow; }
-        if(state.activeTimer.pausedAt && state.activeTimer.bombTickTs!=null && bombModeOn(state)){
-          state.bombRemainingMs = Math.max(0, bombBaseMs(state) - (ck.goodNow - state.activeTimer.bombTickTs));
-          state.activeTimer.bombTickTs = null;
-        }
-      }
-    }
-  } else {
-    analyzeClock(state); // keep the monotonic baseline fresh while already frozen (jump result ignored)
+  // ONE-TIME MIGRATION — clean up legacy Time Inconsistency state that may exist in persisted data
+  // from app versions that had the TI feature. Safe to run on every boot: the delete is a no-op if
+  // the properties don't exist.
+  if(state.timeInconsistency != null){
+    delete state.timeInconsistency;
+    if(state.activeTimer) delete state.activeTimer._frozenWasRunning;
+    if(state.settings) delete state.settings.timeInconsistencyDetectorEnabled;
+    await saveState(state);
   }
-  syncFreezeReasons(state); // Pillar 2: refresh the central freeze reason-set from live state
+  syncFreezeReasons(state); // refresh the central freeze reason-set from live state (Sleep + Bomb-Lock)
   const sleeping = FreezeManager.has(FREEZE.SLEEP);
-  // The central freeze halts ALL timer advancement. Bomb Explosion (BOMB_LOCK) joins Sleep and Time
-  // Inconsistency here so its freeze behaves IDENTICALLY: the running/paused timer is hard-paused, the
-  // bomb tick baseline is banked & dropped, the daily reset is deferred, and no internal elapsed leaks.
-  const frozen = FreezeManager.has(FREEZE.SLEEP) || FreezeManager.has(FREEZE.TIME_INCONSISTENCY) || FreezeManager.has(FREEZE.BOMB_LOCK);
-  // Safe "now" for the freeze math.
-  //  • Time Inconsistency: the live clock is untrusted, so freeze at the last trusted wall time (unchanged).
-  //  • Sleep (ROOT-CAUSE FIX for the "+8h Hour Streak" bug): freeze at the LAST TRUSTED wall time, not at
-  //    the instant this poll happens to run. lastSeenWall only advances while the app is awake with a
-  //    trusted clock, so if the app was CLOSED across Sleep Start and reopened mid-sleep, the session
-  //    freezes at the pre-sleep boundary (time actually studied) instead of counting the whole night.
-  //    For a continuously-open app lastSeenWall is only ~one poll stale (negligible).
-  const freezeNow = state.timeInconsistency
-    ? (state.lastSeenWall != null ? state.lastSeenWall : Date.now())
-    : (state.lastSeenWall != null ? Math.min(Date.now(), state.lastSeenWall) : Date.now());
-  // SLEEP DURATION / TIME INCONSISTENCY — hard-freeze whatever timer was running (Pomodoro or Bomb).
+  // The central freeze halts ALL timer advancement. Bomb Explosion (BOMB_LOCK) joins Sleep here so its
+  // freeze behaves identically: the running/paused timer is hard-paused, the bomb tick baseline is banked
+  // & dropped, the daily reset is deferred, and no internal elapsed leaks.
+  const frozen = FreezeManager.has(FREEZE.SLEEP) || FreezeManager.has(FREEZE.BOMB_LOCK);
+  // Safe "now" for the freeze math (ROOT-CAUSE FIX for the "+8h Hour Streak" bug).
+  // Freeze at the LAST TRUSTED wall time, not at the instant this poll happens to run.
+  // lastSeenWall only advances while the app is awake, so if the app was CLOSED across Sleep Start
+  // and reopened mid-sleep, the session freezes at the pre-sleep boundary (time actually studied)
+  // instead of counting the whole night. For a continuously-open app it is only ~one poll stale.
+  const freezeNow = state.lastSeenWall != null ? Math.min(Date.now(), state.lastSeenWall) : Date.now();
+  // SLEEP / BOMB-LOCK — hard-freeze whatever timer was running (Pomodoro or Bomb).
   // The daily reset below is deferred while frozen, so the Home screen & History stay frozen with
   // the completed Study Day's records intact.
   if(frozen && state.activeTimer && !state.activeTimer.pausedAt){
-    state.activeTimer.pausedAt = freezeNow;
+    state.activeTimer.pausedAt = monotonicNow();
   }
   // Also freezes a bomb that was ticking under an already-PAUSED session: bank its live value
   // and drop the tick baseline so the whole frozen window doesn't get subtracted from the clock.
   if(frozen && state.activeTimer && state.activeTimer.pausedAt && state.activeTimer.bombTickTs!=null && bombModeOn(state)){
-    state.bombRemainingMs = Math.max(0, bombBaseMs(state) - (freezeNow - state.activeTimer.bombTickTs));
+    state.bombRemainingMs = Math.max(0, bombBaseMs(state) - (monotonicNow() - state.activeTimer.bombTickTs));
     state.activeTimer.bombTickTs = null;
   }
-  // Advance the "last trusted wall time" ONLY while the clock is trusted (not frozen for a time jump),
-  // so a wrong clock can never poison the backward-jump baseline.
-  if(!state.timeInconsistency){ state.lastSeenWall = Date.now(); }
+  // Advance the last trusted wall time every poll while the app is awake.
+  state.lastSeenWall = Date.now();
   if(state.lastActiveDate !== today && !frozen){
     // Home Day Streak break check — if the day that just ended never hit its full Study allocation, the chain breaks.
     if(state.homeDayStreakLastAward !== state.lastActiveDate) state.homeDayStreak = 0;
@@ -3969,7 +4189,7 @@ async function recoverState(){
       state.bombDormant = false;                             // Mode 1: never dormant
       BombEngine.armForNewDay(state);                        // fresh full Bomb clock + re-arm — new Study Day starts clean (single owner)
     }
-    BombEngine.resetDailyLifelines(state); // hearts→1, dailyLifelinesEarned→0 (single lifeline authority)
+    BombEngine.resetDailyLifelines(state); // hearts→1, dailyLifelinesEarned��0 (single lifeline authority)
     state.bombLocked = false;         // Task 6.5: day-rollover clears the persisted flag; syncFreezeReasons() exits BOMB_LOCK on next poll
     state.bombExplodedToday = 0;      // fresh explosion counter for the new Study Day
     state.dailyStudySeconds = 0;
@@ -3990,7 +4210,7 @@ async function recoverState(){
     }
     for(const d in dayBank){ if(state.studyDayTotals[d]===undefined) state.studyDayTotals[d] = dayBank[d]; }
     await idbPut('meta', state); STATE = state; // persist bank BEFORE deleting (direct put — never skipped)
-    for(const e of oldTl){ if(e.date !== today) await idbDelete('timeline', e.id); }
+    for(const e of oldTl){ if(e.date !== today) await idbDelete('timeline', e.id); } invalidateTimelineCache();
     const oldSs = await idbAll('sessions');
     for(const s2 of oldSs){ if(appDayKey(new Date(s2.startTs||0)) !== today) await idbDelete('sessions', s2.id); }
   }
@@ -4005,7 +4225,7 @@ async function recoverState(){
   // or paused under an older build) must resume ticking the bomb from now against its frozen clock.
   if(!frozen && state.activeTimer && state.activeTimer.pausedAt && state.activeTimer.type!=='bomb'
      && state.activeTimer.bombTickTs==null && bombModeOn(state)){
-    state.activeTimer.bombTickTs = Date.now();
+    state.activeTimer.bombTickTs = monotonicNow();
     await saveState(state);
   }
   // WAKE-UP STATE RECONSTRUCTION (Mode 1) — replay the elapsed time between today's
@@ -4084,7 +4304,7 @@ async function startSession(type, task, topic){
     type: runType, task: task.name,
     subject: runType==='study' ? (isCreditProxy(task) ? othersLabel(task) : task.name) : null,
     topic: topic||null,
-    startTs: Date.now(), duration: remainingSec, pausedAt:null, accumulatedPause:0,
+    startTs: monotonicNow(), duration: remainingSec, pausedAt:null, accumulatedPause:0,
     taskId: task.id, baseConsumedSec
   };
   await saveState(state);
@@ -4105,7 +4325,7 @@ async function startExtraStudySession(durationMinutes){
   const durationSec = Math.max(60, Math.round(durationMinutes*60));
   state.activeTimer = {
     type:'study', task:'Extra Goal Study', subject:'Extra Goal Study', topic:null,
-    startTs: Date.now(), duration: durationSec, pausedAt:null, accumulatedPause:0,
+    startTs: monotonicNow(), duration: durationSec, pausedAt:null, accumulatedPause:0,
     taskId: null, baseConsumedSec: 0, isExtraGoal: true
   };
   if(state.goal) state.goal.extraActive = true; // lets the Goals page render its live mini-countdown
@@ -4122,12 +4342,12 @@ async function pauseResumeSession(){
     // RESUME. In Bomb Mode the bomb was ticking during the pause — bank the burned time and re-freeze
     // (single owner: BombEngine.onSessionResume), then restore the activity's own pause bookkeeping.
     BombEngine.onSessionResume(state);
-    at.accumulatedPause = (at.accumulatedPause||0) + (Date.now() - at.pausedAt);
+    at.accumulatedPause = (at.accumulatedPause||0) + (monotonicNow() - at.pausedAt);
     at.pausedAt = null;
   } else {
     // PAUSE. The activity freezes, but in Bomb Mode the bomb must immediately start ticking — it
     // treats a pause exactly like the activity going inactive (single owner: BombEngine.onSessionPause).
-    at.pausedAt = Date.now();
+    at.pausedAt = monotonicNow();
     BombEngine.onSessionPause(state);
   }
   await syncActiveTaskProgress(state); // checkpoint the task's consumed/remaining time on every pause/resume
@@ -4239,32 +4459,108 @@ function maybeAwardLiveLifeline(){
   const awarded = BombEngine.grantEarnedLifelines(STATE, total);
   if(awarded){ BombEngine.persistAward(STATE); showToast('❤️ New Lifeline earned!'); } // 4.2: serialized, ordered persist — no clobber
 }
-// Renders the top bar every second: date, clock, and Lifeline hearts (filled vs dim/locked + progress caption)
+// Renders the top bar every second: goal finish widget, and Lifeline hearts (filled vs dim/locked + progress caption)
 function renderHeader(){
   const now = new Date();
-  document.getElementById('hdrD1').textContent = now.toLocaleDateString(undefined,{day:'2-digit', month:'long', year:'numeric'});
-  document.getElementById('hdrD2').textContent = now.toLocaleDateString(undefined,{weekday:'long'});
-  document.getElementById('hdrTime').textContent = now.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
-  // Lifelines belong to the Bomb system — hide the entire hearts section (and its divider) when Bomb Mode is OFF.
+
+  // ── Profile card date (bottom of Home) ──────────────────────────────────
+  const pcD1 = document.getElementById('pcDateD1');
+  const pcD2 = document.getElementById('pcDateD2');
+  if(pcD1) pcD1.textContent = now.toLocaleDateString(undefined,{day:'2-digit', month:'long', year:'numeric'});
+  if(pcD2) pcD2.textContent = now.toLocaleDateString(undefined,{weekday:'long'});
+
+  // ── HOME WIDGET: Study Complete By / Max Study Today ─────────────────────────
+  // 4 possible states, all owned by Home screen, rendered from cachedFinishByText
+  const goalBadgeEl = document.getElementById('hdrGoalBadge');
+  const goalLabelEl = document.getElementById('hdrGoalLabel');
+  const goalValueEl = document.getElementById('hdrGoalValue');
+  const goalHelperEl = document.getElementById('hdrGoalHelper'); // Helper text for NO_STUDY_PLANNED
+  if(goalBadgeEl && goalLabelEl && goalValueEl){
+    const state = cachedFinishByText;
+    
+    // Skip rendering if data is still loading (prevents blank/placeholder state on startup)
+    if(state === 'LOADING') return;
+
+    // Helper references for the new icon swap + info button
+    const clockIcon = document.getElementById('hdrGoalClockIcon');
+    const checkIcon = document.getElementById('hdrGoalCheckIcon');
+    const infoBtn   = document.getElementById('hdrGoalInfoBtn');
+
+    // Reset icon to clock and hide info button by default
+    if(clockIcon) clockIcon.style.display = '';
+    if(checkIcon) checkIcon.style.display = 'none';
+    if(infoBtn)   infoBtn.style.display = 'none';
+
+    if(state.startsWith('FINISH_TIME|')){
+      // STATE 1: Study Complete By — green, achievable finish time
+      const timeStr = state.replace('FINISH_TIME|', '');
+      goalBadgeEl.className = 'hdr-goal-badge green';
+      goalLabelEl.className = 'hdr-goal-label green';
+      goalLabelEl.textContent = 'Study Complete By';
+      goalValueEl.textContent = timeStr;
+      if(goalHelperEl){ goalHelperEl.style.display = ''; goalHelperEl.textContent = 'Planned: ' + cachedGoalLabels.planned; }
+      if(infoBtn) infoBtn.style.display = '';
+    } 
+    else if(state.startsWith('MAX_STUDY|')){
+      // STATE 2: Max Study Today — red, plan not achievable
+      const maxHours = state.replace('MAX_STUDY|', '');
+      goalBadgeEl.className = 'hdr-goal-badge red';
+      goalLabelEl.className = 'hdr-goal-label red';
+      goalLabelEl.textContent = 'Max Study Today';
+      goalValueEl.textContent = maxHours;
+      if(goalHelperEl){ goalHelperEl.style.display = ''; goalHelperEl.textContent = 'Planned: ' + cachedGoalLabels.planned; }
+      if(infoBtn) infoBtn.style.display = '';
+    }
+    else if(state === 'TODAY_COMPLETE'){
+      // STATE 3: Today's Study Complete — green, done; swap clock → checkmark
+      goalBadgeEl.className = 'hdr-goal-badge green';
+      goalLabelEl.className = 'hdr-goal-label green';
+      goalLabelEl.textContent = 'Today\'s Study Complete';
+      goalValueEl.textContent = 'All Done';
+      if(goalHelperEl){
+        goalHelperEl.style.display = '';
+        goalHelperEl.textContent = 'Completed: ' + cachedGoalLabels.completed + ' \u00a0/\u00a0 ' + cachedGoalLabels.planned;
+      }
+      if(clockIcon) clockIcon.style.display = 'none';
+      if(checkIcon) checkIcon.style.display = '';
+    }
+  else if(state === 'NO_STUDY_PLANNED'){
+  // STATE 4: No Study Planned Today — neutral, not an error
+  goalBadgeEl.className = 'hdr-goal-badge neutral';
+  goalLabelEl.className = 'hdr-goal-label neutral';
+  goalLabelEl.textContent = 'No Study Planned Today';
+  goalValueEl.innerHTML = '';
+  if(goalHelperEl){ goalHelperEl.style.display = ''; goalHelperEl.textContent = 'Assign Study tasks to begin'; }
+  }
+    else {
+      // Fallback (empty state)
+      goalBadgeEl.className = 'hdr-goal-badge neutral';
+      goalLabelEl.className = 'hdr-goal-label neutral';
+      goalLabelEl.textContent = 'No Study Planned Today';
+      goalValueEl.textContent = '—';
+      if(goalHelperEl) goalHelperEl.style.display = 'none';
+    }
+  }
+
+  // ── Lifelines belong to the Bomb system — hide hearts section when Bomb Mode is OFF ──
   const heartsOn = bombModeOn(STATE);
   const heartsSection = document.getElementById('hdrHeartsSection');
   const heartsDivider = document.getElementById('heartsDivider');
   if(heartsSection) heartsSection.style.display = heartsOn ? '' : 'none';
   if(heartsDivider) heartsDivider.style.display = heartsOn ? '' : 'none';
-  // Bomb Mode ON: hide the Clock section so the Lifeline takes its place (clock text keeps updating above).
-  // Bomb Mode OFF: restore the Clock to its original position.
-  const clockSection = document.getElementById('hdrClockSection');
-  const clockDivider = document.getElementById('clockDivider');
-  if(clockSection) clockSection.style.display = heartsOn ? 'none' : '';
-  if(clockDivider) clockDivider.style.display = heartsOn ? 'none' : '';
+
+  // ── Age Bar (profile card) — recalculated continuously ──────────────────
+  const nm = STATE.settings.userName || 'You';
+  document.getElementById('ageLbl').textContent = nm;
+  const ag = calcAge(STATE.settings.dob);
+  document.getElementById('ageVal').textContent = ag ? `${ag.years}Y • ${ag.months}M • ${ag.days}D` : 'Set DOB in Settings';
+
   if(!heartsOn){
-    // still keep the Age Bar fresh below, but skip all lifeline work
-    const nm = STATE.settings.userName || 'You';
-    document.getElementById('ageLbl').textContent = nm;
-    const ag = calcAge(STATE.settings.dob);
-    document.getElementById('ageVal').textContent = ag ? `${ag.years}Y • ${ag.months}M • ${ag.days}D` : 'Set DOB in Settings';
+    updateStreakBar();
     return;
   }
+
+  // ── Hearts rendering ─────────────────────────────────────────────────────
   const heartsWrap = document.getElementById('hdrHearts');
   heartsWrap.innerHTML='';
   const max = STATE.settings.heartsMaxPerDay;
@@ -4273,31 +4569,19 @@ function renderHeader(){
     if(filled){
       heartsWrap.innerHTML += `<svg class="heart-icon" viewBox="0 0 24 24" fill="#EF4444" stroke="#EF4444" stroke-width="1.8"><path d="M12 21s-7.5-4.6-10-9.3C.6 8.4 2.4 5 6 5c2 0 3.4 1 4 2.4C10.6 6 12 5 14 5c3.6 0 5.4 3.4 4 6.7C19.5 16.4 12 21 12 21z"/></svg>`;
     } else {
-      // locked / not yet earned — dim
       heartsWrap.innerHTML += `<svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="#C9C6DC" stroke-width="1.8" style="opacity:0.55;"><path d="M12 21s-7.5-4.6-10-9.3C.6 8.4 2.4 5 6 5c2 0 3.4 1 4 2.4C10.6 6 12 5 14 5c3.6 0 5.4 3.4 4 6.7C19.5 16.4 12 21 12 21z"/></svg>`;
     }
   }
   document.getElementById('hdrHeartsLbl').textContent = STATE.hearts+'/'+max+' Lives';
-  // Age Bar — recalculated continuously so it advances a day automatically at midnight
-  const name = STATE.settings.userName || 'You';
-  document.getElementById('ageLbl').textContent = name;
-  const age = calcAge(STATE.settings.dob);
-  document.getElementById('ageVal').textContent = age ? `${age.years}Y • ${age.months}M • ${age.days}D` : 'Set DOB in Settings';
   // Progress caption: shows hours remaining until the next not-yet-earned Lifeline unlocks
   const progressEl = document.getElementById('hdrHeartsProgress');
   const maxBonus = Math.max(0, max - 1);
   if(STATE.dailyLifelinesEarned >= maxBonus){
     progressEl.textContent = 'All earned today';
   } else {
-    // Live HH:MM countdown — counts the running Study session's elapsed time in real time,
-    // using the configurable interval from Settings (never hardcoded).
     const intSec = (STATE.settings.lifelineEveryHours||4)*3600;
     const nextThresholdSec = (STATE.dailyLifelinesEarned+1)*intSec;
     const atH = STATE.activeTimer;
-    // Pillar 1: clamped canonical elapsed (freezes at pausedAt AND can never exceed the session length).
-    // Pillar 3: renderHeader is now READ-ONLY — it only displays the countdown. The actual Lifeline award
-    // is performed by the business-logic function maybeAwardLiveLifeline() (called from the tick loop),
-    // so a render pass can no longer mutate or persist state.
     const liveSec = (atH && atH.type!=='bomb' && atH.subject && atH.state!=='REVIEW_PENDING') ? sessionElapsedSec(atH) : 0;
     const remainSec = nextThresholdSec - ((STATE.dailyStudySeconds||0) + liveSec);
     if(remainSec<=0){
@@ -4314,7 +4598,7 @@ function renderHeader(){
 // Streak progress bar — dual mode, switches automatically with Bomb Mode:
 // • Bomb ON:  fills over the current Study session toward the next hourly streak point;
 //   reaching 100% coincides with Pomodoro completion, which increments the streak and resets the bar.
-// • Bomb OFF: mirrors the Goals section — fills by today's cumulative study hours vs. the daily
+// ��� Bomb OFF: mirrors the Goals section — fills by today's cumulative study hours vs. the daily
 //   minimum streak requirement (e.g. 4/8 hrs = 50%). Resets to 0% automatically each new day
 //   because dailyStudySeconds is reset by the existing day-rollover logic.
 function updateStreakBar(){
@@ -4384,7 +4668,7 @@ function renderPomoIdlePreview(){
 function applyLabels(){
   const L = STATE.settings.labels;
   document.getElementById('lblSelectTask').textContent = L.taskSection;
-  document.getElementById('lblStreak').textContent = L.streak.toUpperCase();
+  // lblStreak is handled by renderHome() based on bomb mode, so skip it here to prevent flickering
   document.getElementById('lblBreak').textContent = L.breakTimer.toUpperCase();
   document.getElementById('lblTelegram').textContent = L.telegram;
   // Master toggle hides the whole Home Telegram card; otherwise refresh the pending-report pill/buttons.
@@ -4417,7 +4701,7 @@ function applyLabels(){
 // Inline SVG illustrations for the idle states (STATE 3 = No Task, STATE 4 = Sleep Mode)
 const CA_NOTASK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="5.64" y1="5.64" x2="18.36" y2="18.36"/></svg>';
 const CA_MOON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#5B4FE8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8 8 0 0 1 9.4 3.5a8 8 0 1 0 11.1 11.1z" fill="rgba(91,79,232,0.18)"/><path d="M17 3l.7 1.8L19.5 5.5l-1.8.7L17 8l-.7-1.8L14.5 5.5l1.8-.7z" fill="#F5A623" stroke="none"/></svg>';
-const CA_WARN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#E0940F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="rgba(245,166,35,0.18)"/><path d="M12 7.5v5l3 1.8"/></svg>';
+
 // Compact duration label for progress chips, e.g. "30m" or "1h 15m"
 function fmtChipDur(sec){ const m=Math.round(sec/60); return m>=60 ? (Math.floor(m/60)+'h'+(m%60?' '+(m%60)+'m':'')) : m+'m'; }
 // Splits a total activity duration into Pomodoro parts using the Default Pomodoro setting,
@@ -4430,7 +4714,7 @@ function activitySplit(totalSec, pomoSec){
 }
 // Builds the Current Activity card structure. When nothing is running the card shrinks
 // and shows "NO ACTIVITY RUNNING"; live values are then updated by tickCurrentActivity().
-// ── Shared Current Activity view-model (Task 6) ────�����──────────────────────���─
+// ── Shared Current Activity view-model (Task 6) ────�����───────────────────���─������─
 // SINGLE source of truth for the Home Screen Current Activity card AND the
 // Android/Telegram notification. No screen recomputes these values on its own —
 // the notification shows EXACTLY what the card shows.
@@ -4466,15 +4750,12 @@ function renderCurrentActivity(){
   const at=STATE.activeTimer;
   // Sleep Mode is the highest-priority state: while active, the card always shows the
   // existing Sleep Mode view and ignores whether a Study/Pomodoro task is running.
-  // Time Inconsistency is the highest-priority idle state — above Sleep Mode and No-Task.
-  // Task 6.3: a bomb explosion latches BOMB_LOCK and reuses this exact idle card (same shell/button as
-  // Time Inconsistency) — it takes top priority so the explosion is acknowledged before anything else.
+  // Bomb Explosion (BOMB_LOCK) takes top priority so the explosion is acknowledged before anything else.
   const bombLocked = FreezeManager.has(FREEZE.BOMB_LOCK);
-  const inconsistent = !bombLocked && !!(STATE && STATE.timeInconsistency);
-  const sleepingNow = !bombLocked && !inconsistent && isSleepActive();
-  const running = !bombLocked && !inconsistent && !sleepingNow && at && at.type!=='bomb' && !(at.type==='pomodoro' && at.state==='REVIEW_PENDING');
+  const sleepingNow = !bombLocked && isSleepActive();
+  const running = !bombLocked && !sleepingNow && at && at.type!=='bomb' && !(at.type==='pomodoro' && at.state==='REVIEW_PENDING');
   card.classList.toggle('idle', !running);
-  if(running){ card.classList.remove('sleep','timewarn','notask','bomblock'); } // never let an idle-state tint linger on the running card
+  if(running){ card.classList.remove('sleep','notask','bomblock'); } // never let an idle-state tint linger on the running card
   document.getElementById('caBody').style.display = running?'':'none';
   document.getElementById('caIdle').style.display = running?'none':'';
   const badge=document.getElementById('caBadge');
@@ -4482,9 +4763,8 @@ function renderCurrentActivity(){
   if(!running){
     const sleeping = sleepingNow;
     card.classList.toggle('sleep', sleeping);
-    card.classList.toggle('timewarn', inconsistent);
     card.classList.toggle('bomblock', bombLocked);
-    card.classList.toggle('notask', !sleeping && !inconsistent && !bombLocked);
+    card.classList.toggle('notask', !sleeping && !bombLocked);
     const icEl=document.getElementById('caStatusIc');
     const titleEl=document.getElementById('caStatusTitle');
     const subEl2=document.getElementById('caStatusSub');
@@ -4500,12 +4780,6 @@ function renderCurrentActivity(){
       subEl2.style.fontSize = '12.5px';
       subEl2.innerHTML = 'The Bomb reached 00:00 with no Lifeline remaining. Your Hour Streak will reset from <b>'+fromH+' hours</b> to <b>0 hours</b> after restarting.';
       if(verifyBtn){ verifyBtn.textContent = 'Restart Hour Streak'; verifyBtn.style.display = ''; }
-    } else if(inconsistent){
-      subEl2.style.fontSize = '';
-      icEl.innerHTML = CA_WARN_SVG;
-      titleEl.textContent = 'Time Inconsistency Detected';
-      subEl2.innerHTML = 'All timers have been temporarily frozen because a significant device time change was detected. Please verify that your device date &amp; time are correct.';
-      if(verifyBtn){ verifyBtn.textContent = 'Verify & Resume'; verifyBtn.style.display = ''; }
     } else if(sleeping){
       subEl2.style.fontSize = '';
       if(verifyBtn) verifyBtn.style.display = 'none';
@@ -4950,7 +5224,7 @@ function sleepIntervalsInWindow(windowStart, now){
   }
   return res;
 }
-// ─── Timeline Architecture ────────────────────────────────────────────────────
+// ─── Timeline Architecture ──────────────────────────────────────────���─────────
 // The Timeline is PRESENTATION ONLY. It shows the chronological sequence of the
 // user's day. It has zero responsibility for:
 //   Goal / Hour Streak / Bomb business logic / Lifeline / FreezeManager / Campaign.
@@ -4962,10 +5236,10 @@ function sleepIntervalsInWindow(windowStart, now){
 //   • SLEEP   — any gap that overlaps the configured sleep window.
 //   • BOMB    — the Bomb countdown is running. When Bomb Mode is on, the Bomb is armed and ticking
 //               during EVERY inactivity gap once the first productive activity of the day has started.
-//   • IDLE    — only when the Bomb countdown is NOT running: the stretch right after Wake-up before the
+//   • IDLE    ���� only when the Bomb countdown is NOT running: the stretch right after Wake-up before the
 //               very first task starts, the frozen period after an explosion (BOMB_LOCK) until reset,
 //               and (Bomb Mode off) any awake gap with nothing running.
-// ───────────────────────────────────────────────────────────────��─────────────
+// ─────────────────────────────────────────��─────────────────────��─────────────
 
 // Returns the timestamp of the most recent Wake-up moment (getWakeHour()) on or before `now`.
 function todayWakeTs(now){
@@ -5159,7 +5433,7 @@ async function renderTimeline(){
     const name = cat === 'bomb'  ? 'Bomb'
                : cat === 'noact' ? 'Idle'
                : e.task;
-    const sub  = cat === 'bomb'  ? 'Bomb countdown active'
+    const sub  = cat === 'bomb'  ? 'Bomb countdown'
                : cat === 'noact' ? 'No Activity'
                : cat === 'sleep' ? 'Sleep'
                : (e.topic || (cat==='study' ? 'Study session' : cat==='routine' ? 'Routine' : cat==='health' ? 'Health activity' : 'Activity'));
@@ -5627,6 +5901,7 @@ function renderSettings(){
   updateOtherHoursPreview();
   document.getElementById('setPomo').value = Math.round(STATE.settings.pomodoroDuration/60);
   document.getElementById('setToastsEnabled').checked = STATE.settings.toastsEnabled !== false;
+
   document.getElementById('setBomb').value = Math.round(STATE.settings.bombDuration/60);
   document.getElementById('setBombMode').checked = bombModeOn(STATE);
   document.getElementById(STATE.settings.bombWakeTrigger === 'first-activity' ? 'setBombTriggerFirst' : 'setBombTriggerWake').checked = true;
@@ -5681,10 +5956,306 @@ function renderSettings(){
   document.getElementById('setLblCatOthers').value = L.catOthers;
 }
 
+// ── Live Formula Debugging ────────────────────────────────────────────────────
+// Accordion toggle for Home Widget debugging card (reuses standard .expanded class pattern).
+// On expand: renders the card once via one-shot call. On collapse: nothing happens (dormant).
+document.getElementById('dbgHomeCard')?.addEventListener('click', function(e){
+  // Only toggle if clicking on the header area (not deep nested elements)
+  if(e.target.closest('.dbg-header')){
+    const isExpanding = !this.classList.contains('expanded');
+    this.classList.toggle('expanded');
+    if(isExpanding) renderHomeWidgetDebugCard(); // one-shot render on expand only
+  }
+});
+
+// Accordion toggle for Goal Widget debugging card.
+// On expand: renders the card once via one-shot call. On collapse: nothing happens (dormant).
+document.getElementById('dbgGoalCard')?.addEventListener('click', function(e){
+  if(e.target.closest('.dbg-header')){
+    const isExpanding = !this.classList.contains('expanded');
+    this.classList.toggle('expanded');
+    if(isExpanding) renderGoalWidgetDebugCard(); // one-shot render on expand only
+  }
+});
+
+// Renders the Home Widget debugging card from existing computeStudyCompletionWidget() data.
+// DORMANT INSPECTOR — never called by the render() cycle. Fires exactly once when the user
+// opens the card via toggleDbgHome(), or manually via the Refresh button. Zero background work.
+async function renderHomeWidgetDebugCard(){
+  const subPage = document.getElementById('subFormulaDebug');
+  if(!subPage || subPage.style.display === 'none') return; // only render when visible
+
+  const subtitle = document.getElementById('dbgHomeSubtitle');
+  const body     = document.getElementById('dbgHomeBody');
+  if(!body || body.style.display === 'none') return; // collapsed — skip DOM writes
+
+  const data = await computeStudyCompletionWidget();
+
+  if(!data){
+    if(subtitle) subtitle.textContent = 'No active goal';
+    return;
+  }
+
+  const fmt  = s => fmtHoursMinutes(s / 3600);
+  const now  = new Date();
+
+  // §1 Planned
+  const planned   = fmt(data.plannedStudySeconds);
+  // §2 Completed
+  const completed = fmt(data.completedStudySeconds);
+  // §3 Remaining study
+  const remStudy  = fmt(data.remainingStudySeconds);
+  // §4 Non-study
+  const nonStudy  = fmt(data.remainingNonStudySeconds);
+  // §5 Remaining day + boundaries
+  const remDay    = fmt(data.remainingDaySeconds);
+  const dayEndStr = fmtTimeOfDay(data.dayEndTime.getTime());
+  const nowStr    = fmtTimeOfDay(now.getTime());
+  // §6 Free capacity
+  const free      = fmt(data.freeCapacitySeconds);
+  // §7 Max study today
+  const maxStudy  = fmt(data.maxStudyTodaySeconds);
+  
+  // §8 Comparison — COMPLETELY DYNAMIC based on current widget state
+  // When "Study Complete By" (canFinishToday=true): Available Study Time ≥ Today's Remaining Study
+  // When "Max Study Today" (canFinishToday=false): Available Study Time < Today's Remaining Study
+  let cmpOp, cmpLeftVal, cmpRightVal, cmpLabel;
+  if(data.canFinishToday){
+    cmpOp       = '\u2265';  // ≥ (greater-than-or-equal)
+    cmpLabel    = 'Available Study Time Today ≥ Today\'s Remaining Study';
+    cmpLeftVal  = free;      // Available study time
+    cmpRightVal = remStudy;  // Remaining study
+  } else {
+    cmpOp       = '<';       // < (less-than)
+    cmpLabel    = 'Available Study Time Today < Today\'s Remaining Study';
+    cmpLeftVal  = free;      // Available study time
+    cmpRightVal = remStudy;  // Remaining study (now exceeds available, hence "max")
+  }
+  
+  // §9 Result + widget label
+  let widgetLabel, resultVal, resultColor;
+  if(data.completedStudySeconds >= data.plannedStudySeconds && data.plannedStudySeconds > 0){
+    widgetLabel  = 'Today Complete';
+    resultVal    = planned + ' done';
+    resultColor  = 'var(--green,#34C759)';
+  } else if(data.canFinishToday){
+    const h = data.projectedFinishTime.getHours();
+    const mn = data.projectedFinishTime.getMinutes();
+    const ap = h >= 12 ? 'PM' : 'AM';
+    const h12 = (h % 12) === 0 ? 12 : h % 12;
+    const tStr = mn === 0 ? `${h12} ${ap}` : `${h12}:${String(mn).padStart(2,'0')} ${ap}`;
+    widgetLabel = 'Study Complete By';
+    resultVal   = tStr;
+    resultColor = 'var(--green,#34C759)';
+  } else {
+    widgetLabel = 'Max Study Today';
+    resultVal   = maxStudy;
+    resultColor = 'var(--warn,#FF9F0A)';
+  }
+
+  // Update subtitle (collapsed line)
+  if(subtitle) subtitle.textContent = widgetLabel + ' \u2014 ' + resultVal;
+
+  // Populate all DOM elements
+  const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+  const setColor = (id, c) => { const el = document.getElementById(id); if(el) el.style.color = c; };
+
+  set('dbgPlanned',    planned);
+  set('dbgCompleted',  completed);
+  set('dbgPlanned2',   planned);
+  set('dbgCompleted2', completed);
+  set('dbgRemStudy',   remStudy);
+  set('dbgNonStudy',   nonStudy);
+  set('dbgDayEnd',     dayEndStr);
+  set('dbgNow',        nowStr);
+  set('dbgRemDay',     remDay);
+  set('dbgRemDay2',    remDay);
+  set('dbgNonStudy2',  nonStudy);
+  set('dbgFree',       free);
+  set('dbgCompleted3', completed);
+  set('dbgFree2',      free);
+  set('dbgMaxStudy',   maxStudy);
+  set('dbgCmpOp',      cmpOp);
+  set('dbgCmpOp2',     cmpOp);
+  set('dbgFree3',      cmpLeftVal);
+  set('dbgRemStudy2',  cmpRightVal);
+  set('dbgWidgetLabel', widgetLabel);
+  set('dbgResult',     resultVal);
+  setColor('dbgResult', resultColor);
+}
+
+// Renders the Goal Widget debugging card from the current active Goal's metrics.
+// DORMANT INSPECTOR — fires exactly once when the user expands the card via accordion toggle.
+async function renderGoalWidgetDebugCard(){
+  // Update subtitle before any early-return so the card always shows the right state label
+  const subtitle = document.getElementById('dbgGoalSubtitle');
+  const g = STATE.goal;
+  if(!g || !g.name){
+    if(subtitle) subtitle.textContent = 'No active goal';
+    return;
+  }
+  const m = await computeGoalMetrics(); // reads STATE.goal internally — no arguments
+  if(!m){
+    if(subtitle) subtitle.textContent = 'No data';
+    return;
+  }
+  if(subtitle) subtitle.textContent = g.name;
+  const todayKey = goalTodayKey(new Date()); // needed for §4 daysPassed calculation
+  
+  // Helper: format time hh:mm
+  const fmt = (seconds) => {
+    if(seconds < 0) seconds = 0;
+    const h = Math.floor(seconds / 3600);
+    const min = Math.floor((seconds % 3600) / 60);
+    if(h === 0) return `${min}m`;
+    if(min === 0) return `${h}h`;
+    return `${h}h ${min}m`;
+  };
+  
+  // Helper: format percentage
+  const fmtPct = (val) => Math.round(val * 100) / 100 + '%';
+  
+  // Helper: format time with sign preserved (uses unicode minus for negative)
+  const fmtSigned = (seconds) => {
+    if(seconds < 0) return '\u2212' + fmt(-seconds);
+    return fmt(seconds);
+  };
+  
+  // Helper: format date
+  const fmtDate = (dateKey) => {
+    if(!dateKey || dateKey.length < 8) return '—';
+    const y = parseInt(dateKey.substring(0, 4));
+    const mo = parseInt(dateKey.substring(4, 6));
+    const d = parseInt(dateKey.substring(6, 8));
+    const date = new Date(y, mo - 1, d);
+    return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+  
+  // Helper to set text and/or color
+  const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+  const setColor = (id, c) => { const el = document.getElementById(id); if(el) el.style.color = c; };
+  
+  // §1 Total Days in Goal
+  // HTML layout: = End Date − Start Date + 1  (end comes first in the subtraction)
+  set('dbgGoalEndDate',   fmtDate(g.endDate));
+  set('dbgGoalStartDate', fmtDate(g.startDate));
+  const totalDaysVal = daysBetweenKeys(g.startDate, g.endDate) + 1;
+  set('dbgGoalTotalDays', String(totalDaysVal));
+  
+  // §2 Total Goal Target Hours
+  set('dbgGoalTotalDays2',   String(totalDaysVal));
+  set('dbgGoalDailyTarget',  fmt(m.dailyTargetHours * 3600));
+  set('dbgGoalTotalTarget',  fmt(m.totalRequiredHours * 3600));
+  
+  // §3 Goal Total Progress Till Now
+  set('dbgGoalPrevious',     fmt((m.campaignHours - m.todayHours) * 3600));
+  set('dbgGoalToday',        fmt(m.todayHours * 3600));
+  set('dbgGoalStudyTillNow', fmt(m.campaignHours * 3600));
+  set('dbgGoalStudyTillNow2', fmt(m.campaignHours * 3600));
+  set('dbgGoalTotalTarget2',  fmt(m.totalRequiredHours * 3600));
+  set('dbgGoalProgressPct',  fmtPct(m.campaignHours / m.totalRequiredHours));
+  
+  // §4 Expected Progress upto Today
+  const daysPassed = m.active ? daysBetweenKeys(g.startDate, todayKey) + 1 : 0;
+  set('dbgGoalDaysPassed',   String(daysPassed));
+  set('dbgGoalDailyTarget2', fmt(m.dailyTargetHours * 3600));
+  set('dbgGoalExpectedProgress', fmt(m.expectedHours * 3600));
+  set('dbgGoalExpectedProgress2', fmt(m.expectedHours * 3600));
+  
+  // §5 Progress Difference (Offset)
+  set('dbgGoalStudyTillNow3', fmt(m.campaignHours * 3600));
+  set('dbgGoalOffset',       fmtSigned(m.offset * 3600));
+  
+  // §6 Goal Status
+  const cmpOp6 = m.offset < 0 ? '<' : (m.offset > 0 ? '>' : '=');
+  const statusText = m.statusKey === 'behind' ? fmt(Math.abs(m.offset) * 3600) + ' Behind' : (m.statusKey === 'ahead' ? fmt(Math.abs(m.offset) * 3600) + ' Ahead' : 'On Track');
+  const statusColor = m.statusKey === 'behind' ? 'var(--red,#FF3B30)' : (m.statusKey === 'ahead' ? 'var(--green,#34C759)' : 'var(--yellow,#FFCC00)');
+  set('dbgGoalOffsetCmp',    cmpOp6);
+  set('dbgGoalOffsetVal',    fmtSigned(m.offset * 3600));
+  set('dbgGoalOffsetCmp2',   cmpOp6);
+  set('dbgGoalStatusText',   statusText);
+  setColor('dbgGoalStatusText', statusColor);
+  
+  // §7 Required Study Now
+  const effectiveDays7 = m.remainingDeadlineDays > 0 ? m.remainingDeadlineDays : 1;
+  const extraPerDaySec7 = (m.offset / effectiveDays7) * 3600;
+  set('dbgGoalOffset2',      fmtSigned(m.offset * 3600));
+  set('dbgGoalEffectiveDays', String(effectiveDays7));
+  set('dbgGoalExtraPerDay',  fmtSigned(extraPerDaySec7));
+  const helperText = m.offset < 0 ? 'Study ' + fmt(-extraPerDaySec7) + ' More Every Day' : (m.offset > 0 ? 'Study ' + fmt(extraPerDaySec7) + ' Less Every Day' : 'On Track');
+  set('dbgGoalHelperText',   helperText);
+  set('dbgGoalDailyTarget3', fmt(m.dailyTargetHours * 3600));
+  set('dbgGoalExtraPerDay2', fmtSigned(extraPerDaySec7));
+  const reqStep2El = document.getElementById('dbgGoalReqStep2');
+  if(reqStep2El) {
+    if(m.offset < 0) {
+      reqStep2El.style.display = '';
+      set('dbgGoalDailyTarget3b', fmt(m.dailyTargetHours * 3600));
+      set('dbgGoalExtraPerDay2b', fmt(-extraPerDaySec7));
+    } else {
+      reqStep2El.style.display = 'none';
+    }
+  }
+  set('dbgGoalRequiredNow',  fmt(m.requiredNowPerDay * 3600));
+  
+  // §8 Projected Finish
+  set('dbgGoalOffset3',      fmtSigned(m.offset * 3600));
+  set('dbgGoalDailyTarget4', fmt(m.dailyTargetHours * 3600));
+  const absOffsetDays8 = m.dailyTargetHours > 0 ? Math.abs(m.offset) / m.dailyTargetHours : 0;
+  const offsetWholeDays8 = Math.floor(absOffsetDays8);
+  const offsetFracMins8 = Math.round((absOffsetDays8 - offsetWholeDays8) * m.dailyTargetHours * 60);
+  const buildOffDayStr8 = (includeSign) => {
+    const parts = [];
+    if(offsetWholeDays8 > 0) parts.push(offsetWholeDays8 + (offsetWholeDays8 === 1 ? ' Day' : ' Days'));
+    if(offsetFracMins8 > 0) parts.push(offsetFracMins8 + ' Min');
+    if(parts.length === 0) return '0 Days';
+    return (includeSign && m.offset < 0 ? '\u2212' : '') + parts.join(' ');
+  };
+  set('dbgGoalOffsetDays',   buildOffDayStr8(true));
+  set('dbgGoalDeadline',     fmtDate(g.endDate));
+  set('dbgGoalOffsetDays2',  buildOffDayStr8(true));
+  const projStep2El = document.getElementById('dbgGoalProjStep2');
+  if(projStep2El) {
+    if(m.offset < 0 && absOffsetDays8 > 0) {
+      projStep2El.style.display = '';
+      set('dbgGoalDeadlineB',     fmtDate(g.endDate));
+      set('dbgGoalOffsetDaysAbs', buildOffDayStr8(false));
+    } else {
+      projStep2El.style.display = 'none';
+    }
+  }
+  set('dbgGoalProjectedFinish', fmtDate(m.projectedFinishKey));
+  set('dbgGoalFinalDay',     fmt(m.delayFracHours * 3600));
+  
+  // §9 Live Completion Check
+  set('dbgGoalOffset4',      fmtSigned(m.offset * 3600));
+  
+  // Get available study time from Home Widget engine
+  let availableHours = 0;
+  const homeWidget = await computeStudyCompletionWidget();
+  if(homeWidget) availableHours = homeWidget.freeCapacitySeconds / 3600;
+  set('dbgGoalAvailableTime', fmt(availableHours * 3600));
+  
+  // Comparison — line 1: |signed offset| op available  line 2: abs offset op available
+  const hoursBehind = Math.max(0, -m.offset);
+  const cmpOp9 = hoursBehind <= availableHours ? '≤' : '>';
+  set('dbgGoalOffset5',        fmtSigned(m.offset * 3600));   // signed value inside |...|
+  set('dbgGoalCmpOp',          cmpOp9);
+  set('dbgGoalAvailableTime2', fmt(availableHours * 3600));
+  set('dbgGoalAbsOffset',      fmt(hoursBehind * 3600));       // absolute value on second line
+  set('dbgGoalCmpOp2',         cmpOp9);
+  set('dbgGoalAvailableTime3', fmt(availableHours * 3600));
+  
+  // Live status
+  const liveStatusDisplay = { ontime: '🟢 On Time', canRecover: '🟡 Can Recover Today', delayed: '🔴 Delayed' };
+  const liveStatusText = liveStatusDisplay[m.liveStatus] || '🟢 On Time';
+  set('dbgGoalLiveStatus', liveStatusText);
+}
+
 /* ======================================================================================
    GOALS ENGINE
    Everything on the Goals screen is derived, live, from three things:
-     1) state.goal            — the few values the user actually set in Goal Settings
+     1) state.goal            ��� the few values the user actually set in Goal Settings
                                  (name, startDate, endDate, dailyTargetHours, minStreakHours,
                                  extraTimerLimitMin, motivation, streakCurrent, lastStreakCheckDay)
      2) the 'timeline' table   — every completed Study-category session (normal AND Extra
@@ -5782,10 +6353,19 @@ async function computeGoalMetrics(){
   const remainingDeadlineDays = Math.max(0, daysBetweenKeys(todayKey, g.endDate));
 
   // ---- Section 2: Today's Progress ----
-  const todaySeconds = started ? await getStudySecondsInRange(todayKey, todayKey) : 0;
+  // liveTodayStudySec() = dailyStudySeconds (committed) + running session delta (live).
+  // Replaces getStudySecondsInRange(today, today) which only saw committed IDB entries and
+  // therefore showed stale progress while a session was actively running.
+  const todaySeconds = started ? liveTodayStudySec(STATE) : 0;
 
   // ---- Section 4: Campaign Progress (cumulative since Start Date, through today) ----
-  const campaignSeconds = started ? await getStudySecondsInRange(g.startDate, todayKey) : 0;
+  // Split: past days via IDB (getStudySecondsInRange excludes today because today is never
+  // banked) + today via liveTodayStudySec(). The two sources are mutually exclusive:
+  // studyDayTotals never contains today, IDB timeline never contains the running session.
+  // Zero double-count risk — same guarantee as the existing bank/timeline exclusion guard.
+  const yesterdayKey = addDaysToKey(todayKey, -1);
+  const campaignPastSeconds = started ? await getStudySecondsInRange(g.startDate, yesterdayKey) : 0;
+  const campaignSeconds = started ? campaignPastSeconds + liveTodayStudySec(STATE) : 0;
   const campaignHours = campaignSeconds/3600;
 
   // ---- Section 5: Intelligent Status Engine ----
@@ -5798,74 +6378,91 @@ async function computeGoalMetrics(){
   const originalDailyTarget = effDaily; // effective Goal Daily Hours (Home Study Timer by default, or the custom override)
   let expectedHours = started ? (daysPassed + 1) * originalDailyTarget : 0; // today counts in full at day start
   expectedHours = Math.min(expectedHours, totalRequiredHours);
-  const diffHours = campaignHours - expectedHours; // + means ahead, - means behind
+  const offset = campaignHours - expectedHours; // Progress Difference (Offset): + means ahead, - means behind
 
   let statusKey = 'ontime';
-  if(diffHours < -0.001) statusKey = 'behind';
-  else if(diffHours > 0.001) statusKey = 'ahead';
+  if(offset < -0.001) statusKey = 'behind';
+  else if(offset > 0.001) statusKey = 'ahead';
 
-  // Required Now: Remaining Hours spread evenly across the days still remaining (today counts as
-  // one). Once the deadline has passed there are no campaign days left to distribute across —
-  // the engine enters the "Deadline Passed" state instead of computing a per-day figure.
-  const remainingRequiredHours = Math.max(0, totalRequiredHours - campaignHours);
+  // Required Now: consumes offset directly — no re-derivation.
+  // offset < 0 → behind (negative → extra work needed per day)
+  // offset > 0 → ahead  (positive → less work needed per day)
+  // offset = 0 → exactly on track
+  //
+  // Required Now = Daily Target − (offset ÷ Effective Days Left)
+  //   offset < 0 (behind) → subtracting a negative → Required Now INCREASES  e.g. 14h − (−1h 51m) = 15h 51m
+  //   offset > 0 (ahead)  → subtracting a positive → Required Now DECREASES  e.g. 14h − (+4m)     = 13h 56m
+  //   offset = 0 (on track)→ no change             → Required Now = Daily Target
+  //
+  // The sign of offset drives the result naturally. No absolute value used.
   const deadlinePassed = started && todayKey > g.endDate;
   let requiredNowPerDay = 0;
-  if(remainingRequiredHours > 0 && !deadlinePassed){
+  if(!deadlinePassed && remainingDeadlineDays > 0){
     const effectiveDaysLeft = started
-      ? Math.max(1, remainingDeadlineDays + 1)
+      ? Math.max(1, remainingDeadlineDays)
       : Math.max(1, daysBetweenKeys(g.startDate, g.endDate) + 1);
-    requiredNowPerDay = remainingRequiredHours/effectiveDaysLeft;
+    // Required Now = Daily Target − (offset / effectiveDaysLeft)
+    // Algebraically identical to: Daily Target + ((-offset) / effectiveDaysLeft)
+    requiredNowPerDay = Math.max(0, originalDailyTarget - (offset / Math.max(1, effectiveDaysLeft)));
   }
 
-  // Projected Finish: earliest realistic completion — actual Remaining Hours �� Original Daily
-  // Target, counted forward from today. Moves automatically as campaign hours change, and stays
-  // correct even after the deadline or with an existing backlog.
-  const projectedStudyDays = originalDailyTarget>0 ? remainingRequiredHours/originalDailyTarget : 0;
-  let projectedWholeDays = Math.floor(projectedStudyDays);
-  const projectedFracHours = (projectedStudyDays - projectedWholeDays)*originalDailyTarget; // hours left on the final day
-  // Exact division: when remaining hours divide evenly by the Original Daily Target (fraction
-  // rounds to zero minutes), the base day itself is study day #1, so the finish lands on the
-  // final required study day — not one extra day later.
-  if(projectedWholeDays > 0 && Math.round(projectedFracHours*60) === 0){
-    projectedWholeDays -= 1;
-  }
-  // Before the Goal officially starts, the forward projection counts from the configured Start
-  // Date; once started, it counts from today exactly as before.
-  const projectionBaseKey = started ? todayKey : g.startDate;
-  const projectedFinishKey = addDaysToKey(projectionBaseKey, projectedWholeDays);
+  // ── Status Engine: Projected Finish ──
+  // Step 1: Convert offset to absolute days (always positive).
+  //   absOffsetDays = |offset| ÷ Daily Target
+  // Step 2: Split into whole days + fractional day.
+  //   wholeDays = floor(absOffsetDays)   ← floor is correct here because input is always ≥ 0
+  //   fracHours = (absOffsetDays − wholeDays) × Daily Target   ← always ≥ 0 (Final Day Study)
+  // Step 3: Apply direction to the deadline.
+  //   Offset < 0 (behind)  → add wholeDays to deadline  → Projected Finish AFTER deadline
+  //   Offset = 0 (on time) → no shift                   → Projected Finish = deadline
+  //   Offset > 0 (ahead)   → subtract wholeDays          → Projected Finish BEFORE deadline
+  //
+  // Verified with examples:
+  //   offset = +6.5h → absOffsetDays = 0.65 → wholeDays = 0 → Projected = deadline,     Final-Day = 6.5h
+  //   offset =  0h   → absOffsetDays = 0    → wholeDays = 0 → Projected = deadline,     Final-Day = 0h
+  //   offset = -15h  → absOffsetDays = 1.5  → wholeDays = 1 → Projected = deadline + 1, Final-Day = 5h
+  const absOffsetDays   = originalDailyTarget > 0 ? Math.abs(offset) / originalDailyTarget : 0;
+  const offsetWholeDays = Math.floor(absOffsetDays);                                   // whole-day shift (always ≥ 0)
+  const projectedFracHours = (absOffsetDays - offsetWholeDays) * originalDailyTarget; // Final Day Study (always ≥ 0)
+  const directedWholeDays  = offset >= 0 ? -offsetWholeDays : offsetWholeDays;        // negative = ahead, positive = behind
+  const projectedFinishKey = started
+    ? addDaysToKey(g.endDate, directedWholeDays)
+    : g.endDate; // not started yet → show deadline as-is
   const projectedLateBy = Math.max(0, daysBetweenKeys(g.endDate, projectedFinishKey)); // whole days past deadline
   const delayDays = projectedLateBy; // >0 ⇒ finishing past the deadline (preserved for the UI)
-  const delayFracHours = projectedFracHours; // hours left on the final day (computed before the exact-division adjustment)
+  const delayFracHours = projectedFracHours; // Final Day Study hours (displayed in UI)
 
   // ---- Live Campaign Status (drives the Projected Finish status sub-line) ----
-  // UI-status only: NO delay-days/hours math. It reuses the two values that already exist elsewhere:
-  //   1. Today's Pure Study Time Available — the EXACT "Finishing By" spine:
-  //        (Day End − now) − remaining non-study activities today.
-  //   2. Total Campaign Backlog — the EXACT "You are behind by X" value: max(0, expected − campaign).
-  // If the whole campaign backlog can still fit inside today's available study time → On Time,
-  // otherwise → Delayed. Fully live: re-run by the 3s render loop as study/time changes.
-  let liveOnTime = true;
-  if(started){
-    // Today's Pure Study Time Available (identical to the "Finishing By" engine)
-    const otherRemainingSec = (CACHED_TASKS||[]).filter(t=>t.category!=='study')
-      .reduce((s,t)=>s+Math.max(0,(t.duration||0)-(t.consumedSec||0)),0);
-    const rh = getDayResetHour();
-    const dayEnd = new Date(); dayEnd.setHours(rh,0,0,0);
-    if(dayEnd.getTime() <= now.getTime()) dayEnd.setDate(dayEnd.getDate()+1);
-    const pureStudyAvailHours = Math.max(0, (dayEnd.getTime() - now.getTime())/1000 - otherRemainingSec) / 3600;
-    // Total campaign backlog — the same value shown as "You are behind by X".
-    const totalCampaignBacklog = Math.max(0, expectedHours - campaignHours);
-    // On Time while the entire backlog still fits inside today's available study time.
-    liveOnTime = totalCampaignBacklog <= pureStudyAvailHours;
+  // Three states, driven entirely by offset sign + today's available capacity:
+  //
+  //   offset >= 0 (ahead or exactly on schedule)
+  //     → 'ontime'    — no comparison needed, campaign is not in deficit
+  //
+  //   offset < 0 (behind schedule)
+  //     → compare |offset| against today's available study time
+  //     → |offset| ≤ availableHours  →  'canRecover'  (deficit exists but can be erased today)
+  //     → |offset| >  availableHours →  'delayed'     (deficit cannot be recovered today)
+  //
+  // "canRecover" is intentionally distinct from "ontime": the campaign is still behind schedule,
+  // but recovery is still mathematically possible before the day ends.
+  let liveStatus = 'ontime';
+  if(started && offset < 0){
+    const _w = await computeStudyCompletionWidget();
+    if(_w){
+      // freeCapacitySeconds: Remaining Day − Remaining Non-Study (lost time NOT subtracted).
+      const availableHours = _w.freeCapacitySeconds / 3600;
+      const hoursBehind    = -offset; // offset < 0, so negating gives positive magnitude
+      liveStatus = hoursBehind <= availableHours ? 'canRecover' : 'delayed';
+    }
   }
 
   return {
-    liveOnTime,
+    liveStatus,
     active: started, name: g.name, totalRequiredHours, remainingDeadlineDays,
     todayHours: todaySeconds/3600, dailyTargetHours: effDaily,
     streakCurrent: g.streakCurrent||0, minStreakHours: g.minStreakHours,
-    campaignHours, expectedHours, statusKey, diffHours, requiredNowPerDay,
-    remainingRequiredHours, deadlinePassed,
+    campaignHours, expectedHours, statusKey, offset, requiredNowPerDay,
+    deadlinePassed,
     projectedFinishKey, projectedLateBy, delayDays, delayFracHours,
     extraTimerLimitMin: g.extraTimerLimitMin, extraActive: !!g.extraActive, motivation: g.motivation||''
   };
@@ -5892,6 +6489,189 @@ function playGoalConfetti(){
   }
   document.body.appendChild(layer);
   setTimeout(()=>{ layer.remove(); }, 3000); // light burst, self-removing — plays once, never loops
+}
+
+// ── computeStudyCompletionWidget ──────────────────────────────────────────
+// Pure computation engine. Single source of truth for the Study Complete By /
+// Max Study Today widget. Always returns all nine values regardless of which
+// mode the renderer chooses to display. No UI text is produced here.
+//
+// Returns null when no active Goal exists (widget should hide).
+//
+// Returns:
+//   {
+//     plannedStudySeconds:      number,   // §1  Sum of today's Study task durations
+//     completedStudySeconds:    number,   // §2  Committed + live running session
+//     remainingStudySeconds:    number,   // §3  Planned − Completed, ≥ 0
+//     remainingNonStudySeconds: number,   // §4  Remaining non-Study task time
+//     lostTimeSeconds:          number,   // ��5  Bomb + Inactivity (irreversible)
+//     remainingDaySeconds:      number,   // §6  Day End − now
+//     freeCapacitySeconds:      number,   // §7  Remaining Day �� Non-Study − Lost, ≥ 0
+//     maxStudyTodaySeconds:     number,   // §8  Completed + Free Capacity
+//     projectedFinishTime:      Date,     // §10 now + Remaining Study + Non-Study + Lost
+//     canFinishToday:           boolean,  // §9  Max Study Today >= Planned Study Today
+//     dayEndTime:               Date      //     Day End boundary (for renderer context)
+//   }
+async function computeStudyCompletionWidget(){
+  const state = STATE;
+  if(!state || !state.goal) return null;
+
+  // Guard: only show widget while a Goal is active (start date reached).
+  // IMPORTANT: Do NOT call computeGoalMetrics() here — computeGoalMetrics() calls
+  // computeStudyCompletionWidget() internally, which would create mutual infinite recursion
+  // and stack-overflow the JS engine (fatal on Android Chrome). Use the same inline
+  // active check that computeGoalMetrics itself uses: goalTodayKey >= startDate.
+  const _activeCheck = goalTodayKey(new Date()) >= state.goal.startDate;
+  if(!_activeCheck) return null;
+
+  // §1 — Planned Study Today ────────�����───────────────────────────────────────
+  // Sum of every today's task whose effective credit category is 'study'.
+  // homeDayTargetSec() already filters by creditCat(t)==='study', which includes
+  // Others tasks configured as "Count as Study". Returns seconds directly.
+  const plannedStudySeconds = homeDayTargetSec();
+
+  // §2 — Completed Study ────────────────────────────────────────────────────
+  // Committed sessions banked in dailyStudySeconds plus the live running session
+  // delta. Continuously increases while the user is actively studying.
+  // liveTodayStudySec() returns seconds directly.
+  const completedStudySeconds = liveTodayStudySec(state);
+
+  // §3 — Remaining Study ────────────────────���───────────────────────────────
+  // Planned − Completed. Clamped to zero; never negative.
+  const remainingStudySeconds = Math.max(0, plannedStudySeconds - completedStudySeconds);
+
+  // §4 — Remaining Non-Study ────────���───────────────────────────────────────
+  // Remaining time across every today's task whose effective credit category is
+  // NOT 'study'. Uses creditCat(t) so that Others → "Count as Study" tasks are
+  // excluded here and counted only in §1/§2/§3.
+  const remainingNonStudySeconds = (CACHED_TASKS||[])
+    .filter(t => creditCat(t) !== 'study')
+    .reduce((sum, t) => sum + Math.max(0, (t.duration||0) - (t.consumedSec||0)), 0);
+
+  // §5 — Lost Time ──────────────────────────────────────────────────────────
+  // Bomb + Inactivity time already consumed today. Irreversible; shrinks the
+  // available window. Uses existing buildFullDayTimeline path unchanged.
+  const tlEntries = await getTimelineEntries(); // uses in-memory cache; invalidated on every write
+  const fullDay = buildFullDayTimeline(tlEntries);
+  const bombSeconds  = fullDay.filter(e => e.category === 'bomb' ).reduce((s, e) => s + e.duration, 0);
+  const noactSeconds = fullDay.filter(e => e.category === 'noact').reduce((s, e) => s + e.duration, 0);
+  const lostTimeSeconds = bombSeconds + noactSeconds;
+
+  // §6 — Day End Boundary & Remaining Day ───────────────────────────────────
+  const resetHour = getDayResetHour();
+  const dayEndTime = new Date();
+  dayEndTime.setHours(resetHour, 0, 0, 0);
+  if(dayEndTime.getTime() <= Date.now()) dayEndTime.setDate(dayEndTime.getDate() + 1);
+  const remainingDaySeconds = Math.max(0, (dayEndTime.getTime() - Date.now()) / 1000);
+
+  // §7 — Free Capacity ──────────────────────────────────────────────────────
+  // The maximum amount of Study time that can still physically fit into today.
+  // Formula: Remaining Day − Remaining Non-Study obligations.
+  // Lost Time (bombSeconds + noactSeconds) is a historical record of the past;
+  // it has already advanced the clock to the current moment and reduced what was
+  // available then. Subtracting it again from Remaining Day would mix two
+  // different timelines and double-penalise the user. It is retained in the
+  // return value for analytics, reports and debugging only.
+  const freeCapacitySeconds = Math.max(0, remainingDaySeconds - remainingNonStudySeconds);
+
+  // §8 — Max Study Today ────────────────────────────────���───────────────────
+  // The maximum total Study the user can possibly complete before the day ends.
+  // Independent of the Goal system.
+  const maxStudyTodaySeconds = completedStudySeconds + freeCapacitySeconds;
+
+  // §9 — Decision: can the plan still be completed today? ───────────────────
+  const canFinishToday = maxStudyTodaySeconds >= plannedStudySeconds;
+
+  // §10 — Projected Finish Time ─────────────────────���───────────────────────
+  // Clock time at which Study will be complete assuming all remaining work is
+  // performed from this moment onward.
+  // Formula: now + Remaining Study + Remaining Non-Study.
+  // Lost Time is excluded: it is historical (already elapsed) and does not
+  // create a future obligation that pushes the finish time forward.
+  const projectedFinishTime = new Date(
+    Date.now() + (remainingStudySeconds + remainingNonStudySeconds) * 1000
+  );
+
+  return {
+    plannedStudySeconds,
+    completedStudySeconds,
+    remainingStudySeconds,
+    remainingNonStudySeconds,
+    lostTimeSeconds,
+    remainingDaySeconds,
+    freeCapacitySeconds,
+    maxStudyTodaySeconds,
+    projectedFinishTime,
+    canFinishToday,
+    dayEndTime
+  };
+}
+
+// ── updateFinishByCache ──────────────────────────────────────────────────────
+// Calls computeStudyCompletionWidget() and formats the result as UI text for
+// the Home topbar widget. Cached for 3s refresh cycle. Encodes state info so
+// renderHeader() can apply correct styling and labels (4 states).
+// FREEZE LIFECYCLE: During Sleep Mode, stops all live calculations and preserves
+// the last computed values. Resumes naturally when the freeze lifts (at day rollover).
+async function updateFinishByCache(){
+  const isFrozen = FreezeManager.isFrozen();
+  
+  // FREEZE: Stop all live calculations; preserve the last valid cached state.
+  // No updates occur during Sleep or Bomb-Lock. The widget simply displays the
+  // preserved values from before the freeze started (matching Pomodoro/Bomb behavior).
+  if(isFrozen){
+    widgetWasFrozen = true;
+    return; // Freeze halts all recalculation and preserves cachedFinishByText + cachedGoalLabels
+  }
+  
+  // RESUME: Once freeze lifts (at day rollover), detect the transition and allow
+  // a fresh recalculation. The day-transition system will have already updated
+  // the active Goal and task state, so fresh calculations produce new values.
+  // No manual reset needed — the widget simply resumes live updates naturally.
+  if(widgetWasFrozen){
+    widgetWasFrozen = false;
+    // Continue to fresh calculation below (no early return)
+  }
+  
+  const data = await computeStudyCompletionWidget();
+  if(!data){
+    // No active Goal — STATE 4: No Study Planned Today (or no goal at all)
+    cachedFinishByText = 'NO_STUDY_PLANNED';
+    return;
+  }
+
+  // Pre-format helper labels once so the renderer can use them directly
+  cachedGoalLabels = {
+    planned:   fmtHoursMinutes(data.plannedStudySeconds   / 3600),
+    completed: fmtHoursMinutes(data.completedStudySeconds / 3600)
+  };
+  
+  // Check STATE 3: Completed Study >= Planned Study
+  if(data.completedStudySeconds >= data.plannedStudySeconds && data.plannedStudySeconds > 0){
+    cachedFinishByText = 'TODAY_COMPLETE';
+    return;
+  }
+  
+  // Check STATE 4: No Study Planned Today (plannedStudySeconds = 0)
+  if(data.plannedStudySeconds === 0){
+    cachedFinishByText = 'NO_STUDY_PLANNED';
+    return;
+  }
+  
+  // STATE 1: Study Complete By — plan is achievable
+  if(data.canFinishToday){
+    const h = data.projectedFinishTime.getHours();
+    const mn = data.projectedFinishTime.getMinutes();
+    const ap = h >= 12 ? 'PM' : 'AM';
+    const h12 = (h % 12) === 0 ? 12 : h % 12;
+    const tStr = mn === 0 ? `${h12} ${ap}` : `${h12}:${String(mn).padStart(2, '0')} ${ap}`;
+    cachedFinishByText = `FINISH_TIME|${tStr}`;
+    return;
+  }
+  
+  // STATE 2: Max Study Today — plan can no longer be completed
+  const maxHours = data.maxStudyTodaySeconds / 3600;
+  cachedFinishByText = `MAX_STUDY|${fmtHoursMinutes(maxHours)}`;
 }
 
 async function renderGoalsScreen(){
@@ -5936,34 +6716,16 @@ async function renderGoalsScreen(){
   document.getElementById('goalStreakDays').textContent = m.streakCurrent;
   document.getElementById('goalStreakNote').textContent = `Min ${fmtStreakHours(m.minStreakHours)} hr needed to continue streak`;
 
-  // "Finishing By" — projected clock time when today's study target completes:
-  // Current time + remaining study hours today + remaining non-study activity durations today
-  // (non-study categories consume available time, so they push the finish time later).
+  // "Remaining" helper — Goal-focused (how much Study left to reach today's Goal target).
+  // This is NOT the same as the Home widget (which is task-scheduled based).
+  // Formula: Goal Daily Target - Completed Study Today, clamped to zero.
   const finEl = document.getElementById('goalFinishBy');
   if(finEl){
-    const remStudySec = Math.max(0, (m.dailyTargetHours - m.todayHours)*3600);
-    const otherSec = (CACHED_TASKS||[]).filter(t=>t.category!=='study').reduce((s,t)=>s+Math.max(0,(t.duration||0)-(t.consumedSec||0)),0);
-    if(m.active && remStudySec > 0){
-      const fin = new Date(Date.now() + (remStudySec + otherSec)*1000);
-      // Day End boundary — next occurrence of the configured Day/Sleep reset hour
-      const rh = getDayResetHour();
-      const dayEnd = new Date(); dayEnd.setHours(rh,0,0,0);
-      if(dayEnd.getTime() <= Date.now()) dayEnd.setDate(dayEnd.getDate()+1);
+    if(m.active){
       finEl.style.display = '';
-      if(fin.getTime() <= dayEnd.getTime()){
-        const h = fin.getHours(), mn = fin.getMinutes();
-        const ap = h>=12 ? 'PM' : 'AM', h12 = (h%12)===0 ? 12 : h%12;
-        const tStr = mn===0 ? `${h12} ${ap}` : `${h12}:${String(mn).padStart(2,'0')} ${ap}`;
-        finEl.textContent = `Finishing at ${tStr}`;
-      } else {
-        // Goal no longer achievable before Day End — show max study still possible today
-        const maxStudySec = Math.max(0, (dayEnd.getTime()-Date.now())/1000 - otherSec);
-        const maxTotalHours = m.todayHours + maxStudySec/3600;
-        finEl.textContent = `Max study by Day End: ${fmtHoursMinutes(maxTotalHours)} / ${fmtHoursMinutes(m.dailyTargetHours)}`;
-      }
-    } else if(m.active){
-      finEl.style.display = '';
-      finEl.textContent = "Today's target complete";
+      const remainingSeconds = Math.max(0, (m.dailyTargetHours * 3600) - (m.todayHours * 3600));
+      const remainingHours = remainingSeconds / 3600;
+      finEl.textContent = `Remaining: ${fmtHoursMinutes(remainingHours)}`;
     } else {
       finEl.style.display = 'none';
     }
@@ -6010,9 +6772,9 @@ async function renderGoalsScreen(){
   const labels = {behind:'Behind Schedule', ontime:'On Track', ahead:'Ahead of Schedule'};
   document.getElementById('goalStatusIcon').textContent = icons[m.statusKey];
   document.getElementById('goalStatusText').textContent = labels[m.statusKey];
-  const absDiff = Math.abs(m.diffHours);
+  const absOffset = Math.abs(m.offset);
   const diffEl = document.getElementById('goalStatusDiff');
-  if(m.statusKey==='behind') diffEl.innerHTML = `<span class="mut">You are behind by</span> <b>${fmtHoursMinutes(absDiff)}</b><span class="mut">.</span>`;
+  if(m.statusKey==='behind') diffEl.innerHTML = `<span class="mut">You are behind by</span> <b>${fmtHoursMinutes(absOffset)}</b><span class="mut">.</span>`;
   else if(m.statusKey==='ahead') diffEl.innerHTML = `<span class="mut">You are ahead by</span> <b>${fmtHoursMinutes(absDiff)}</b><span class="mut">.</span>`;
   else diffEl.innerHTML = `<span class="mut">You are</span> <b>exactly on schedule</b><span class="mut">.</span>`;
   const reqNowEl = document.getElementById('goalRequiredNow');
@@ -6046,11 +6808,13 @@ async function renderGoalsScreen(){
   } else {
     fracEl.style.display = 'none';
   }
-  // Live campaign status — UI status only: "On Time" while the whole campaign backlog still fits in
-  // today's available study time, otherwise "Delayed". No delay days/hours are computed. The date
-  // headline + Final Day Study above are intentionally untouched.
+  // Live campaign status sub-line — three states:
+  //   'ontime'     → offset >= 0: campaign ahead or exactly on schedule, no comparison needed
+  //   'canRecover' → offset < 0 AND |offset| ≤ available today: behind but recoverable today
+  //   'delayed'    → offset < 0 AND |offset| >  available today: deficit cannot be recovered today
   const projSubEl = document.getElementById('goalProjectedFinishSub');
-  projSubEl.textContent = m.liveOnTime ? '🟢 On Time' : '🔴 Delayed';
+  const _lsMap = { ontime: '🟢 On Time', canRecover: '🟡 Can Recover Today', delayed: '🔴 Delayed' };
+  projSubEl.textContent = _lsMap[m.liveStatus] || '🟢 On Time';
 
   // Section 6 — Why This Goal Matters To You (collapsible, purely motivational)
   document.getElementById('goalMotivBody').textContent = m.motivation || 'Write down why this goal matters to you in Settings.';
@@ -6109,7 +6873,7 @@ function renderGoalSettingsScreen(){
 // Core campaign fields frozen after start (Name, Start, Deadline, Daily Target — Total Required
 // Hours is derived from these, so it is locked implicitly). Motivation etc. remain editable.
 const GOAL_LOCKED_FIELD_IDS = ['gsetName','gsetStart','gsetEnd']; // Goal Daily Hours stays adjustable (custom override), so it is no longer hard-locked
-// Live "Automatic Preview" block — recalculated on every keystroke, read-only
+// Live "Automatic Preview" block ��� recalculated on every keystroke, read-only
 function updateGoalSettingsPreview(){
   const start = document.getElementById('gsetStart').value;
   const end = document.getElementById('gsetEnd').value;
@@ -6125,7 +6889,7 @@ function updateGoalSettingsPreview(){
   }
 }
 
-// Main render entry point — re-draws whatever is currently on screen and shows the
+// Main render entry point �� re-draws whatever is currently on screen and shows the
 // Chain Broken overlay if a bomb explosion happened since the last render
 async function render(){
   // SELF-HEAL: CACHED_TASKS is only repopulated by action functions (startSession/promoteTomorrow),
@@ -6138,12 +6902,18 @@ async function render(){
     try { CACHED_TASKS = await loadTasks(); } catch(e){ console.warn('[render] task reload failed', e); }
   }
   applyLabels();
+  // Update the Home-screen-owned finish widget cache first, so renderHeader() (called next)
+  // always shows a live value regardless of whether the Goals screen has been opened.
+  await updateFinishByCache();
   renderHeader();
   renderHome();
   if(document.getElementById('screen-history').classList.contains('active')) await renderHistoryScreen();
   if(document.getElementById('screen-tasks').classList.contains('active')) renderTasks();
   // Settings inputs are rendered only on navigation (not on the 3s auto-render loop), so typed values are never clobbered before Save
   if(document.getElementById('screen-goals').classList.contains('active')) await renderGoalsScreen();
+  // NOTE: Live Formula Debugging is NOT hooked into this render cycle.
+  // It is a fully dormant on-demand inspector: it wakes only when the user explicitly
+  // opens the card (via toggleDbgHome), renders once, and returns to sleep immediately.
 }
 
 /* ============ REVIEW MODAL ============ */
@@ -6330,7 +7100,7 @@ function applyModalCat(cat, isEdit){
   const L = STATE.settings.labels;
   const catName = ({study:L.catStudy, routine:L.catRoutine, health:L.catHealth, others:L.catOthers})[cat] || cat;
   const titleEl = document.getElementById('taskModalTitle');
-  const baseTitle = (isEdit?'Edit Task':'Add Task')+' — '+catName.toUpperCase();
+  const baseTitle = (isEdit?'Edit Task':'Add Task')+' �� '+catName.toUpperCase();
   const saveBtn = document.getElementById('saveTaskBtn');
   if(planMode==='tomorrow'){
     // Tomorrow section only: TOMORROW badge + light-red themed save button (Today untouched)
@@ -6509,6 +7279,17 @@ document.getElementById('streakInfoBtn').addEventListener('click',(e)=>{
     : 'This streak measures consecutive days of completing your Daily Goal. Missing your Daily Goal resets the Day Streak.';
   showToast(msg, 3000);
 });
+document.getElementById('hdrGoalInfoBtn').addEventListener('click',(e)=>{
+  e.stopPropagation();
+  const state = cachedFinishByText;
+  let msg = '';
+  if(state.startsWith('FINISH_TIME|')){
+    msg = 'This is the estimated time you will finish today\'s planned Study.';
+  } else if(state.startsWith('MAX_STUDY|')){
+    msg = 'This is the maximum Study you can still complete before today\'s day ends. It already considers the time needed for your remaining activities.';
+  }
+  if(msg) showToast(msg, 3500);
+});
 // Switches between Today and Tomorrow Planning — same screen, different data source
 document.getElementById('planTabs').addEventListener('click',(e)=>{
   const tab = e.target.closest('.plan-tab'); if(!tab) return;
@@ -6536,65 +7317,15 @@ function showSleepPopup(feature){
   document.getElementById('editLockedNextDate').textContent = hourLabel(getWakeHour());
   document.getElementById('editLockedOverlay').classList.add('show');
 }
-// ── TIME INCONSISTENCY dialog + resume ───────────────────────────────────────
-// Opens the typed-confirm dialog (reuses the shared shell). Accepts "123" (verify & resume)
-// or the muted "TIME WRONG 123" bypass — both simply un-freeze and continue from the frozen values.
-function showTimeWarnDialog(){
-  const inp = document.getElementById('timeWarnCode');
-  if(inp) inp.value = '';
-  const btn = document.getElementById('timeWarnConfirm');
-  if(btn){ btn.disabled = true; btn.style.opacity = '.45'; }
-  document.getElementById('timeWarnDialog').classList.add('show');
-}
+// ── TIME INCONSISTENCY dialog + resume ───────────────────────���───────────────
 // Shared action gate: blocks a timer action while frozen for ANY reason and shows the right popup.
 function blockIfFrozen(feature){
-  syncFreezeReasons(STATE); // Pillar 2: consult the central Freeze Manager (same conditions, same order)
-  if(FreezeManager.has(FREEZE.TIME_INCONSISTENCY)){ showTimeWarnDialog(); return true; }
+  syncFreezeReasons(STATE); // consult the central Freeze Manager (same conditions, same order)
   if(FreezeManager.has(FREEZE.SLEEP)){ showSleepPopup(feature); return true; }
   // Bomb Explosion freeze: timer buttons are dulled; tapping one shows the shared toast and does nothing.
   // The Bomb Explosion card (with "Restart Hour Streak") is the only way forward, so no popup here.
   if(FreezeManager.has(FREEZE.BOMB_LOCK)){ showToast('Timers are frozen — restart your Hour Streak to continue.'); return true; }
   return false;
-}
-// Clears the Time Inconsistency state and resumes every frozen timer with a COMPLETELY FRESH
-// baseline anchored at the verification moment. It preserves only the frozen *elapsed/remaining
-// value* — every internal timestamp (startTs, accumulatedPause, pausedAt, bombTickTs) is rebuilt
-// from `now`, so the old (untrusted) clock jump can never influence future calculations or trigger
-// another immediate freeze. Applies to both the Activity timer and the Bomb timer.
-async function resumeFromTimeInconsistency(){
-  let state = await getState();
-  document.getElementById('timeWarnDialog').classList.remove('show');
-  if(!state.timeInconsistency){ return; }
-  const now = Date.now();
-  state.timeInconsistency = false;
-  state.lastSeenWall = now;                     // adopt the current clock as the NEW trusted baseline
-  resetClockBaseline();                          // wipe the pre-jump monotonic baseline so it can't re-fire
-  const at = state.activeTimer;
-  if(at && at.type==='bomb'){
-    // BOMB timer — bank its frozen remaining, then re-arm entirely from `now`
-    // (armBomb sets startTs=now with no accumulatedPause/pausedAt: a clean baseline).
-    state.bombRemainingMs = Math.max(0, msRemaining(at));
-    armBomb(state);
-  } else if(at){
-    // ACTIVITY timer — capture the frozen elapsed value, then discard every old timestamp and
-    // rebuild them relative to `now`. accumulatedPause is reset to 0 (no retained wall-clock delta).
-    const frozenElapsedMs = Math.min(Math.max(0, (at.duration||0)*1000), Math.max(0, effectiveElapsedMs(at))); // frozen elapsed (uses pausedAt), clamped to the session's assigned duration
-    const wasRunning = at._frozenWasRunning === true;
-    delete at._frozenWasRunning;
-    at.startTs = now - frozenElapsedMs;          // fresh baseline: next elapsed starts from verification
-    at.accumulatedPause = 0;                      // drop any accumulated wall-clock delta entirely
-    if(wasRunning){
-      at.pausedAt = null;                         // resume running; bomb stays frozen under a live session
-      at.bombTickTs = null;
-    } else {
-      at.pausedAt = now;                          // stay paused, but re-anchored to now
-      at.bombTickTs = bombModeOn(state) ? now : null; // bomb resumes ticking from its frozen value at `now`
-    }
-  }
-  await saveState(state);
-  STATE = state;
-  render();
-  showToast('Time verified — timers resumed.');
 }
 // Opens the Edit Menu bottom sheet for a task (Rename / Change Duration / Change Icon / Delete),
 // unless today's activities have already been logged — then it shows the Locked dialog instead.
@@ -6708,7 +7439,7 @@ document.getElementById('tgRetryBtn').onclick = ()=> retryPendingReports();
 document.getElementById('tgCopyBtn').onclick = async ()=>{
   const q = STATE.pendingReports||[];
   if(!q.length) return;
-  const text = q.map(r=>r.text).join('\n\n────────\n\n');
+  const text = q.map(r=>r.text).join('\n\n────���───\n\n');
   try{ await navigator.clipboard.writeText(text); showToast('Pending report copied.'); }
   catch(e){ tgMsgInput.value = text; autogrow(tgMsgInput); showToast('Copied into the composer.'); }
 };
@@ -6721,7 +7452,7 @@ document.querySelectorAll('.nav-item').forEach(item=>{
     item.classList.add('active');
     hsCollapse(); // navigating away ends task selection
     const _gmc = document.getElementById('goalMotivCard'); if(_gmc) _gmc.classList.remove('expanded'); // "Why?" dropdown always resets to collapsed on tab switch
-    // Never preserve an opened Settings subsection across tab switches — always reset to the main Settings page
+    // Never preserve an opened Settings subsection across tab switches ��� always reset to the main Settings page
     document.querySelectorAll('.set-sub').forEach(d=>{ d.style.display = 'none'; });
     const _sMain = document.getElementById('settingsMain'); if(_sMain) _sMain.style.display = 'block';
     const _sSave = document.getElementById('saveSettingsBtn'); if(_sSave) _sSave.style.display = 'none';
@@ -6923,7 +7654,7 @@ document.getElementById('pomoMoods').addEventListener('click', (e)=>{
   const b = e.target.closest('.pomo-mood-btn'); if(!b) return;
   const was = b.classList.contains('sel');
   document.querySelectorAll('#pomoMoods .pomo-mood-btn').forEach(x=>x.classList.remove('sel'));
-  if(!was) b.classList.add('sel'); // tap again to deselect — mood is optional
+  if(!was) b.classList.add('sel'); // tap again to deselect �� mood is optional
 });
 document.getElementById('pomoPop').addEventListener('click', (e)=>{ if(e.target.id==='pomoPop'){ document.getElementById('pomoPop').classList.remove('show'); pomoPopTarget=null; } });
 document.getElementById('pomoPopSave').addEventListener('click', async ()=>{
@@ -7086,18 +7817,18 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
   render();
 };
 
-/* ============ SETTINGS: FOLDER-STYLE CATEGORY NAVIGATION ============ */
-// Opens a settings sub-page (Home Section, Bomb Challenge, Task Create, All Other, About)
-document.querySelectorAll('#settingsMain .goal-settings-launch[data-sub]').forEach(el=>{
-  el.addEventListener('click', ()=>{
-    document.getElementById('settingsMain').style.display = 'none';
-    document.getElementById(el.dataset.sub).style.display = 'block';
-    // Save button only appears inside sub-pages that hold editable inputs (hidden for About)
-    // Save button hidden for read-only/instant-apply sub-pages (About + Application Settings)
-    document.getElementById('saveSettingsBtn').style.display = (el.dataset.sub === 'subAbout' || el.dataset.sub === 'subAndroid') ? 'none' : '';
-    window.scrollTo(0,0);
-  });
-});
+  /* ============ SETTINGS: FOLDER-STYLE CATEGORY NAVIGATION ============ */
+  // Opens a settings sub-page (Home Section, Bomb Challenge, Task Create, All Other, About)
+  document.querySelectorAll('#settingsMain .goal-settings-launch[data-sub]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      document.getElementById('settingsMain').style.display = 'none';
+      document.getElementById(el.dataset.sub).style.display = 'block';
+      // Save button only appears inside sub-pages that hold editable inputs (hidden for About)
+      // Save button hidden for read-only/instant-apply sub-pages (About + Application Settings)
+      document.getElementById('saveSettingsBtn').style.display = (el.dataset.sub === 'subAbout' || el.dataset.sub === 'subAndroid') ? 'none' : '';
+      window.scrollTo(0,0);
+    }); // close click listener
+  }); // close forEach
 // Task Lock banner gear — deep-links from the Tasks screen straight to Settings → Task Create
 // Section, where "Lock Today's Task Editing During Study Day" can be changed. UI navigation only.
 document.getElementById('taskLockBannerSettings').addEventListener('click', ()=>{
@@ -7114,6 +7845,11 @@ document.getElementById('taskLockBannerSettings').addEventListener('click', ()=>
 // Back buttons on every settings sub-page → return to the main folder list
 document.querySelectorAll('.set-sub-back').forEach(btn=>{
   btn.addEventListener('click', ()=>{
+    // Collapse all debug cards when exiting Live Formula Debugging
+    document.querySelectorAll('#dbgHomeCard.expanded, #dbgGoalCard.expanded').forEach(card=>{
+      card.classList.remove('expanded');
+    });
+    
     document.querySelectorAll('.set-sub').forEach(d=>{ d.style.display = 'none'; });
     document.getElementById('settingsMain').style.display = 'block';
     document.getElementById('saveSettingsBtn').style.display = 'none';
@@ -7434,25 +8170,11 @@ document.getElementById('breachConfirmInput').addEventListener('input', function
   btn.disabled = !ok; btn.style.opacity = ok ? '1' : '.45';
 });
 
-/* ============ TIME INCONSISTENCY controls ============ */
-// Shared Current Activity action button. During a bomb explosion (BOMB_LOCK) it is the "Restart Our
-// Streak" button and opens the EXISTING breach password dialog (only the trigger moved from auto → click);
-// otherwise it is the Time-Inconsistency "Verify & Resume" button. Same freeze/verify/unlock flow either way.
+/* ============ CURRENT ACTIVITY action button ============ */
+// During a bomb explosion (BOMB_LOCK) this button is "Restart Hour Streak" and opens the breach
+// password dialog. No other frozen state uses this button any more.
 document.getElementById('caVerifyBtn').onclick = ()=>{
   if(FreezeManager.has(FREEZE.BOMB_LOCK)){ document.getElementById('breachScreen').classList.add('show'); return; }
-  showTimeWarnDialog();
-};
-document.getElementById('timeWarnCancel').onclick = ()=> document.getElementById('timeWarnDialog').classList.remove('show');
-// Accept exactly "123" (verify & resume) OR the muted "TIME WRONG 123" bypass — both un-freeze.
-function timeWarnCodeOk(v){ v = (v||'').trim(); return v === '123' || v.toUpperCase() === 'TIME WRONG 123'; }
-document.getElementById('timeWarnCode').addEventListener('input', function(){
-  const ok = timeWarnCodeOk(this.value);
-  const btn = document.getElementById('timeWarnConfirm');
-  btn.disabled = !ok; btn.style.opacity = ok ? '1' : '.45';
-});
-document.getElementById('timeWarnConfirm').onclick = ()=>{
-  if(!timeWarnCodeOk(document.getElementById('timeWarnCode').value)) return;
-  resumeFromTimeInconsistency();
 };
 
 /* ============ ANDROID SHELL INTEGRATION (Bridge v2.2) ============
@@ -7483,6 +8205,55 @@ const AND = {
   }
 };
 
+// ─── Monotonic clock ───────���──────────────────────────────────────��───────────
+// Replaces Date.now() as the source of truth for all elapsed-time anchors
+// (timer startTs, pausedAt, bombTickTs). Calendar timestamps (history records,
+// wake/sleep times, alarm scheduling, daily-reset comparisons) continue to use
+// Date.now() directly — they must track wall time, not elapsed time.
+//
+// The anchor is established exactly once at page load and is never recreated
+// during the page's lifetime, which means monotonicNow() is immune to the user
+// changing the device clock mid-session.
+//
+// On Android: uses AndroidBridge.currentTimeInfo() (wallMs + monoMs) to anchor
+// elapsedRealtime() to the epoch on first call, then pure delta from there.
+// In the browser: anchors performance.now() to Date.now() at load time.
+//
+// Return value: an epoch-compatible millisecond number in the same unit/scale
+// as Date.now(), so all existing startTs arithmetic remains correct with zero
+// type changes anywhere in the codebase.
+const _monoAnchor = {
+  wall: Date.now(),        // epoch ms at anchor time (always available at parse)
+  perf: performance.now(), // performance.now() at anchor time (browser fallback)
+  monoMs: null,            // AndroidBridge monoMs at anchor time (populated lazily on first call)
+  anchored: false          // true once the Android anchor has been established
+};
+function monotonicNow(){
+  // Android path: anchor once to currentTimeInfo(), then pure elapsedRealtime() delta.
+  if(AND.on){
+    if(!_monoAnchor.anchored){
+      const info = AND.json('currentTimeInfo', null);
+      if(info && typeof info.wallMs === 'number' && typeof info.monoMs === 'number'){
+        // Re-anchor using the simultaneously-sampled pair so there is zero skew.
+        _monoAnchor.wall    = info.wallMs;
+        _monoAnchor.monoMs  = info.monoMs;
+        _monoAnchor.anchored = true;
+      }
+      // If bridge isn't ready yet, fall through to browser fallback this tick.
+      // The anchor will be established on the very next call once the bridge is available.
+    }
+    if(_monoAnchor.anchored){
+      const mono = AND.call('elapsedRealtime');
+      if(typeof mono === 'number'){
+        return _monoAnchor.wall + (mono - _monoAnchor.monoMs);
+      }
+    }
+  }
+  // Browser fallback: performance.now() delta from the load-time anchor.
+  return _monoAnchor.wall + (performance.now() - _monoAnchor.perf);
+}
+// ──────────��───────────────────────────���───────────────────────────────────────
+
 // HTML-side Android preferences (native flags cover the rest). Stored inside
 // STATE.settings.android so they ride along with normal state persistence + backup.
 const AND_CFG_DEFAULTS = { bombNotif:true, sessionAlarm:true, taskCompletionAlarm:false, bombAlarm:true, vibrate:false, soundDurationSec:60 };
@@ -7495,7 +8266,7 @@ function andCfg(){
   return c;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
+/* ───────��─────────────────────────────────────────────────────────────────
    SoundController — the single, centralized owner of completion-sound
    playback for the whole app.
 
@@ -7510,7 +8281,7 @@ function andCfg(){
    • Browser fallback: with no Android shell, a WebAudio tone is used so the
      controller (and the Test/Stop toggle + duration) still work in a plain
      browser preview.
-   ───────────────────────���─────────────────────────────────────────────��─── */
+   ─────────────────────────────────────────────────────────────────────��─── */
 const SoundController = {
   _stopTimer: null,     // duration timer -> hard stop
   _btn: null,           // currently active preview <button>, if any
@@ -7654,7 +8425,7 @@ function andFmtBomb(sec){
 // It pulls every field from the shared caComputeView() view-model — nothing is recomputed here.
 // Formatting rules (no "RUNNING"/"PAUSED" words — the emoji is the status):
 //   🟢 = Study category running · 🔵 = any other category running · 🟡 = anything paused · 🔴 = bomb.
-//   Separator between fields is " — "; the Left value is preceded by " —— ".
+//   Separator between fields is " — "; the Left value is preceded by " ���— ".
 // Layout:
 //   Study  →  Line1: 🟢 Topic — Subject      Line2: 28:07 — 1/7 —— Left 26m
 //   Other  →  Line1: 🔵 Activity             Line2: 53:04 —— Left 53m
@@ -7697,7 +8468,7 @@ function andBuildBombNotif(at){
 function andBuildSessionState(at){
   const v = caComputeView(at);
   const paused = !!at.pausedAt;
-  const emoji = paused ? '🟡' : (v.isStudy ? '🟢' : '🔵');
+  const emoji = paused ? '🟡' : (v.isStudy ? '🟢' : '��');
   const title = emoji + ' ' + v.activity + (v.subject ? ' — ' + v.subject : '');
   const clocks = [];
   let tmpl;
@@ -7844,7 +8615,7 @@ function andSyncAlarms(){
   // in Bomb Mode), so an explosion still fires if the app is killed while paused.
   if(cfg.bombAlarm && bombIsTicking(STATE)){
     const remain = bombLiveRemainingMs(STATE);
-    if(remain > 3000) andSetAlarm(AND_ALARM_BOMB, Date.now()+remain, '💣 Bomb reached 00:00!', 'Open Goal Tracker now — your streak is at stake.');
+    if(remain > 3000) andSetAlarm(AND_ALARM_BOMB, Date.now()+remain, '��� Bomb reached 00:00!', 'Open Goal Tracker now — your streak is at stake.');
     else andClearAlarm(AND_ALARM_BOMB);
   } else andClearAlarm(AND_ALARM_BOMB);
 }
@@ -8005,7 +8776,7 @@ async function andRestoreFromNative(){
   if(!snap || !snap.state){ showToast('Backup restored, but no Goal Tracker data was found inside it.'); return; }
   try{
     RESETTING = true; // freeze the background recovery loop during the swap
-    await idbClear('tasks'); await idbClear('sessions'); await idbClear('timeline');
+    await idbClear('tasks'); await idbClear('sessions'); await idbClear('timeline'); invalidateTimelineCache();
     for(const t of (snap.tasks||[])) await idbPut('tasks', t);
     for(const s of (snap.sessions||[])) await idbPut('sessions', s);
     for(const e of (snap.timeline||[])) await idbPut('timeline', e);
@@ -8099,9 +8870,6 @@ async function gtResumeResync(){
   if(RESETTING || gtResumeBusy) return;
   gtResumeBusy = true;
   try{
-    // Resume: clear ONLY the multi-stage confirmation counter (absorb transient resume glitches) while KEEPING
-    // the surviving monotonic anchor, so a clock change made while backgrounded is still confirmed on the next polls.
-    TimeConsistencyEngine.onResume();
     STATE = await recoverState();
     await maybeSendScheduledReport(); // before promotion so a Wake report still sees the finished day's tasks
     await maybeWakePromotion();
@@ -8428,115 +9196,5 @@ boot();
 })();
 </script>
 
-<!-- Goal Section Manual renderer — injects the external manuals.js content (window.GOAL_SECTION_MANUAL)
-     into the "Formula & Calculation Logic" card. Documentation only: touches no goal calculation.
-     When manuals.js loads successfully the manual is shown normally with no extra UI.
-     When manuals.js fails to load (e.g. missing from APK assets) a clean fallback card is shown
-     with a single "Open Wrapper Manual" button that calls the Android JS bridge if available. -->
-<script>
-(function(){
-  function renderGoalManual(){
-    var el = document.getElementById('goalManualBody');
-    if(!el) return;
-
-    var txt = (window.GOAL_SECTION_MANUAL) ? String(window.GOAL_SECTION_MANUAL) : '';
-    if(txt){
-      // ---- SUCCESS PATH: show the manual, no fallback UI shown at all ----
-      // Escape HTML first so the authored text is shown verbatim, then apply light **bold** formatting.
-      var safe = txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      safe = safe.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
-      el.innerHTML = '<div class="goal-manual-text">' + safe + '</div>';
-      return;
-    }
-
-    // ---- FAILURE PATH: manuals.js did not load or was empty ----
-    el.innerHTML = [
-      '<div class="gm-fallback">',
-        '<div class="gm-fallback-msg">',
-          '<span class="gm-warn-icon">&#9888;</span>',
-          '<p>',
-            '<span>Goal Manual couldn\'t be loaded.</span>',
-            'The HTML version couldn\'t access the manual file.',
-            '<br>If you\'re using the Android App, you can open the bundled manual instead.',
-          '</p>',
-        '</div>',
-        '<button class="gm-wrapper-btn" id="gmWrapperBtn">',
-          '&#128218; Open Wrapper Manual',
-        '</button>',
-      '</div>'
-    ].join('');
-
-    document.getElementById('gmWrapperBtn').addEventListener('click', function(){
-      // Call getManualText() on the JS bridge (registered as "AndroidBridge" in JsBridge.kt).
-      // This reads manuals.js from the live app directory OR the bundled APK asset —
-      // whichever is available — and returns the raw JS source string.
-      // We then extract window.GOAL_SECTION_MANUAL from it via a controlled new Function()
-      // (no arbitrary code runs; only the template-literal value is captured) and render
-      // the manual inline in the same card, replacing the fallback UI entirely.
-      var bridge = window.AndroidBridge || window.Android || null;
-      if(!bridge || typeof bridge.getManualText !== 'function') return;
-
-      var btn = document.getElementById('gmWrapperBtn');
-      if(btn){ btn.disabled = true; btn.textContent = 'Loading\u2026'; }
-
-      // getManualText() is synchronous (runs on the bridge thread).
-      var raw = '';
-      try { raw = bridge.getManualText(); } catch(_){}
-
-      if(!raw){
-        if(btn){ btn.disabled = false; btn.innerHTML = '&#128218; Open Wrapper Manual'; }
-        return;
-      }
-
-      // Extract only the GOAL_SECTION_MANUAL value — never eval the whole file.
-      // The file format is:  window.GOAL_SECTION_MANUAL = `...text...`;
-      // We use new Function() to run a sandboxed snippet that only sets one variable.
-      var txt = '';
-      try {
-        var sandbox = {};
-        // Wrap in an IIFE that sets a local `window` proxy so no real globals are touched.
-        new Function('window', raw)(sandbox);
-        txt = sandbox.GOAL_SECTION_MANUAL ? String(sandbox.GOAL_SECTION_MANUAL) : '';
-      } catch(_){}
-
-      var el = document.getElementById('goalManualBody');
-      if(!el) return;
-
-      if(txt){
-        var safe = txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        safe = safe.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
-        el.innerHTML = '<div class="goal-manual-text">' + safe + '</div>';
-      } else {
-        if(btn){ btn.disabled = false; btn.innerHTML = '&#128218; Open Wrapper Manual'; }
-      }
-    });
-  }
-
-  // Wait for the dynamically injected manuals.js to finish loading before rendering.
-  // We use a small polling loop (max ~2 s) so onerror/onload from the dynamic script
-  // have had time to fire before we check window.GOAL_SECTION_MANUAL.
-  function waitAndRender(){
-    var waited = 0;
-    var interval = 50; // ms
-    var maxWait  = 2000; // ms — give the script plenty of time even on slow WebViews
-    function attempt(){
-      // __manualsLoaded is set by the dynamic script's onload/onerror handlers.
-      if(window.__manualsLoaded === true || window.__manualsLoaded === false || waited >= maxWait){
-        renderGoalManual();
-        return;
-      }
-      waited += interval;
-      setTimeout(attempt, interval);
-    }
-    attempt();
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', waitAndRender);
-  } else {
-    waitAndRender();
-  }
-})();
-</script>
 </body>
 </html>
