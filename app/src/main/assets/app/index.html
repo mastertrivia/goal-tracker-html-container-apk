@@ -1153,7 +1153,7 @@ body.bomb-danger{background-color:#EF4444;}
       <div class="task-tabs" id="taskTabsHome" style="margin-bottom:10px;">
         <div class="task-tab active" data-cat="study"><span class="ic">📖</span><span id="tabLabelStudy">STUDY</span><div class="task-tab-count" id="countStudy">0 out of 0</div></div>
         <div class="task-tab" data-cat="routine"><span class="ic">☕</span><span id="tabLabelRoutine">ROUTINE</span><div class="task-tab-count" id="countRoutine">0 out of 0</div></div>
-        <div class="task-tab" data-cat="health"><span class="ic">���️</span><span id="tabLabelHealth">HEALTH</span><div class="task-tab-count" id="countHealth">0 out of 0</div></div>
+        <div class="task-tab" data-cat="health"><span class="ic">❤️</span><span id="tabLabelHealth">HEALTH</span><div class="task-tab-count" id="countHealth">0 out of 0</div></div>
         <div class="task-tab" data-cat="others"><span class="ic">⋯</span><span id="tabLabelOthers">OTHERS</span><div class="task-tab-count" id="countOthers">0 out of 0</div></div>
       </div>
       <!-- Compact expandable task picker — reuses the Tasks list logic in a highly compact, one-tap-play form -->
@@ -7100,7 +7100,7 @@ function applyModalCat(cat, isEdit){
   const L = STATE.settings.labels;
   const catName = ({study:L.catStudy, routine:L.catRoutine, health:L.catHealth, others:L.catOthers})[cat] || cat;
   const titleEl = document.getElementById('taskModalTitle');
-  const baseTitle = (isEdit?'Edit Task':'Add Task')+' �� '+catName.toUpperCase();
+  const baseTitle = (isEdit?'Edit Task':'Add Task')+' - '+catName.toUpperCase();
   const saveBtn = document.getElementById('saveTaskBtn');
   if(planMode==='tomorrow'){
     // Tomorrow section only: TOMORROW badge + light-red themed save button (Today untouched)
