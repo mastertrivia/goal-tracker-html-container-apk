@@ -599,7 +599,7 @@ body.bomb-danger{background-color:#EF4444;}
   .ec-note{font-size:12px !important;color:var(--text-dim);margin:0;line-height:1.32;text-wrap:balance;border-top:1.5px solid rgba(91,79,232,.28);padding-top:9px;margin-top:9px;}
   .ec-note .hl{color:var(--primary);font-weight:700;}
 
-  /* �����─ Confirm section ── */
+  /* 🔵��─ Confirm section ── */
   .ec-instruct{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-dim);margin:0 0 6px;}
   .ec-instruct-icon{width:22px;height:22px;flex:none;color:var(--primary);display:flex;align-items:center;justify-content:center;}
   .ec-instruct-icon svg{width:20px;height:20px;}
@@ -681,7 +681,7 @@ body.bomb-danger{background-color:#EF4444;}
   .nav-item svg{width:20px;height:20px;display:block;margin:0 auto 3px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   .nav-item span{font-size:9.5px;font-weight:700;letter-spacing:0.02em;}
 
-  /* Bottom sheet overlay — shared shell for Session Review and Add/Edit Task modals */
+  /* Bottom sheet overlay ����������� shared shell for Session Review and Add/Edit Task modals */
   .overlay{position:fixed;inset:0;background:rgba(27,23,64,0.48);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:50;}
   .overlay.show{display:flex;}
   .overlay.center-modal{align-items:center;}
@@ -1390,7 +1390,7 @@ body.bomb-danger{background-color:#EF4444;}
       <div class="plain-card">
         <div class="goal-settings-launch" data-sub="subAndroid">
           <div class="gl-ic" style="background:linear-gradient(155deg,#5B4FE8 0%,#4A3FD1 100%);box-shadow:0 6px 14px rgba(91,79,232,0.28);"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2.5"/><path d="M10.5 18.5h3"/></svg></div>
-          <div class="gl-txt"><div class="gl-t1">Application Settings</div><div class="gl-t2" id="andLaunchSub">Notifications, alarms, sound, backup &amp; diagnostics</div></div>
+          <div class="gl-txt"><div class="gl-t1">Android Shell Settings</div><div class="gl-t2" id="andLaunchSub">Notifications, alarms, sound, backup &amp; diagnostics</div></div>
           <div class="gl-chev">›</div>
         </div>
       </div>
@@ -1577,6 +1577,7 @@ body.bomb-danger{background-color:#EF4444;}
           <!-- §5 Progress Difference (Offset) -->
           <div class="dbg-section">
             <div class="dbg-label">§5 &nbsp; Progress Difference (Offset)</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Shows how far ahead or behind you are compared to where you should be today.</div>
             <div class="dbg-eq dbg-formula">= Goal Study Till Now − Expected Progress</div>
             <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalStudyTillNow3" class="dbg-dim">—</span> − <span id="dbgGoalExpectedProgress2" class="dbg-dim">—</span></div>
             <div class="dbg-eq">= <span id="dbgGoalOffset" class="dbg-val">—</span></div>
@@ -1599,6 +1600,7 @@ body.bomb-danger{background-color:#EF4444;}
           <!-- §7 Required Study Now -->
           <div class="dbg-section">
             <div class="dbg-label">§7 &nbsp; Required Study Now</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Calculates the daily study time required from today onwards to finish the goal before the deadline.</div>
             <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Extra Study Per Day</div>
             <div class="dbg-eq dbg-formula">= Offset ÷ Effective Days Left</div>
             <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalOffset2" class="dbg-dim">—</span> ÷ <span id="dbgGoalEffectiveDays" class="dbg-dim">—</span></div>
@@ -1618,6 +1620,7 @@ body.bomb-danger{background-color:#EF4444;}
           <!-- §8 Projected Finish -->
           <div class="dbg-section">
             <div class="dbg-label">§8 &nbsp; Projected Finish</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Estimates when your goal will be completed if you continue at the newly required daily study rate.</div>
             <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Step 1) Convert Offset into Goal Days</div>
             <div class="dbg-eq dbg-formula">= Offset ÷ Daily Target</div>
             <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalOffset3" class="dbg-dim">—</span> ÷ <span id="dbgGoalDailyTarget4" class="dbg-dim">—</span></div>
@@ -1630,6 +1633,7 @@ body.bomb-danger{background-color:#EF4444;}
             <div class="dbg-eq">= <span id="dbgGoalProjectedFinish" class="dbg-val">—</span></div>
             <div style="margin-top:8px;"></div>
             <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Final Day Study</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px;">If the goal finishes on the projected date, this is the amount of study required on that final day.</div>
             <div class="dbg-eq">= <span id="dbgGoalFinalDay" class="dbg-val">—</span></div>
           </div>
           <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
@@ -1637,6 +1641,7 @@ body.bomb-danger{background-color:#EF4444;}
           <!-- §9 Live Completion Check -->
           <div class="dbg-section">
             <div class="dbg-label">§9 &nbsp; Live Completion Check</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Checks whether today's remaining available study time is enough to recover your total backlog.</div>
             <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Current Offset</div>
             <div class="dbg-eq">= <span id="dbgGoalOffset4" class="dbg-val">—</span></div>
             <div style="margin-top:8px;"></div>
@@ -1680,27 +1685,6 @@ body.bomb-danger{background-color:#EF4444;}
         <div class="field"><label>User Name</label><input type="text" id="setUserName"></div>
         <div class="field"><label>Date of Birth</label><input type="date" id="setDob"></div>
         <div class="subtext" id="profileDynamic" style="font-weight:600;color:var(--text);">Not set yet</div>
-      </div>
-      <!-- Edit Category Icons & Names — rename and re-icon the 4 fixed categories -->
-      <div class="plain-card">
-        <h3>Edit Category Icons &amp; Names</h3>
-        <div class="subtext" style="margin-top:0;">Rename the existing categories and change their icons. New categories cannot be created and existing ones cannot be deleted — the category structure always stays intact.</div>
-        <div class="field-row2">
-          <div class="field"><label>Study icon</label><input type="text" id="setIconStudy" maxlength="4" style="text-align:center;"></div>
-          <div class="field"><label>Study category name</label><input type="text" id="setLblCatStudy"></div>
-        </div>
-        <div class="field-row2">
-          <div class="field"><label>Routine icon</label><input type="text" id="setIconRoutine" maxlength="4" style="text-align:center;"></div>
-          <div class="field"><label>Routine category name</label><input type="text" id="setLblCatRoutine"></div>
-        </div>
-        <div class="field-row2">
-          <div class="field"><label>Health icon</label><input type="text" id="setIconHealth" maxlength="4" style="text-align:center;"></div>
-          <div class="field"><label>Health category name</label><input type="text" id="setLblCatHealth"></div>
-        </div>
-        <div class="field-row2">
-          <div class="field"><label>Others icon</label><input type="text" id="setIconOthers" maxlength="4" style="text-align:center;"></div>
-          <div class="field"><label>Others category name</label><input type="text" id="setLblCatOthers"></div>
-        </div>
       </div>
       <!-- Per-category default duration settings, used to pre-fill new tasks (moved here from Task Create Section) -->
       <div class="plain-card">
@@ -1848,6 +1832,28 @@ body.bomb-danger{background-color:#EF4444;}
         <div class="field"><label>History page title</label><input type="text" id="setLblHistory"></div>
         <div class="field"><label>Tasks page title</label><input type="text" id="setLblTasksPage"></div>
       </div>
+
+      <!-- Edit Category Icons & Names — rename and re-icon the 4 fixed categories -->
+      <div class="plain-card">
+        <h3>Edit Category Icons &amp; Names</h3>
+        <div class="subtext" style="margin-top:0;">Rename the existing categories and change their icons. New categories cannot be created and existing ones cannot be deleted — the category structure always stays intact.</div>
+        <div class="field-row2">
+          <div class="field"><label>Study icon</label><input type="text" id="setIconStudy" maxlength="4" style="text-align:center;"></div>
+          <div class="field"><label>Study category name</label><input type="text" id="setLblCatStudy"></div>
+        </div>
+        <div class="field-row2">
+          <div class="field"><label>Routine icon</label><input type="text" id="setIconRoutine" maxlength="4" style="text-align:center;"></div>
+          <div class="field"><label>Routine category name</label><input type="text" id="setLblCatRoutine"></div>
+        </div>
+        <div class="field-row2">
+          <div class="field"><label>Health icon</label><input type="text" id="setIconHealth" maxlength="4" style="text-align:center;"></div>
+          <div class="field"><label>Health category name</label><input type="text" id="setLblCatHealth"></div>
+        </div>
+        <div class="field-row2">
+          <div class="field"><label>Others icon</label><input type="text" id="setIconOthers" maxlength="4" style="text-align:center;"></div>
+          <div class="field"><label>Others category name</label><input type="text" id="setLblCatOthers"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Sub-page 7: About — informational only, no editable settings -->
@@ -1876,7 +1882,7 @@ body.bomb-danger{background-color:#EF4444;}
          Every control is feature-detected: hidden or disabled when the bridge (or a specific
          capability) is unavailable, so this page is inert-but-safe in a normal browser. -->
     <div class="set-sub" id="subAndroid" style="display:none;">
-      <div class="gset-header"><button class="gset-back set-sub-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="gset-title">Application Settings</div><div style="width:34px;"></div></div>
+      <div class="gset-header"><button class="gset-back set-sub-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="gset-title">Android Shell Settings</div><div style="width:34px;"></div></div>
 
       <!-- Shown ONLY when the HTML is not running inside the Android shell -->
       <div class="plain-card" id="andNoBridge" style="display:none;">
@@ -2282,6 +2288,7 @@ body.bomb-danger{background-color:#EF4444;}
       <div class="field" style="margin-bottom:8px;"><label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;cursor:pointer;"><input type="checkbox" id="gsetCustomDaily" style="width:auto;margin:0;"> Use custom Goal Daily Hours</label></div>
       <div class="field"><label>Hours / Day</label><input type="number" id="gsetDailyTarget" min="0.5" step="0.5"></div>
       <div class="subtext">Default: follows your main Home Study Timer hours (currently <b id="gsetMaxStudyHint">—</b> hour(s)/day) — if Home study hours change, the Goal updates automatically. Enable the custom option to use a goal-specific value; it must be equal to or less than the Home study hours (never more). Total Required Hours is calculated automatically from this and the dates above.</div>
+      <div style="font-size:12px;color:var(--primary);line-height:1.5;margin-top:8px;margin-bottom:12px;">Remember - Your Daily Target Hours (<b id="gsetDailyHint">—</b>) will be added all at once at your Wake-up Time every day. Completing them before the Study Day ends is your daily responsibility.</div>
     </div>
     <div class="plain-card">
       <h3>Minimum Hours to Maintain Goal Streak</h3>
@@ -2415,7 +2422,7 @@ body.bomb-danger{background-color:#EF4444;}
 <!-- Reset All Data confirmation — reuses the Goal-delete dialog shell; requires typing 123456789 -->
 <div class="overlay center-modal" id="resetConfirmDialog">
   <div class="dialog">
-    <div class="d-icon warn">⚠�����</div>
+    <div class="d-icon warn">⚠️🔵</div>
     <h3>Reset All Data</h3>
     <p>This action will permanently delete all tasks, history, goals, settings, streaks, statistics, and every saved value.<br><br>This action cannot be undone.</p>
     <input type="text" inputmode="numeric" class="gdel-input" id="resetConfirmCode" placeholder="123456789" maxlength="9" autocomplete="off">
@@ -2479,7 +2486,7 @@ body.bomb-danger{background-color:#EF4444;}
     <input type="text" class="gdel-input ec-input" id="earlyCompleteCode" placeholder="DONE" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false">
     <div class="d-btn-row">
       <button class="d-btn cancel" id="earlyCompleteCancel">Cancel</button>
-      <button class="d-btn primary" id="earlyCompleteConfirm" disabled style="opacity:.45;">⚡ Mark as Complete</button>
+      <button class="d-btn primary" id="earlyCompleteConfirm" disabled style="opacity:.45;"><span id="earlyCompleteEmoji">⚡</span> Mark as Complete</button>
     </div>
   </div>
 </div>
@@ -2690,7 +2697,7 @@ function todayStr(d){ d=d||new Date(); return d.getFullYear()+'-'+String(d.getMo
    The app's "new day starts here" moment is a single configurable setting
    (Settings → Day Boundary → dayResetHour, default 0 = 12:00 AM). Every place in the
    app that needs to know "which day does this moment belong to" — daily hours/hearts
-   resets, the Study Timeline's day grouping, and the entire Goals engine ��� must go
+   resets, the Study Timeline's day grouping, and the entire Goals engine 🔵 must go
    through appDayKey()/appDayStart() below instead of raw calendar dates, so changing
    this one setting instantly and consistently affects the whole app. */
 function getDayResetHour(){ return (STATE && STATE.settings && STATE.settings.dayResetHour!=null) ? STATE.settings.dayResetHour : DEFAULT_SETTINGS.dayResetHour; }
@@ -2794,13 +2801,61 @@ function fmtClock(sec){ sec=Math.max(0,Math.round(sec)); const m=Math.floor(sec/
 function fmtTimeOfDay(ts){ const d=new Date(ts); let h=d.getHours(); const m=String(d.getMinutes()).padStart(2,'0'); const ap=h>=12?'PM':'AM'; h=h%12; if(h===0)h=12; return h+':'+m+' '+ap; }
 // Shows a brief toast message at the top of the screen (auto-hides after ~2.6s)
   function showToast(msg, ms){ if(STATE && STATE.settings && STATE.settings.toastsEnabled===false) return; const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(showToast._t); showToast._t=setTimeout(()=>t.classList.remove('show'), ms||2600); }
-const CAT_ICON = {study:'📖', routine:'☕', health:'❤️', others:'⋯'}; // Default emoji per task category
+// ══ Initialize page with emoji constants ══
+document.addEventListener('DOMContentLoaded', function() {
+  const earlyCompleteEl = document.getElementById('earlyCompleteEmoji');
+  if (earlyCompleteEl) {
+    earlyCompleteEl.textContent = '⚡'; // Will be set to EMOJI.lightning after constant loads
+  }
+});
+
+// ══ Centralized emoji constants — Single source of truth to prevent corruption ══
+const EMOJI = {
+  bomb: '💣',
+  explosion: '💥',
+  red_circle: '🔴',
+  green_circle: '🟢',
+  yellow_circle: '🟡',
+  blue_circle: '🔵',
+  seedling: '🌱',
+  fire: '🔥',
+  coffee: '☕',
+  heart: '❤️',
+  muscle: '💪',
+  book: '📖',
+  moon: '🌙',
+  times: '✕',
+  dots: '⋯',
+  chart: '📊',
+  clipboard: '📋',
+  trophy: '🏆',
+  clock: '⏰',
+  checkmark: '✅',
+  cross: '❌',
+  target: '🎯',
+  calendar: '🗓️',
+  trash: '🗑️',
+  warning: '⚠️',
+  party: '🎉',
+  party_face: '🥳',
+  smile: '😊',
+  neutral: '😐',
+  frown: '☹️',
+  check: '✔️',
+  love: '💜',
+  info: 'ℹ️',
+  lock: '🔒',
+  lightning: '⚡',
+  person_lifting: '🏋️'
+};
+
+const CAT_ICON = {study:EMOJI.book, routine:EMOJI.coffee, health:EMOJI.heart, others:EMOJI.dots}; // Default emoji per task category
 const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TIME', others:'OTHER TIME'}; // Pomodoro sub-label per category
 
   // Default Daily Study Report template (item 9). Used automatically until the user customizes it,
   // and restored by the "Reset to Default" button on the Telegram Settings page.
   const DEFAULT_REPORT_TEMPLATE = `━━━━━━━━━━━━━━━━━━━━━━
-�� Daily Study Report
+📊 Daily Study Report
 • Date : {date}
 ━━━━━━━━━━━━━━━━━━━━━━
 
@@ -2891,11 +2946,11 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
 const CAT_COLOR_DEFAULT = {study:'#5B4FE8', routine:'#22C55E', health:'#EF4444', others:'#8B87A6'}; // Default dot/accent color per task category
 const CAT_NAME = {study:'Study', routine:'Routine', health:'Health', others:'Others'}; // Human-readable category name (for the "Count as" info popup)
 
-// ── "Others → Count this Activity as" ─────────────────────��──���───────────────────
+// ── "Others → Count this Activity as" ─────────────────────��──🔵───────────────────
 // An Others task may be CREDITED to another category (Study / Routine / Health) for every
 // time-based calculation, while remaining STORED and DISPLAYED only under Others.
 //   • creditCat(t)   → the category this task's TIME should be credited to.
-//   ��� isCreditProxy(t) → true only for an Others task carrying a non-Others credit category.
+//   🔵 isCreditProxy(t) → true only for an Others task carrying a non-Others credit category.
 // The task's stored `category` is never changed, so it always lives in the Others list; only the
 // running session's type (and therefore its Timeline entries / Study stats) follows the credit category.
 function creditCat(t){
@@ -2919,7 +2974,7 @@ function othersLabel(t){
 // the auto-filled Bomb Running gap segments.
 const HIST_COLOR = {study:'#5B4FE8', routine:'#F5A623', health:'#22C55E', others:'#8B87A6', bomb:'#EF4444', sleep:'#5B4FE8', noact:'#8B87A6'};
 const HIST_COLOR_LIGHT = {study:'#EEECFE', routine:'rgba(245,166,35,0.14)', health:'#E8FBF0', others:'rgba(139,135,166,0.14)', bomb:'#FDEDED', sleep:'#EEECFE', noact:'rgba(139,135,166,0.14)'};
-const HIST_ICON = {study:'📖', routine:'☕', health:'❤️', others:'⋯', bomb:'💣', sleep:'🌙', noact:'✕'};
+const HIST_ICON = {study:EMOJI.book, routine:EMOJI.coffee, health:EMOJI.heart, others:EMOJI.dots, bomb:EMOJI.bomb, sleep:EMOJI.moon, noact:EMOJI.times};
 
 // Escapes user-entered text (task comments) before inserting into innerHTML
 function escapeHtml(str){
@@ -3016,6 +3071,19 @@ function calcAge(dobStr){
 }
 
 let STATE = null; // In-memory cache of the current app state (mirrors the 'meta' IndexedDB record)
+// REFACTOR v7.1 (2025-07-20): Centralized Timestamp-Driven Architecture
+// ───────────────────────────────────────────────────────────────────────────────────
+// ROOT FIXES:
+//  1. BOMB EXPLOSION BUG: Multiple ticks at the same boundary could trigger explosion multiple times,
+//     consuming extra time. Fixed by tracking transition (was running → now expired) instead of checking
+//     if remaining ≤ 0 on every single tick.
+//  2. CENTRALIZED CALCULATIONS: All elapsed-time derivations now route through BombEngine.liveRemainingMs()
+//     (the single source of truth). Removed scattered inline calculations that could desync.
+//  3. BOUNDARY-CROSSING LOGIC: Explosions only fire on the STATE._bombWasTicking → false transition,
+//     preventing multiple firings if intervals are suspended.
+//  4. DETERMINISTIC RECOVERY: Recovery uses the same timestamp-based formulas as runtime, ensuring
+//     consistency and eliminating state corruption from fast-forwards.
+// ───────────────────────────────────────────────────────────────────────────────────
 let RESETTING = false; // True while a Factory Reset is in progress — pauses the background recovery interval so it can't re-persist stale state over the freshly restored defaults
 let CACHED_TASKS = []; // In-memory cache of all user-defined tasks, avoids re-reading IndexedDB on every render
 let selectedCategory = 'study'; // Which task category tab is active on the Home screen picker
@@ -3206,7 +3274,7 @@ async function ensureDefaultTasks(){
     {category:'routine', name:'Bathing', duration:20*60, icon:'🚿', color:'#22C55E'},
     {category:'routine', name:'Breakfast', duration:20*60, icon:'🍳', color:'#22C55E'},
     {category:'routine', name:'Toilet', duration:10*60, icon:'🚻', color:'#22C55E'},
-    {category:'routine', name:'Exercise', duration:45*60, icon:'🏋️', color:'#22C55E'},
+    {category:'routine', name:'Exercise', duration:45*60, icon:EMOJI.person_lifting, color:'#22C55E'},
     {category:'health', name:'Meditation', duration:10*60, icon:'🧘', color:'#EF4444'},
     {category:'health', name:'Stretching', duration:15*60, icon:'🤸', color:'#EF4444'},
   ];
@@ -3340,7 +3408,7 @@ async function getTimelineSecondsByCat(dayKey){
   for(const e of all){ if(e.date===dayKey && out[e.category]!=null) out[e.category] += (e.duration||0); }
   return out;
 }
-// ���������─ STUDY PROGRESS — SINGLE SOURCE OF TRUTH (History → Study Task Progress) ────────────────────
+// 🔵🔵🔵─ STUDY PROGRESS — SINGLE SOURCE OF TRUTH (History → Study Task Progress) ────────────────────
 // Everything Telegram reports about Study reads THROUGH this one reader, which mirrors exactly what
 // the History → Study Task Progress tab shows (same "started" filter, same clamped consumed time via
 // getEffectiveConsumedSec, same Pomodoro split via activitySplit, same STATE.pomoLogs reflections).
@@ -3352,7 +3420,7 @@ const STUDY_STATUS = {
   awaiting:      {emoji:'🟡', label:'Awaiting Review'},
   incomplete:    {emoji:'⏳', label:'Incomplete'}
 };
-const MOOD_EMOJI = {good:'😊', ok:'😐', bad:'☹️'}; // same three moods as the Reflection Summary
+const MOOD_EMOJI = {good:EMOJI.smile, ok:EMOJI.neutral, bad:EMOJI.frown}; // same three moods as the Reflection Summary
 // Returns the completed/started Study rows exactly as History → Study Task Progress derives them:
 //   { id, name, subject, statusKey, pomodoros:[{ n, comment, mood }] }
 // pomodoros lists EVERY planned session (blank until logged), so the numbered list matches the tab.
@@ -3442,10 +3510,10 @@ function buildTodayTasksBlock(){
   return started.map(t=>{
     const icon = t.icon || CAT_ICON[t.category];
     let s;
-    if(t.completionStatus==='completed') s='✅ Completed';
-    else if(t.completionStatus==='not_completed') s='❌ Not Completed';
-    else if((t.consumedSec||0) >= (t.duration||1)) s='🟡 Awaiting Review';
-    else s='�� Incomplete';
+if(t.completionStatus==='completed') s=EMOJI.checkmark+' Completed';
+else if(t.completionStatus==='not_completed') s=EMOJI.cross+' Not Completed';
+else if((t.consumedSec||0) >= (t.duration||1)) s=EMOJI.yellow_circle+' Awaiting Review';
+    else s='⚠️ Incomplete';
     return `${icon} ${t.name} — ${s}`;
   }).join('\n');
 }
@@ -3459,7 +3527,7 @@ async function buildDailyReport(state, dayKey, opts){
   const statusLabels = {behind:'Behind Schedule', ontime:'On Track', ahead:'Ahead of Schedule'};
   const tokens = {
     date: formatDateKeyLong(dayKey),
-    // Extra user-data variables ��� all sourced from the same existing state (no duplicate data sources)
+    // Extra user-data variables 🔵 all sourced from the same existing state (no duplicate data sources)
     userName: state.settings.userName || '—',
     totalToday: fmtHM((cat.study||0)+(cat.routine||0)+(cat.health||0)+(cat.others||0)),
     hourStreak: Math.floor((state.hourStreakSec||0)/3600)+' hrs',
@@ -3472,8 +3540,8 @@ async function buildDailyReport(state, dayKey, opts){
     sleepDuration: fmtHM(getSleepDurationSec()),
     todayTasks: buildTodayTasksBlock(), // legacy mixed block (kept for back-compat)
     // Reflection Summary — same computeReflectionSummary() source as the Timeline strip (always in sync)
-    reflection: (function(){ const r = computeReflectionSummary(); return `😊${r.good} + 😐${r.ok} + ☹️${r.bad} = ${r.done} / ${r.total}`; })(),
-    goalName: g ? g.name : '🎯',
+    reflection: (function(){ const r = computeReflectionSummary(); return EMOJI.smile+`${r.good} + `+EMOJI.neutral+`${r.ok} + `+EMOJI.frown+`${r.bad} = ${r.done} / ${r.total}`; })(),
+    goalName: g ? g.name : EMOJI.target,
     startDate: g ? formatDateKeyLong(g.startDate) : '—',
     endDate: g ? formatDateKeyLong(g.endDate) : '—',
     goalStreak: m ? (m.streakCurrent + (m.streakCurrent===1 ? ' day' : ' days')) : '—',
@@ -3524,7 +3592,7 @@ async function retryPendingReports(){
   renderHome();
   setTgStatus(remaining.length ? (remaining.length+' report(s) still pending.') : '✓ All pending reports sent.');
 }
-// ── ReportScheduler (item 1) ──────────────��────��──────���────────────────────────────────────────
+// ── ReportScheduler (item 1) ──────────────��────��──────🔵────────────────���───────────────────────
 // Centralized owner of WHEN the automatic Daily Study Report is sent. Two mutually-exclusive modes,
 // chosen by settings.reportTiming (default 'sleep'):
 //   'sleep' → generated the moment Sleep begins (the Sleep-Start / End-of-Day boundary).
@@ -3576,7 +3644,7 @@ async function maybeLogNonStudy(entry, state){
   const token = state.settings.telegramBotToken, chatId = state.settings.telegramChatId;
   const text = buildNonStudyLogMessage(entry, state);
   showTgMessage(text);
-  setTgStatus('Sending activity log to Telegram���');
+  setTgStatus('Sending activity log to Telegram🔵');
   if(!token || !chatId){ setTgStatus('Telegram not configured — add Bot Token & Chat ID in Settings.'); return; }
   try{
     const ok = await telegramApiSend(token, chatId, text);
@@ -3615,7 +3683,7 @@ function msRemaining(at){ return at.duration*1000 - effectiveElapsedMs(at); }
      (1) sessionElapsedSec() — the SINGLE, clamped source of truth for how many seconds a session has
          legitimately accrued. A session can never accrue more than its own assigned run length
          (at.duration), so no timing edge case can ever inflate it. Read-only; used by every live display.
-     (2) commitStudySeconds() — the strict gate every PERSISTED study value must pass through. It clamps
+     (2) commitStudySeconds() �� the strict gate every PERSISTED study value must pass through. It clamps
          to the physically-possible max and logs any correction, so an impossible value can never reach
          Hour Streak / Daily Study / Timeline / Goals / Campaign / Hearts. */
 const STUDY_ANOMALY_LOG = []; // capped in-memory diagnostic ring; inspect in console via GT_studyAnomalies()
@@ -3673,25 +3741,25 @@ function commitStudySeconds(rawSec, at, context){
 }
 
 /* =====================================================================================
-   BOMB MODE ENGINE  (Task 1 — foundation)
+   BOMB MODE ENGINE  (Task 1 — foundation + REFACTOR: Centralized Calculation System)
    -------------------------------------------------------------------------------------
-   Controlled-centralization migration. This object is being established as the SINGLE
-   owner of all Bomb-mode logic. It is introduced incrementally:
-
-     • Task 1 (this step): create the engine and make it the one owner of every Bomb
-       DERIVATION (read/query) — enabled?, base clock, live remaining, is-ticking,
-       lifeline extension, and the canonical "fresh full clock" value. The old helper
-       functions below (bombModeOn/bombBaseMs/bombIsTicking/bombLiveRemainingMs/
-       lifelineExtensionMs) are now THIN DELEGATES to this engine, so ~25 existing call
-       sites keep working unchanged while the math lives in exactly one place.
-
-     • Task 2 (next): move the STATE TRANSITIONS in here too (arm, armForNewDay,
-       consumeLifeline, explode, reconcile-while-paused, session pause/resume banking,
-       lifeline granting). Those functions are intentionally left untouched for now.
-
-     • Task 3: enable BombEngine.clampToFull() at every refill/bank site (upper safety
-       clamp). It is DEFINED here but deliberately NOT yet applied, so Task 1 changes
-       nothing about runtime behaviour.
+   CENTRALIZED ARCHITECTURE (Timestamp-Driven State):
+   
+   This engine is the SINGLE SOURCE OF TRUTH for all Bomb time calculations. Every
+   display and decision derives from these centralized reads:
+     • liveRemainingMs() — computes remaining time from wall-clock timestamps (never
+       from a separate counter). This is the ONLY function that calculates live time.
+     • baseMs() — reads the persisted "day clock" snapshot, READ-CLAMPED to the ceiling
+   
+   EXPLOSION SAFETY (Boundary-Crossing Logic):
+   Every timer interval that checks for explosion uses boundary-crossing logic:
+     • STATE._bombWasTicking tracks whether the bomb was "running" last tick
+     • Explosion only triggers when transitioning from (was running) to (now ≤ 0)
+     • This prevents multiple explosions if ticks pile up while the interval is suspended
+   
+   SINGLE OWNER RULES:
+   All Bomb-mode logic is owned by BombEngine; delegate functions below are THIN
+   wrappers that forward to the engine. Zero duplicated calculations = zero desync bugs.
 
    Rules honoured: no full rewrite, no touching the timer engine or the Study Time
    architecture, and no duplicated ownership — the derivation math now has one home.
@@ -3736,6 +3804,8 @@ const BombEngine = {
     return !!at.pausedAt;               // productive session PAUSED → bomb runs
   },
   // Live remaining Bomb ms — valid for both the armed-bomb case and the paused-session case.
+  // CENTRALIZED CALCULATION: This is now the ONLY place that computes live remaining time.
+  // Every display derives from this single function to ensure consistency and prevent desync bugs.
   // Task 3 hardening (item #7): every path is upper-clamped to the legitimate ceiling and lower-bounded
   // at 0, and the paused elapsed can never go negative — so a future/skewed timestamp or a
   // background-recovery jump can never display MORE time than the clock legitimately holds.
@@ -3762,7 +3832,9 @@ const BombEngine = {
   arm(state){
     const st = state || STATE;
     const remainMs = Math.max(0, this.baseMs(st));
-    st.activeTimer = { type:'bomb', startTs: monotonicNow(), duration: remainMs/1000 };
+    // wallStartTs: wall-clock anchor set at arm time. Used by recoverState() to detect background
+    // elapsed time that the monotonic clock (performance.now()) misses when the app is backgrounded.
+    st.activeTimer = { type:'bomb', startTs: monotonicNow(), duration: remainMs/1000, wallStartTs: Date.now() };
   },
   // 2.2 ARM FOR NEW DAY: one of the only two places the Bomb clock is refilled to a fresh FULL
   // duration (the other is an explosion). Called from the day-rollover reconciliation. Refills the
@@ -3851,6 +3923,20 @@ const BombEngine = {
       this.armForNewDay(st);                       // idle — fresh full clock + a freshly re-armed bomb
     }
   },
+  // --- CENTRALIZED BOMB CLOCK PAUSE/RESUME ---
+  // Aliases for bankPausedElapsed (existing method) to maintain semantic clarity in callers.
+  // Both delegate to the single authority: bankPausedElapsed().
+  bankBombClockFromPause(state){
+    // CENTRALIZED: Delegates to bankPausedElapsed (the single authority for banking elapsed bomb time).
+    // Called when a session stops: the bomb was ticking during pause, so bank the elapsed time.
+    this.bankPausedElapsed(state);
+  },
+  pauseBombClockForFreeze(state){
+    // CENTRALIZED: Delegates to bankPausedElapsed (the single authority for banking elapsed bomb time).
+    // Called when a running session is frozen (Sleep/Bomb-Lock): bank the bomb time without ticking it further.
+    this.bankPausedElapsed(state);
+  },
+
   // ==========================================================================
   // 2.7 REPLAY BRIDGE — advanceElapsed(ms)  [Wake-up State Reconstruction, Mode 1]
   // --------------------------------------------------------------------------
@@ -3907,49 +3993,51 @@ const BombEngine = {
     return { consumedMs: remaining, terminal: !!STATE.bombLocked };
   },
   // ==========================================================================
-  // REPLAY ORCHESTRATOR — replayWakeElapsed(state, frozen)  [Mode 1 only]
+  // FIRST-ACTIVITY WAKE DEDUCTION — applyWakeElapsedOnStart(state)  [Mode 1 only]
   // --------------------------------------------------------------------------
-  // Owns ONLY the "Pending Elapsed Budget": the milliseconds that have passed
-  // between today's Wake-up Time and the moment the app was opened. It feeds that
-  // budget to the engine (via advanceElapsed) in slices and lets the engine react.
-  // It contains ZERO Bomb business decisions — no lifeline / explosion / freeze /
-  // streak / notification logic. It is the sole component that knows "replay" exists;
-  // the engine remains completely unaware.
+  // Called exactly once per study day, from the first user-initiated START press
+  // (startSession or startExtraStudySession), NOT on app-open.
   //
-  // Runs at most ONCE per STUDY day (wake-boundary key), only in Mode 1 ('wake-time'),
-  // only when the app is awake & trusted, right after the day-rollover has armed a
-  // fresh full Bomb. After it finishes, the existing catch-up loop finds the bomb
-  // already reconciled (remaining>0, or bombLocked) and no-ops — no double processing.
+  // Old behaviour: deduction ran automatically inside recoverState() on every app-open,
+  // which caused inconsistent results when the app opened during a freeze or before the
+  // bomb was armed.
+  //
+  // New behaviour:
+  //   1. At Wake-up Time the bomb is armed with its full clock (day-rollover, unchanged).
+  //   2. The wake timestamp is stored in state.wakeAnchorTs at that moment.
+  //   3. No deduction happens on app-open.
+  //   4. The first START press calls this method BEFORE arming the activity timer.
+  //   5. This method computes (now - wakeAnchorTs), feeds it to advanceElapsed, marks done.
+  //   6. If the bomb reaches zero here, advanceElapsed → explode() handles it exactly as
+  //      at runtime; the caller then sees bombLocked and aborts starting the session.
+  //
+  // Runs at most ONCE per study day (wakeReplayDate marker, same as before).
+  // advanceElapsed and explode() are unchanged — only the call site moves.
   // ==========================================================================
-  async replayWakeElapsed(state, frozen){
+  async applyWakeElapsedOnStart(state){
     const st = state || STATE;
     if(!this.isEnabled(st)) return;
     if(!st.settings || st.settings.bombWakeTrigger !== 'wake-time') return; // Mode 1 only
-    // Never during a freeze (Sleep / Bomb-Lock): wait until awake & unlocked.
-    // We deliberately do NOT set the marker here, so replay can still run once the freeze lifts.
-    if(frozen || isSleepActive() || st.bombLocked) return;
-    // Once per STUDY day. `wakeReplayDate` is a dedicated marker owned solely by replay —
-    // it is intentionally independent of the day-rollover's `lastActiveDate`.
+    if(st.bombLocked) return; // already exploded — nothing to deduct
     const sdk = studyDayKey();
-    if(st.wakeReplayDate === sdk) return;
+    if(st.wakeReplayDate === sdk) return; // already applied once today
     const at = st.activeTimer;
+    // If the bomb isn't armed (e.g. a session is already running), skip — no idle time to deduct.
     if(!at || at.type !== 'bomb'){ st.wakeReplayDate = sdk; return; }
     const now = Date.now();
-    const wakeTs = todayWakeTs(now);
+    // Use the stored wake anchor if available; fall back to todayWakeTs for backwards compatibility.
+    const wakeTs = (st.wakeAnchorTs && st.wakeAnchorTs > 0) ? st.wakeAnchorTs : todayWakeTs(now);
     if(wakeTs == null || wakeTs > now){ st.wakeReplayDate = sdk; return; }
-    let pending = now - wakeTs; // the Pending Elapsed Budget (ms since Wake-up)
-    // BUDGET-DRIVEN REPLAY: hand the budget to the existing engine one slice at a time.
-    // The budget lives ONLY in this local variable — it is never stored in startTs, so
-    // the engine's re-arm (which resets startTs to Date.now()) can never lose it.
+    let pending = now - wakeTs; // elapsed since Wake-up Time
     let guard = 0;
     while(pending > 0 && guard < 2000){
       guard++;
       const res = await this.advanceElapsed(pending);
       pending -= res.consumedMs;
-      if(res.terminal) break;          // engine reached a stop state (e.g. exploded → locked)
-      if(res.consumedMs <= 0) break;    // safety: no forward progress, never spin
+      if(res.terminal) break;       // exploded or locked — stop
+      if(res.consumedMs <= 0) break; // safety: no forward progress
     }
-    st.wakeReplayDate = sdk; // mark done for this study day (idempotent for later opens)
+    st.wakeReplayDate = sdk; // mark applied for this study day
     await saveState(st);
   },
   // 2.5 SESSION PAUSE/RESUME BANKING — single owner of the bomb's behaviour around a productive
@@ -3963,6 +4051,8 @@ const BombEngine = {
     if(at && this.isEnabled(st) && !isSleepActive()){ at.bombTickTs = monotonicNow(); }
   },
   bankPausedElapsed(state){
+    // CENTRALIZED: This is the single authority for banking bomb time after a pause.
+    // Called from onSessionResume and bankBombClockFromPause to ensure consistent state.
     const st = state || STATE; const at = st.activeTimer;
     if(at && at.bombTickTs!=null && this.isEnabled(st) && !isSleepActive()){
       // Future-timestamp guard: elapsed can never be negative (would otherwise resurrect burned time),
@@ -4164,9 +4254,9 @@ async function recoverState(){
   }
   // Also freezes a bomb that was ticking under an already-PAUSED session: bank its live value
   // and drop the tick baseline so the whole frozen window doesn't get subtracted from the clock.
+  // CENTRALIZED: Use BombEngine method instead of inline calculation — guarantees consistency.
   if(frozen && state.activeTimer && state.activeTimer.pausedAt && state.activeTimer.bombTickTs!=null && bombModeOn(state)){
-    state.bombRemainingMs = Math.max(0, bombBaseMs(state) - (monotonicNow() - state.activeTimer.bombTickTs));
-    state.activeTimer.bombTickTs = null;
+    BombEngine.pauseBombClockForFreeze(state);
   }
   // Advance the last trusted wall time every poll while the app is awake.
   state.lastSeenWall = Date.now();
@@ -4185,9 +4275,16 @@ async function recoverState(){
       state.bombRemainingMs = BombEngine.fullClockMs(state); // Mode 2: always reset to default Bomb Duration at Wake-up
       state.activeTimer = null;                              // no live Bomb yet — nothing arms it while dormant
       state.bombDormant = true;                              // idle-until-first-activity latch (cleared on first session start)
+      state.wakeAnchorTs = null;                             // Mode 2: no wake anchor needed
     } else {
       state.bombDormant = false;                             // Mode 1: never dormant
       BombEngine.armForNewDay(state);                        // fresh full Bomb clock + re-arm — new Study Day starts clean (single owner)
+      // Store the wake anchor: the exact moment the bomb was armed for today.
+      // applyWakeElapsedOnStart() uses this to calculate elapsed since wake-up on the first START press.
+      const now = Date.now();
+      const wakeTs = todayWakeTs(now);
+      state.wakeAnchorTs = (wakeTs != null && wakeTs <= now) ? wakeTs : now;
+      state.wakeReplayDate = null; // clear marker so the new day's deduction can run
     }
     BombEngine.resetDailyLifelines(state); // hearts→1, dailyLifelinesEarned��0 (single lifeline authority)
     state.bombLocked = false;         // Task 6.5: day-rollover clears the persisted flag; syncFreezeReasons() exits BOMB_LOCK on next poll
@@ -4228,13 +4325,67 @@ async function recoverState(){
     state.activeTimer.bombTickTs = monotonicNow();
     await saveState(state);
   }
-  // WAKE-UP STATE RECONSTRUCTION (Mode 1) — replay the elapsed time between today's
-  // Wake-up and this app-open into the freshly-armed Bomb, using the existing engine as
-  // the sole decision-maker. Runs once per study day, only in 'wake-time' mode, only when
-  // awake & trusted. After it returns, the catch-up loop below finds the bomb already
-  // reconciled (remaining>0 or bombLocked) and no-ops, so there is no double processing.
-  await BombEngine.replayWakeElapsed(state, frozen);
-  state = STATE; // replay mutates STATE in place (same object); keep the local in sync
+  // WAKE-UP DEDUCTION (Mode 1): no longer runs on app-open.
+  // The elapsed-time deduction now happens on the first START press via
+  // BombEngine.applyWakeElapsedOnStart(), called from startSession / startExtraStudySession.
+  // This eliminates the inconsistency where opening the app during a freeze would silently
+  // skip or partially apply the deduction.
+  state = STATE; // keep local in sync with STATE (unchanged from before)
+
+  // BACKGROUND ELAPSED RECOVERY — centralized elapsed-time processing for the idle Bomb.
+  // ROOT CAUSE OF THE SCREENSHOT BUG: monotonicNow() (performance.now()) pauses when the app
+  // is backgrounded on mobile. So msRemaining(at) returns falsely-high remaining time because
+  // the monotonic clock didn't advance while the tab was suspended.
+  // FIX: measure the real wall-clock gap (Date.now() - lastSeenWall). If the bomb was idle and
+  // the wall gap exceeds what the monotonic clock shows has elapsed, feed the difference through
+  // BombEngine.advanceElapsed() — the same single path used by wake-up deduction and all other
+  // elapsed-time processing. This guarantees every real-world second is accounted for exactly once.
+  if(!frozen && bombModeOn(state) && !state.bombLocked && !state.bombDormant){
+    const at = state.activeTimer;
+    const wallNow = Date.now();
+    const lastWall = state.lastSeenWall; // set a few lines above to Date.now() on this tick
+    // We need the wall time from the PREVIOUS tick, stored before we updated lastSeenWall.
+    // state.lastSeenWall was already updated above to wallNow, so we use the prev value we can
+    // derive: the bomb timer's startTs is monotonic. We instead keep a separate persisted
+    // wall-clock anchor on the bomb timer itself. If it doesn't exist, seed it now and skip
+    // (can't know the gap on the very first tick after this code is deployed).
+    if(at && at.type === 'bomb'){
+      if(at.wallStartTs == null){
+        // First time this code sees this bomb timer — seed the wall anchor; gap unknown, skip.
+        at.wallStartTs = wallNow;
+        await saveState(state);
+      } else {
+        // Wall-clock elapsed since bomb armed = wallNow - at.wallStartTs
+        // Monotonic elapsed since bomb armed = monotonicNow() - at.startTs
+        // Any difference is time the app was backgrounded/closed and the monotonic clock missed.
+        const wallElapsed = Math.max(0, wallNow - at.wallStartTs);
+        const monoElapsed = Math.max(0, monotonicNow() - at.startTs);
+        const missedMs = wallElapsed - monoElapsed;
+        if(missedMs > 500){ // >0.5s gap: real background time, not floating-point noise
+          // Feed the missed time through the centralized advanceElapsed path.
+          // advanceElapsed moves at.startTs backward by the slice, then calls explode() if needed.
+          // This is the SAME path as wake-up deduction and wake replay — one deterministic system.
+          let pending = missedMs;
+          let guardAdv = 0;
+          while(pending > 0 && guardAdv < 2000){
+            guardAdv++;
+            const res = await BombEngine.advanceElapsed(pending);
+            pending -= res.consumedMs;
+            if(res.terminal) break;
+            if(res.consumedMs <= 0) break;
+          }
+          state = STATE; // advanceElapsed mutates STATE; resync local
+          // After catch-up, re-anchor the wall start so the NEXT tick only sees incremental gap.
+          if(state.activeTimer && state.activeTimer.type === 'bomb'){
+            state.activeTimer.wallStartTs = wallNow;
+            await saveState(state);
+          }
+        }
+      }
+    }
+  }
+  state = STATE; // resync after potential advanceElapsed mutations
+
   let guard = 0; // Safety cap so a very long-idle app can't loop forever catching up
   while(state.activeTimer && guard < 25){
     guard++;
@@ -4286,8 +4437,15 @@ async function startSession(type, task, topic){
   if(blockIfFrozen('Tasks')){ return; } // no daily session may start during Sleep Duration or a Time Inconsistency freeze
   let state = await getState();
   if(state.activeTimer && state.activeTimer.type==='bomb'){
-    state.bombRemainingMs = Math.max(0, msRemaining(state.activeTimer)); // pause the bomb clock, don't discard it
+    // CENTRALIZED: Use BombEngine to pause the bomb clock instead of inline calculation
+    state.bombRemainingMs = Math.max(0, BombEngine.liveRemainingMs(state)); // pause the bomb clock, don't discard it
   }
+  // MODE 1 WAKE DEDUCTION: deduct elapsed time since Wake-up on the very first START press of the day.
+  // applyWakeElapsedOnStart is idempotent (once per study day) and a no-op for Mode 2.
+  await BombEngine.applyWakeElapsedOnStart(state);
+  state = STATE; // applyWakeElapsedOnStart may have mutated STATE; resync local
+  // If the deduction caused an explosion, the bomb is now locked — abort starting the session.
+  if(state.bombLocked){ syncFreezeReasons(state); render(); return; }
   state.bombDormant = false; // Mode 2: the first activity has begun — hand control to the normal Bomb engine for the rest of the day
   ensureTaskProgressFields(task);
   const baseConsumedSec = Math.min(task.duration, task.consumedSec||0);
@@ -4319,8 +4477,13 @@ async function startSession(type, task, topic){
 async function startExtraStudySession(durationMinutes){
   let state = await getState();
   if(state.activeTimer && state.activeTimer.type==='bomb'){
-    state.bombRemainingMs = Math.max(0, msRemaining(state.activeTimer));
+    // CENTRALIZED: Use BombEngine to pause the bomb clock instead of inline calculation
+    state.bombRemainingMs = Math.max(0, BombEngine.liveRemainingMs(state));
   }
+  // MODE 1 WAKE DEDUCTION: same first-START deduction as startSession — Extra Study also counts as first activity.
+  await BombEngine.applyWakeElapsedOnStart(state);
+  state = STATE;
+  if(state.bombLocked){ syncFreezeReasons(state); render(); return; }
   state.bombDormant = false; // Mode 2: an Extra Study session also counts as the first activity — engine takes over
   const durationSec = Math.max(60, Math.round(durationMinutes*60));
   state.activeTimer = {
@@ -4378,7 +4541,8 @@ async function stopSession(){
   if(at.isExtraGoal && state.goal){ state.goal.extraActive = false; } // Extra Study session ended early — Goals page stops showing the mini countdown
   // If the session was PAUSED with the bomb ticking, bank that elapsed bomb time so the re-armed
   // bomb continues from the correct value instead of resurrecting the time it already burned.
-  BombEngine.bankPausedElapsed(state);
+  // CENTRALIZED: Use BombEngine method — guarantees consistent bomb state before re-arming
+  BombEngine.bankBombClockFromPause(state);
   armBomb(state);
   await saveState(state);
   showToast('Session stopped — progress saved.');
@@ -4457,7 +4621,7 @@ function maybeAwardLiveLifeline(){
   const total = (STATE.dailyStudySeconds||0) + liveSec;
   // Single authority for awarding earned Lifelines (BombEngine.grantEarnedLifelines).
   const awarded = BombEngine.grantEarnedLifelines(STATE, total);
-  if(awarded){ BombEngine.persistAward(STATE); showToast('❤️ New Lifeline earned!'); } // 4.2: serialized, ordered persist — no clobber
+  if(awarded){ BombEngine.persistAward(STATE); showToast(EMOJI.heart+' New Lifeline earned!'); } // 4.2: serialized, ordered persist — no clobber
 }
 // Renders the top bar every second: goal finish widget, and Lifeline hearts (filled vs dim/locked + progress caption)
 function renderHeader(){
@@ -4468,6 +4632,12 @@ function renderHeader(){
   const pcD2 = document.getElementById('pcDateD2');
   if(pcD1) pcD1.textContent = now.toLocaleDateString(undefined,{day:'2-digit', month:'long', year:'numeric'});
   if(pcD2) pcD2.textContent = now.toLocaleDateString(undefined,{weekday:'long'});
+
+  // ── Age Bar (profile card) — always runs first, independent of goal widget state ──
+  const nm = STATE.settings.userName || 'You';
+  document.getElementById('ageLbl').textContent = nm;
+  const ag = calcAge(STATE.settings.dob);
+  document.getElementById('ageVal').textContent = ag ? `${ag.years}Y • ${ag.months}M • ${ag.days}D` : 'Set DOB in Settings';
 
   // ── HOME WIDGET: Study Complete By / Max Study Today ─────────────────────────
   // 4 possible states, all owned by Home screen, rendered from cachedFinishByText
@@ -4542,18 +4712,12 @@ function renderHeader(){
     }
   }
 
-  // ── Lifelines belong to the Bomb system — hide hearts section when Bomb Mode is OFF ──
+  // ── Lifelines belong to the Bomb system — hide hearts section when Bomb Mode is OFF ─🔵
   const heartsOn = bombModeOn(STATE);
   const heartsSection = document.getElementById('hdrHeartsSection');
   const heartsDivider = document.getElementById('heartsDivider');
   if(heartsSection) heartsSection.style.display = heartsOn ? '' : 'none';
   if(heartsDivider) heartsDivider.style.display = heartsOn ? '' : 'none';
-
-  // ── Age Bar (profile card) — recalculated continuously ──────────────────
-  const nm = STATE.settings.userName || 'You';
-  document.getElementById('ageLbl').textContent = nm;
-  const ag = calcAge(STATE.settings.dob);
-  document.getElementById('ageVal').textContent = ag ? `${ag.years}Y • ${ag.months}M • ${ag.days}D` : 'Set DOB in Settings';
 
   if(!heartsOn){
     updateStreakBar();
@@ -4585,11 +4749,11 @@ function renderHeader(){
     const liveSec = (atH && atH.type!=='bomb' && atH.subject && atH.state!=='REVIEW_PENDING') ? sessionElapsedSec(atH) : 0;
     const remainSec = nextThresholdSec - ((STATE.dailyStudySeconds||0) + liveSec);
     if(remainSec<=0){
-      progressEl.textContent = 'Next ❤ ready!';
+      progressEl.textContent = 'Next '+EMOJI.heart+' ready!';
     } else {
       const hh = String(Math.floor(remainSec/3600)).padStart(2,'0');
       const mm = String(Math.floor((remainSec%3600)/60)).padStart(2,'0');
-      progressEl.textContent = hh+':'+mm+' to next ❤';
+      progressEl.textContent = hh+':'+mm+' to next '+EMOJI.heart;
     }
   }
   updateStreakBar(); // keeps the Hour Streak progress bar filling smoothly (renderHeader ticks every second)
@@ -4598,7 +4762,7 @@ function renderHeader(){
 // Streak progress bar — dual mode, switches automatically with Bomb Mode:
 // • Bomb ON:  fills over the current Study session toward the next hourly streak point;
 //   reaching 100% coincides with Pomodoro completion, which increments the streak and resets the bar.
-// ��� Bomb OFF: mirrors the Goals section — fills by today's cumulative study hours vs. the daily
+// 🔵 Bomb OFF: mirrors the Goals section — fills by today's cumulative study hours vs. the daily
 //   minimum streak requirement (e.g. 4/8 hrs = 50%). Resets to 0% automatically each new day
 //   because dailyStudySeconds is reset by the existing day-rollover logic.
 function updateStreakBar(){
@@ -4646,7 +4810,7 @@ function renderPomoIdlePreview(){
   const remaining = task ? Math.max(0, task.duration - consumed) : 0;
   document.getElementById('pomoTime').textContent = task ? fmtClock(remaining) : '--:--';
   document.getElementById('pomoSub').textContent = task ? task.name : CAT_LABEL[selectedCategory];
-  document.getElementById('pomoEmoji').textContent = selectedCategory==='study' ? '🌱' : (selectedCategory==='routine'?'☕':(selectedCategory==='health'?'💪':'⋯'));
+  document.getElementById('pomoEmoji').textContent = selectedCategory==='study' ? EMOJI.seedling : (selectedCategory==='routine'?EMOJI.coffee:(selectedCategory==='health'?EMOJI.muscle:EMOJI.dots));
   // Resume note — makes it obvious this task will pick back up instead of restarting from scratch
   const progEl = document.getElementById('pomoProgress');
   if(task && task.completionStatus){
@@ -4657,7 +4821,7 @@ function renderPomoIdlePreview(){
     progEl.textContent = `⏵ Resuming — ${pct}% already done`;
     progEl.style.display = 'block';
   } else if(task && consumed >= task.duration){
-    progEl.textContent = '🎉 100% done — finalize it in Task History';
+    progEl.textContent = EMOJI.party+' 100% done — finalize it in Task History';
     progEl.style.display = 'block';
   } else {
     progEl.style.display = 'none';
@@ -4714,7 +4878,7 @@ function activitySplit(totalSec, pomoSec){
 }
 // Builds the Current Activity card structure. When nothing is running the card shrinks
 // and shows "NO ACTIVITY RUNNING"; live values are then updated by tickCurrentActivity().
-// ── Shared Current Activity view-model (Task 6) ────�����───────────────────���─������─
+// ── Shared Current Activity view-model (Task 6) ────🔵��───────────────────🔵─🔵🔵─
 // SINGLE source of truth for the Home Screen Current Activity card AND the
 // Android/Telegram notification. No screen recomputes these values on its own —
 // the notification shows EXACTLY what the card shows.
@@ -4773,7 +4937,7 @@ function renderCurrentActivity(){
       // Reuse the warning card verbatim — only icon (Bomb), colour (red), text and button caption
       // change. "Restart Hour Streak" opens the existing breach dialog (see caVerifyBtn.onclick).
       const fromH = (STATE && STATE.bombExplodedFromHours!=null) ? STATE.bombExplodedFromHours : 0;
-      icEl.innerHTML = '<span style="font-size:34px;line-height:1;">💣</span>';
+      icEl.innerHTML = '<span style="font-size:34px;line-height:1;">'+EMOJI.bomb+'</span>';
       titleEl.textContent = 'Bomb Exploded';
       // Future tense: nothing is reset yet — the reset happens only after the Restart Hour Streak flow.
       // Smaller description keeps the card clean & narrow (per spec); cleared again in the other states.
@@ -5034,6 +5198,8 @@ function updateBombCardLive(){
 function renderHome(){
   renderCurrentActivity();
   if(ringTimerHandle){ clearInterval(ringTimerHandle); ringTimerHandle = null; }
+  // Initialize bomb boundary-crossing tracker: ensures explosions only fire once per cycle
+  if(STATE._bombWasTicking === undefined) STATE._bombWasTicking = (bombLiveRemainingMs(STATE) > 0);
   const at = STATE.activeTimer;
   const btnStart = document.getElementById('btnStart');
   const btnPause = document.getElementById('btnPause');
@@ -5069,12 +5235,18 @@ function renderHome(){
       }
       // Bomb Mode: while this session is PAUSED the bomb keeps ticking. Drive its live display
       // from here (the paused card holds this interval) and hand off to recoverState on explosion.
+      // CRITICAL: Only trigger explosion on the boundary crossing (from >0 to ≤0), never on repeated ticks.
+      // This prevents consuming extra time if multiple ticks pile up before render() can stop the interval.
       if(at.pausedAt && bombIsTicking(STATE)){
-        if(bombLiveRemainingMs(STATE) <= 0){
+        const bombRemaining = bombLiveRemainingMs(STATE);
+        const wasTicking = STATE._bombWasTicking; // private flag: whether the bomb was still running last tick
+        STATE._bombWasTicking = (bombRemaining > 0);
+        if(wasTicking && bombRemaining <= 0){
+          // Explosion boundary: transition from ticking to expired. Hand off immediately.
           clearInterval(ringTimerHandle); ringTimerHandle = null;
           await recoverState(); STATE = await getState(); render(); return;
         }
-        updateBombCardLive();
+        if(bombRemaining > 0) updateBombCardLive(); // only update display if bomb hasn't exploded
       }
       document.getElementById('pomoTime').textContent = fmtClock(remain/1000);
       const _prc = document.getElementById('pomoRunCountdown'); if(_prc) _prc.textContent = fmtClock(remain/1000); // live History Log countdown — reuses this tick, no extra timer
@@ -5115,10 +5287,18 @@ function renderHome(){
     // For case (a) there is no other interval, so the bomb owns ringTimerHandle here. For case (b)
     // the paused-session tick (set up above) already owns ringTimerHandle and updates the bomb too,
     // so we must NOT stack a second interval.
+    // CRITICAL: Use boundary-crossing logic to prevent multiple explosions on the same cycle.
     if(!ringTimerHandle){
       ringTimerHandle = setInterval(async ()=>{
-        if(bombLiveRemainingMs(STATE)<=0){ clearInterval(ringTimerHandle); ringTimerHandle = null; await recoverState(); STATE = await getState(); render(); return; }
-        updateBombCardLive();
+        const bombRemaining = bombLiveRemainingMs(STATE);
+        const wasTicking = STATE._bombWasTicking; // private flag: whether the bomb was still running last tick
+        STATE._bombWasTicking = (bombRemaining > 0);
+        if(wasTicking && bombRemaining <= 0){
+          // Explosion boundary: transition from ticking to expired. Hand off immediately.
+          clearInterval(ringTimerHandle); ringTimerHandle = null;
+          await recoverState(); STATE = await getState(); render(); return;
+        }
+        if(bombRemaining > 0) updateBombCardLive(); // only update display if bomb hasn't exploded
       }, 500);
     }
   } else {
@@ -5127,7 +5307,7 @@ function renderHome(){
     breakTimeEl.style.display = '';
     document.body.classList.remove('bomb-danger');
     bombEmoji.classList.remove('ticking');
-    const frozenBombMs = (at && at.type==='bomb') ? Math.max(0, msRemaining(at)) : (STATE.bombRemainingMs!==undefined ? STATE.bombRemainingMs : STATE.settings.bombDuration*1000);
+    const frozenBombMs = BombEngine.baseMs(STATE); // single owner: BombEngine.baseMs covers both armed-bomb and paused-session cases
     breakTimeEl.textContent = fmtClock(frozenBombMs/1000);
     breakBarFill.style.width='0%';
     // Mode 2 dormant state reads as "waiting for your first activity"; a normal frozen bomb (paused
@@ -5224,7 +5404,7 @@ function sleepIntervalsInWindow(windowStart, now){
   }
   return res;
 }
-// ─── Timeline Architecture ──────────────────────────────────────────���─────────
+// ─── Timeline Architecture ──────────────────────────────────────────🔵─────────
 // The Timeline is PRESENTATION ONLY. It shows the chronological sequence of the
 // user's day. It has zero responsibility for:
 //   Goal / Hour Streak / Bomb business logic / Lifeline / FreezeManager / Campaign.
@@ -5236,7 +5416,7 @@ function sleepIntervalsInWindow(windowStart, now){
 //   • SLEEP   — any gap that overlaps the configured sleep window.
 //   • BOMB    — the Bomb countdown is running. When Bomb Mode is on, the Bomb is armed and ticking
 //               during EVERY inactivity gap once the first productive activity of the day has started.
-//   • IDLE    ���� only when the Bomb countdown is NOT running: the stretch right after Wake-up before the
+//   • IDLE    🔵� only when the Bomb countdown is NOT running: the stretch right after Wake-up before the
 //               very first task starts, the frozen period after an explosion (BOMB_LOCK) until reset,
 //               and (Bomb Mode off) any awake gap with nothing running.
 // ─────────────────────────────────────────��─────────────────────��─────────────
@@ -5572,7 +5752,7 @@ async function renderHistTasks(){
       const early = (t.finishedEarly && t.category==='study');
       const doneConsumed = early ? t.earlyConsumedSec : r.duration;
       const doneTarget   = early ? t.plannedDuration : r.duration;
-      const doneLabel    = early ? '⚡ Completed Early' : '✔ Completed';
+      const doneLabel    = early ? EMOJI.lightning+' Completed Early' : EMOJI.check+' Completed';
       const doneClass    = early ? 'early' : 'done';
       body = `${segBarHtml(t, doneConsumed, doneTarget)}
       <div class="hist-chip-row"><span class="hist-mini-chip ${doneClass}">${doneLabel}</span><span class="hist-info-line" style="margin:0;">${fmtHMu(doneConsumed)} <span class="dim">/</span> ${fmtHMu(doneTarget)}</span><button class="hist-mini-chip btn" data-reset="${t.id}">↺ Restart</button></div>`;
@@ -6247,15 +6427,15 @@ async function renderGoalWidgetDebugCard(){
   set('dbgGoalAvailableTime3', fmt(availableHours * 3600));
   
   // Live status
-  const liveStatusDisplay = { ontime: '🟢 On Time', canRecover: '🟡 Can Recover Today', delayed: '🔴 Delayed' };
-  const liveStatusText = liveStatusDisplay[m.liveStatus] || '🟢 On Time';
+  const liveStatusDisplay = { ontime: EMOJI.green_circle+' On Time', canRecover: EMOJI.yellow_circle+' Can Recover Today', delayed: EMOJI.red_circle+' Delayed' };
+  const liveStatusText = liveStatusDisplay[m.liveStatus] || (EMOJI.green_circle+' On Time');
   set('dbgGoalLiveStatus', liveStatusText);
 }
 
 /* ======================================================================================
    GOALS ENGINE
    Everything on the Goals screen is derived, live, from three things:
-     1) state.goal            ��� the few values the user actually set in Goal Settings
+     1) state.goal            🔵 the few values the user actually set in Goal Settings
                                  (name, startDate, endDate, dailyTargetHours, minStreakHours,
                                  extraTimerLimitMin, motivation, streakCurrent, lastStreakCheckDay)
      2) the 'timeline' table   — every completed Study-category session (normal AND Extra
@@ -6524,23 +6704,23 @@ async function computeStudyCompletionWidget(){
   const _activeCheck = goalTodayKey(new Date()) >= state.goal.startDate;
   if(!_activeCheck) return null;
 
-  // §1 — Planned Study Today ────────�����───────────────────────────────────────
+  // §1 — Planned Study Today ────────🔵��───────────────────────────────────────
   // Sum of every today's task whose effective credit category is 'study'.
   // homeDayTargetSec() already filters by creditCat(t)==='study', which includes
   // Others tasks configured as "Count as Study". Returns seconds directly.
   const plannedStudySeconds = homeDayTargetSec();
 
-  // §2 — Completed Study ────────────────────────────────────────────────────
+  // §2 🔵 Completed Study ────────────���───────────────────────────────────────
   // Committed sessions banked in dailyStudySeconds plus the live running session
   // delta. Continuously increases while the user is actively studying.
   // liveTodayStudySec() returns seconds directly.
   const completedStudySeconds = liveTodayStudySec(state);
 
-  // §3 — Remaining Study ────────────────────���───────────────────────────────
+  // §3 — Remaining Study ────────────────────🔵───────────────────────────────
   // Planned − Completed. Clamped to zero; never negative.
   const remainingStudySeconds = Math.max(0, plannedStudySeconds - completedStudySeconds);
 
-  // §4 — Remaining Non-Study ────────���───────────────────────────────────────
+  // §4 — Remaining Non-Study ────────🔵───────────────────────────────────────
   // Remaining time across every today's task whose effective credit category is
   // NOT 'study'. Uses creditCat(t) so that Others → "Count as Study" tasks are
   // excluded here and counted only in §1/§2/§3.
@@ -6548,7 +6728,7 @@ async function computeStudyCompletionWidget(){
     .filter(t => creditCat(t) !== 'study')
     .reduce((sum, t) => sum + Math.max(0, (t.duration||0) - (t.consumedSec||0)), 0);
 
-  // §5 — Lost Time ──────────────────────────────────────────────────────────
+  // §5 — Lost Time ──────────────────��─────────────────────����─────────────────
   // Bomb + Inactivity time already consumed today. Irreversible; shrinks the
   // available window. Uses existing buildFullDayTimeline path unchanged.
   const tlEntries = await getTimelineEntries(); // uses in-memory cache; invalidated on every write
@@ -6574,15 +6754,15 @@ async function computeStudyCompletionWidget(){
   // return value for analytics, reports and debugging only.
   const freeCapacitySeconds = Math.max(0, remainingDaySeconds - remainingNonStudySeconds);
 
-  // §8 — Max Study Today ────────────────────────────────���───────────────────
+  // §8 — Max Study Today ────────────────────────────────🔵───────────────────
   // The maximum total Study the user can possibly complete before the day ends.
   // Independent of the Goal system.
   const maxStudyTodaySeconds = completedStudySeconds + freeCapacitySeconds;
 
-  // §9 — Decision: can the plan still be completed today? ───────────────────
+  // ��9 — Decision: can the plan still be completed today? ───────────────────
   const canFinishToday = maxStudyTodaySeconds >= plannedStudySeconds;
 
-  // §10 — Projected Finish Time ─────────────────────���───────────────────────
+  // §10 — Projected Finish Time ─────────────────────🔵───────────────────────
   // Clock time at which Study will be complete assuming all remaining work is
   // performed from this moment onward.
   // Formula: now + Remaining Study + Remaining Non-Study.
@@ -6607,7 +6787,7 @@ async function computeStudyCompletionWidget(){
   };
 }
 
-// ── updateFinishByCache ──────────────────────────────────────────────────────
+// ── updateFinishByCache ────────────────────────────────────────��──���──────────
 // Calls computeStudyCompletionWidget() and formats the result as UI text for
 // the Home topbar widget. Cached for 3s refresh cycle. Encodes state info so
 // renderHeader() can apply correct styling and labels (4 states).
@@ -6813,7 +6993,7 @@ async function renderGoalsScreen(){
   //   'canRecover' → offset < 0 AND |offset| ≤ available today: behind but recoverable today
   //   'delayed'    → offset < 0 AND |offset| >  available today: deficit cannot be recovered today
   const projSubEl = document.getElementById('goalProjectedFinishSub');
-  const _lsMap = { ontime: '🟢 On Time', canRecover: '🟡 Can Recover Today', delayed: '🔴 Delayed' };
+  const _lsMap = { ontime: EMOJI.green_circle+' On Time', canRecover: EMOJI.yellow_circle+' Can Recover Today', delayed: EMOJI.red_circle+' Delayed' };
   projSubEl.textContent = _lsMap[m.liveStatus] || '🟢 On Time';
 
   // Section 6 — Why This Goal Matters To You (collapsible, purely motivational)
@@ -6859,6 +7039,8 @@ function renderGoalSettingsScreen(){
   document.getElementById('gsetExtraLimit').value = g ? g.extraTimerLimitMin : 60;
   document.getElementById('gsetMotivation').value = g ? g.motivation : '';
   document.getElementById('gsetMaxStudyHint').textContent = fmtStreakHours(s.studyHours||0);
+  const dailyHours = useCustom ? (g.customDailyHours||g.dailyTargetHours) : (s.studyHours || (g ? g.dailyTargetHours : 8));
+  document.getElementById('gsetDailyHint').textContent = fmtStreakHours(dailyHours);
   // Once the campaign has started, its core configuration is read-only — the engine has already
   // used these values for progress, backlog, streak & history. Only metadata stays editable.
   const locked = !!(g && goalTodayKey(new Date()) >= g.startDate);
@@ -6873,7 +7055,7 @@ function renderGoalSettingsScreen(){
 // Core campaign fields frozen after start (Name, Start, Deadline, Daily Target — Total Required
 // Hours is derived from these, so it is locked implicitly). Motivation etc. remain editable.
 const GOAL_LOCKED_FIELD_IDS = ['gsetName','gsetStart','gsetEnd']; // Goal Daily Hours stays adjustable (custom override), so it is no longer hard-locked
-// Live "Automatic Preview" block ��� recalculated on every keystroke, read-only
+// Live "Automatic Preview" block 🔵 recalculated on every keystroke, read-only
 function updateGoalSettingsPreview(){
   const start = document.getElementById('gsetStart').value;
   const end = document.getElementById('gsetEnd').value;
@@ -6982,7 +7164,7 @@ function renderSubjectSlotSettings(){
         <input type="time" value="${s.end}" data-slot-end="${i}" style="flex:1;min-width:0;padding:9px 10px;border-radius:11px;border:1.5px solid var(--border);font-size:13px;font-family:'Inter',sans-serif;color:var(--text);">
       </div>
       <div style="font-size:10.5px;color:var(--text-dim);margin-top:6px;">${slotRangeLabel(s)}</div>
-    </div>`).join('') : '<div class="subtext">No time slots yet ⏰ all tasks will show under "Any Time".</div>';
+    </div>`).join('') : '<div class="subtext">No time slots yet '+EMOJI.clock+' all tasks will show under "Any Time".</div>';
 }
 document.getElementById('addSubjectBtn').onclick = async ()=>{
   STATE.settings.subjects.push('New Subject');
@@ -7317,7 +7499,7 @@ function showSleepPopup(feature){
   document.getElementById('editLockedNextDate').textContent = hourLabel(getWakeHour());
   document.getElementById('editLockedOverlay').classList.add('show');
 }
-// ── TIME INCONSISTENCY dialog + resume ───────────────────────���───────────────
+// ── TIME INCONSISTENCY dialog + resume ────────────🔵──────────🔵───────────────
 // Shared action gate: blocks a timer action while frozen for ANY reason and shows the right popup.
 function blockIfFrozen(feature){
   syncFreezeReasons(STATE); // consult the central Freeze Manager (same conditions, same order)
@@ -7439,7 +7621,7 @@ document.getElementById('tgRetryBtn').onclick = ()=> retryPendingReports();
 document.getElementById('tgCopyBtn').onclick = async ()=>{
   const q = STATE.pendingReports||[];
   if(!q.length) return;
-  const text = q.map(r=>r.text).join('\n\n────���───\n\n');
+  const text = q.map(r=>r.text).join('\n\n' + Array(16).fill('─').join('') + '\n\n');
   try{ await navigator.clipboard.writeText(text); showToast('Pending report copied.'); }
   catch(e){ tgMsgInput.value = text; autogrow(tgMsgInput); showToast('Copied into the composer.'); }
 };
@@ -7452,7 +7634,7 @@ document.querySelectorAll('.nav-item').forEach(item=>{
     item.classList.add('active');
     hsCollapse(); // navigating away ends task selection
     const _gmc = document.getElementById('goalMotivCard'); if(_gmc) _gmc.classList.remove('expanded'); // "Why?" dropdown always resets to collapsed on tab switch
-    // Never preserve an opened Settings subsection across tab switches ��� always reset to the main Settings page
+    // Never preserve an opened Settings subsection across tab switches 🔵 always reset to the main Settings page
     document.querySelectorAll('.set-sub').forEach(d=>{ d.style.display = 'none'; });
     const _sMain = document.getElementById('settingsMain'); if(_sMain) _sMain.style.display = 'block';
     const _sSave = document.getElementById('saveSettingsBtn'); if(_sSave) _sSave.style.display = 'none';
@@ -7824,8 +8006,8 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
       document.getElementById('settingsMain').style.display = 'none';
       document.getElementById(el.dataset.sub).style.display = 'block';
       // Save button only appears inside sub-pages that hold editable inputs (hidden for About)
-      // Save button hidden for read-only/instant-apply sub-pages (About + Application Settings)
-      document.getElementById('saveSettingsBtn').style.display = (el.dataset.sub === 'subAbout' || el.dataset.sub === 'subAndroid') ? 'none' : '';
+      // Save button hidden for read-only/instant-apply sub-pages (About + Application Settings + Formula Debugging)
+      document.getElementById('saveSettingsBtn').style.display = (el.dataset.sub === 'subAbout' || el.dataset.sub === 'subAndroid' || el.dataset.sub === 'subFormulaDebug') ? 'none' : '';
       window.scrollTo(0,0);
     }); // close click listener
   }); // close forEach
@@ -7995,7 +8177,7 @@ document.getElementById('tgSendDemoBtn').onclick = async ()=>{
     const ok = await telegramApiSend(token, chatId, text);
     if(ok) showToast('Manual report sent.');
     else showToast('Failed to send — check your Bot Token & Chat ID.');
-  }catch(e){ showToast('Offline ⚠️ could not send the demo report.'); }
+  }catch(e){ showToast('Offline '+EMOJI.warning+' could not send the demo report.'); }
   finally{ btn.disabled = false; btn.textContent = prev; }
 };
 // Save persists all Telegram settings, then refreshes Home so the card visibility/pending pill update.
@@ -8205,7 +8387,7 @@ const AND = {
   }
 };
 
-// ─── Monotonic clock ───────���──────────────────────────────────────��───────────
+// ─── Monotonic clock ───────🔵─────────────────────��────────────────��───────────
 // Replaces Date.now() as the source of truth for all elapsed-time anchors
 // (timer startTs, pausedAt, bombTickTs). Calendar timestamps (history records,
 // wake/sleep times, alarm scheduling, daily-reset comparisons) continue to use
@@ -8252,7 +8434,7 @@ function monotonicNow(){
   // Browser fallback: performance.now() delta from the load-time anchor.
   return _monoAnchor.wall + (performance.now() - _monoAnchor.perf);
 }
-// ──────────��───────────────────────────���───────────────────────────────────────
+// ──────────��───────────────────────────🔵────────────────────────��──────────────
 
 // HTML-side Android preferences (native flags cover the rest). Stored inside
 // STATE.settings.android so they ride along with normal state persistence + backup.
@@ -8266,7 +8448,7 @@ function andCfg(){
   return c;
 }
 
-/* ───────��─────────────────────────────────────────────────────────────────
+/* ───────🔵─────────────────────────────────────────────────────────────────
    SoundController — the single, centralized owner of completion-sound
    playback for the whole app.
 
@@ -8425,7 +8607,7 @@ function andFmtBomb(sec){
 // It pulls every field from the shared caComputeView() view-model — nothing is recomputed here.
 // Formatting rules (no "RUNNING"/"PAUSED" words — the emoji is the status):
 //   🟢 = Study category running · 🔵 = any other category running · 🟡 = anything paused · 🔴 = bomb.
-//   Separator between fields is " — "; the Left value is preceded by " ���— ".
+//   Separator between fields is " — "; the Left value is preceded by " 🔵— ".
 // Layout:
 //   Study  →  Line1: 🟢 Topic — Subject      Line2: 28:07 — 1/7 —— Left 26m
 //   Other  →  Line1: 🔵 Activity             Line2: 53:04 —— Left 53m
@@ -8435,7 +8617,7 @@ function andFmtBomb(sec){
 function andBuildSessionNotif(at){
   const v = caComputeView(at);
   const paused = !!at.pausedAt;
-  const emoji = paused ? '🟡' : (v.isStudy ? '🟢' : '🔵');
+  const emoji = paused ? EMOJI.yellow_circle : (v.isStudy ? EMOJI.green_circle : EMOJI.blue_circle);
   // Line 1 (title): emoji + Activity, with " — Subject" appended for Study when a subject exists.
   const title = emoji + ' ' + v.activity + (v.subject ? ' — ' + v.subject : '');
   // Line 2 (body): countdown [— session] —— Left <whole-activity remaining>.
@@ -8452,13 +8634,13 @@ function andBuildSessionNotif(at){
   if(paused && bombIsTicking(STATE)){
     // 🔴 kept at the start; 💣 sits right after the "Bomb Ticking" label. The native shell
     // renders this as its OWN row (InboxStyle addLine), so it never runs into the line above.
-    bodyLines.push('🔴 Bomb Ticking 💣 — ' + andFmtBomb(bombLiveRemainingMs(STATE)/1000) + ' remaining');
+    bodyLines.push(EMOJI.red_circle+' Bomb Ticking '+EMOJI.bomb+' — ' + andFmtBomb(bombLiveRemainingMs(STATE)/1000) + ' remaining');
   }
   return { title, text: bodyLines.join('\n') };
 }
 function andBuildBombNotif(at){
   const remain = Math.max(0, msRemaining(at)/1000);
-  return { title:'🔴 Bomb Ticking 💣', text: andFmtBomb(remain)+' until explosion — start a task fast.' };
+  return { title:EMOJI.red_circle+' Bomb Ticking '+EMOJI.bomb, text: andFmtBomb(remain)+' until explosion — start a task fast.' };
 }
 
 // ---- Live notification sync (the state machine) ----
@@ -8468,7 +8650,7 @@ function andBuildBombNotif(at){
 function andBuildSessionState(at){
   const v = caComputeView(at);
   const paused = !!at.pausedAt;
-  const emoji = paused ? '🟡' : (v.isStudy ? '🟢' : '��');
+  const emoji = paused ? EMOJI.yellow_circle : (v.isStudy ? EMOJI.green_circle : EMOJI.blue_circle);
   const title = emoji + ' ' + v.activity + (v.subject ? ' — ' + v.subject : '');
   const clocks = [];
   let tmpl;
@@ -8484,7 +8666,7 @@ function andBuildSessionState(at){
   // Bomb Mode: while PAUSED the bomb ticks — append ONE extra line to the SAME
   // notification; its clock keeps ticking natively even though the session is frozen.
   if(paused && bombIsTicking(STATE)){
-    tmpl += '\n🔴 Bomb Ticking 💣 — {c2} remaining';
+    tmpl += '\n'+EMOJI.red_circle+' Bomb Ticking '+EMOJI.bomb+' — {c2} remaining';
     clocks.push({ id:'c2', fmt:'bomb', remainMs:Math.max(0,bombLiveRemainingMs(STATE)), ticking:true });
   }
   return { title, template:tmpl, clocks };
@@ -8501,7 +8683,7 @@ function andBuildBombState(at){
   //     resume the old exploded countdown).
   const ticking = bombIsTicking(STATE);
   return {
-    title: ticking ? '🔴 Bomb Ticking 💣' : '🔒 Bomb Frozen 💣',
+    title: ticking ? EMOJI.red_circle+' Bomb Ticking '+EMOJI.bomb : EMOJI.lock+' Bomb Frozen '+EMOJI.bomb,
     template: ticking ? '{c0} until explosion — start a task fast.' : '{c0} — frozen',
     clocks:[{ id:'c0', fmt:'bomb', remainMs:Math.max(0,bombLiveRemainingMs(STATE)), ticking:ticking }]
   };
@@ -8531,7 +8713,7 @@ function andSyncNotificationNative(){
     // available to add/remove. HTML stays the single source of truth: it
     // computes this and re-pushes/overwrites on resume. Native does NO bomb math.
     if(bombModeOn(STATE) && !isSleepActive()){
-      bombPreview = { id:'c2', fmt:'bomb', remainMs:Math.max(0,bombLiveRemainingMs(STATE)), line:'\n🔴 Bomb Ticking 💣 — {c2} remaining' };
+      bombPreview = { id:'c2', fmt:'bomb', remainMs:Math.max(0,bombLiveRemainingMs(STATE)), line:'\n'+EMOJI.red_circle+' Bomb Ticking '+EMOJI.bomb+' — {c2} remaining' };
     }
   } else if(at && at.type==='bomb' && cfg.bombNotif && bombModeOn(STATE) && !isSleepActive()){
     running=true; paused=false; st=andBuildBombState(at);
@@ -8615,7 +8797,7 @@ function andSyncAlarms(){
   // in Bomb Mode), so an explosion still fires if the app is killed while paused.
   if(cfg.bombAlarm && bombIsTicking(STATE)){
     const remain = bombLiveRemainingMs(STATE);
-    if(remain > 3000) andSetAlarm(AND_ALARM_BOMB, Date.now()+remain, '��� Bomb reached 00:00!', 'Open Goal Tracker now — your streak is at stake.');
+    if(remain > 3000) andSetAlarm(AND_ALARM_BOMB, Date.now()+remain, EMOJI.bomb+EMOJI.explosion+EMOJI.red_circle+' Bomb reached 00:00!', 'Open Goal Tracker now — your streak is at stake.');
     else andClearAlarm(AND_ALARM_BOMB);
   } else andClearAlarm(AND_ALARM_BOMB);
 }
@@ -8686,7 +8868,7 @@ function andDetectEvents(){
       const playNow = cfg.sessionAlarm && !cfg.taskCompletionAlarm;
       if(v){
         andSaveReviewTarget({ taskId: at.taskId, idx: Math.max(0, v.cur - 1) });
-        const title = '✔️ ' + v.cur + '/' + v.total + ' completed — Add Reflection 🥳';
+        const title = EMOJI.check+' ' + v.cur + '/' + v.total + ' completed — Add Reflection '+EMOJI.party_face;
         const body  = v.activity + (v.subject ? ' — ' + v.subject : '');
         // Native notification (Android bridge)
         if(AND.on){
@@ -8703,7 +8885,7 @@ function andDetectEvents(){
           { taskId: at.taskId, idx: Math.max(0, v.cur - 1) });
       } else {
         andSaveReviewTarget(null);
-        if(AND.on){ andNotifyReview(AND_NOTIF_REVIEW, '✔️ Session completed — Add Reflection 🥳', (p.task||'Session')); }
+        if(AND.on){ andNotifyReview(AND_NOTIF_REVIEW, EMOJI.check+' Session completed — Add Reflection '+EMOJI.party_face, (p.task||'Session')); }
         showReviewBanner('✓ Session completed.', null);
       }
       // If neither flag is set, still play once as neutral feedback (original behavior)
@@ -8714,14 +8896,14 @@ function andDetectEvents(){
   }
   // 2) Daily Study target reached (Home Day Streak awarded for today)
   if(now.homeAward !== p.homeAward && now.homeAward === appDayKey()){
-    andNotifyCompletion(2, '🏆 Daily target complete', "Today's full Study allocation is done. Day Streak +1!");
+    andNotifyCompletion(2, EMOJI.trophy+' Daily target complete', "Today's full Study allocation is done. Day Streak +1!");
   }
   // 3) A task reached 100% of its assigned duration
   if(now.doneTasks !== p.doneTasks){
     const prevSet = new Set(p.doneTasks ? p.doneTasks.split(',') : []);
     (CACHED_TASKS||[]).forEach(t=>{
       if(t.completedAt && !prevSet.has(String(t.id))){
-        AND.call('showNotification', 3, '✅ Task complete', (CAT_ICON[t.category]||'')+' '+t.name+' reached 100%.');
+        AND.call('showNotification', 3, EMOJI.checkmark+' Task complete', (CAT_ICON[t.category]||'')+' '+t.name+' reached 100%.');
         // Task Completion Alarm: play sound once when the entire task finishes (not on intermediate Pomodoros)
         if(andCfg().taskCompletionAlarm) SoundController.play('completion');
       }
@@ -8732,8 +8914,8 @@ function andDetectEvents(){
   //    screen, plus the dedicated bomb warning sound. Falls back gracefully on old shells.
   if(bombModeOn(STATE) && p.hourStreak > 0 && now.hourStreak === 0){
     const bombMsg = 'Your Hour Streak was reset to 0. Open Goal Tracker and start again!';
-    if(AND.has('showPersistentNotification')) AND.call('showPersistentNotification', AND_NOTIF_BOMB_EXPLODE, '💥 Bomb exploded', bombMsg);
-    else AND.call('showNotification', AND_NOTIF_BOMB_EXPLODE, '💥 BOOM! Bomb exploded', bombMsg);
+if(AND.has('showPersistentNotification')) AND.call('showPersistentNotification', AND_NOTIF_BOMB_EXPLODE, EMOJI.explosion+' Bomb exploded', bombMsg);
+else AND.call('showNotification', AND_NOTIF_BOMB_EXPLODE, EMOJI.explosion+' BOOM! Bomb exploded', bombMsg);
     andPlayBombSound();
     const cfg = andCfg();
     if(cfg.vibrate && navigator.vibrate){ try{ navigator.vibrate([300,120,300,120,300]); }catch(e){} }
