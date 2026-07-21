@@ -438,10 +438,29 @@ body.bomb-danger{background-color:#EF4444;}
   .hist-sum-val{font-family:'Poppins',sans-serif;font-weight:800;font-size:18.5px;color:var(--text);line-height:1.15;}
   .hist-sum-total{font-size:10px;color:var(--text-dim);font-weight:600;margin-top:3px;}
 
-  .tl-headrow{display:flex;font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.07em;padding:0 2px 10px;border-bottom:1px solid var(--border);margin-bottom:2px;}
   .tl-headrow .h-time{width:86px;flex-shrink:0;}
   .tl-headrow .h-act{flex:1;}
   .tl-headrow .h-dur{width:58px;text-align:right;flex-shrink:0;}
+  /* Timeline mode filter buttons — pill-style with full background on active */
+  .tl-headrow{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.07em;padding:0 2px 10px;border-bottom:1px solid var(--border);margin-bottom:2px;}
+  .tl-mode-menu-wrap{display:inline-flex;gap:0;border:1px solid var(--border);border-radius:6px;background:var(--bg);overflow:hidden;}
+  .tl-mode-btn{background:transparent;border:none;padding:6px 12px;margin:0;cursor:pointer;font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.03em;line-height:1;transition:all 0.15s ease;}
+  .tl-mode-btn:not(:first-child){border-left:1px solid var(--border);}
+  .tl-mode-btn.active{background:var(--primary);color:white;font-weight:700;}
+  .tl-mode-chev{font-size:8px;opacity:.6;}
+  /* Activity-grouped row header — click only on the chevron/triangle, not the whole row */
+  .tl-act-group{border-bottom:1px solid var(--border);}
+  .tl-act-group:last-child{border-bottom:none;}
+  .tl-act-group-row{display:flex;align-items:center;gap:8px;padding:10px 0;}
+  .tl-act-group-chev{flex-shrink:0;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:transform 0.25s ease;}
+  .tl-act-group.expanded .tl-act-group-chev{transform:rotate(90deg);}
+  .tl-act-data{flex:1;display:flex;align-items:center;gap:8px;pointer-events:none;}
+  /* Ultra-compact expanded log — minimal vertical space, full horizontal readability */
+  .tl-act-log{max-height:0;overflow:hidden;transition:max-height 0.3s ease;padding:0;}
+  .tl-act-group.expanded .tl-act-log{max-height:2000px;}
+  .tl-log-entry{font-size:11px;color:var(--text-dim);line-height:1.2;padding:1px 0;display:flex;justify-content:space-between;align-items:center;padding-left:32px;padding-right:2px;font-variant-numeric:tabular-nums;margin:0;}
+  .tl-log-time{flex-shrink:0;}
+  .tl-log-dur{flex-shrink:0;text-align:right;}
   .tl-row{display:flex;align-items:flex-start;gap:9px;padding:12px 2px;border-bottom:1px solid var(--border);}
   .tl-row:last-child{border-bottom:none;}
   .tl-dotline{width:9px;flex-shrink:0;position:relative;display:flex;justify-content:center;padding-top:4px;align-self:stretch;}
@@ -468,7 +487,7 @@ body.bomb-danger{background-color:#EF4444;}
 /* Integrated card-corner dropdown: fills the card's top-left corner (top padding down to the subject
    row) so it reads as part of the container, not a floating button. Bigger touch target, same rows. */
 .hist-task-card{position:relative;}
-.pomo-toggle{position:absolute;top:0;left:0;width:38px;height:46px;border:none;border-radius:19px 0 16px 0;background:var(--primary-light,#EEECFE);color:var(--primary);font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;z-index:2;}
+  .pomo-toggle{position:absolute;top:0;left:0;width:38px;height:46px;border:none;border-radius:19px 0 16px 0;background:var(--primary-light,#EEECFE);color:var(--primary);font-size:16.8px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;z-index:2;}
 .pomo-toggle:active{opacity:.75;}
 .hist-top-left{padding-left:28px;}
 .pomo-log{margin-top:8px;background:rgba(139,135,166,0.07);border-radius:10px;padding:6px 7px;}
@@ -681,7 +700,7 @@ body.bomb-danger{background-color:#EF4444;}
   .nav-item svg{width:20px;height:20px;display:block;margin:0 auto 3px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   .nav-item span{font-size:9.5px;font-weight:700;letter-spacing:0.02em;}
 
-  /* Bottom sheet overlay ����������� shared shell for Session Review and Add/Edit Task modals */
+  /* Bottom sheet overlay ��������������������� shared shell for Session Review and Add/Edit Task modals */
   .overlay{position:fixed;inset:0;background:rgba(27,23,64,0.48);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:50;}
   .overlay.show{display:flex;}
   .overlay.center-modal{align-items:center;}
@@ -1228,7 +1247,7 @@ body.bomb-danger{background-color:#EF4444;}
         <div class="hist-sum-grid" id="histSummaryGrid"></div>
       </div>
       <div class="plain-card">
-        <div class="tl-headrow"><div class="h-act">ACTIVITY</div><div class="h-dur">DURATION</div></div>
+        <div class="tl-headrow"><div class="tl-mode-menu-wrap"><button class="tl-mode-btn tl-mode-opt" id="tlModeTimeline" data-mode="timeline" type="button">⏱ TIMELINE</button><button class="tl-mode-btn tl-mode-opt" id="tlModeActivity" data-mode="activity" type="button">≡ ACTIVITY</button></div><div class="h-dur">DURATION</div></div>
         <div id="timelineCard"><div class="empty-state" id="tlEmpty"><div class="big">🗓️</div>No activity logged yet today.</div></div>
       </div>
     </div>
@@ -1485,7 +1504,7 @@ body.bomb-danger{background-color:#EF4444;}
           </div>
           <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
 
-          <!-- §7 Max Study Today (renumbered from §8) -->
+          <!-- §7 Max Study Today (renumbered from ��8) -->
           <div class="dbg-section">
             <div class="dbg-label">§7 &nbsp; Maximum Study Possible Today</div>
             <div class="dbg-eq dbg-formula">= Study Completed Today + Available Study Time Today</div>
@@ -1694,6 +1713,22 @@ body.bomb-danger{background-color:#EF4444;}
         <div class="field"><label id="lblDefRoutine">Routine default (minutes)</label><input type="number" id="setDefRoutine" min="1"></div>
         <div class="field"><label id="lblDefHealth">Health default (minutes)</label><input type="number" id="setDefHealth" min="1"></div>
         <div class="field"><label id="lblDefOthers">Others default (minutes)</label><input type="number" id="setDefOthers" min="1"></div>
+      </div>
+      <!-- Ignore Short Records in History — pure UI filter, never touches stored data -->
+      <div class="plain-card">
+        <h3>Ignore Short Records in History</h3>
+        <div class="subtext">Hide history entries shorter than the selected duration. This is a display filter only — no records are deleted and no totals are affected.</div>
+        <div class="field">
+          <label>Hide entries shorter than</label>
+          <select id="setHistShortFilter" class="task-select">
+            <option value="0">Off (show all)</option>
+            <option value="30">30 seconds</option>
+            <option value="60">1 minute</option>
+            <option value="120">2 minutes</option>
+            <option value="180">3 minutes</option>
+            <option value="300">5 minutes</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -2869,7 +2904,7 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
 • Reflection = {reflection}
 ━━━━━━━━━━━━━━━━━━━━━━
 
-📚 Study Tasks
+���� Study Tasks
 
 {studyTask}
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -2908,6 +2943,7 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
   totalAvailableHours: 16,
   studyHours: 14,
   lockTodayEditing: true, // Hide Edit button for Today's tasks during the active Study Day
+  historyShortFilter: 0, // Minimum duration (seconds) for a history row to appear in the Timeline/Activity view. 0 = Off (show all).
 
   telegramBotToken: "8801704479:AAH2f4mJzl5wE8Fz8lRXHYtv3nRX4vaq4PY",
   telegramChatId: "-1003886064150",
@@ -3365,7 +3401,8 @@ function setTgStatus(msg){
     },3000);
   }
 }
-function showTgMessage(text){ const el=document.getElementById('tgMsgInput'); if(el) el.value = text; } // Previews the outgoing message text in the composer input
+function showTgMessage(text){ const el=document.getElementById('tgMsgInput'); if(!el) return; el.value = text; if(typeof autogrow==='function') autogrow(el); if(typeof refreshTgButtons==='function') refreshTgButtons(); } // Previews the outgoing message text in the composer input (failure/pending only); triggers auto-grow and button state since programmatic value sets don't fire 'input'
+function clearTgMessage(){ const el=document.getElementById('tgMsgInput'); if(!el) return; el.value = ''; if(typeof autogrow==='function') autogrow(el); if(typeof refreshTgButtons==='function') refreshTgButtons(); } // Clears the composer after a successful send; collapses height and disables buttons
 
 // Sends a message to Telegram via the Bot API; returns true/false for success
 async function telegramApiSend(token, chatId, text){
@@ -3381,14 +3418,14 @@ async function sendTelegramReport(session, state){
   const token = state.settings.telegramBotToken;
   const chatId = state.settings.telegramChatId;
   const text = buildStudyLogMessage(session, state);
-  showTgMessage(text);
   setTgStatus('Sending study log to Telegram📤');
-  if(!token || !chatId){ setTgStatus('Telegram not configured — add Bot Token & Chat ID in Settings.'); session.telegramSynced=false; await idbPut('sessions', session); return; }
+  if(!token || !chatId){ showTgMessage(text); setTgStatus('Telegram not configured — add Bot Token & Chat ID in Settings.'); session.telegramSynced=false; await idbPut('sessions', session); return; }
   try{
     const ok = await telegramApiSend(token, chatId, text);
     session.telegramSynced = ok;
-    setTgStatus(ok ? '✓ Auto-logged to Telegram' : 'Failed to send — will retry when online.');
-  }catch(e){ session.telegramSynced = false; setTgStatus('Offline — will retry when back online.'); }
+    if(ok){ clearTgMessage(); setTgStatus('✓ Auto-logged to Telegram'); }
+    else { showTgMessage(text); setTgStatus('Failed to send — will retry when online.'); }
+  }catch(e){ showTgMessage(text); session.telegramSynced = false; setTgStatus('Offline — will retry when back online.'); }
   await idbPut('sessions', session);
 }
 // Re-sends any Study Pomodoro logs that failed to reach Telegram (e.g. device was offline)
@@ -3565,14 +3602,19 @@ async function sendDailyReport(state, dayKey, opts){
   if(!state.settings.telegramEnabled) return;
   const text = await buildDailyReport(state, dayKey, opts);
   const token = state.settings.telegramBotToken, chatId = state.settings.telegramChatId;
-  showTgMessage(text);
-  if(!token || !chatId){ queuePendingReport(state, text, dayKey); setTgStatus('Telegram not configured — report saved to Pending.'); return; }
+  if(!token || !chatId){
+    showTgMessage(text);
+    queuePendingReport(state, text, dayKey);
+    await saveState(state); renderHome();
+    setTgStatus('Telegram not configured — report saved to Pending.');
+    return;
+  }
   setTgStatus('Sending Daily Study Report…');
   try{
     const ok = await telegramApiSend(token, chatId, text);
-    if(ok) setTgStatus('✓ Daily Study Report sent to Telegram');
-    else { queuePendingReport(state, text, dayKey); setTgStatus('Failed to send — report saved to Pending.'); }
-  }catch(e){ queuePendingReport(state, text, dayKey); setTgStatus('Offline — report saved to Pending.'); }
+    if(ok){ clearTgMessage(); setTgStatus('✓ Daily Study Report sent to Telegram'); }
+    else { showTgMessage(text); queuePendingReport(state, text, dayKey); await saveState(state); renderHome(); setTgStatus('Failed to send — report saved to Pending.'); }
+  }catch(e){ showTgMessage(text); queuePendingReport(state, text, dayKey); await saveState(state); renderHome(); setTgStatus('Offline — report saved to Pending.'); }
 }
 // Retries every queued report; successfully sent ones are dropped, the rest stay pending.
 async function retryPendingReports(){
@@ -3615,7 +3657,7 @@ async function maybeSendScheduledReport(){
     // First-run baselines — adopt the current keys; never send retroactively.
     if(state.lastSleepReportKey == null){ state.lastSleepReportKey = sleepKey; dirty = true; }
     if(state.lastWakeReportKey  == null){ state.lastWakeReportKey  = wakeKey;  dirty = true; }
-    // (A) Sleep-Start crossed �� the app-day that just ended is the finished study-day.
+    // (A) Sleep-Start crossed ��� the app-day that just ended is the finished study-day.
     if(state.lastSleepReportKey !== sleepKey){
       const finishedKey = state.lastSleepReportKey;
       state.pendingWakeReportKey = finishedKey; // remembered for a 'wake'-mode send at the next Wake
@@ -3979,11 +4021,13 @@ const BombEngine = {
     if(!at || at.type !== 'bomb') return { consumedMs: 0, terminal: true };
     const remaining = Math.max(0, msRemaining(at));
     if(ms < remaining){
-      // PARTIAL ADVANCE — the slice fits inside the current cycle. The ONLY mutation
-      // is moving the timer's start reference back; NO engine method is called and NO
-      // other bomb field (duration / hearts / bombRemainingMs / bombLocked / ...) is
-      // touched. The bomb simply shows less time remaining.
+      // PARTIAL ADVANCE — the slice fits inside the current cycle. Move the timer's
+      // start reference back AND sync state.bombRemainingMs to the new remaining value.
+      // Both must stay in agreement: arm() reads bombRemainingMs to set at.duration,
+      // so if bombRemainingMs is not updated here the next arm() (Stop/Review/etc.)
+      // silently resurrects all consumed time, making the countdown appear to reset.
       at.startTs -= ms;
+      st.bombRemainingMs = this.clampToFull(remaining - ms, st);
       return { consumedMs: ms, terminal: false };
     }
     // FULL-CYCLE BOUNDARY — drive the current cycle to exactly 00:00, then let the
@@ -4439,6 +4483,11 @@ async function startSession(type, task, topic){
   if(state.activeTimer && state.activeTimer.type==='bomb'){
     // CENTRALIZED: Use BombEngine to pause the bomb clock instead of inline calculation
     state.bombRemainingMs = Math.max(0, BombEngine.liveRemainingMs(state)); // pause the bomb clock, don't discard it
+    // FIX: write the banked bomb value into STATE immediately so the resync below (state = STATE)
+    // does not overwrite it with the stale last-saved value. applyWakeElapsedOnStart is a no-op for
+    // Mode 2 and for subsequent START presses, so without this line the live remaining value computed
+    // above was silently discarded whenever state = STATE ran after a no-op call.
+    STATE.bombRemainingMs = state.bombRemainingMs;
   }
   // MODE 1 WAKE DEDUCTION: deduct elapsed time since Wake-up on the very first START press of the day.
   // applyWakeElapsedOnStart is idempotent (once per study day) and a no-op for Mode 2.
@@ -4479,6 +4528,8 @@ async function startExtraStudySession(durationMinutes){
   if(state.activeTimer && state.activeTimer.type==='bomb'){
     // CENTRALIZED: Use BombEngine to pause the bomb clock instead of inline calculation
     state.bombRemainingMs = Math.max(0, BombEngine.liveRemainingMs(state));
+    // FIX: mirror into STATE before the resync (same fix as startSession — see comment there).
+    STATE.bombRemainingMs = state.bombRemainingMs;
   }
   // MODE 1 WAKE DEDUCTION: same first-START deduction as startSession — Extra Study also counts as first activity.
   await BombEngine.applyWakeElapsedOnStart(state);
@@ -4835,7 +4886,8 @@ function applyLabels(){
   // lblStreak is handled by renderHome() based on bomb mode, so skip it here to prevent flickering
   document.getElementById('lblBreak').textContent = L.breakTimer.toUpperCase();
   document.getElementById('lblTelegram').textContent = L.telegram;
-  // Master toggle hides the whole Home Telegram card; otherwise refresh the pending-report pill/buttons.
+  // Master toggle hides the whole Home Telegram card; otherwise refresh only the pending-report pill.
+  // Button state is driven by input event and programmatic showTgMessage/clearTgMessage calls only (no polling).
   const tgCard = document.getElementById('telegramCard');
   if(tgCard){
     const on = STATE.settings.telegramEnabled !== false;
@@ -4845,8 +4897,6 @@ function applyLabels(){
       const pill = document.getElementById('tgPendingPill');
       pill.textContent = 'Pending : '+n;
       pill.classList.toggle('has', n>0);
-      document.getElementById('tgRetryBtn').disabled = n===0;
-      document.getElementById('tgCopyBtn').disabled = n===0;
     }
   }
   document.getElementById('lblHistoryTitle').textContent = L.history;
@@ -4878,7 +4928,7 @@ function activitySplit(totalSec, pomoSec){
 }
 // Builds the Current Activity card structure. When nothing is running the card shrinks
 // and shows "NO ACTIVITY RUNNING"; live values are then updated by tickCurrentActivity().
-// ── Shared Current Activity view-model (Task 6) ────🔵��───────────────────🔵─🔵🔵─
+// ── Shared Current Activity view-model (Task 6) ─���──🔵��─────────────���─────🔵─🔵🔵─
 // SINGLE source of truth for the Home Screen Current Activity card AND the
 // Android/Telegram notification. No screen recomputes these values on its own —
 // the notification shows EXACTLY what the card shows.
@@ -4942,7 +4992,7 @@ function renderCurrentActivity(){
       // Future tense: nothing is reset yet — the reset happens only after the Restart Hour Streak flow.
       // Smaller description keeps the card clean & narrow (per spec); cleared again in the other states.
       subEl2.style.fontSize = '12.5px';
-      subEl2.innerHTML = 'The Bomb reached 00:00 with no Lifeline remaining. Your Hour Streak will reset from <b>'+fromH+' hours</b> to <b>0 hours</b> after restarting.';
+      subEl2.innerHTML = 'Your Hour Streak will reset from <b>'+fromH+' hours</b> to <b>0 hours</b> after restarting.';
       if(verifyBtn){ verifyBtn.textContent = 'Restart Hour Streak'; verifyBtn.style.display = ''; }
     } else if(sleeping){
       subEl2.style.fontSize = '';
@@ -5608,7 +5658,18 @@ async function renderTimeline(){
     ? `<div style="font-size:12px;color:var(--text-dim);margin:4px 0 10px;padding:0 2px;">Bomb exploded today: <b style="color:${explodedCount>0?'var(--red)':'var(--text)'}">${explodedCount}</b></div>`
     : '';
 
-  wrap.innerHTML = bombStatHtml + full.map(e=>{
+  // Sync mode button active states (do not reset openActGroup — preserve expansion state)
+  document.getElementById('tlModeTimeline').classList.toggle('active', timelineMode === 'timeline');
+  document.getElementById('tlModeActivity').classList.toggle('active', timelineMode === 'activity');
+
+  if(timelineMode === 'activity'){
+    renderTimelineGrouped(full, wrap, bombStatHtml);
+    return;
+  }
+
+  const _shortThreshold = (STATE.settings && STATE.settings.historyShortFilter) || 0;
+  const filteredFull = _shortThreshold > 0 ? full.filter(e => e.duration >= _shortThreshold) : full;
+  wrap.innerHTML = bombStatHtml + filteredFull.map(e=>{
     const cat = e.category;
     const name = cat === 'bomb'  ? 'Bomb'
                : cat === 'noact' ? 'Idle'
@@ -5630,6 +5691,84 @@ async function renderTimeline(){
     </div>`;
   }).join('');
 }
+
+// ── Activity-grouped timeline mode ─────────────────────────────────────────
+let timelineMode = 'timeline'; // 'timeline' | 'activity'
+let openActGroup = null;       // key of the expanded activity group — one at a time
+
+// Groups the flat timeline array by activity and renders a compact sorted list.
+// All formatting helpers (HIST_COLOR, HIST_ICON, fmtHM, fmtTimeOfDay, escapeHtml)
+// are shared with renderTimeline() — no duplication.
+function renderTimelineGrouped(full, wrap, bombStatHtml){
+  if(full.length === 0){ wrap.innerHTML = `<div class="empty-state"><div class="big">🗓️</div>No activity logged yet today.</div>`; return; }
+
+  // UI-only display filter — applied only when rendering individual log rows.
+  // groupMap is built from the original unfiltered `full` so that g.totalSec (the group
+  // total shown in the Activity view) always reflects every record, including hidden ones.
+  const _shortThreshold = (STATE.settings && STATE.settings.historyShortFilter) || 0;
+
+  // Build groups: key = task name (or category for bomb/noact/sleep)
+  const groupMap = new Map(); // key -> { cat, name, sub, totalSec, entries[] }
+  full.forEach(e => {
+    const cat  = e.category;
+    const key  = (cat === 'bomb' || cat === 'noact' || cat === 'sleep') ? cat : (e.task || cat);
+    const name = cat === 'bomb'  ? 'Bomb'
+               : cat === 'noact' ? 'Idle'
+               : e.task;
+    const sub  = cat === 'bomb'  ? 'Bomb countdown'
+               : cat === 'noact' ? 'No Activity'
+               : cat === 'sleep' ? 'Sleep'
+               : (e.topic || (cat==='study' ? 'Study session' : cat==='routine' ? 'Routine' : cat==='health' ? 'Health activity' : 'Activity'));
+    if(!groupMap.has(key)) groupMap.set(key, { cat, name, sub, totalSec: 0, entries: [] });
+    const g = groupMap.get(key);
+    g.totalSec += e.duration;
+    g.entries.push(e);
+  });
+
+  // Sort groups by total duration descending
+  const groups = Array.from(groupMap.values()).sort((a, b) => b.totalSec - a.totalSec);
+
+  wrap.innerHTML = bombStatHtml + groups.map(g => {
+    const cat      = g.cat;
+    const isOpen   = openActGroup === g.name + cat;
+    const visibleEntries = _shortThreshold > 0 ? g.entries.filter(e => e.duration >= _shortThreshold) : g.entries;
+    // If every entry in this group is below the threshold, hide the whole card —
+    // an expandable group with zero rows would be confusing. Totals are still
+    // calculated from the full unfiltered entries so nothing is lost.
+    if(visibleEntries.length === 0) return '';
+    const logRows  = visibleEntries.slice().sort((a,b) => b.startTs - a.startTs).map(e => {
+      const dur = fmtHM(e.duration); // e.g. "0h 05m"
+      return `<div class="tl-log-entry"><span class="tl-log-time">${fmtTimeOfDay(e.startTs)} - ${fmtTimeOfDay(e.endTs)}</span><span class="tl-log-dur">${dur}</span></div>`;
+    }).join('');
+    return `<div class="tl-act-group${isOpen ? ' expanded' : ''}" data-actkey="${escapeHtml(g.name + cat)}">
+      <div class="tl-act-group-row">
+        <div class="tl-act-group-chev" data-groupkey="${escapeHtml(g.name + cat)}" style="color:${HIST_COLOR[cat]}">▶</div>
+        <div class="tl-act-data">
+          <div class="tl-act">
+            <div class="tl-act-ic" style="background:${HIST_COLOR_LIGHT[cat]};color:${HIST_COLOR[cat]}">${HIST_ICON[cat]}</div>
+            <div class="tl-act-txt"><div class="tl-act-name">${escapeHtml(g.name)}</div><div class="tl-act-sub">${escapeHtml(g.sub)}</div></div>
+          </div>
+        </div>
+        <div class="tl-row-dur" style="color:${HIST_COLOR[cat]}">${fmtHM(g.totalSec)}</div>
+      </div>
+      <div class="tl-act-log">${logRows}</div>
+    </div>`;
+  }).join('');
+
+  // Expand/collapse ONLY on chevron click — one open at a time
+  wrap.querySelectorAll('.tl-act-group-chev').forEach(chev => {
+    chev.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const group = chev.closest('.tl-act-group');
+      const key   = chev.getAttribute('data-groupkey');
+      const willOpen = !group.classList.contains('expanded');
+      wrap.querySelectorAll('.tl-act-group.expanded').forEach(g => g.classList.remove('expanded'));
+      openActGroup = willOpen ? key : null;
+      if(willOpen) group.classList.add('expanded');
+    });
+  });
+}
+// ───────────────────────────────────────────────────────────────────────────
 
 let openPomoLogId = null; // which task's Pomodoro Log dropdown is open — only one at a time
 let pomoPopTarget = null; // {taskId, idx} of the reflection row being filled in the popup
@@ -5808,11 +5947,18 @@ async function renderHistTasks(){
 }
 
 let currentHistTab = 'timeline'; // Which sub-tab (Timeline/Tasks) is active on the History screen
+let prevHistTab = 'timeline'; // Track previous tab to detect actual tab switches
 // Renders whichever History sub-tab is currently active, keeping Timeline + Tasks always in sync
 async function renderHistoryScreen(){
   const bt = document.getElementById('histResetTime'); if(bt) bt.textContent = hourLabel(getWakeHour());
-  if(currentHistTab==='timeline'){ openPomoLogId = null; await renderTimeline(); } // navigating away auto-collapses any open Pomodoro Log
-  else await renderHistTasks();
+  // Only collapse expanded groups when SWITCHING AWAY from timeline tab, not on every poll cycle
+  if(currentHistTab==='timeline'){
+    if(prevHistTab !== 'timeline'){ openPomoLogId = null; openActGroup = null; } // actual tab switch into timeline: collapse
+    await renderTimeline();
+  } else {
+    await renderHistTasks();
+  }
+  prevHistTab = currentHistTab;
 }
 
 /* ============ TOMORROW PLANNING ============ */
@@ -6117,6 +6263,7 @@ function renderSettings(){
     const connected = STATE.settings.telegramBotToken && STATE.settings.telegramChatId;
     tgSub.textContent = !on ? 'Turned off' : (connected ? 'On · Daily report at End of Day' : 'On · Not connected yet');
   }
+  document.getElementById('setHistShortFilter').value = String(STATE.settings.historyShortFilter || 0);
   const D = STATE.settings.defaultDurations;
   document.getElementById('setDefStudy').value = Math.round(D.study/60);
   document.getElementById('setDefRoutine').value = Math.round(D.routine/60);
@@ -6710,13 +6857,13 @@ async function computeStudyCompletionWidget(){
   // Others tasks configured as "Count as Study". Returns seconds directly.
   const plannedStudySeconds = homeDayTargetSec();
 
-  // §2 🔵 Completed Study ────────────���───────────────────────────────────────
+  // §2 🔵 Completed Study ────────────���────────────────────────────────────��──
   // Committed sessions banked in dailyStudySeconds plus the live running session
   // delta. Continuously increases while the user is actively studying.
   // liveTodayStudySec() returns seconds directly.
   const completedStudySeconds = liveTodayStudySec(state);
 
-  // §3 — Remaining Study ────────────────────🔵───────────────────────────────
+  // §3 — Remaining Study ────────────────────🔵──��────────────────────────────
   // Planned − Completed. Clamped to zero; never negative.
   const remainingStudySeconds = Math.max(0, plannedStudySeconds - completedStudySeconds);
 
@@ -6759,7 +6906,7 @@ async function computeStudyCompletionWidget(){
   // Independent of the Goal system.
   const maxStudyTodaySeconds = completedStudySeconds + freeCapacitySeconds;
 
-  // ��9 — Decision: can the plan still be completed today? ───────────────────
+  // ��9 — Decision: can the plan still be completed today? ─────��─────────────
   const canFinishToday = maxStudyTodaySeconds >= plannedStudySeconds;
 
   // §10 — Projected Finish Time ─────────────────────🔵───────────────────────
@@ -7613,16 +7760,27 @@ document.getElementById('tgSendBtn').onclick = async ()=>{
   await sendManualTelegramMessage(text);
   autogrow(tgMsgInput);
 };
-tgMsgInput.addEventListener('input', ()=> autogrow(tgMsgInput));
+tgMsgInput.addEventListener('input', ()=>{ autogrow(tgMsgInput); refreshTgButtons(); });
 // Enter never sends — it only inserts a newline (default textarea behavior). The Send button is the
 // only way to send, allowing free multi-line composing.
+// Buttons are active whenever the textarea has text OR there are pending queued reports.
+function refreshTgButtons(){
+  const hasText = tgMsgInput.value.trim().length > 0;
+  const hasPending = (STATE.pendingReports||[]).length > 0;
+  const active = hasText || hasPending;
+  document.getElementById('tgRetryBtn').disabled = !active;
+  document.getElementById('tgCopyBtn').disabled = !active;
+}
 // Pending report controls: retry re-sends the queue; copy puts the pending report text on the clipboard.
 document.getElementById('tgRetryBtn').onclick = ()=> retryPendingReports();
 document.getElementById('tgCopyBtn').onclick = async ()=>{
   const q = STATE.pendingReports||[];
-  if(!q.length) return;
-  const text = q.map(r=>r.text).join('\n\n' + Array(16).fill('─').join('') + '\n\n');
-  try{ await navigator.clipboard.writeText(text); showToast('Pending report copied.'); }
+  // Prefer pending queue text; fall back to whatever is currently in the composer.
+  const text = q.length
+    ? q.map(r=>r.text).join('\n\n' + Array(16).fill('─').join('') + '\n\n')
+    : tgMsgInput.value.trim();
+  if(!text) return;
+  try{ await navigator.clipboard.writeText(text); showToast(q.length ? 'Pending report copied.' : 'Message copied.'); }
   catch(e){ tgMsgInput.value = text; autogrow(tgMsgInput); showToast('Copied into the composer.'); }
 };
 
@@ -7633,6 +7791,8 @@ document.querySelectorAll('.nav-item').forEach(item=>{
     document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
     item.classList.add('active');
     hsCollapse(); // navigating away ends task selection
+    openActGroup = null;   // collapse any expanded Activity-view row dropdown
+    openPomoLogId = null;  // collapse any expanded Timeline Pomodoro-log dropdown
     const _gmc = document.getElementById('goalMotivCard'); if(_gmc) _gmc.classList.remove('expanded'); // "Why?" dropdown always resets to collapsed on tab switch
     // Never preserve an opened Settings subsection across tab switches 🔵 always reset to the main Settings page
     document.querySelectorAll('.set-sub').forEach(d=>{ d.style.display = 'none'; });
@@ -7667,6 +7827,21 @@ document.getElementById('histTabs').addEventListener('click', async (e)=>{
   document.getElementById('histPanel-timeline').classList.toggle('active', currentHistTab==='timeline');
   document.getElementById('histPanel-tasks').classList.toggle('active', currentHistTab==='tasks');
   await renderHistoryScreen();
+});
+// Timeline mode toggle: filter buttons switch between chronological (TIMELINE) and grouped (ACTIVITY) views
+document.getElementById('tlModeTimeline').addEventListener('click', async ()=>{
+  if(timelineMode !== 'timeline'){
+    timelineMode = 'timeline';
+    openActGroup = null;
+    await renderTimeline();
+  }
+});
+document.getElementById('tlModeActivity').addEventListener('click', async ()=>{
+  if(timelineMode !== 'activity'){
+    timelineMode = 'activity';
+    openActGroup = null;
+    await renderTimeline();
+  }
 });
 // (View Calendar button removed — the Timeline card header is now the Reflection Summary strip)
 // Handles taps inside the Tasks tab: selecting Completed/Not Completed, Save (final lock),
@@ -7920,6 +8095,14 @@ function updateAvailableHoursFromSleep(){
 document.getElementById('setDayResetHour').addEventListener('change', updateAvailableHoursFromSleep);
 document.getElementById('setWakeHour').addEventListener('change', updateAvailableHoursFromSleep);
 document.getElementById('setStudyHours').addEventListener('input', updateOtherHoursPreview);
+// Live update: immediately persist the short-record filter and re-render History so the change
+// is visible at once — no Save button press required, and no recalculation of any totals.
+document.getElementById('setHistShortFilter').addEventListener('change', async ()=>{
+  const state = await getState();
+  state.settings.historyShortFilter = parseInt(document.getElementById('setHistShortFilter').value, 10) || 0;
+  await saveState(state);
+  renderHistoryScreen();
+});
 // Reads every Settings screen input and persists it to STATE, clamping Hearts/day-progress to the new max
 document.getElementById('saveSettingsBtn').onclick = async ()=>{
   const state = await getState();
@@ -7968,6 +8151,7 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
   const defRoutine = parseInt(document.getElementById('setDefRoutine').value,10);
   const defHealth = parseInt(document.getElementById('setDefHealth').value,10);
   const defOthers = parseInt(document.getElementById('setDefOthers').value,10);
+  state.settings.historyShortFilter = parseInt(document.getElementById('setHistShortFilter').value, 10) || 0;
   state.settings.defaultDurations = {
     study: (defStudy>0?defStudy:30)*60,
     routine: (defRoutine>0?defRoutine:20)*60,
