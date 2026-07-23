@@ -1472,7 +1472,7 @@ body.bomb-danger{background-color:#EF4444;}
 
           <!-- §3 Remaining Study -->
           <div class="dbg-section">
-            <div class="dbg-label">§3 &nbsp; Today's Remaining Study</div>
+            <div class="dbg-label">��3 &nbsp; Today's Remaining Study</div>
             <div class="dbg-eq">= Today's Study Target &minus; Study Completed Today</div>
             <div class="dbg-eq">= <span id="dbgPlanned2" class="dbg-dim">—</span> &minus; <span id="dbgCompleted2" class="dbg-dim">—</span></div>
             <div class="dbg-eq">= <span id="dbgRemStudy" class="dbg-val">—</span></div>
@@ -1705,14 +1705,10 @@ body.bomb-danger{background-color:#EF4444;}
         <div class="field"><label>Date of Birth</label><input type="date" id="setDob"></div>
         <div class="subtext" id="profileDynamic" style="font-weight:600;color:var(--text);">Not set yet</div>
       </div>
-      <!-- Per-category default duration settings, used to pre-fill new tasks (moved here from Task Create Section) -->
+      <!-- Timer duration settings - Pomodoro session length -->
       <div class="plain-card">
-        <h3>Task Default Timers</h3>
-        <div class="subtext">Every new task you create in a category is automatically pre-filled with that category's default duration — so you never have to set it manually.</div>
-        <div class="field"><label id="lblDefStudy">Study default (minutes)</label><input type="number" id="setDefStudy" min="1"></div>
-        <div class="field"><label id="lblDefRoutine">Routine default (minutes)</label><input type="number" id="setDefRoutine" min="1"></div>
-        <div class="field"><label id="lblDefHealth">Health default (minutes)</label><input type="number" id="setDefHealth" min="1"></div>
-        <div class="field"><label id="lblDefOthers">Others default (minutes)</label><input type="number" id="setDefOthers" min="1"></div>
+        <h3>Timers</h3>
+        <div class="field"><label>Pomodoro Duration (minutes)</label><input type="number" id="setPomo" min="1"></div>
       </div>
       <!-- Ignore Short Records in History — pure UI filter, never touches stored data -->
       <div class="plain-card">
@@ -1735,15 +1731,18 @@ body.bomb-danger{background-color:#EF4444;}
     <!-- Sub-page 2: Bomb Challenge Mode & Lifeline -->
     <div class="set-sub" id="subBomb" style="display:none;">
       <div class="gset-header"><button class="gset-back set-sub-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="gset-title">Bomb Challenge Mode</div><div style="width:34px;"></div></div>
-      <!-- Bomb Challenge Mode - master switch for the whole Bomb/Lifeline system + its default duration -->
+      <!-- Bomb Challenge Mode - master switch for the whole Bomb/Lifeline system -->
       <div class="plain-card">
-        <h3>Bomb Challenge Mode</h3>
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text);">
-          <input type="checkbox" id="setBombMode" style="width:18px;height:18px;accent-color:var(--primary);">
-          Enable Bomb Challenge Mode
-        </label>
-        <div class="subtext">When OFF, the Bomb countdown, explosion, background alert, and Lifelines are all disabled, and the Home streak switches to your Goal Day Streak.</div>
-        <div class="field" style="margin-top:12px;"><label>Default Bomb Duration (minutes)</label><input type="number" id="setBomb" min="1"></div>
+        <div class="and-row">
+          <div class="ar-txt"><div class="ar-t1">Enable Bomb Challenge Mode</div><div class="ar-t2">When OFF, the Bomb countdown, explosion, background alert, and Lifelines are all disabled, and the Home streak switches to your Goal Day Streak.</div></div>
+          <label class="tg-switch"><input type="checkbox" id="setBombMode"><span class="slider"></span></label>
+        </div>
+      </div>
+      <!-- Default Bomb Duration - separate card -->
+      <div class="plain-card">
+        <h3>Default Bomb Duration</h3>
+        <div class="field"><label>Default Bomb Duration (minutes)</label><input type="number" id="setBomb" min="1"></div>
+        <div class="subtext">Changes take effect after the current Bomb explodes or is reset.</div>
       </div>
       <!-- Lifeline settings — max is permanently fixed at 3; only earn-rate and bomb-extension are configurable -->
       <div class="plain-card">
@@ -1787,12 +1786,11 @@ body.bomb-danger{background-color:#EF4444;}
       <div class="gset-header"><button class="gset-back set-sub-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="gset-title">Task Create Section</div><div style="width:34px;"></div></div>
       <!-- Lock Today's Task Editing during the active Study Day (Wake-up → Sleep Start) -->
       <div class="plain-card">
-        <h3>Task Editing</h3>
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text);">
-          <input type="checkbox" id="setLockTodayEditing" style="width:18px;height:18px;accent-color:var(--primary);">
-          Lock Today's Task Editing During Study Day
-        </label>
-        <div class="subtext">When ON, the Edit button is hidden for Today's tasks while the Study Day is active (Wake-up → Sleep Start). Tomorrow Planning always stays editable.</div>
+        <div class="and-row">
+          <div class="ar-txt"><div class="ar-t1">Lock Today's Task Editing During Study Day</div><div class="ar-t2">When ON, the Edit button is hidden for Today's tasks while the Study Day is active (Wake-up → Sleep Start). Tomorrow Planning always stays editable.</div></div>
+          <label class="tg-switch"><input type="checkbox" id="setLockTodayEditing"><span class="slider"></span></label>
+        </div>
+        <div class="subtext" style="margin-top:8px;font-size:11px;color:#ff9800;font-weight:600;">⚡ TOGGLE IS IMMEDIATE</div>
       </div>
       <!-- Subjects (Study Add-Task dropdown) + fully customizable Preferred Time slots -->
       <div class="plain-card">
@@ -1805,6 +1803,15 @@ body.bomb-danger{background-color:#EF4444;}
         <div id="slotListArea"></div>
         <button class="btn-full ghost" id="addSlotBtn" style="margin-top:8px;margin-bottom:0;">+ Add Time Slot</button>
         <div class="subtext" style="margin-top:10px;margin-bottom:0;">"Any Time" always remains available as the final section for tasks without a Preferred Time.</div>
+      </div>
+      <!-- Per-category default duration settings, used to pre-fill new tasks -->
+      <div class="plain-card">
+        <h3>Task Default Timers</h3>
+        <div class="subtext">Every new task you create in a category is automatically pre-filled with that category's default duration — so you never have to set it manually.</div>
+        <div class="field"><label id="lblDefStudy">Study default (minutes)</label><input type="number" id="setDefStudy" min="1"></div>
+        <div class="field"><label id="lblDefRoutine">Routine default (minutes)</label><input type="number" id="setDefRoutine" min="1"></div>
+        <div class="field"><label id="lblDefHealth">Health default (minutes)</label><input type="number" id="setDefHealth" min="1"></div>
+        <div class="field"><label id="lblDefOthers">Others default (minutes)</label><input type="number" id="setDefOthers" min="1"></div>
       </div>
     </div>
 
@@ -1837,11 +1844,6 @@ body.bomb-danger{background-color:#EF4444;}
         <div class="field"><label>Total Available Hours (24 − sleep, auto)</label><input type="number" id="setTotalHours" min="1" step="0.5" readonly style="background:var(--bg);color:var(--text-dim);cursor:not-allowed;"></div>
         <div class="field"><label>Study Hours (Must Use)</label><input type="number" id="setStudyHours" min="0" step="0.5"></div>
         <div class="subtext">Other Activities (Routine + Health + Others combined) automatically get whatever remains — currently <b id="setOtherHoursPreview">2</b> hour(s). This updates instantly on the Tasks page.</div>
-      </div>
-      <!-- Timer duration settings - Pomodoro session length -->
-      <div class="plain-card">
-        <h3>Timers</h3>
-        <div class="field"><label>Pomodoro Duration (minutes)</label><input type="number" id="setPomo" min="1"></div>
       </div>
       <!-- Pop-up (toast) messages — controls the small in-app confirmations AND, inside the
            Android shell, mirrors to the native "nativeToastsEnabled" flag so native informational
@@ -2129,7 +2131,7 @@ body.bomb-danger{background-color:#EF4444;}
               <div style="display:flex;align-items:flex-start;gap:5px;">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--gp-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:5px;"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
                 <div style="text-align:left;">
-                  <div class="ghr-val" id="goalTotalRequired">—</div>
+                  <div class="ghr-val" id="goalTotalRequired">���</div>
                   <div class="ghr-sub">hours</div>
                 </div>
               </div>
@@ -2238,7 +2240,7 @@ body.bomb-danger{background-color:#EF4444;}
             <div class="goal-status-metric-txt">
               <div class="gsm-lbl">Required Now</div>
               <div class="gsm-val" style="white-space:nowrap;"><span id="goalRequiredNow">—</span> <span class="u">/day</span></div>
-              <div class="gsm-sub" id="goalRequiredNowSub">—</div>
+              <div class="gsm-sub" id="goalRequiredNowSub">��</div>
             </div>
           </div>
           <div class="goal-status-vline" aria-hidden="true"></div>
@@ -2956,9 +2958,9 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
   telegramReportTemplate: DEFAULT_REPORT_TEMPLATE, // The Daily Study Report body (item 9); preserved once customized.
   reportTiming: 'sleep', // When the automatic Daily Study Report is sent: 'sleep' (default) or 'wake' (item 1).
   defaultDurations: { study: 30*60, routine: 20*60, health: 15*60, others: 15*60 },
-  subjects: ['Mathematics','English','General Knowledge'],
+  subjects: ['Maths','Reasoning','English','G.K.'],
   timeSlots: [
-    {id:1, name:'Morning',   start:'07:00', end:'09:00'},
+    {id:1, name:'Morning',   start:'07:00', end:'12:00'},
     {id:2, name:'Afternoon', start:'12:00', end:'16:00'},
     {id:3, name:'Evening',   start:'16:00', end:'20:00'},
     {id:4, name:'Night',     start:'20:00', end:'23:59'}
@@ -3119,7 +3121,7 @@ let STATE = null; // In-memory cache of the current app state (mirrors the 'meta
 //     preventing multiple firings if intervals are suspended.
 //  4. DETERMINISTIC RECOVERY: Recovery uses the same timestamp-based formulas as runtime, ensuring
 //     consistency and eliminating state corruption from fast-forwards.
-// ───────────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────�����──��─�����������─
 let RESETTING = false; // True while a Factory Reset is in progress — pauses the background recovery interval so it can't re-persist stale state over the freshly restored defaults
 let CACHED_TASKS = []; // In-memory cache of all user-defined tasks, avoids re-reading IndexedDB on every render
 let selectedCategory = 'study'; // Which task category tab is active on the Home screen picker
@@ -3261,7 +3263,7 @@ function ensureTaskProgressFields(t){
   if(t.comment===undefined) t.comment = '';
   if(t.completedAt===undefined) t.completedAt = null;
   if(t.cycleStartTs===undefined) t.cycleStartTs = null;
-  // "Completed early" bookkeeping — set only when the user marks an in-progress activity as done early.
+  // "Completed early" bookkeeping �� set only when the user marks an in-progress activity as done early.
   // plannedDuration/earlyConsumedSec preserve the ORIGINAL target and progress for the History tag,
   // even though `duration` itself is trimmed to the consumed time to release the leftover budget.
   if(t.finishedEarly===undefined) t.finishedEarly = false;
@@ -3304,9 +3306,10 @@ async function ensureDefaultTasks(){
   const existing = await loadTasks();
   if(existing.length>0){ CACHED_TASKS = existing; return; }
   const defaults = [
-    {category:'study', name:'Mathematics', duration:30*60, icon:'📖', color:'#5B4FE8'},
+    {category:'study', name:'Maths', duration:30*60, icon:'📖', color:'#5B4FE8'},
+    {category:'study', name:'Reasoning', duration:30*60, icon:'📖', color:'#5B4FE8'},
     {category:'study', name:'English', duration:30*60, icon:'📖', color:'#5B4FE8'},
-    {category:'study', name:'General Knowledge', duration:30*60, icon:'📖', color:'#5B4FE8'},
+    {category:'study', name:'G.K.', duration:30*60, icon:'📖', color:'#5B4FE8'},
     {category:'routine', name:'Bathing', duration:20*60, icon:'🚿', color:'#22C55E'},
     {category:'routine', name:'Breakfast', duration:20*60, icon:'🍳', color:'#22C55E'},
     {category:'routine', name:'Toilet', duration:10*60, icon:'🚻', color:'#22C55E'},
@@ -3496,7 +3499,7 @@ function buildStudyTaskBlock(){
   return rows.map(r=>{
     const st = STUDY_STATUS[r.statusKey];
     const subj = r.subject ? ` (${r.subject})` : '';
-    return `📖 ${r.name}${subj} — ${st.emoji} ${st.label}`;
+    return `���� ${r.name}${subj} — ${st.emoji} ${st.label}`;
   }).join('\n');
 }
 // {studyTaskPomodoro} — SAME Study Progress rows, plus each task's numbered Pomodoro sessions with
@@ -3634,7 +3637,7 @@ async function retryPendingReports(){
   renderHome();
   setTgStatus(remaining.length ? (remaining.length+' report(s) still pending.') : '✓ All pending reports sent.');
 }
-// ── ReportScheduler (item 1) ──────────────��────��──────🔵────────────────���───────────────────────
+// ── ReportScheduler (item 1) ──────────────��────��������─��─��────────────────���───────────────────────
 // Centralized owner of WHEN the automatic Daily Study Report is sent. Two mutually-exclusive modes,
 // chosen by settings.reportTiming (default 'sleep'):
 //   'sleep' → generated the moment Sleep begins (the Sleep-Start / End-of-Day boundary).
@@ -3762,6 +3765,26 @@ function liveTodayStudySec(state){
   const live = (at && at.type!=='bomb' && at.subject && at.state!=='REVIEW_PENDING')
     ? sessionElapsedSec(at) : 0;
   return (st.dailyStudySeconds||0) + live;
+}
+// Symmetric to liveTodayStudySec, but for non-Study categories.
+// Returns the effective remaining time for non-Study tasks, accounting for any
+// currently running non-Study session. This ensures the widget shows stable values
+// while non-Study activities are running, preventing false "time decay" visuals.
+function effectiveRemainingNonStudySec(state){
+  const st = state || STATE;
+  const at = st && st.activeTimer;
+  
+  // Frozen: remaining time across every today's non-Study task
+  const frozen = (CACHED_TASKS||[])
+    .filter(t => creditCat(t) !== 'study')
+    .reduce((sum, t) => sum + Math.max(0, (t.duration||0) - (t.consumedSec||0)), 0);
+  
+  // Live delta: if a non-Study task is currently running, subtract its elapsed time
+  // since it hasn't been committed to consumedSec yet
+  const delta = (at && at.type !== 'bomb' && at.type !== 'study' && at.state !== 'REVIEW_PENDING')
+    ? sessionElapsedSec(at) : 0;
+  
+  return Math.max(0, frozen - delta);
 }
 // (2) Strict commit gate for any study-seconds value about to be written to persistent stats.
 // Clamps to the session's physically-possible maximum and logs the correction in full detail.
@@ -4775,7 +4798,7 @@ function renderHeader(){
     return;
   }
 
-  // ── Hearts rendering ─────────────────────────────────────────────────────
+  // ── Hearts rendering ──────────────────────────��──────────────────────────
   const heartsWrap = document.getElementById('hdrHearts');
   heartsWrap.innerHTML='';
   const max = STATE.settings.heartsMaxPerDay;
@@ -4928,7 +4951,7 @@ function activitySplit(totalSec, pomoSec){
 }
 // Builds the Current Activity card structure. When nothing is running the card shrinks
 // and shows "NO ACTIVITY RUNNING"; live values are then updated by tickCurrentActivity().
-// ── Shared Current Activity view-model (Task 6) ─���──🔵��─────────────���─────🔵─🔵🔵─
+// ── Shared Current Activity view-model (Task 6) ─���──��������─────────────���─────🔵─🔵🔵─
 // SINGLE source of truth for the Home Screen Current Activity card AND the
 // Android/Telegram notification. No screen recomputes these values on its own —
 // the notification shows EXACTLY what the card shows.
@@ -5120,15 +5143,16 @@ function tickCurrentActivity(at){
     }
     start+=size;
   });
-  positionRunChip(runSeg, runFrac, cur, parts.length, runEndClock);
+  positionRunChip(runSeg, runFrac, cur, parts.length, runEndClock, at);
 }
 // Moves the single floating Running chip so its notch points to the live progress spot,
 // clamped so the chip body always stays fully inside the card.
-function positionRunChip(runSeg, frac, cur, total, remainClock){
+function positionRunChip(runSeg, frac, cur, total, remainClock, at){
   const chip=document.getElementById('caRunChip'), segs=document.getElementById('caSegs');
   if(!chip||!segs) return;
   if(!runSeg){ chip.classList.remove('show'); return; }
-  document.getElementById('caRunTime').textContent = 'Running '+fmtClock(remainClock);
+  const status = (at && at.pausedAt) ? 'Paused' : 'Running';
+  document.getElementById('caRunTime').textContent = status+' '+fmtClock(remainClock);
   document.getElementById('caRunSess').textContent = 'Session '+cur+' / '+total;
   chip.classList.add('show');
   const fillEl=runSeg.querySelector('.ca-fill');
@@ -5168,7 +5192,7 @@ function hsTaskRow(t, opts){
     + `<div class="hs-pg">${fmtBudget(consumed)} / ${fmtBudget(t.duration)}</div>${btn}</div>`;
 }
 // Renders the compact list into #hsTaskList, honoring the expand state and current sort mode.
-const HS_TOPIC_LABEL = {study:'Choose the "STUDY" topic', routine:'Choose the "ROUTINE" topic', health:'Choose the "HEALTH" topic', others:'Choose the "OTHERS" topic'};
+const HS_TOPIC_LABEL = {study:'Choose the "STUDY" topic', routine:'Choose the "ROUTINE" task', health:'Choose the "HEALTH" task', others:'Choose the "OTHERS" task'};
 function renderHomeTaskList(){
   const picker = document.getElementById('hsPicker'); if(!picker) return;
   const cat = selectedCategory;
@@ -5357,7 +5381,8 @@ function renderHome(){
     breakTimeEl.style.display = '';
     document.body.classList.remove('bomb-danger');
     bombEmoji.classList.remove('ticking');
-    const frozenBombMs = BombEngine.baseMs(STATE); // single owner: BombEngine.baseMs covers both armed-bomb and paused-session cases
+    // If bomb has exploded, display 00:00; otherwise show the frozen countdown snapshot
+    const frozenBombMs = STATE.bombLocked ? 0 : BombEngine.baseMs(STATE); // single owner: BombEngine.baseMs covers both armed-bomb and paused-session cases
     breakTimeEl.textContent = fmtClock(frozenBombMs/1000);
     breakBarFill.style.width='0%';
     // Mode 2 dormant state reads as "waiting for your first activity"; a normal frozen bomb (paused
@@ -5679,7 +5704,7 @@ async function renderTimeline(){
                : cat === 'sleep' ? 'Sleep'
                : (e.topic || (cat==='study' ? 'Study session' : cat==='routine' ? 'Routine' : cat==='health' ? 'Health activity' : 'Activity'));
     const tot  = cat === 'bomb'  ? ` — Total: ${fmtHM(bombTotal)}`
-               : cat === 'noact' ? ` — Total: ${fmtHM(noactTotal)}`
+               : cat === 'noact' ? ` ��� Total: ${fmtHM(noactTotal)}`
                : '';
     return `<div class="tl-row">
       <div class="tl-dotline"><div class="tl-dot ${cat}"></div></div>
@@ -5742,7 +5767,7 @@ function renderTimelineGrouped(full, wrap, bombStatHtml){
     }).join('');
     return `<div class="tl-act-group${isOpen ? ' expanded' : ''}" data-actkey="${escapeHtml(g.name + cat)}">
       <div class="tl-act-group-row">
-        <div class="tl-act-group-chev" data-groupkey="${escapeHtml(g.name + cat)}" style="color:${HIST_COLOR[cat]}">▶</div>
+        <div class="tl-act-group-chev" data-groupkey="${escapeHtml(g.name + cat)}" style="color:${HIST_COLOR[cat]}">���</div>
         <div class="tl-act-data">
           <div class="tl-act">
             <div class="tl-act-ic" style="background:${HIST_COLOR_LIGHT[cat]};color:${HIST_COLOR[cat]}">${HIST_ICON[cat]}</div>
@@ -6031,8 +6056,11 @@ function studyDayActive(){ return !isSleepActive(); }
 // Keeps the two day-tabs (labels/dates/active state) and the Tomorrow-only note in sync
 function updatePlanTabsUI(){
   const opt={day:'2-digit',month:'long',year:'numeric'};
-  const td=document.getElementById('planTodayDate'); if(td) td.textContent=new Date().toLocaleDateString(undefined,opt);
-  const tm=document.getElementById('planTomorrowDate'); if(tm) tm.textContent=tomorrowDate().toLocaleDateString(undefined,opt);
+  // Use Study Day (appDayKey) instead of calendar date to align with internal app scheduling
+  const todayStudyDay = appDayKey();
+  const tomorrowStudyDay = addDaysToKey(todayStudyDay, 1);
+  const td=document.getElementById('planTodayDate'); if(td) td.textContent=formatDateKeyLong(todayStudyDay);
+  const tm=document.getElementById('planTomorrowDate'); if(tm) tm.textContent=formatDateKeyLong(tomorrowStudyDay);
   document.querySelectorAll('#planTabs .plan-tab').forEach(c=>c.classList.toggle('active', c.getAttribute('data-plan')===planMode));
   const note=document.getElementById('tomorrowNote'); if(note) note.style.display = planMode==='tomorrow' ? 'block' : 'none';
   // Tomorrow-only editing banner: visible only on the Tomorrow tab, date recomputed live so it
@@ -6818,7 +6846,7 @@ function playGoalConfetti(){
   setTimeout(()=>{ layer.remove(); }, 3000); // light burst, self-removing — plays once, never loops
 }
 
-// ── computeStudyCompletionWidget ──────────────────────────────────────────
+// ── computeStudyCompletionWidget ───────────────���─��─�����───��─────────────────
 // Pure computation engine. Single source of truth for the Study Complete By /
 // Max Study Today widget. Always returns all nine values regardless of which
 // mode the renderer chooses to display. No UI text is produced here.
@@ -6871,9 +6899,8 @@ async function computeStudyCompletionWidget(){
   // Remaining time across every today's task whose effective credit category is
   // NOT 'study'. Uses creditCat(t) so that Others → "Count as Study" tasks are
   // excluded here and counted only in §1/§2/§3.
-  const remainingNonStudySeconds = (CACHED_TASKS||[])
-    .filter(t => creditCat(t) !== 'study')
-    .reduce((sum, t) => sum + Math.max(0, (t.duration||0) - (t.consumedSec||0)), 0);
+  // Now accounts for live session delta to prevent false "time decay" while running.
+  const remainingNonStudySeconds = effectiveRemainingNonStudySec(STATE);
 
   // §5 — Lost Time ──────────────────��─────────────────────����─────────────────
   // Bomb + Inactivity time already consumed today. Irreversible; shrinks the
@@ -6906,10 +6933,10 @@ async function computeStudyCompletionWidget(){
   // Independent of the Goal system.
   const maxStudyTodaySeconds = completedStudySeconds + freeCapacitySeconds;
 
-  // ��9 — Decision: can the plan still be completed today? ─────��─────────────
+  // ��9 — Decision: can the plan still be completed today? ────────────────────
   const canFinishToday = maxStudyTodaySeconds >= plannedStudySeconds;
 
-  // §10 — Projected Finish Time ─────────────────────🔵───────────────────────
+  // §10 — Projected Finish Time ──────────��──────────🔵───────────────────────
   // Clock time at which Study will be complete assuming all remaining work is
   // performed from this moment onward.
   // Formula: now + Remaining Study + Remaining Non-Study.
@@ -6934,7 +6961,7 @@ async function computeStudyCompletionWidget(){
   };
 }
 
-// ── updateFinishByCache ────────────────────────────────────────��──���──────────
+// ── updateFinishByCache ─────────────────────────────���──────────��──���──────────
 // Calls computeStudyCompletionWidget() and formats the result as UI text for
 // the Home topbar widget. Cached for 3s refresh cycle. Encodes state info so
 // renderHeader() can apply correct styling and labels (4 states).
@@ -8181,6 +8208,13 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
   andSyncToastFlag(); // push the preference into the native shell (no-op in a plain browser)
   showToast('Settings saved.');
   render();
+  
+  // Auto-return to main Settings page (like Telegram settings behavior)
+  document.querySelectorAll('.set-sub').forEach(d=>{ d.style.display = 'none'; });
+  document.getElementById('settingsMain').style.display = 'block';
+  document.getElementById('saveSettingsBtn').style.display = 'none';
+  renderSettings();
+  window.scrollTo(0,0);
 };
 
   /* ============ SETTINGS: FOLDER-STYLE CATEGORY NAVIGATION ============ */
@@ -8192,9 +8226,25 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
       // Save button only appears inside sub-pages that hold editable inputs (hidden for About)
       // Save button hidden for read-only/instant-apply sub-pages (About + Application Settings + Formula Debugging)
       document.getElementById('saveSettingsBtn').style.display = (el.dataset.sub === 'subAbout' || el.dataset.sub === 'subAndroid' || el.dataset.sub === 'subFormulaDebug') ? 'none' : '';
-      window.scrollTo(0,0);
-    }); // close click listener
-  }); // close forEach
+    window.scrollTo(0,0);
+  }); // close click listener
+}); // close forEach
+
+// Lock Today's Task Editing toggle — save immediately without waiting for Save button
+document.getElementById('setLockTodayEditing').addEventListener('change', async ()=>{
+  const isNowLocked = document.getElementById('setLockTodayEditing').checked;
+  const state = STATE || {};
+  state.settings = state.settings || {};
+  state.settings.lockTodayEditing = isNowLocked;
+  
+  try {
+    await saveState(state);
+    if(isNowLocked) showToast('Task Editing Locked');
+  } catch(e) {
+    console.error('Error saving task editing lock:', e);
+  }
+});
+
 // Task Lock banner gear — deep-links from the Tasks screen straight to Settings → Task Create
 // Section, where "Lock Today's Task Editing During Study Day" can be changed. UI navigation only.
 document.getElementById('taskLockBannerSettings').addEventListener('click', ()=>{
@@ -8632,7 +8682,7 @@ function andCfg(){
   return c;
 }
 
-/* ───────🔵─────────────────────────────────────────────────────────────────
+/* ���──────🔵─────────────────────────────────────────────────────────────────
    SoundController — the single, centralized owner of completion-sound
    playback for the whole app.
 
