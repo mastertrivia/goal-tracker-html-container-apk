@@ -1375,7 +1375,7 @@ body.bomb-danger{background-color:#EF4444;}
           <div class="gl-chev">›</div>
         </div>
       </div>
-      <!-- 3. Telegram launcher ����� opens the dedicated full-screen Telegram Settings page -->
+      <!-- 3. Telegram launcher ������� opens the dedicated full-screen Telegram Settings page -->
       <div class="plain-card">
         <div class="goal-settings-launch" id="openTgSettingsBtn">
           <div class="gl-ic" style="background:linear-gradient(155deg,#2DAEF0 0%,#229ED9 100%);box-shadow:0 6px 14px rgba(34,158,217,0.28);"><svg viewBox="0 0 24 24"><path d="M21.9 3.2 1.9 10.9c-1.1.4-1.1 1.6-.2 1.9l5.1 1.6 1.9 6c.2.7 1.1.9 1.6.4l2.7-2.6 5.3 3.9c.6.4 1.4.1 1.6-.6l3.3-16.9c.2-1-.6-1.8-1.3-1.4Z" fill="#fff" stroke="none"/></svg></div>
@@ -3132,7 +3132,7 @@ function calcAge(dobStr){
 
 let STATE = null; // In-memory cache of the current app state (mirrors the 'meta' IndexedDB record)
 // REFACTOR v7.1 (2025-07-20): Centralized Timestamp-Driven Architecture
-// ─────────────────────────────────────────���─���─���─────────────────────────────────────
+// ───────────────────────────────��─────���───���─���─���─────────────────────────────────────
 // ROOT FIXES:
 //  1. BOMB EXPLOSION BUG: Multiple ticks at the same boundary could trigger explosion multiple times,
 //     consuming extra time. Fixed by tracking transition (was running → now expired) instead of checking
@@ -3347,7 +3347,7 @@ async function ensureDefaultTasks(){
   CACHED_TASKS = await loadTasks();
 }
 
-// ��─ Timeline read cache ─────────────────────────────────────────────────────
+// ��─ Timeline read cache ───────────────���─────────────────────────────────────
 // idbAll('timeline') is called both inside addTimelineEntry (duplicate check) AND inside
 // computeStudyCompletionWidget on every 3-second render cycle.  On Android Chrome this means
 // TWO full IndexedDB table scans per cycle, which stalls the JS thread noticeably.
@@ -7182,15 +7182,19 @@ function playGoalConfetti(){
 //   }
 async function computeStudyCompletionWidget(){
   const state = STATE;
-  if(!state || !state.goal) return null;
+  if(!state) return null;
+  // NOTE: This widget is independent of the Goal section.
+  // It runs purely on study tasks from the task creation section.
+  // The goal gate has been intentionally removed — the widget shows
+  // "Max Study Today" / "Study Complete By" whenever study tasks exist,
+  // and "No Study Planned Today" when none exist. No goal required.
 
-  // Guard: only show widget while a Goal is active (start date reached).
-  // IMPORTANT: Do NOT call computeGoalMetrics() here — computeGoalMetrics() calls
-  // computeStudyCompletionWidget() internally, which would create mutual infinite recursion
-  // and stack-overflow the JS engine (fatal on Android Chrome). Use the same inline
-  // active check that computeGoalMetrics itself uses: goalTodayKey >= startDate.
-  const _activeCheck = goalTodayKey(new Date()) >= state.goal.startDate;
-  if(!_activeCheck) return null;
+  // FOOLPROOF CACHE SYNC: Reload tasks fresh from IndexedDB before computing.
+  // This eliminates the intermittent bug where a newly-added task wasn't visible in the
+  // home widget because CACHED_TASKS was stale from before the task was saved.
+  // The cache is always reloaded here (not just on render), so even if the 3s auto-render
+  // fires faster than the task-save's loadTasks() completes, this ensures the widget sees it.
+  try { CACHED_TASKS = await loadTasks(); } catch(e){ console.warn('[widget] task sync failed', e); }
 
   // §1 — Planned Study Today ────────🔵 ◇ ────────────────────────────────────────
   // Sum of every today's task whose effective credit category is 'study'.
@@ -7204,7 +7208,7 @@ async function computeStudyCompletionWidget(){
   // liveTodayStudySec() returns seconds directly.
   const completedStudySeconds = liveTodayStudySec(state);
 
-  // §3 — Remaining Study ────────────────────🔵────────────────────────────────
+  // §3 — Remaining Study ────────────────────🔵───────────��────────────────────
   // Planned − Completed. Clamped to zero; never negative.
   const remainingStudySeconds = Math.max(0, plannedStudySeconds - completedStudySeconds);
 
@@ -7302,7 +7306,7 @@ async function updateFinishByCache(){
   
   const data = await computeStudyCompletionWidget();
   if(!data){
-    // No active Goal — STATE 4: No Study Planned Today (or no goal at all)
+    // STATE 4: computeStudyCompletionWidget returned null (STATE is not ready)
     cachedFinishByText = 'NO_STUDY_PLANNED';
     return;
   }
