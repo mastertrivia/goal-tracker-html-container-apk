@@ -474,7 +474,7 @@ body.bomb-danger{background-color:#EF4444;}
   .tl-act-txt{min-width:0;}
   .tl-act-name{font-weight:700;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .tl-act-sub{font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .tl-row-dur{width:58px;flex-shrink:0;text-align:right;font-weight:700;font-size:11.5px;padding-top:3px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;gap:1px;}
+  .tl-row-dur{flex-shrink:0;text-align:right;font-weight:700;font-size:11.5px;padding-top:3px;display:flex;flex-direction:row;flex-wrap:wrap;justify-content:flex-end;align-items:baseline;gap:3px;white-space:nowrap;}
 
   /* HISTORY — Tasks tab: today's planned tasks with Completed/Not-Completed lock + comment */
   .hist-task-card{padding:16px;}
@@ -1375,7 +1375,7 @@ body.bomb-danger{background-color:#EF4444;}
           <div class="gl-chev">›</div>
         </div>
       </div>
-      <!-- 3. Telegram launcher ������� opens the dedicated full-screen Telegram Settings page -->
+      <!-- 3. Telegram launcher ������������������� opens the dedicated full-screen Telegram Settings page -->
       <div class="plain-card">
         <div class="goal-settings-launch" id="openTgSettingsBtn">
           <div class="gl-ic" style="background:linear-gradient(155deg,#2DAEF0 0%,#229ED9 100%);box-shadow:0 6px 14px rgba(34,158,217,0.28);"><svg viewBox="0 0 24 24"><path d="M21.9 3.2 1.9 10.9c-1.1.4-1.1 1.6-.2 1.9l5.1 1.6 1.9 6c.2.7 1.1.9 1.6.4l2.7-2.6 5.3 3.9c.6.4 1.4.1 1.6-.6l3.3-16.9c.2-1-.6-1.8-1.3-1.4Z" fill="#fff" stroke="none"/></svg></div>
@@ -1625,7 +1625,7 @@ body.bomb-danger{background-color:#EF4444;}
             <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Extra Study Per Day</div>
             <div class="dbg-eq dbg-formula">= Offset ÷ Effective Days Left</div>
             <div class="dbg-eq dbg-intermediate">= <span id="dbgGoalOffset2" class="dbg-dim">—</span> ÷ <span id="dbgGoalEffectiveDays" class="dbg-dim">—</span></div>
-            <div class="dbg-eq">= <span id="dbgGoalExtraPerDay" class="dbg-val">—</span> / Day</div>
+            <div class="dbg-eq">= <span id="dbgGoalExtraPerDay" class="dbg-val">��</span> / Day</div>
             <div style="margin-top:8px;"></div>
             <div class="dbg-label" style="font-weight:600;margin-bottom:5px;">Helper</div>
             <div class="dbg-eq" style="color:var(--warn,#FF9F0A);">= <span id="dbgGoalHelperText" class="dbg-val">—</span></div>
@@ -3028,6 +3028,19 @@ function fmtHM(sec){
   if(h === 0) return m+'m';
   return h+'h '+String(m).padStart(2,'0')+'m';
 }
+// Like fmtHM but appends seconds as a smaller superscript-style span — used for stopped timeline
+// entries so seconds remain visible but visually secondary to hours/minutes.
+function fmtHMSmall(sec){
+  sec = Math.max(0, Math.round(sec||0));
+  const h = Math.floor(sec/3600);
+  const m = Math.floor((sec%3600)/60);
+  const s = sec%60;
+  // Seconds rendered as a smaller inline element; the parent .tl-row-dur is a flex row with
+  // align-items:baseline so it sits on the same text baseline as the h/m part.
+  const sSpan = `<span style="font-size:0.72em;opacity:0.72;font-weight:600;">${s}s</span>`;
+  if(h === 0) return `<span>${m}m</span>${sSpan}`;
+  return `<span>${h}h ${String(m).padStart(2,'0')}m</span>${sSpan}`;
+}
 // Like fmtHM but appends seconds — used ONLY for the live running row in the History timeline.
 // Seconds disappear as soon as the session stops (the element is rebuilt without _isLive).
 function fmtHMS(sec){
@@ -3132,7 +3145,7 @@ function calcAge(dobStr){
 
 let STATE = null; // In-memory cache of the current app state (mirrors the 'meta' IndexedDB record)
 // REFACTOR v7.1 (2025-07-20): Centralized Timestamp-Driven Architecture
-// ───────────────────────────────��─────���───���─���─���─────────────────────────────────────
+// ───────────────────────────���─���─�����������─�����──���───���─���─���─────────────────────────────────────
 // ROOT FIXES:
 //  1. BOMB EXPLOSION BUG: Multiple ticks at the same boundary could trigger explosion multiple times,
 //     consuming extra time. Fixed by tracking transition (was running → now expired) instead of checking
@@ -3748,10 +3761,21 @@ async function sendManualTelegramMessage(text){
 }
 
 /* ============ CORE ENGINE ============ */
-// Calculates how much time has actually passed on a timer, accounting for any pauses
+// Calculates how much time has actually passed on a timer, accounting for any pauses.
+// WALL-CLOCK PATH (preferred): if wallStartTs is present (always set for sessions started in
+// this build), we use Date.now()-based arithmetic which survives page reloads and Android
+// process restarts — the monotonic performance.now() epoch resets on every page load, making
+// (monotonicNow() - at.startTs) return ~0 for any session that was active across a reload.
+// MONOTONIC FALLBACK: used only for old saved sessions that lack wallStartTs.
 function effectiveElapsedMs(at){
+  if(at.wallStartTs){
+    // Wall-clock path: accurate across reloads. Subtract wall-clock pause duration.
+    const now = at.pausedAt ? (at.wallPausedAt || Date.now()) : Date.now();
+    return Math.max(0, now - at.wallStartTs - (at.wallAccumulatedPauseMs||0));
+  }
+  // Legacy monotonic fallback (pre-wallStartTs sessions).
   const now = at.pausedAt || monotonicNow();
-  return now - at.startTs - (at.accumulatedPause||0);
+  return Math.max(0, now - at.startTs - (at.accumulatedPause||0));
 }
 // Calculates remaining time on any active timer (Pomodoro or Bomb) using timestamps, not a live counter
 function msRemaining(at){ return at.duration*1000 - effectiveElapsedMs(at); }
@@ -3898,7 +3922,7 @@ function commitStudySeconds(rawSec, at, context){
    Every timer interval that checks for explosion uses boundary-crossing logic:
      • STATE._bombWasTicking tracks whether the bomb was "running" last tick
      • Explosion only triggers when transitioning from (was running) to (now ≤ 0)
-     • This prevents multiple explosions if ticks pile up while the interval is suspended
+     ��� This prevents multiple explosions if ticks pile up while the interval is suspended
    
    SINGLE OWNER RULES:
    All Bomb-mode logic is owned by BombEngine; delegate functions below are THIN
@@ -4641,7 +4665,7 @@ async function recoverState(){
 // Starts a new Study/Routine/Health session. If the Bomb was running, its remaining
 // time is saved (paused), not discarded — resumed later instead of refilled.
 // `task` is the full task record (not just its name) so its persisted progress can be resumed instead
-// of restarted. The session's duration is whatever remains of the task's assigned time — never the
+// of restarted. The session's duration is whatever remains of the task's assigned time ��� never the
 // full duration again once some of it has already been consumed in an earlier session.
 async function startSession(type, task, topic){
   if(blockIfFrozen('Tasks')){ return; } // no daily session may start during Sleep Duration or a Time Inconsistency freeze
@@ -4661,7 +4685,7 @@ async function startSession(type, task, topic){
   state = STATE; // applyWakeElapsedOnStart may have mutated STATE; resync local
   // If the deduction caused an explosion, the bomb is now locked — abort starting the session.
   if(state.bombLocked){ syncFreezeReasons(state); render(); return; }
-  state.bombDormant = false; // Mode 2: the first activity has begun — hand control to the normal Bomb engine for the rest of the day
+  state.bombDormant = false; // Mode 2: the first activity has begun ��� hand control to the normal Bomb engine for the rest of the day
   ensureTaskProgressFields(task);
   const baseConsumedSec = Math.min(task.duration, task.consumedSec||0);
   const remainingSec = Math.max(0, task.duration - baseConsumedSec);
@@ -4678,6 +4702,9 @@ async function startSession(type, task, topic){
     subject: runType==='study' ? (isCreditProxy(task) ? othersLabel(task) : task.name) : null,
     topic: topic||null,
     startTs: monotonicNow(), duration: remainingSec, pausedAt:null, accumulatedPause:0,
+    segmentStartTs: monotonicNow(),
+    wallStartTs: Date.now(),        // wall-clock (Date.now) counterpart of startTs — used for addTimelineEntry so endTs-startTs gives correct duration
+    wallSegmentStartTs: Date.now(), // wall-clock counterpart of segmentStartTs — reset on every resume
     taskId: task.id, baseConsumedSec
   };
   await saveState(state);
@@ -4706,6 +4733,9 @@ async function startExtraStudySession(durationMinutes){
   state.activeTimer = {
     type:'study', task:'Extra Goal Study', subject:'Extra Goal Study', topic:null,
     startTs: monotonicNow(), duration: durationSec, pausedAt:null, accumulatedPause:0,
+    segmentStartTs: monotonicNow(),
+    wallStartTs: Date.now(),
+    wallSegmentStartTs: Date.now(),
     taskId: null, baseConsumedSec: 0, isExtraGoal: true
   };
   if(state.goal) state.goal.extraActive = true; // lets the Goals page render its live mini-countdown
@@ -4722,13 +4752,32 @@ async function pauseResumeSession(){
     // RESUME. In Bomb Mode the bomb was ticking during the pause — bank the burned time and re-freeze
     // (single owner: BombEngine.onSessionResume), then restore the activity's own pause bookkeeping.
     BombEngine.onSessionResume(state);
-    at.accumulatedPause = (at.accumulatedPause||0) + (monotonicNow() - at.pausedAt);
+    // Use wall-clock pause duration (wallPausedAt is Date.now()-based) so this remains
+    // correct across page reloads — monotonicNow() epoch resets on every page load, so
+    // (monotonicNow() - at.pausedAt) would be wrong if the app reloaded while paused.
+    const wallPauseDurMs = Date.now() - (at.wallPausedAt || Date.now());
+    const pauseDurMs = at.wallPausedAt ? wallPauseDurMs : (monotonicNow() - at.pausedAt);
+    at.accumulatedPause = (at.accumulatedPause||0) + pauseDurMs;
+    at.wallAccumulatedPauseMs = (at.wallAccumulatedPauseMs||0) + wallPauseDurMs;
     at.pausedAt = null;
+    at.wallPausedAt = null;
+    // Start a fresh timeline segment from this moment.
+    at.segmentStartTs    = monotonicNow();
+    at.wallSegmentStartTs = Date.now();
   } else {
     // PAUSE. The activity freezes, but in Bomb Mode the bomb must immediately start ticking — it
     // treats a pause exactly like the activity going inactive (single owner: BombEngine.onSessionPause).
     at.pausedAt = monotonicNow();
+    at.wallPausedAt = Date.now(); // wall-clock counterpart so effectiveElapsedMs stays accurate across reloads
     BombEngine.onSessionPause(state);
+    // Commit the completed segment to the timeline immediately, exactly as stopSession would.
+    // Use wallSegmentStartTs (Date.now()-based) — NOT segmentStartTs (performance.now()-based).
+    const segStart = at.wallSegmentStartTs || at.wallStartTs || Date.now();
+    const segEndTs = Date.now();
+    const segDurSec = Math.max(0, (segEndTs - segStart) / 1000);
+    if(segDurSec >= 1){
+      addTimelineEntry({ category: at.type, task: at.task, topic: at.topic||null, startTs: segStart, endTs: segEndTs, duration: segDurSec });
+    }
   }
   await syncActiveTaskProgress(state); // checkpoint the task's consumed/remaining time on every pause/resume
   await saveState(state);
@@ -4745,7 +4794,10 @@ async function stopSession(){
   const endTs = Date.now();
   const actualDurationSec = commitStudySeconds(effectiveElapsedMs(at)/1000, at, 'stopSession'); // Pillar 3: strict gate before banking to Timeline/Hour Streak/Daily Study
   if(actualDurationSec > 0){
-    await addTimelineEntry({ category: at.type, task: at.task, topic: at.topic||null, startTs: at.startTs, endTs, duration: actualDurationSec });
+    // Use wallStartTs (Date.now()-based) not startTs (performance.now()-based) so the timeline entry
+    // has correct wall-clock timestamps. endTs - wallStartTs gives the true elapsed duration in ms.
+    const wallStart = at.wallStartTs || endTs - actualDurationSec * 1000;
+    await addTimelineEntry({ category: at.type, task: at.task, topic: at.topic||null, startTs: wallStart, endTs, duration: actualDurationSec });
   }
   await syncActiveTaskProgress(state); // save exactly how much of the task was consumed so it resumes correctly next time
   // Bank the partial Study time BEFORE the bomb re-arms, so the Hour Streak progress, the Lifeline
@@ -5495,7 +5547,11 @@ function renderHome(){
       }
       document.getElementById('pomoTime').textContent = fmtClock(remain/1000);
       const _prc = document.getElementById('pomoRunCountdown'); if(_prc) _prc.textContent = fmtClock(remain/1000); // live History Log countdown — reuses this tick, no extra timer
-      const _liveSec = sessionElapsedSec(at);
+      // Use wallSegmentStartTs (Date.now()-based, reset on every resume) so the live History row
+      // shows only the current segment's elapsed time, matching buildFullDayTimeline exactly.
+      // segmentStartTs is performance.now()-based and must NOT be subtracted from Date.now().
+      const _segStart = at.wallSegmentStartTs || at.wallStartTs || at.startTs;
+      const _liveSec = Math.max(0, (Date.now() - _segStart) / 1000);
       // When the session is paused and the bomb is live, hist-live-dur belongs to the bomb entry
       // (buildFullDayTimeline excludes paused sessions from having a live entry). Do NOT overwrite it
       // with the frozen session elapsed time — updateBombCardLive() handles it correctly above.
@@ -5724,9 +5780,11 @@ function fillGap(gs, ge, sleeps, bombOn, bombArmTs, bombDurationMs, bombAlive){
       return [{category:'noact', task:'Idle', topic:'No Activity', startTs:s, endTs:e, duration:(e-s)/1000, synthetic:true}];
     }
     // Bomb is armed and this segment is within its active window.
-    // If the bomb is still alive it owns the entire segment — no Idle may co-exist.
-    // If the bomb already exploded we cap at bombDurationMs from the segment start; the overflow is Idle.
-    const bombEndMs = (bombAlive || bombDurationMs <= 0) ? e : Math.min(s + bombDurationMs, e);
+    // Cap the bomb segment at bombDurationMs regardless of whether the bomb is still alive.
+    // bombAlive only means the bomb hasn't exploded *yet at render time* — it does NOT mean a single
+    // gap can be longer than the bomb duration. A 40-minute gap with a 20-minute bomb must show
+    // 20min bomb + 20min idle. Without this cap the entire gap rendered as bomb (the 40-min bug).
+    const bombEndMs = (bombDurationMs <= 0) ? e : Math.min(s + bombDurationMs, e);
     // bombRemSec for the history renderer "-MM:SS" annotation.
     // When alive: remaining time at render time (bombDurationMs already holds STATE.bombRemainingMs).
     // When exploded: 0 (clock ran out).
@@ -5809,7 +5867,8 @@ function buildFullDayTimeline(entries){
     const end   = Math.min(e.endTs,   windowEnd);
     if(end <= start) continue; // entry fully outside window after clamping
     if(start - cursor > GAP_THRESHOLD_MS){
-      // Mid-day gap: bomb was running through it (bombAlive) — the entire gap is bomb, never idle.
+      // Mid-day gap: bomb was running through this idle stretch. Cap is still applied at bombDurationMs
+      // so a long gap (e.g. 40 min) only shows bombDurationMs of bomb then idle for the overflow.
       full.push(...fillGap(cursor, start, sleeps, bombOn, bombArmTs, bombDurationMs, bombAlive));
     }
     // Push entry, clamped to the day window
@@ -5817,10 +5876,29 @@ function buildFullDayTimeline(entries){
     cursor = Math.max(cursor, end);
   }
 
-  // Fill trailing gap up to windowEnd. When locked, bombArmTs is nulled so the entire stretch is Idle
-  // (post-explosion). When alive, bombAlive=true so the whole trailing stretch is bomb.
-  if(windowEnd - cursor > GAP_THRESHOLD_MS){
-    full.push(...fillGap(cursor, windowEnd, sleeps, bombOn, bombLockedNow ? null : bombArmTs, bombDurationMs, bombAlive));
+  // Detect a currently-running (non-paused, non-bomb) session BEFORE filling the trailing gap.
+  // The current segment owns [segmentStartTs → now]; the bomb must NOT overlap that interval.
+  // segmentStartTs is reset to monotonicNow() on every resume, so the bomb cap is always tight
+  // to the current run's start — not the original startTs from before the first pause.
+  const _at = STATE && STATE.activeTimer;
+  // Activity timers never carry a .state field (only bomb timers do); checking type and pausedAt is sufficient.
+  const _liveRunning = _at && _at.type !== 'bomb' && !_at.pausedAt;
+  // Use wallSegmentStartTs (Date.now()-based, reset on resume) so the bomb only fills up to where
+  // the current wall-clock segment began. segmentStartTs is performance.now()-based and must NOT
+  // be compared against cursor (which is a Date.now()-based Unix timestamp).
+  const _liveSegStart = _liveRunning ? (_at.wallSegmentStartTs || _at.wallStartTs || Date.now()) : null;
+  const _trailingEnd = (_liveRunning && _liveSegStart > cursor) ? _liveSegStart : windowEnd;
+
+  // Fill trailing gap up to _trailingEnd (or the live session's segmentStartTs when one is running).
+  // When locked, bombArmTs is nulled so the entire stretch is Idle (post-explosion).
+  // When bombAlive is true the bomb is STILL RUNNING right now, so the entire trailing gap belongs
+  // to the bomb — no duration cap applies. Pass the gap length itself as bombDurationMs so
+  // Math.min(s + bombDurationMs, e) == e and no phantom Idle is appended beyond the bomb segment.
+  // (The cap in fillGap is for HISTORICAL mid-day gaps where we know the bomb has a fixed length;
+  // for the live trailing gap the bomb owns every second up to now.)
+  if(_trailingEnd - cursor > GAP_THRESHOLD_MS){
+    const _trailingBombDur = bombAlive ? (_trailingEnd - cursor + 1) : bombDurationMs;
+    full.push(...fillGap(cursor, _trailingEnd, sleeps, bombOn, bombLockedNow ? null : bombArmTs, _trailingBombDur, bombAlive));
   }
 
   // Live running entry: if a non-bomb session is active and not in review, append a synthetic entry
@@ -5828,18 +5906,20 @@ function buildFullDayTimeline(entries){
   // A paused session is not "running" for display purposes — treat it as stopped so its endTs freezes
   // and truly active timers (the bomb, another running activity) appear at the top of the timeline.
   // duration is recalculated each render via sessionElapsedSec — the 1s tick updates only the text node.
-  const _at = STATE && STATE.activeTimer;
-  if(_at && _at.type !== 'bomb' && _at.state !== 'REVIEW_PENDING' && _at.state !== 'IDLE' && !_at.pausedAt){
-    const liveElapsed = sessionElapsedSec(_at);
-    if(liveElapsed > 0){
+  if(_liveRunning){
+    // Use wallSegmentStartTs (Date.now()-based, reset on every resume) as startTs for the live entry.
+    // segmentStartTs is performance.now()-based and cannot be used as a wall-clock timestamp here.
+    const _wallSeg = _at.wallSegmentStartTs || _at.wallStartTs || Date.now();
+    const _segElapsed = Math.max(0, (Date.now() - _wallSeg) / 1000);
+    if(_segElapsed > 0){
       full.push({
         category: _at.type,
-        task:      _at.subject || '',
+        task:      _at.task || _at.subject || '',
         topic:     _at.topic   || '',
-        startTs:   _at.startTs,
+        startTs:   _wallSeg,
         endTs:     Date.now(),
-        duration:  liveElapsed,
-        _isLive:   true   // sentinel so the tick can find and update just the duration text
+        duration:  _segElapsed,
+        _isLive:   true
       });
     }
   }
@@ -6003,7 +6083,18 @@ async function renderTimeline(){
         <div class="tl-act-ic" style="background:${HIST_COLOR_LIGHT[cat]};color:${HIST_COLOR[cat]}">${HIST_ICON[cat]}</div>
         <div class="tl-act-txt"><div class="tl-act-name">${escapeHtml(name)}</div><div class="tl-act-sub">${escapeHtml(sub)}${tot}</div><div style="font-size:11px;color:var(--text-dim);margin-top:2px;">🕐 ${fmtTimeOfDay(e.startTs)} - ${fmtTimeOfDay(e.endTs)}</div></div>
       </div>
-      <div class="tl-row-dur"${e._isLive ? ' id="hist-live-dur"' : ''} style="color:${HIST_COLOR[cat]}">${e._isLive ? fmtHMS(e.duration) : fmtHM(e.duration)}${(!e._isLive && cat === 'bomb' && e.bombRemSec != null) ? `<div style="font-size:10.5px;color:#888;font-weight:400;">-${fmtMSS(e.bombRemSec)}</div>` : ''}</div>
+      <div class="tl-row-dur" style="color:${HIST_COLOR[cat]}">${
+        e._isLive && cat === 'bomb'
+          // Live bomb: elapsed in a named span so the tick can update it without clobbering the
+          // remaining-time child. hist-live-rem is the id the tick updater already queries.
+          ? `<span id="hist-live-dur">${fmtHMS(e.duration)}</span><div style="font-size:10.5px;color:#888;font-weight:400;flex-basis:100%;text-align:right;" id="hist-live-rem">-${fmtMSS(e.bombRemSec != null ? e.bombRemSec : 0)}</div>`
+        : e._isLive
+          // Live non-bomb: single span, ticked as before
+          ? `<span id="hist-live-dur">${fmtHMS(e.duration)}</span>`
+        : fmtHMSmall(e.duration)
+          // Stopped bomb: remaining time on second line
+          + (cat === 'bomb' && e.bombRemSec != null ? `<div style="font-size:10.5px;color:#888;font-weight:400;flex-basis:100%;text-align:right;">-${fmtMSS(e.bombRemSec)}</div>` : '')
+      }</div>
     </div>`;
   }).join('');
 }
@@ -6063,10 +6154,12 @@ function renderTimelineGrouped(full, wrap, bombStatHtml){
     const liveEntryDur = groupHasLive ? (visibleEntries.find(e => e._isLive) || {}).duration || 0 : 0;
     const committedGroupSec = g.totalSec - liveEntryDur;
     const groupDurId = groupHasLive ? ` id="hist-live-act-dur" data-committed-sec="${committedGroupSec}"` : '';
-    // When live: stamp committedGroupSec as the stable base — updateBombCardLive() adds the live
-    // delta on every tick. Using g.totalSec here would cause the group row to oscillate between
-    // the ticked value and the re-rendered snapshot value, producing the visible flicker.
-    const groupDurDisplay = groupHasLive ? fmtHM(committedGroupSec) : fmtHM(g.totalSec);
+    // Always render g.totalSec (committed + live snapshot at render time) as the initial display.
+    // The tick will overwrite this 500ms later with a marginally newer value; since fmtHM rounds
+    // to whole minutes, both values produce the same string in almost every case — no visible flicker.
+    // The old approach of rendering committedGroupSec and waiting for the tick to add the live delta
+    // caused a stale number to blink in every ~3 s whenever render() rebuilt the DOM.
+    const groupDurDisplay = fmtHM(g.totalSec);
     return `<div class="tl-act-group${isOpen ? ' expanded' : ''}" data-actkey="${escapeHtml(g.name + cat)}">
       <div class="tl-act-group-row">
         <div class="tl-act-group-chev" data-groupkey="${escapeHtml(g.name + cat)}" style="color:${HIST_COLOR[cat]};font-size:18px">▸</div>
@@ -7202,7 +7295,7 @@ async function computeStudyCompletionWidget(){
   // Others tasks configured as "Count as Study". Returns seconds directly.
   const plannedStudySeconds = homeDayTargetSec();
 
-  // §2 🔵 Completed Study ────────────—────────────────────────────────────────
+  // §2 🔵 Completed Study ────────────—─────────���──────────────────────────────
   // Committed sessions banked in dailyStudySeconds plus the live running session
   // delta. Continuously increases while the user is actively studying.
   // liveTodayStudySec() returns seconds directly.
@@ -7219,7 +7312,7 @@ async function computeStudyCompletionWidget(){
   // Now accounts for live session delta to prevent false "time decay" while running.
   const remainingNonStudySeconds = effectiveRemainingNonStudySec(STATE);
 
-  // §5 — Lost Time ─────────────────────────────────────────📚─────────────────
+  // §5 — Lost Time ────────��────────────────────────────────📚─────────────────
   // Bomb + Inactivity time already consumed today. Irreversible; shrinks the
   // available window. Uses existing buildFullDayTimeline path unchanged.
   const tlEntries = await getTimelineEntries(); // uses in-memory cache; invalidated on every write
@@ -7729,7 +7822,7 @@ function secToHHMM(sec){ const m=Math.round(sec/60); return Math.floor(m/60)+':'
   // Split-duration helpers: write seconds into the HH/MM boxes and read them back
   function setDurInputs(sec){ const m=Math.round((sec||0)/60); const hh=document.getElementById('taskDurHH'), mm=document.getElementById('taskDurMM'); if(hh) hh.value=String(Math.floor(m/60)).padStart(2,'0'); if(mm) mm.value=String(m%60).padStart(2,'0'); }
   function getDurSec(){ const h=parseInt(document.getElementById('taskDurHH').value,10)||0; const mi=parseInt(document.getElementById('taskDurMM').value,10)||0; return (h*60+mi)*60; }
-  // Reject invalid values while typing (HH 00–24, MM 00–59, digits only)
+  // Reject invalid values while typing (HH 00��24, MM 00–59, digits only)
   (function(){
     const hh=document.getElementById('taskDurHH'), mm=document.getElementById('taskDurMM');
     if(hh) hh.addEventListener('input', function(){ let v=this.value.replace(/\D/g,'').slice(0,2); if(v!=='' && parseInt(v,10)>24) v='24'; this.value=v; });
@@ -7977,7 +8070,7 @@ function showSleepPopup(feature){
   document.getElementById('editLockedNextDate').textContent = hourLabel(getWakeHour());
   document.getElementById('editLockedOverlay').classList.add('show');
 }
-// ── TIME INCONSISTENCY dialog + resume ────────────🔵──────────🔵───────────────
+// ── TIME INCONSISTENCY dialog + resume ────────────🔵──────────🔵───��───────────
 // Shared action gate: blocks a timer action while frozen for ANY reason and shows the right popup.
 function blockIfFrozen(feature){
   syncFreezeReasons(STATE); // consult the central Freeze Manager (same conditions, same order)
@@ -8940,7 +9033,7 @@ const AND = {
   }
 };
 
-// ─── Monotonic clock ───────🔵────────��─────────────────��─────────────────────────
+// ─── Monotonic clock ───────🔵────────��─────────────────��───���─────────────────────
 // Replaces Date.now() as the source of truth for all elapsed-time anchors
 // (timer startTs, pausedAt, bombTickTs). Calendar timestamps (history records,
 // wake/sleep times, alarm scheduling, daily-reset comparisons) continue to use
@@ -8987,7 +9080,7 @@ function monotonicNow(){
   // Browser fallback: performance.now() delta from the load-time anchor.
   return _monoAnchor.wall + (performance.now() - _monoAnchor.perf);
 }
-// ───────────────────���───────────────────🔵─────────────────────────────��──────────
+// ───────────────────�����───────────────���───🔵─────────────────────────────��──────────
 
 // HTML-side Android preferences (native flags cover the rest). Stored inside
 // STATE.settings.android so they ride along with normal state persistence + backup.
