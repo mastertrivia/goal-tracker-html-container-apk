@@ -3145,7 +3145,7 @@ function calcAge(dobStr){
 
 let STATE = null; // In-memory cache of the current app state (mirrors the 'meta' IndexedDB record)
 // REFACTOR v7.1 (2025-07-20): Centralized Timestamp-Driven Architecture
-// ───────────────────────────���─���─�����������─�����──���───���─���─���─────────────────────────────────────
+// ───────────────────────────���─���─�����������─�����──���───���─���─���───────────���─────────────────────────
 // ROOT FIXES:
 //  1. BOMB EXPLOSION BUG: Multiple ticks at the same boundary could trigger explosion multiple times,
 //     consuming extra time. Fixed by tracking transition (was running → now expired) instead of checking
@@ -3347,7 +3347,7 @@ async function ensureDefaultTasks(){
   const defaults = [
     {category:'study', name:'Maths', duration:30*60, icon:'📖', color:'#5B4FE8'},
     {category:'study', name:'Reasoning', duration:30*60, icon:'📖', color:'#5B4FE8'},
-    {category:'study', name:'English', duration:30*60, icon:'📖', color:'#5B4FE8'},
+    {category:'study', name:'English', duration:30*60, icon:'������', color:'#5B4FE8'},
     {category:'study', name:'G.K.', duration:30*60, icon:'📖', color:'#5B4FE8'},
     {category:'routine', name:'Bathing', duration:20*60, icon:'🚿', color:'#22C55E'},
     {category:'routine', name:'Breakfast', duration:20*60, icon:'🍳', color:'#22C55E'},
@@ -4670,14 +4670,34 @@ async function recoverState(){
 async function startSession(type, task, topic){
   if(blockIfFrozen('Tasks')){ return; } // no daily session may start during Sleep Duration or a Time Inconsistency freeze
   let state = await getState();
-  if(state.activeTimer && state.activeTimer.type==='bomb'){
-    // CENTRALIZED: Use BombEngine to pause the bomb clock instead of inline calculation
-    state.bombRemainingMs = Math.max(0, BombEngine.liveRemainingMs(state)); // pause the bomb clock, don't discard it
-    // FIX: write the banked bomb value into STATE immediately so the resync below (state = STATE)
-    // does not overwrite it with the stale last-saved value. applyWakeElapsedOnStart is a no-op for
-    // Mode 2 and for subsequent START presses, so without this line the live remaining value computed
-    // above was silently discarded whenever state = STATE ran after a no-op call.
-    STATE.bombRemainingMs = state.bombRemainingMs;
+  if(state.activeTimer){
+    const _prev = state.activeTimer;
+    const _prevEndTs = Date.now();
+    if(_prev.type === 'bomb'){
+      // Bank the bomb clock and write the bomb segment to the timeline.
+      state.bombRemainingMs = Math.max(0, BombEngine.liveRemainingMs(state));
+      STATE.bombRemainingMs = state.bombRemainingMs;
+      const _bombStartTs = _prev.wallStartTs || _prevEndTs;
+      const _bombDurSec = Math.max(0, (_prevEndTs - _bombStartTs) / 1000);
+      if(_bombDurSec >= 1){
+        // bombRemSec is already banked into state.bombRemainingMs above — snapshot it permanently.
+        await addTimelineEntry({ category: 'bomb', task: 'Bomb', startTs: _bombStartTs, endTs: _prevEndTs, duration: _bombDurSec, bombRemSec: state.bombRemainingMs / 1000 });
+      }
+    } else {
+      // A non-bomb activity is currently running (or paused). Commit the current segment exactly
+      // as stopSession does — wallSegmentStartTs is the start of this segment (reset on every resume).
+      // Any prior segments were already committed by pauseResumeSession when the user paused.
+      if(!_prev.pausedAt){
+        // Only commit if it is actually running (not already paused — pausing already committed it).
+        const _segStart = _prev.wallSegmentStartTs || _prev.wallStartTs || _prevEndTs;
+        const _segDurSec = Math.max(0, (_prevEndTs - _segStart) / 1000);
+        if(_segDurSec >= 1){
+          await addTimelineEntry({ category: _prev.type, task: _prev.task, topic: _prev.topic||null, startTs: _segStart, endTs: _prevEndTs, duration: _segDurSec });
+        }
+      }
+      // Bank any bomb time that burned during this activity's pause (if it was paused).
+      BombEngine.bankBombClockFromPause(state);
+    }
   }
   // MODE 1 WAKE DEDUCTION: deduct elapsed time since Wake-up on the very first START press of the day.
   // applyWakeElapsedOnStart is idempotent (once per study day) and a no-op for Mode 2.
@@ -4718,11 +4738,27 @@ async function startSession(type, task, topic){
 // exactly the signal syncActiveTaskProgress() already uses to skip per-task bookkeeping.
 async function startExtraStudySession(durationMinutes){
   let state = await getState();
-  if(state.activeTimer && state.activeTimer.type==='bomb'){
-    // CENTRALIZED: Use BombEngine to pause the bomb clock instead of inline calculation
-    state.bombRemainingMs = Math.max(0, BombEngine.liveRemainingMs(state));
-    // FIX: mirror into STATE before the resync (same fix as startSession — see comment there).
-    STATE.bombRemainingMs = state.bombRemainingMs;
+  if(state.activeTimer){
+    const _prev = state.activeTimer;
+    const _prevEndTs = Date.now();
+    if(_prev.type === 'bomb'){
+      state.bombRemainingMs = Math.max(0, BombEngine.liveRemainingMs(state));
+      STATE.bombRemainingMs = state.bombRemainingMs;
+      const _bombStartTs = _prev.wallStartTs || _prevEndTs;
+      const _bombDurSec = Math.max(0, (_prevEndTs - _bombStartTs) / 1000);
+      if(_bombDurSec >= 1){
+        await addTimelineEntry({ category: 'bomb', task: 'Bomb', startTs: _bombStartTs, endTs: _prevEndTs, duration: _bombDurSec, bombRemSec: state.bombRemainingMs / 1000 });
+      }
+    } else {
+      if(!_prev.pausedAt){
+        const _segStart = _prev.wallSegmentStartTs || _prev.wallStartTs || _prevEndTs;
+        const _segDurSec = Math.max(0, (_prevEndTs - _segStart) / 1000);
+        if(_segDurSec >= 1){
+          await addTimelineEntry({ category: _prev.type, task: _prev.task, topic: _prev.topic||null, startTs: _segStart, endTs: _prevEndTs, duration: _segDurSec });
+        }
+      }
+      BombEngine.bankBombClockFromPause(state);
+    }
   }
   // MODE 1 WAKE DEDUCTION: same first-START deduction as startSession — Extra Study also counts as first activity.
   await BombEngine.applyWakeElapsedOnStart(state);
@@ -4794,9 +4830,11 @@ async function stopSession(){
   const endTs = Date.now();
   const actualDurationSec = commitStudySeconds(effectiveElapsedMs(at)/1000, at, 'stopSession'); // Pillar 3: strict gate before banking to Timeline/Hour Streak/Daily Study
   if(actualDurationSec > 0){
-    // Use wallStartTs (Date.now()-based) not startTs (performance.now()-based) so the timeline entry
-    // has correct wall-clock timestamps. endTs - wallStartTs gives the true elapsed duration in ms.
-    const wallStart = at.wallStartTs || endTs - actualDurationSec * 1000;
+    // Use wallSegmentStartTs — the wall-clock start of the CURRENT segment (reset on every resume).
+    // pauseResumeSession already committed all prior segments, each with their own wallSegmentStartTs.
+    // Using wallStartTs here would create an entry spanning the entire session (original start → now),
+    // which overlaps every already-committed segment and makes bomb entries between them disappear.
+    const wallStart = at.wallSegmentStartTs || at.wallStartTs || endTs - actualDurationSec * 1000;
     await addTimelineEntry({ category: at.type, task: at.task, topic: at.topic||null, startTs: wallStart, endTs, duration: actualDurationSec });
   }
   await syncActiveTaskProgress(state); // save exactly how much of the task was consumed so it resumes correctly next time
@@ -4839,7 +4877,11 @@ async function submitReview(focus, energy, mood, notes){
   };
   const sessionId = await idbPut('sessions', session);
   session.id = sessionId;
-  await addTimelineEntry({ category:'study', task: at.subject, topic: at.topic, startTs: at.startTs, endTs, duration: actualDuration });
+  // Use wallSegmentStartTs (wall-clock, reset on every resume) — not at.startTs which is monotonicNow()-based
+  // and wrong across reloads. A completed Pomodoro has no prior pause-committed segments so wallSegmentStartTs
+  // equals wallStartTs here, but using wallSegmentStartTs is consistent with every other commit path.
+  const _reviewSegStart = at.wallSegmentStartTs || at.wallStartTs || endTs - actualDuration * 1000;
+  await addTimelineEntry({ category:'study', task: at.subject, topic: at.topic, startTs: _reviewSegStart, endTs, duration: actualDuration });
 
   // Updates today's streak and lifetime totals
   state.completedPomodorosToday += 1;
@@ -5899,6 +5941,18 @@ function buildFullDayTimeline(entries){
   if(_trailingEnd - cursor > GAP_THRESHOLD_MS){
     const _trailingBombDur = bombAlive ? (_trailingEnd - cursor + 1) : bombDurationMs;
     full.push(...fillGap(cursor, _trailingEnd, sleeps, bombOn, bombLockedNow ? null : bombArmTs, _trailingBombDur, bombAlive));
+    // When a non-bomb activity is running and the bomb is alive, fillGap receives
+    // (_trailingEnd - cursor) as bombDurationMs — the gap length, NOT the remaining time.
+    // That causes the trailing bomb entry's bombRemSec to show the elapsed gap duration
+    // instead of the true countdown. Fix it here by stamping the correct live remaining.
+    if(bombAlive && _liveRunning){
+      for(let _j = full.length - 1; _j >= 0; _j--){
+        if(full[_j].category === 'bomb' && full[_j].synthetic){
+          full[_j] = { ...full[_j], bombRemSec: bombLiveRemainingMs(STATE) / 1000 };
+          break;
+        }
+      }
+    }
   }
 
   // Live running entry: if a non-bomb session is active and not in review, append a synthetic entry
@@ -5943,7 +5997,7 @@ function buildFullDayTimeline(entries){
       for(let _i = full.length - 1; _i >= 0; _i--){
         if(full[_i].category === 'bomb' && full[_i].synthetic){
           // bombRemSec here is the LIVE remaining (decreasing) — updated each tick via updateBombCardLive.
-          full[_i] = { ...full[_i], duration: liveElapsedSec, endTs: Date.now(), _isLive: true, bombRemSec: _bombCapMs / 1000 };
+          full[_i] = { ...full[_i], duration: liveElapsedSec, endTs: Date.now(), _isLive: true, bombRemSec: bombLiveRemainingMs(STATE) / 1000 };
           break;
         }
       }
@@ -7210,7 +7264,7 @@ async function computeGoalMetrics(){
   if(started && offset < 0){
     const _w = await computeStudyCompletionWidget();
     if(_w){
-      // freeCapacitySeconds: Remaining Day − Remaining Non-Study (lost time NOT subtracted).
+      // freeCapacitySeconds: Remaining Day ��� Remaining Non-Study (lost time NOT subtracted).
       const availableHours = _w.freeCapacitySeconds / 3600;
       const hoursBehind    = -offset; // offset < 0, so negating gives positive magnitude
       liveStatus = hoursBehind <= availableHours ? 'canRecover' : 'delayed';
@@ -7295,7 +7349,7 @@ async function computeStudyCompletionWidget(){
   // Others tasks configured as "Count as Study". Returns seconds directly.
   const plannedStudySeconds = homeDayTargetSec();
 
-  // §2 🔵 Completed Study ────────────—─────────���──────────────────────────────
+  // §2 🔵 Completed Study ────────────—─────────���────────────────────────────��─
   // Committed sessions banked in dailyStudySeconds plus the live running session
   // delta. Continuously increases while the user is actively studying.
   // liveTodayStudySec() returns seconds directly.
@@ -8802,7 +8856,7 @@ document.getElementById('tgSendDemoBtn').onclick = async ()=>{
   const btn = document.getElementById('tgSendDemoBtn');
   const tmpl = document.getElementById('setTgTemplate').value || DEFAULT_REPORT_TEMPLATE;
   const demoState = Object.assign({}, STATE, {settings: Object.assign({}, STATE.settings, {telegramReportTemplate: tmpl})});
-  const prev = btn.textContent; btn.disabled = true; btn.textContent = 'Sending…';
+  const prev = btn.textContent; btn.disabled = true; btn.textContent = 'Sending���';
   try{
     const text = await buildDailyReport(demoState, appDayKey());
     const ok = await telegramApiSend(token, chatId, text);
