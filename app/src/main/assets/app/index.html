@@ -291,6 +291,14 @@ body.bomb-danger{background-color:#EF4444;}
   .ca-card.idle.bomblock .ca-status-ic{background:rgba(239,68,68,0.14);}
   .ca-card.idle.bomblock .ca-status-title{color:var(--red);}
   .ca-card.idle.bomblock .ca-verify-btn{background:linear-gradient(155deg,#FF6B6B 0%,var(--red) 100%);box-shadow:0 6px 16px rgba(239,68,68,0.30);}
+  /* GOOD MORNING lock state — warm golden palette, same card shell */
+  .ca-card.idle.morning .ca-status{background:#FFFBEB;border-color:rgba(245,166,35,0.28);}
+  .ca-card.idle.morning .ca-status-ic{background:rgba(245,166,35,0.18);}
+  .ca-card.idle.morning .ca-status-title{color:var(--text);font-size:20px;line-height:1.15;font-weight:800;}
+  .ca-card.idle.morning .ca-status-sub{color:var(--text-dim);font-size:8.5px;font-weight:400;line-height:1.35;margin-top:1px;opacity:.7;}
+  .ca-card.idle.morning .ca-morning-date{display:block;font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;color:var(--text);margin-bottom:2px;letter-spacing:-0.01em;}
+  .ca-card.idle.morning .ca-verify-btn{background:linear-gradient(155deg,#FFD048 0%,var(--orange) 100%);box-shadow:0 6px 16px rgba(245,166,35,0.38);color:#1B1740;font-size:14px;font-weight:800;padding:6px 28px;border-radius:14px;}
+  .ca-card.idle.morning .ca-verify-btn:active{transform:scale(0.96);}
   .ca-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
   /* Badge/chip label with a small pulsing red status dot, matching the Running indicator language */
   .ca-title{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:0.06em;color:var(--red);background:var(--primary-light);padding:3px 10px;border-radius:999px;}
@@ -3241,6 +3249,7 @@ async function getState(){
   // Pomodoro Log (History → Study Task Progress) — daily, local-only reflections per Study task.
   // Isolated from Goals / Telegram / streaks / completion formulas. Shape: {taskId:[{n,comment,mood,saved}]}
   if(s.pomoLogs===undefined) s.pomoLogs = {};
+  if(s.morningUnlockedKey===undefined) s.morningUnlockedKey = null; // null = not yet unlocked today; set to studyDayKey() on Unlock press
   if(s.studyDayTotals===undefined) s.studyDayTotals = {}; // Goal Progress Bank — per-day Study seconds of finished days (see recoverState)
   if(s.goal===undefined) s.goal = null;
   if(s.goal){
@@ -4340,8 +4349,14 @@ function armBomb(state){ BombEngine.arm(state); }
 // Rule: the Bomb must be on immediately whenever no productive timer is running.
 async function completeNonStudySession(state){
   const at = state.activeTimer;
-  const endTs = at.startTs + (at.accumulatedPause||0) + at.duration*1000;
-  const entry = { category: at.type, task: at.task, startTs: at.startTs, endTs, duration: at.duration };
+  // FIX: at.startTs is monotonicNow()/performance.now() — a different epoch to Date.now().
+  // addTimelineEntry dedup checks exact startTs equality; startSession writes with
+  // wallSegmentStartTs (wall-clock). Using the old at.startTs caused the two records to
+  // have completely different startTs values, bypassing dedup and writing two IDB entries.
+  // reconcileDailyStudySeconds then sums both, doubling time across all counters.
+  const _wallStart = at.wallSegmentStartTs || at.wallStartTs || Date.now();
+  const endTs = _wallStart + at.duration * 1000;
+  const entry = { category: at.type, task: at.task, startTs: _wallStart, endTs, duration: at.duration };
   await addTimelineEntry(entry);
   await syncActiveTaskProgress(state); // task just hit 100% — persist the checkpoint before the Bomb re-arms
   armBomb(state);
@@ -4687,7 +4702,13 @@ async function startSession(type, task, topic){
       // A non-bomb activity is currently running (or paused). Commit the current segment exactly
       // as stopSession does — wallSegmentStartTs is the start of this segment (reset on every resume).
       // Any prior segments were already committed by pauseResumeSession when the user paused.
-      if(!_prev.pausedAt){
+      // FIX: Do NOT commit a segment for a REVIEW_PENDING Pomodoro. submitReview() is the
+      // sole authority for writing the final timeline entry of a completed Pomodoro.
+      // Writing here (endTs=now) AND submitReview() writing later (endTs=review-submit time,
+      // minutes apart) produces two IDB records the 1-second dedup window cannot catch.
+      // reconcileDailyStudySeconds sums all IDB entries — so streak, goals, and every
+      // widget that reads dailyStudySeconds or hourStreakSec doubles the Pomodoro's duration.
+      if(!_prev.pausedAt && _prev.state !== 'REVIEW_PENDING'){
         // Only commit if it is actually running (not already paused — pausing already committed it).
         const _segStart = _prev.wallSegmentStartTs || _prev.wallStartTs || _prevEndTs;
         const _segDurSec = Math.max(0, (_prevEndTs - _segStart) / 1000);
@@ -4750,7 +4771,8 @@ async function startExtraStudySession(durationMinutes){
         await addTimelineEntry({ category: 'bomb', task: 'Bomb', startTs: _bombStartTs, endTs: _prevEndTs, duration: _bombDurSec, bombRemSec: state.bombRemainingMs / 1000 });
       }
     } else {
-      if(!_prev.pausedAt){
+      // FIX: Same REVIEW_PENDING guard as startSession — submitReview() owns that write.
+      if(!_prev.pausedAt && _prev.state !== 'REVIEW_PENDING'){
         const _segStart = _prev.wallSegmentStartTs || _prev.wallStartTs || _prevEndTs;
         const _segDurSec = Math.max(0, (_prevEndTs - _segStart) / 1000);
         if(_segDurSec >= 1){
@@ -5173,8 +5195,23 @@ function applyLabels(){
 
 /* ============ CURRENT ACTIVITY CARD ============ */
 // Inline SVG illustrations for the idle states (STATE 3 = No Task, STATE 4 = Sleep Mode)
-const CA_NOTASK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="5.64" y1="5.64" x2="18.36" y2="18.36"/></svg>';
-const CA_MOON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#5B4FE8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8 8 0 0 1 9.4 3.5a8 8 0 1 0 11.1 11.1z" fill="rgba(91,79,232,0.18)"/><path d="M17 3l.7 1.8L19.5 5.5l-1.8.7L17 8l-.7-1.8L14.5 5.5l1.8-.7z" fill="#F5A623" stroke="none"/></svg>';
+  const CA_NOTASK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="5.64" y1="5.64" x2="18.36" y2="18.36"/></svg>';
+  const CA_MOON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#5B4FE8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8 8 0 0 1 9.4 3.5a8 8 0 1 0 11.1 11.1z" fill="rgba(91,79,232,0.18)"/><path d="M17 3l.7 1.8L19.5 5.5l-1.8.7L17 8l-.7-1.8L14.5 5.5l1.8-.7z" fill="#F5A623" stroke="none"/></svg>';
+  // GOOD MORNING LOCK — premium filled golden padlock SVG matching the reference lock-screen icon
+  const CA_LOCK_SVG = '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="3" fill="#F5A623"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#5A3A00" stroke-width="2.2" fill="none" stroke-linecap="round"/><circle cx="12" cy="16.5" r="1.6" fill="#5A3A00"/><rect x="11.2" y="16.5" width="1.6" height="2.2" rx=".8" fill="#5A3A00"/></svg>';
+  // Returns formatted "Day, DD Month" string for the Good Morning card subtitle date line
+  function getMorningDateLine(){
+    const now = new Date();
+    const day = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()];
+    const d = now.getDate();
+    const mon = ['January','February','March','April','May','June','July','August','September','October','November','December'][now.getMonth()];
+    return day+',  '+d+' '+mon;
+  }
+  // True when the Good Morning gate should be showing (not yet unlocked for today's study day)
+  function isGoodMorningLocked(){
+    if(!STATE) return false;
+    return STATE.morningUnlockedKey !== studyDayKey();
+  }
 
 // Compact duration label for progress chips, e.g. "30m" or "1h 15m"
 function fmtChipDur(sec){ const m=Math.round(sec/60); return m>=60 ? (Math.floor(m/60)+'h'+(m%60?' '+(m%60)+'m':'')) : m+'m'; }
@@ -5225,11 +5262,13 @@ function renderCurrentActivity(){
   // Sleep Mode is the highest-priority state: while active, the card always shows the
   // existing Sleep Mode view and ignores whether a Study/Pomodoro task is running.
   // Bomb Explosion (BOMB_LOCK) takes top priority so the explosion is acknowledged before anything else.
+  // Good Morning gate sits between Bomb and Sleep in priority.
   const bombLocked = FreezeManager.has(FREEZE.BOMB_LOCK);
-  const sleepingNow = !bombLocked && isSleepActive();
-  const running = !bombLocked && !sleepingNow && at && at.type!=='bomb' && !(at.type==='pomodoro' && at.state==='REVIEW_PENDING');
+  const morningGate = !bombLocked && isGoodMorningLocked() && !isSleepActive();
+  const sleepingNow = !bombLocked && !morningGate && isSleepActive();
+  const running = !bombLocked && !morningGate && !sleepingNow && at && at.type!=='bomb' && !(at.type==='pomodoro' && at.state==='REVIEW_PENDING');
   card.classList.toggle('idle', !running);
-  if(running){ card.classList.remove('sleep','notask','bomblock'); } // never let an idle-state tint linger on the running card
+  if(running){ card.classList.remove('sleep','notask','bomblock','morning'); } // never let an idle-state tint linger on the running card
   document.getElementById('caBody').style.display = running?'':'none';
   document.getElementById('caIdle').style.display = running?'none':'';
   const badge=document.getElementById('caBadge');
@@ -5238,7 +5277,8 @@ function renderCurrentActivity(){
     const sleeping = sleepingNow;
     card.classList.toggle('sleep', sleeping);
     card.classList.toggle('bomblock', bombLocked);
-    card.classList.toggle('notask', !sleeping && !bombLocked);
+    card.classList.toggle('morning', morningGate);
+    card.classList.toggle('notask', !sleeping && !bombLocked && !morningGate);
     const icEl=document.getElementById('caStatusIc');
     const titleEl=document.getElementById('caStatusTitle');
     const subEl2=document.getElementById('caStatusSub');
@@ -5254,6 +5294,16 @@ function renderCurrentActivity(){
       subEl2.style.fontSize = '12.5px';
       subEl2.innerHTML = 'Your Hour Streak will reset from <b>'+fromH+' hours</b> to <b>0 hours</b> after restarting.';
       if(verifyBtn){ verifyBtn.textContent = 'Restart Hour Streak'; verifyBtn.style.display = ''; }
+    } else if(morningGate){
+      // GOOD MORNING GATE — same card shell, warm golden palette, padlock icon, Unlock button.
+      // Matches the lock-screen style exactly: large greeting, date line slightly bolder than
+      // the description but not as bold as the greeting, and a single yellow Unlock button.
+      subEl2.style.fontSize = '';
+      icEl.innerHTML = CA_LOCK_SVG;
+      titleEl.textContent = 'Good Morning \u2600\uFE0F';
+      subEl2.innerHTML = '<span class="ca-morning-date">'+getMorningDateLine()+'</span>'
+        +'Pomodoro is locked.<br>Click Unlock when you are ready to begin today.';
+      if(verifyBtn){ verifyBtn.textContent = 'Unlock'; verifyBtn.style.display = ''; }
     } else if(sleeping){
       subEl2.style.fontSize = '';
       if(verifyBtn) verifyBtn.style.display = 'none';
@@ -5548,7 +5598,8 @@ function renderHome(){
 
   if(!at || at.type==='bomb'){
     renderPomoIdlePreview();
-    btnStart.disabled = false;
+    // Disable Start while the Good Morning gate is active — Unlock is the only exit
+    btnStart.disabled = isGoodMorningLocked() && !isSleepActive();
     btnPause.disabled = true; btnPause.innerHTML = TBTN_PAUSE_ICO+'<span>PAUSE</span>';
     btnStop.disabled = true;
   } else if(at.type==='pomodoro' && at.state==='REVIEW_PENDING'){
@@ -5762,7 +5813,7 @@ function sleepIntervalsInWindow(windowStart, now){
   }
   return res;
 }
-// ─── Timeline Architecture ──────────────────────────────────────────🔵────────���
+// ─── Timeline Architecture ───────────────────────��──────────────────🔵────────���
 // The Timeline is PRESENTATION ONLY. It shows the chronological sequence of the
 // user's day. It has zero responsibility for:
 //   Goal / Hour Streak / Bomb business logic / Lifeline / FreezeManager / Campaign.
@@ -7120,7 +7171,7 @@ async function getStudySecondsInRange(fromKey, toKey){
 }
 
 // Goal Streak — evaluated ONLY at the day boundary (never mid-day), exactly like the spec's
-// "Study Pomodoro Completed → If Day Ends → Compare with Minimum Streak → Update Streak" flow.
+// "Study Pomodoro Completed → If Day Ends → Compare with Minimum Streak ��� Update Streak" flow.
 // Because this walks forward one app-day at a time from the last-checked day up to (but not
 // including) today, it stays correct even if the app wasn't opened for several days in a row.
 async function updateGoalStreak(state){
@@ -8217,7 +8268,11 @@ document.getElementById('hsSortMenu').addEventListener('click',(e)=>{
 document.getElementById('hsTaskList').addEventListener('click', async (e)=>{
   const play = e.target.closest('[data-hsplay]');
   const stop = e.target.closest('[data-hsstop]');
-  if(play){ await hsPlayTask(parseInt(play.getAttribute('data-hsplay'),10)); return; }
+  if(play){
+    // Block task start while the Good Morning gate is active (Unlock must be pressed first)
+    if(isGoodMorningLocked() && !isSleepActive()){ showToast('Press Unlock to begin your day first.'); return; }
+    await hsPlayTask(parseInt(play.getAttribute('data-hsplay'),10)); return;
+  }
   if(stop){ if(blockIfFrozen('Pomodoro')){ return; } await stopSession(); return; }
 });
 // Auto-collapse when tapping anywhere outside the picker; also close the sort menu.
@@ -9055,8 +9110,16 @@ document.getElementById('breachConfirmInput').addEventListener('input', function
 /* ============ CURRENT ACTIVITY action button ============ */
 // During a bomb explosion (BOMB_LOCK) this button is "Restart Hour Streak" and opens the breach
 // password dialog. No other frozen state uses this button any more.
-document.getElementById('caVerifyBtn').onclick = ()=>{
+document.getElementById('caVerifyBtn').onclick = async ()=>{
   if(FreezeManager.has(FREEZE.BOMB_LOCK)){ document.getElementById('breachScreen').classList.add('show'); return; }
+  // GOOD MORNING GATE — Unlock pressed: stamp today's study day key so the card disappears
+  // immediately and stays gone for the rest of this study day (persists across tabs/refreshes).
+  if(isGoodMorningLocked()){
+    STATE.morningUnlockedKey = studyDayKey();
+    await saveState(STATE);
+    render();
+    return;
+  }
 };
 
 /* ============ ANDROID SHELL INTEGRATION (Bridge v2.2) ============
