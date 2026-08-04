@@ -40,6 +40,12 @@
   body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;overflow-x:hidden;}
 /* Bomb Timer running — constant glowing red page background (static, no blinking); cards themselves are unchanged */
 body.bomb-danger{background-color:#EF4444;}
+  body.app-booting #app{visibility:hidden;}
+  .app-startup{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:var(--bg);color:var(--text);}
+  body.app-booting .app-startup{display:flex;}
+  .app-startup-card{display:flex;align-items:center;gap:12px;background:var(--card);border:var(--card-border);box-shadow:var(--shadow);border-radius:18px;padding:16px 20px;font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;}
+  .app-startup-dot{width:10px;height:10px;border-radius:50%;background:var(--primary);animation:startupPulse .8s ease-in-out infinite alternate;}
+  @keyframes startupPulse{to{transform:scale(.65);opacity:.5;}}
   #app{max-width:520px;width:100%;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding:16px 16px calc(96px + env(safe-area-inset-bottom, 0px));}
   /* Top header (date/time/lives) visible only on Home screen */
   #app:not(:has(#screen-home.active)) .topbar{display:none;}
@@ -210,8 +216,8 @@ body.bomb-danger{background-color:#EF4444;}
   .section-title-row .t{font-size:12.5px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;white-space:nowrap;}
 
   /* Generic form fields + buttons reused by Tasks and Settings screens */
-  .plain-card{background:var(--card);border:var(--card-border);border-radius:20px;box-shadow:var(--shadow);padding:8px 18px 18px;margin-bottom:14px;}
-  .plain-card h3{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:0.09em;color:var(--text-dim);font-weight:700;}
+  .plain-card{background:var(--card);border:var(--card-border);border-radius:20px;box-shadow:var(--shadow);padding:4.2px 19px 4.2px;margin-bottom:14px;}
+  .plain-card h3{margin:0 0 2px;font-size:20px;color:var(--text);font-weight:700;}
   .field{margin-bottom:12px;}
   .field label{font-size:12px;color:var(--text-dim);display:block;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;}
   .field input, .field textarea{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);font-size:14px;font-family:'Inter',sans-serif;color:var(--text);transition:border-color .15s,box-shadow .15s;background:var(--card);}
@@ -703,8 +709,10 @@ body.bomb-danger{background-color:#EF4444;}
   .task-list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
   .task-list-header .tlt{font-size:15.5px;font-weight:800;color:var(--text);letter-spacing:-0.01em;}
   .task-list-header .tlt .cnt{color:var(--primary);font-weight:800;}
-  .btn-add-task{background:var(--primary-light);color:var(--primary);border:none;border-radius:12px;padding:9px 15px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;transition:transform .12s;display:flex;align-items:center;gap:4px;}
-  .btn-add-task:active{transform:scale(0.95);}
+.btn-add-task{background:var(--primary-light);color:var(--primary);border:none;border-radius:12px;padding:9px 15px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;transition:transform .12s;display:flex;align-items:center;gap:4px;}
+.btn-add-task:active{transform:scale(0.95);}
+.btn-filter{background:var(--primary-light);color:var(--primary);border:1px solid var(--border-strong);border-radius:10px;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer;transition:transform .12s;}
+.btn-filter:active{transform:scale(0.95);}
   .task-action-row{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px;}
   .task-action-meta{display:flex;align-items:center;gap:5px;font-size:13.5px;font-weight:700;color:var(--text);}
   .task-meta-sep{color:var(--border-strong);margin:0 3px;}
@@ -1058,6 +1066,20 @@ body.bomb-danger{background-color:#EF4444;}
   .gdel-input::placeholder{color:#D8D4EE;letter-spacing:0.2em;font-weight:700;}
   .gdel-input:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,0.10);}
 
+  /* Shop screen — subject filter chips (compact square corners style) */
+  .shop-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:#fff;font-size:10px;font-weight:600;color:var(--text-dim);cursor:pointer;user-select:none;transition:all .15s;}
+  .shop-chip.active{border-color:var(--primary);background:var(--primary-light);color:var(--primary);}
+  .shop-chip .chip-radio{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .shop-chip.active .chip-radio::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--primary);display:block;}
+  /* Shop chapter row */
+  .shop-row{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);}
+  .shop-row:last-child{border-bottom:none;}
+  .shop-row .shop-dur{display:flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0;}
+  .shop-row .shop-inp{width:36px;text-align:center;padding:4px 6px;font-size:13px;font-weight:700;border:1.5px solid rgba(91,79,232,0.38);border-radius:7px;background:#fff;color:var(--text);box-shadow:inset 0 0 0 1px rgba(91,79,232,0.05);}
+  .shop-row .shop-inp:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,79,232,0.14);}
+  .shop-row .shop-unit{font-size:11px;color:var(--text-dim);font-weight:600;}
+  .shop-row .shop-total{font-size:12px;color:var(--text-dim);margin:0 6px;}
+
   /* Split Duration entry — two compact boxes with a fixed ":" and small HH/MM labels */
   .dur-split{display:flex;align-items:center;gap:8px;}
   .dur-box{position:relative;flex:1;}
@@ -1072,18 +1094,33 @@ body.bomb-danger{background-color:#EF4444;}
   .dbg-card.expanded .dbg-chevron{transform:rotate(90deg);}
   .dbg-body{max-height:0;overflow:hidden;margin-top:0;transition:max-height 0.3s ease, margin-top 0.3s ease;}
   .dbg-card.expanded .dbg-body{max-height:2000px;margin-top:16px;}
-  
-  .dbg-section{margin-bottom:2px;}
-  .dbg-label{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:5px;line-height:1.4;}
-  .dbg-eq{font-size:13px;line-height:1.7;padding-left:12px;font-variant-numeric:tabular-nums;}
-  .dbg-formula{color:var(--text-dim);}
-  .dbg-intermediate{color:var(--text-dim);opacity:0.75;}
-  .dbg-val{font-weight:700;color:var(--primary);}
-  .dbg-dim{color:var(--text-dim);}
-  .dbg-result-val{font-size:14px;font-weight:800;}
+
+  /* Settings typography is intentionally scoped. Planner uses the same card
+     shell as the rest of Settings, but it must never resize the other folders. */
+  #screen-settings .gset-title,
+  #screen-telegramsettings .gset-title{font-size:16px;line-height:1.25;}
+  #screen-settings .plain-card h3,
+  #screen-telegramsettings .plain-card h3{font-size:16px;line-height:1.25;}
+  #screen-settings .planner-card-title{font-size:16px;line-height:1.25;margin:0 0 2px;color:var(--text);font-weight:700;}
+
+  /* Formula content must stay compact and readable independently of the
+     Settings card heading styles above. */
+  #subFormulaDebug .dbg-header > div:first-child > div:first-child{font-size:14px !important;line-height:1.3;}
+  #subFormulaDebug .dbg-label{font-size:13px;font-weight:700;line-height:1.35;margin-bottom:5px;}
+  #subFormulaDebug .dbg-eq{font-size:12.5px;line-height:1.5;margin:2px 0;}
+  #subFormulaDebug .dbg-formula,
+  #subFormulaDebug .dbg-intermediate{color:var(--text-dim);}
+  #subFormulaDebug .dbg-val{font-weight:700;color:var(--primary);}
+
+/* Planner card collapse/expand */
+.plain-card .planner-collapsible{max-height:2000px;overflow:hidden;transition:max-height 0.3s ease;}
+.plain-card:not(.expanded) .planner-collapsible{max-height:0;}
+.plain-card .plannerDropdownBtn svg{transition:transform 0.3s ease;}
+
 </style>
 </head>
-<body>
+<body class="app-booting">
+<div class="app-startup" role="status" aria-live="polite"><div class="app-startup-card"><span class="app-startup-dot"></span><span>Loading your tracker</span></div></div>
 <div id="app">
 
   <!-- Top Bar - Shows goal finish time and Lifeline (hearts) status -->
@@ -1190,6 +1227,7 @@ body.bomb-danger{background-color:#EF4444;}
       <div class="section-title-row" style="margin-bottom:12px;"><div class="line"></div><div class="t" id="lblSelectTask">Select Task</div><div class="line"></div></div>
       <div class="task-tabs" id="taskTabsHome" style="margin-bottom:10px;">
         <div class="task-tab active" data-cat="study"><span class="ic">📖</span><span id="tabLabelStudy">STUDY</span><div class="task-tab-count" id="countStudy">0 out of 0</div></div>
+        <div class="task-tab" data-cat="revision"><span class="ic">📝</span><span id="tabLabelRevision">REV</span><div class="task-tab-count" id="countRevision">0 out of 0</div></div>
         <div class="task-tab" data-cat="routine"><span class="ic">☕</span><span id="tabLabelRoutine">ROUTINE</span><div class="task-tab-count" id="countRoutine">0 out of 0</div></div>
         <div class="task-tab" data-cat="health"><span class="ic">❤️</span><span id="tabLabelHealth">HEALTH</span><div class="task-tab-count" id="countHealth">0 out of 0</div></div>
         <div class="task-tab" data-cat="others"><span class="ic">⋯</span><span id="tabLabelOthers">OTHERS</span><div class="task-tab-count" id="countOthers">0 out of 0</div></div>
@@ -1328,6 +1366,7 @@ body.bomb-danger{background-color:#EF4444;}
 
     <div class="tabs" id="taskTabs">
       <div class="tab active" data-cat="study"><span id="mtabLabelStudy">Study</span></div>
+      <div class="tab" data-cat="revision"><span id="mtabLabelRevision">Rev</span></div>
       <div class="tab" data-cat="routine"><span id="mtabLabelRoutine">Routine</span></div>
       <div class="tab" data-cat="health"><span id="mtabLabelHealth">Health</span></div>
       <div class="tab" data-cat="others"><span id="mtabLabelOthers">Others</span></div>
@@ -1337,12 +1376,13 @@ body.bomb-danger{background-color:#EF4444;}
       <span style="font-size:18px;">📅</span><span>You are editing the tasks for tomorrow (<span id="tomorrowEditDate">—</span>)</span>
     </div>
     <div class="plain-card">
-      <!-- Single action row: [+ Add <Category> Task]  [☰ count | ⏱ duration] -->
-      <div class="task-action-row">
+      <!-- Single action row: [Cart (Study/Revision only)] [+ Add <Category> Task]  [☰ count | ⏱ duration] -->
+      <div class="task-action-row" style="justify-content:flex-start;gap:4px;">
+        <button id="cartBtn" class="btn-add-task" style="display:none;padding:9px 8px;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
         <button class="btn-add-task" id="addTaskBtn">
           + Add <span id="addTaskCatLabel">Study</span> Task
         </button>
-        <div class="task-action-meta">
+        <div class="task-action-meta" style="margin-left:auto;">
           <span class="task-meta-icon"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M4 7h2v2H4zm0 5h2v2H4zm0 5h2v2H4zm4-10h12v2H8zm0 5h12v2H8zm0 5h12v2H8z"/></svg></span><span id="taskCountVal">0</span>
           <span class="task-meta-sep">|</span>
           <span class="task-meta-icon"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61-1.42-1.42c-.43-.43-.99-.69-1.61-.69l0 0c-.62 0-1.18.26-1.6.68L13 8.36c.45.28.87.6 1.26.98l1.42-1.42 1.42 1.42c.38.39.7.81.98 1.26l1.42-1.42-.47-.79zM12 6c-3.87 0-7 3.13-7 7s3.13 7 7 7 7-3.13 7-7-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg></span><span id="taskDurVal">0m</span>
@@ -1366,10 +1406,16 @@ body.bomb-danger{background-color:#EF4444;}
 
   <!-- Settings Screen — folder-style categories; each folder opens its own sub-page -->
   <div class="screen" id="screen-settings">
-    <div class="section-title">Settings</div>
-
     <!-- Main folder list -->
     <div id="settingsMain">
+      <!-- 1. Planner & Revision -->
+      <div class="plain-card">
+        <div class="goal-settings-launch" data-sub="subMilestonesRevision">
+          <div class="gl-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="#fff" stroke="none"/></svg></div>
+          <div class="gl-txt"><div class="gl-t1">Planner &amp; Revision</div><div class="gl-t2">Study planning, milestones &amp; revision system</div></div>
+          <div class="gl-chev">›</div>
+        </div>
+      </div>
       <!-- 1. Home Section -->
       <div class="plain-card">
         <div class="goal-settings-launch" data-sub="subHome">
@@ -1394,7 +1440,7 @@ body.bomb-danger{background-color:#EF4444;}
           <div class="gl-chev">›</div>
         </div>
       </div>
-      <!-- 4. Study Goal launcher — opens the dedicated full-screen Goal Settings page -->
+      <!-- 4. Study Goal launcher ���� opens the dedicated full-screen Goal Settings page -->
       <div class="plain-card">
         <div class="goal-settings-launch" id="openGoalSettingsBtn">
           <div class="gl-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="#fff" stroke="none"/></svg></div>
@@ -1707,6 +1753,79 @@ body.bomb-danger{background-color:#EF4444;}
 
     </div><!-- /subFormulaDebug -->
 
+    <!-- Planner & Revision — navigation shell only -->
+    <div class="set-sub" id="subMilestonesRevision" style="display:none;">
+      <div class="gset-header" style="justify-content:flex-start;gap:12px;">
+        <button class="gset-back set-sub-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div class="tabs" id="milestonesRevisionTabs" style="display:flex;flex:1;gap:0;background:var(--bg);border-radius:8px;padding:3px;overflow:hidden;">
+          <div class="tab active" data-mr-tab="planner" style="flex:1;text-align:center;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;transition:all 0.2s;background:var(--gp-primary);color:#fff;">Planner</div>
+          <div class="tab" data-mr-tab="revision" style="flex:1;text-align:center;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;transition:all 0.2s;color:var(--text);">Revision</div>
+          <div class="tab" data-mr-tab="pending" style="flex:1;text-align:center;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;transition:all 0.2s;color:var(--text);">Pending</div>
+        </div>
+      </div>
+      <!-- Planner Tab Content -->
+      <div id="plannerTabContent" style="display:block;">
+        <!-- Container for all Planner cards (populated dynamically) -->
+        <div id="plannerCardsContainer"></div>
+        
+        <!-- Create New Planner Block (always present at bottom) -->
+        <div class="plain-card" id="createNewPlannerBlock">
+          <div class="goal-settings-launch" id="createNewPlannerBtn" style="cursor:pointer;">
+            <div class="gl-ic" style="background:linear-gradient(135deg, rgba(91,79,232,0.1) 0%, rgba(91,79,232,0.05) 100%);color:var(--gp-primary);">
+              <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+            <div class="gl-txt"><div class="gl-t1" style="color:var(--gp-primary);font-weight:600;">Create New Planner</div><div class="gl-t2">Plan your new goal, subjects and time</div></div>
+            <div class="gl-chev">›</div>
+          </div>
+        </div>
+      </div>
+      <!-- Revision Tab Content (temporary config) -->
+      <div id="revisionTabContent" style="display:none;">
+        <div class="plain-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <label style="font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:.05em;text-transform:uppercase;">Average Daily Revision Duration</label>
+            <button id="revisionEditBtn" style="background:none;border:none;padding:0;cursor:pointer;color:var(--gp-primary);display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+          </div>
+          <div class="dur-split">
+            <div class="dur-box"><input type="text" id="revisionDurHH" inputmode="numeric" maxlength="3" placeholder="00" disabled><span class="dur-sub">HH</span></div>
+            <span class="dur-colon">:</span>
+            <div class="dur-box"><input type="text" id="revisionDurMM" inputmode="numeric" maxlength="2" placeholder="00" disabled><span class="dur-sub">MM</span></div>
+          </div>
+          <button class="btn-full primary" id="saveRevisionDurBtn" disabled style="margin-top:12px;opacity:0.45;pointer-events:none;">Save</button>
+          <div class="subtext" style="margin-top:8px;font-size:11.5px;line-height:1.6;">
+            • This is a temporary configuration used only for Planner Expected Finish estimation.<br>
+            • This screen can be safely removed once the full Revision Planner is implemented.
+          </div>
+        </div>
+      </div>
+      <div id="pendingTabContent" style="display:none;"></div>
+    </div>
+
+    <!-- PLANNER BOTTOM SHEET: Create/Edit Planner (reuses Task sheet structure) -->
+    <div class="overlay" id="plannerOverlay">
+      <div class="sheet" style="padding-bottom:calc(22px + 20px + env(safe-area-inset-bottom));">
+        <div style="display:flex;align-items:center;justify-content:space-between;"><h2 id="plannerModalTitle">Create Planner</h2><button id="plannerDeleteBtn" style="display:none;background:var(--red);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-weight:700;font-size:13px;">Delete</button></div>
+        
+        <!-- Planner Name -->
+        <div class="field"><label>Name</label><input type="text" id="plannerNameInput"></div>
+        
+        <!-- Status Dropdown -->
+        <div class="field"><label>Status</label><select class="task-select" id="plannerStatusInput" style="margin-bottom:0;"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+        
+        <!-- Start Date & End Date Row -->
+        <div class="field-row2">
+          <div class="field"><label>Start Date</label><input type="date" id="plannerStartDateInput"></div>
+          <div class="field"><label>End Date</label><input type="date" id="plannerEndDateInput" min=""></div>
+        </div>
+        
+        <div class="subtext">The total required hours will be calculated automatically based on your daily study hours from Home Settings.</div>
+        
+        <button class="btn-full primary" id="savePlannerBtn" disabled>Save Planner</button>
+      </div>
+    </div>
+
     <!-- Sub-page 1: Home Section -->
     <div class="set-sub" id="subHome" style="display:none;">
       <div class="gset-header"><button class="gset-back set-sub-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="gset-title">Home Section</div><div style="width:34px;"></div></div>
@@ -1953,7 +2072,7 @@ body.bomb-danger{background-color:#EF4444;}
         <h3>Motive of Creation</h3>
         <div class="subtext" style="margin-top:0;">This application was created to help users build long-term consistency instead of relying on motivation. Its primary purpose is to reduce overthinking, encourage disciplined daily action, and make progress measurable through simple, objective tracking.</div>
         <div class="subtext">Rather than focusing only on results, the app rewards consistency through systems such as:</div>
-        <div class="subtext" style="margin-top:4px;line-height:1.7;">• Daily Goals<br>• Hour &amp; Day Streaks<br>• Bomb Challenge Mode<br>• Lifelines<br>• Pomodoro-based study tracking<br>• Progress History</div>
+        <div class="subtext" style="margin-top:4px;line-height:1.7;">• Daily Goals<br>• Hour &amp; Day Streaks<br>• Bomb Challenge Mode<br>• Lifelines<br>• Pomodoro-based study tracking<br>�� Progress History</div>
         <div class="subtext">These features work together to create accountability, maintain momentum, and help users recover from distractions without losing sight of their long-term goals. The app is designed around the philosophy that small, measurable progress repeated every day leads to meaningful long-term improvement.</div>
       </div>
     </div>
@@ -2132,7 +2251,7 @@ body.bomb-danger{background-color:#EF4444;}
       <button class="btn-full primary" style="margin:0;" id="goalEmptyCreateBtn">Create Your Goal</button>
     </div>
 
-    <!-- Full dashboard — shown once a Goal exists -->
+    <!-- Full dashboard ��� shown once a Goal exists -->
     <div id="goalDashboard" style="display:none;">
 
       <!-- Section 1: Goal Header — Name, Total Required Hours, Deadline (+ remaining days) — single row, reference layout -->
@@ -2471,7 +2590,90 @@ body.bomb-danger{background-color:#EF4444;}
     <button class="btn-full primary" id="tgsetSaveBtn">Save Telegram Settings</button>
   </div>
 
-</div>
+  <!-- Cart / Schedule Screen — reuses planDetail header + task row structure -->
+  <div class="screen" id="screen-shop">
+    <!-- Header: back + "Study • Today" + duration + cart icon with badge -->
+    <div class="plain-card" style="padding:8px 12px 12px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button id="shopBackBtn" style="width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--primary);font-size:16px;flex-shrink:0;">‹</button>
+        <div style="flex:1;">
+          <span style="font-size:12px;font-weight:600;color:var(--text-dim);">Study</span><span id="shopTitle" style="font-size:18px;font-weight:700;color:var(--text);"><span id="shopDayLabel"> • Today</span><span id="shopDuration" style="margin-left:8px;font-size:12px;color:var(--text-dim);font-weight:600;">—</span></span>
+        </div>
+        <div style="position:relative;flex-shrink:0;">
+          <button id="shopCartBtn" class="icon-badge" style="width:40px;height:40px;border-radius:12px;cursor:pointer;border:none;padding:0;transition:opacity .2s,filter .2s;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          </button>
+          <span id="shopCartBadge" style="position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:999px;background:var(--primary);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;display:none;">0</span>
+        </div>
+      </div>
+    </div>
+  <!-- Subject filter chips — rendered by JS from getSubjects() -->
+  <div class="plain-card" style="padding:10px 12px;">
+  <div id="shopChips" style="display:flex;flex-wrap:wrap;gap:6px 8px;row-gap:2px;"></div>
+  </div>
+    <!-- Selected subject header: icon + name + Filter button -->
+    <div class="plain-card" style="padding:10px 12px;display:flex;align-items:center;gap:10px;">
+      <div class="ca-ic" style="width:34px;height:34px;border-radius:10px;font-size:17px;flex-shrink:0;" id="shopSubjectIcon">📖</div>
+      <span id="shopSubjectName" style="font-size:16px;font-weight:800;color:var(--text);flex:1;">Mathematics</span>
+      <div class="hs-sortrow" style="margin:0;flex-shrink:0;">
+        <span class="hs-sort-lbl">Sort by:</span>
+        <div class="hs-sortmenu-wrap">
+          <button class="hs-sort-toggle" id="shopSortToggle" type="button"><span id="shopSortVal">Oldest</span> <span class="hs-sort-chev">▼</span></button>
+          <div class="hs-sortmenu" id="shopSortMenu" style="display:none;">
+            <div class="hs-sortopt" data-sort="oldest">Oldest</div>
+            <div class="hs-sortopt" data-sort="newest">Newest</div>
+            <div style="height:1px;background:var(--border);margin:3px 8px;"></div>
+            <div class="hs-sortopt" data-sort="hard">Hard</div>
+            <div class="hs-sortopt" data-sort="medium">Medium</div>
+            <div class="hs-sortopt" data-sort="easy">Easy</div>
+            <div style="height:1px;background:var(--border);margin:3px 8px;"></div>
+            <div class="hs-sortopt" data-sort="running">Running</div>
+            <div class="hs-sortopt" data-sort="completed">Completed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Chapter list — rendered by JS; each row reuses dur-box/dur-split inputs -->
+    <div id="shopChapterList" class="plain-card" style="padding:0;display:flex;flex-direction:column;margin-bottom:40px;"></div>
+  </div>
+
+  <!-- Subject Detail Screen — kept inside #app so it uses the same mobile card frame -->
+  <div class="screen" id="screen-planDetail">
+    <div class="plain-card" style="padding:8px 12px 12px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button id="planDetailBackBtn" style="width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--primary);font-size:16px;flex-shrink:0;">‹</button>
+        <h2 id="planDetailSubjectName" style="margin:0;font-size:20px;font-weight:700;color:var(--text);flex:0 0 auto;">Mathematics</h2>
+        <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;gap:12px;font-size:12px;color:var(--text-dim);">
+          <div id="planDetailTaskCount" style="font-weight:700;color:var(--text);">10 Chapters</div>
+          <span class="task-meta-sep" style="height:16px;opacity:0.3;">|</span>
+          <div id="planDetailDuration" style="font-weight:700;color:var(--text);">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="plain-card" style="display:flex;gap:12px;padding:8px 12px 12px;">
+      <button id="planDetailAddTaskBtn" class="btn-add-task" style="flex:0 0 calc(60% - 6px);"><span style="font-size:18px;">+</span> Add New Chapter</button>
+      <div class="hs-sortrow" style="flex:0 0 calc(40% - 6px);justify-content:center;margin:0;">
+        <span class="hs-sort-lbl">Sort by:</span>
+        <div class="hs-sortmenu-wrap">
+          <button class="hs-sort-toggle" id="planDetailSortToggle" type="button"><span id="planDetailSortVal">Oldest</span> <span class="hs-sort-chev">▼</span></button>
+          <div class="hs-sortmenu" id="planDetailSortMenu" style="display:none;">
+            <div class="hs-sortopt" data-sort="oldest">Oldest</div>
+            <div class="hs-sortopt" data-sort="newest">Newest</div>
+            <div style="height:1px;background:var(--border);margin:3px 8px;"></div>
+            <div class="hs-sortopt" data-sort="hard">Hard</div>
+            <div class="hs-sortopt" data-sort="medium">Medium</div>
+            <div class="hs-sortopt" data-sort="easy">Easy</div>
+            <div style="height:1px;background:var(--border);margin:3px 8px;"></div>
+            <div class="hs-sortopt" data-sort="running">Running</div>
+            <div class="hs-sortopt" data-sort="completed">Completed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="planDetailTasksContainer" class="plain-card" style="display:flex;flex-direction:column;gap:0;margin-bottom:40px;padding:0;"></div>
+  </div>
+
+</div><!-- /#app -->
 
 <!-- Goal Settings 3-dot menu (Delete Goal) — bottom sheet, same shell as Task edit menu -->
 <div class="overlay" id="gsetMenuOverlay">
@@ -2499,7 +2701,21 @@ body.bomb-danger{background-color:#EF4444;}
   </div>
 </div>
 
-<!-- Reset All Data confirmation — reuses the Goal-delete dialog shell; requires typing 123456789 -->
+<!-- Delete Planner confirmation dialog -->
+<div class="overlay center-modal" id="plannerDeleteDialog">
+  <div class="dialog">
+    <div class="d-icon warn">⚠️</div>
+    <h3>Are you sure?</h3>
+    <p>Deleting this Planner permanently removes all its subject progress and task history. This action cannot be undone.</p>
+    <input type="text" inputmode="numeric" class="gdel-input" id="plannerDeleteConfirmCode" placeholder="12345" maxlength="5" autocomplete="off">
+    <div class="d-btn-row">
+      <button class="d-btn cancel" id="plannerDeleteCancel">Cancel</button>
+      <button class="d-btn danger" id="plannerDeleteConfirm">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset All Data confirmation ����� reuses the Goal-delete dialog shell; requires typing 123456789 -->
 <div class="overlay center-modal" id="resetConfirmDialog">
   <div class="dialog">
     <div class="d-icon warn">⚠️🔵</div>
@@ -2566,12 +2782,12 @@ body.bomb-danger{background-color:#EF4444;}
     <input type="text" class="gdel-input ec-input" id="earlyCompleteCode" placeholder="DONE" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false">
     <div class="d-btn-row">
       <button class="d-btn cancel" id="earlyCompleteCancel">Cancel</button>
-      <button class="d-btn primary" id="earlyCompleteConfirm" disabled style="opacity:.45;"><span id="earlyCompleteEmoji">⚡</span> Mark as Complete</button>
+      <button class="d-btn primary" id="earlyCompleteConfirm" disabled style="opacity:.45;"><span id="earlyCompleteEmoji">✅</span> Mark as Complete</button>
     </div>
   </div>
 </div>
 
-<!-- Locked Goal dialog — shown when a core field is tapped after the campaign has started -->
+<!-- Locked Goal dialog �� shown when a core field is tapped after the campaign has started -->
 <div class="overlay center-modal" id="goalLockedDialog">
   <div class="dialog">
     <div class="d-icon warn">🔒</div>
@@ -2651,7 +2867,7 @@ body.bomb-danger{background-color:#EF4444;}
     <div class="field" id="taskSubjectField" style="display:none;"><label>Subject</label><select class="task-select" id="taskSubjectInput" style="margin-bottom:0;"></select></div>
     <div class="field-row2">
       <div class="field"><label>Icon (emoji)</label><input type="text" id="taskIconInput" maxlength="4" placeholder="📖"></div>
-      <div class="field"><label>Color</label><input type="color" class="color-input" id="taskColorInput" value="#5B4FE8"></div>
+      <div class="field"><label id="colorFieldLabel">Difficulty Level</label><select class="task-select" id="taskColorInput" style="margin-bottom:0;"></select></div>
     </div>
     <div class="field-row2">
       <div class="field"><label>Duration</label>
@@ -2665,8 +2881,8 @@ body.bomb-danger{background-color:#EF4444;}
         <div id="taskSlotRange" style="font-size:10.5px;color:var(--text-dim);font-weight:500;margin-top:4px;min-height:13px;"></div>
       </div>
     </div>
-    <div class="subtext">This duration loads automatically every time this task is selected — on the Home Screen or the Tasks page.</div>
     <div class="subtext" id="taskSubjectHint" style="display:none;font-size:10.5px;">You can add, edit or delete subjects from Settings.</div>
+    <div class="subtext" id="plannerCreatedOn" style="display:none;font-size:11px;color:var(--text-dim);"></div>
     <button class="btn-full primary" id="saveTaskBtn">Save Task</button>
   </div>
 </div>
@@ -2768,6 +2984,23 @@ function idbPut(store,val){ return new Promise((res,rej)=>{ const r=tx(store,'re
 function idbDelete(store,key){ return new Promise((res,rej)=>{ const r=tx(store,'readwrite').delete(key); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); }
 function idbAll(store){ return new Promise((res,rej)=>{ const r=tx(store).getAll(); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
 function idbClear(store){ return new Promise((res,rej)=>{ const r=tx(store,'readwrite').clear(); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); }
+
+// A cart hand-off changes both the daily task store and the Planner bank. Keep
+// those writes in one IndexedDB transaction so they either both persist or both
+// roll back; a partial transfer must never be possible.
+function idbCommitPlannerCart(taskCopies, state){
+  return new Promise((resolve,reject)=>{
+    const transaction=db.transaction(['tasks','meta'],'readwrite');
+    transaction.objectStore('tasks');
+    const tasks=transaction.objectStore('tasks');
+    const meta=transaction.objectStore('meta');
+    taskCopies.forEach(copy=>tasks.put(copy));
+    meta.put(state);
+    transaction.oncomplete=()=>resolve();
+    transaction.onerror=()=>reject(transaction.error || new Error('Could not save Planner cart.'));
+    transaction.onabort=()=>reject(transaction.error || new Error('Planner cart save was aborted.'));
+  });
+}
 
 /* ============ HELPERS ============ */
 // Returns today's date as YYYY-MM-DD, used to detect day rollover (streak/hearts/bomb daily resets)
@@ -2903,6 +3136,7 @@ const EMOJI = {
   heart: '❤️',
   muscle: '💪',
   book: '📖',
+  revision: '📖',
   moon: '🌙',
   times: '✕',
   dots: '⋯',
@@ -2929,8 +3163,8 @@ const EMOJI = {
   person_lifting: '🏋️'
 };
 
-// STEP 7: Bomb is now a first-class activity type (alongside Study/Routine/Health)
-const CAT_ICON = {study:EMOJI.book, routine:EMOJI.coffee, health:EMOJI.heart, bomb:'💣', others:EMOJI.dots}; // Default emoji per task category
+  // STEP 7: Bomb is now a first-class activity type (alongside Study/Routine/Health)
+  const CAT_ICON = {study:EMOJI.book, revision:EMOJI.book, routine:EMOJI.coffee, health:EMOJI.heart, bomb:'💣', others:EMOJI.dots}; // Default emoji per task category
 const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TIME', bomb:'BOMB TIME', others:'OTHER TIME'}; // Pomodoro sub-label per category
 
   // Default Daily Study Report template (item 9). Used automatically until the user customizes it,
@@ -2962,7 +3196,7 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
 
 🏆 Goal Progress
 
-• Goal : {goalName}
+🎯 Goal : {goalName}
 • Duration: {startDate} — {endDate}
 
 • Goal Streak : {goalStreak}
@@ -2988,12 +3222,13 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
   wakeHour: 8, // Wake-up hour (0-23). Sleep = dayResetHour → wakeHour. Default = 8:00 AM.
   totalAvailableHours: 16,
   studyHours: 14,
+  avgRevisionSec: 0, // Temporary: average daily revision duration in seconds used for Expected Finish estimation
   lockTodayEditing: true, // Hide Edit button for Today's tasks during the active Study Day
   historyShortFilter: 0, // Minimum duration (seconds) for a history row to appear in the Timeline/Activity view. 0 = Off (show all).
 
   telegramBotToken: "8801704479:AAH2f4mJzl5wE8Fz8lRXHYtv3nRX4vaq4PY",
   telegramChatId: "-1003886064150",
-  telegramMessageTemplate: "📝{n} ({todayStreak}) — ({startTime} to {endTime}) — ({date})\n• Task = {taskFull} (Focus = {focus})",
+  telegramMessageTemplate: "📝{n} ({todayStreak}) — ({startTime} to {endTime}) — ({date})\n📋 Task = {taskFull} (Focus = {focus})",
   autoLogNonStudy: false,
   telegramEnabled: true, // Master switch (item 1). OFF hides the Home Telegram card + disables the auto Daily Report.
   telegramOnBomb: true, // When ON (and Telegram is enabled), a message is sent to Telegram whenever the Bomb explodes.
@@ -3029,7 +3264,7 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
 const CAT_COLOR_DEFAULT = {study:'#5B4FE8', routine:'#22C55E', health:'#EF4444', bomb:'#F97316', others:'#8B87A6'}; // Default dot/accent color per task category
 const CAT_NAME = {study:'Study', routine:'Routine', health:'Health', bomb:'Bomb Challenge', others:'Others'}; // Human-readable category name (for the "Count as" info popup)
 
-// ── "Others → Count this Activity as" ─────────────────────────🔵───────────────────
+// ── "Others → Count this Activity as" ────────────────��─��──────🔵───────────────────
 // An Others task may be CREDITED to another category (Study / Routine / Health) for every
 // time-based calculation, while remaining STORED and DISPLAYED only under Others.
 //   • creditCat(t)   → the category this task's TIME should be credited to.
@@ -3057,7 +3292,7 @@ function othersLabel(t){
 // the auto-filled Bomb Running gap segments.
 const HIST_COLOR = {study:'#5B4FE8', routine:'#F5A623', health:'#22C55E', others:'#8B87A6', bomb:'#EF4444', sleep:'#5B4FE8', noact:'#8B87A6'};
 const HIST_COLOR_LIGHT = {study:'#EEECFE', routine:'rgba(245,166,35,0.14)', health:'#E8FBF0', others:'rgba(139,135,166,0.14)', bomb:'#FDEDED', sleep:'#EEECFE', noact:'rgba(139,135,166,0.14)'};
-const HIST_ICON = {study:EMOJI.book, routine:EMOJI.coffee, health:EMOJI.heart, others:EMOJI.dots, bomb:EMOJI.bomb, sleep:EMOJI.moon, noact:EMOJI.times};
+const HIST_ICON = {study:EMOJI.book, revision:EMOJI.book, routine:EMOJI.coffee, health:EMOJI.heart, others:EMOJI.dots, bomb:EMOJI.bomb, sleep:EMOJI.moon, noact:EMOJI.times};
 
 // Escapes user-entered text (task comments) before inserting into innerHTML
 function escapeHtml(str){
@@ -3110,14 +3345,17 @@ function fmtBudget(sec){
   return h+':'+String(m).padStart(2,'0');
 }
 // Formats seconds as "5h:00m" / "25m" (hours hidden when zero) with the h/m units rendered in
-// small `.tu` spans (50% size, color inherited from the surrounding number text). Used ONLY by
-// the Tasks section and the History → Study Task Progress tab — fmtBudget/fmtHM/hhmm still
+// small `.tu` spans (50% size, color inherited from the surrounding number text). Used by
+// the Tasks section, the History → Study Task Progress tab, and the Planner section.
+// Rules: hours hidden when zero; minutes hidden when zero; fmtBudget/fmtHM/hhmm still
 // serve the Home picker, timers, Goal section, and History Summary/Timeline unchanged.
 function fmtHMu(sec){
   sec = Math.max(0, Math.round(sec||0));
   const h = Math.floor(sec/3600);
   const m = Math.round((sec%3600)/60);
+  if(h<=0 && m<=0) return '0<span class="tu">m</span>';
   if(h<=0) return m+'<span class="tu">m</span>';
+  if(m<=0) return h+'<span class="tu tu-h">h</span>';
   return h+'<span class="tu tu-h">h</span>:'+String(m).padStart(2,'0')+'<span class="tu">m</span>';
 }
 // Returns the day's three headline budgets (in seconds): Total Available, Study (must-use),
@@ -3141,7 +3379,7 @@ function getOtherUsedSeconds(excludeId){
 // from that point on, today's plan is fixed and the Tasks screen becomes read-only (Add/Edit/Delete
 // are all blocked) until the next day begins.
 async function hasTodayActivityLogged(){
-  const all = await idbAll('timeline');
+  const all = await getTimelineEntries();
   const today = appDayKey();
   return all.some(e=>e.date===today);
 }
@@ -3160,6 +3398,12 @@ function fmtTotalPlanned(sec){
   const m = Math.round((total%3600)/60);
   if(h === 0) return `Total ${m}m`;
   return `Total ${h}h ${String(m).padStart(2,'0')}m`;
+}
+// Escape HTML to prevent XSS
+function escapeHtml(text){
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 // Formats streak hours: whole numbers show as "5", fractional as "5.5"
 function fmtStreakHours(h){
@@ -3188,7 +3432,7 @@ function calcAge(dobStr){
 
 let STATE = null; // In-memory cache of the current app state (mirrors the 'meta' IndexedDB record)
 // REFACTOR v7.1 (2025-07-20): Centralized Timestamp-Driven Architecture
-// ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// ───────────────────��──────────────────────────────────────────────────────────────────────────��───────────────
 // ROOT FIXES:
 //  1. BOMB EXPLOSION BUG: Multiple ticks at the same boundary could trigger explosion multiple times,
 //     consuming extra time. Fixed by tracking transition (was running → now expired) instead of checking
@@ -3199,7 +3443,7 @@ let STATE = null; // In-memory cache of the current app state (mirrors the 'meta
 //     preventing multiple firings if intervals are suspended.
 //  4. DETERMINISTIC RECOVERY: Recovery uses the same timestamp-based formulas as runtime, ensuring
 //     consistency and eliminating state corruption from fast-forwards.
-// ────────────────────────────────────────────────────────────────────────────────────📚───────📚📚───
+// ���───────────────────────────────────────��─����─────────────────────────────────────────📚───────📚📚───
 let RESETTING = false; // True while a Factory Reset is in progress — pauses the background recovery interval so it can't re-persist stale state over the freshly restored defaults
 let CACHED_TASKS = []; // In-memory cache of all user-defined tasks, avoids re-reading IndexedDB on every render
 let selectedCategory = 'study'; // Which task category tab is active on the Home screen picker
@@ -3211,6 +3455,8 @@ let widgetWasFrozen = false; // Tracks freeze state to detect transitions (freez
                                    // before the first updateFinishByCache() cycle. On startup, renderHeader() will skip
                                    // rendering incomplete data. Updated by updateFinishByCache() on every render() cycle
                                    // (every 3s), independently of whether the Goals screen has ever been opened.
+
+let cachedWidgetData = null; // Last derived widget result; shared by Goals to avoid duplicate work in one render pass.
 
 // Loads app state from IndexedDB, creating sane defaults on first run and
 // backfilling any fields added by later app versions (so old saves keep working)
@@ -3226,10 +3472,20 @@ async function getState(){
       bombRemainingMs: DEFAULT_SETTINGS.bombDuration*1000,
       pendingReports: [], lastReportDayKey: null,
       settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)),
-      goal: null // No Study Goal exists until the user creates one from Settings → Study Goal
+      goal: null, // No Study Goal exists until the user creates one from Settings → Study Goal
+      planners: [], // Array of Planner objects
+      // Permanent syllabus bank. Daily/tomorrow tasks are intentionally kept
+      // elsewhere so editing them can never alter the Planner chapter.
+      plannerChapters: [],
+      // Separate, wake-up-only carry-forward bank for unfinished Study tasks.
+      plannerPending: []
     };
     await idbPut('meta', s);
   }
+  if(!s.planners) s.planners = [];
+  if(!Array.isArray(s.plannerChapters)) s.plannerChapters = [];
+  if(!Array.isArray(s.plannerPending)) s.plannerPending = [];
+  if(s.wakePromotion===undefined) s.wakePromotion = null;
   if(s.missionText===undefined) s.missionText = '';
   if(s.bombRemainingMs===undefined) s.bombRemainingMs = (s.settings? s.settings.bombDuration : DEFAULT_SETTINGS.bombDuration)*1000;
   if(s.dailyStudySeconds===undefined) s.dailyStudySeconds = 0;
@@ -3246,6 +3502,7 @@ async function getState(){
   if(s.settings.defaultDurations.others===undefined) s.settings.defaultDurations.others = DEFAULT_SETTINGS.defaultDurations.others;
   if(s.settings.totalAvailableHours===undefined) s.settings.totalAvailableHours = DEFAULT_SETTINGS.totalAvailableHours;
   if(s.settings.studyHours===undefined) s.settings.studyHours = DEFAULT_SETTINGS.studyHours;
+  if(s.settings.avgRevisionSec===undefined) s.settings.avgRevisionSec = DEFAULT_SETTINGS.avgRevisionSec;
   if(s.settings.userName===undefined) s.settings.userName = DEFAULT_SETTINGS.userName;
   if(s.settings.dob===undefined) s.settings.dob = DEFAULT_SETTINGS.dob;
   if(!s.settings.labels) s.settings.labels = {...DEFAULT_SETTINGS.labels};
@@ -3295,6 +3552,19 @@ async function getState(){
     if(s.goal.streakCurrent===undefined) s.goal.streakCurrent = 0;
     if(s.goal.lastStreakCheckDay===undefined) s.goal.lastStreakCheckDay = null;
     if(s.goal.extraActive===undefined) s.goal.extraActive = false;
+  }
+  // Planner workspaces: there is always one canonical active planner whenever
+  // planners exist. Legacy global chapters/pending records are migrated once
+  // to that planner and never duplicated into other workspaces.
+  if(s.planners.length){
+    let active = s.planners.find(p=>p.id===s.activePlannerId)
+      || s.planners.find(p=>p.status==='active') || s.planners[0];
+    let changed = s.activePlannerId !== active.id;
+    s.activePlannerId = active.id;
+    s.planners.forEach(p=>{ const status=p.id===active.id?'active':'inactive'; if(p.status!==status){ p.status=status; changed=true; } });
+    s.plannerChapters.forEach(c=>{ if(!c.plannerId){ c.plannerId=active.id; changed=true; } });
+    s.plannerPending.forEach(p=>{ if(!p.plannerId){ p.plannerId=active.id; changed=true; } });
+    if(changed) await idbPut('meta',s);
   }
   return s;
 }
@@ -3472,7 +3742,7 @@ function buildNonStudyLogMessage(entry, state){
   return fillTemplate(state.settings.telegramMessageTemplate, tokens);
 }
 // Updates the small status line under the Telegram box.
-// Success confirmations ("✓ Sent") are temporary: visible ~3s, then fade out and clear.
+// Success confirmations ("�� Sent") are temporary: visible ~3s, then fade out and clear.
 let _tgStatusTimer = null;
 function setTgStatus(msg){
   const el=document.getElementById('tgStatus'); if(!el) return;
@@ -3531,7 +3801,7 @@ async function getTimelineSecondsByCat(dayKey){
   for(const e of all){ if(e.date===dayKey && out[e.category]!=null) out[e.category] += (e.duration||0); }
   return out;
 }
-// 🔵🔵🔵─ STUDY PROGRESS — SINGLE SOURCE OF TRUTH (History → Study Task Progress) ────────────────────
+// 🔵🔵🔵─ STUDY PROGRESS — SINGLE SOURCE OF TRUTH (History → Study Task Progress) ────────────��───────
 // Everything Telegram reports about Study reads THROUGH this one reader, which mirrors exactly what
 // the History → Study Task Progress tab shows (same "started" filter, same clamped consumed time via
 // getEffectiveConsumedSec, same Pomodoro split via activitySplit, same STATE.pomoLogs reflections).
@@ -3650,7 +3920,7 @@ async function buildDailyReport(state, dayKey, opts){
   const statusLabels = {behind:'Behind Schedule', ontime:'On Track', ahead:'Ahead of Schedule'};
   const tokens = {
     date: formatDateKeyLong(dayKey),
-    // Extra user-data variables 🔵 all sourced from the same existing state (no duplicate data sources)
+    // Extra user-data variables ���� all sourced from the same existing state (no duplicate data sources)
     userName: state.settings.userName || '—',
     totalToday: fmtHM((cat.study||0)+(cat.routine||0)+(cat.health||0)+(cat.others||0)),
     hourStreak: Math.floor((state.hourStreakSec||0)/3600)+' hrs',
@@ -3726,7 +3996,7 @@ async function retryPendingReports(){
     if(!token || !chatId){ setTgStatus('Add your Telegram Bot Token & Chat ID first.'); return; }
     const FIVE_MIN = 5 * 60 * 1000;
     const now = Date.now();
-    setTgStatus('Retrying pending reports…');
+    setTgStatus('Retrying pending reports���');
     const remaining = [];
     for(const r of state.pendingReports){
       const age = now - (r.failedAt || r.ts || now);
@@ -3762,7 +4032,7 @@ async function retryPendingReports(){
 // campaign systems. The finished study-day is captured at the Sleep-Start crossing and remembered for a
 // 'wake'-mode send, so both modes always report the exact same day. MUST run before maybeWakePromotion()
 // so a 'wake' report still sees the finished day's Study tasks before Tomorrow→Today rotation clears them.
-let _sendingScheduledReport = false; // re-entrancy guard: boot + visibilitychange/pageshow + 3s poll all call this simultaneously → Night report sent multiple times
+let _sendingScheduledReport = false; // re-entrancy guard: boot + visibilitychange/pageshow + 3s poll all call this simultaneously �� Night report sent multiple times
 // Committed-key mirrors: updated atomically with saveState so concurrent callers that arrive
 // before saveState finishes (the race that caused 4-6 duplicate sends) see the already-committed
 // keys and bail out immediately, even while _sendingScheduledReport is still true from the first call.
@@ -4259,7 +4529,7 @@ const BombEngine = {
   //      decisions and knows nothing about them.
   //
   // Returns { consumedMs, terminal }:
-  //   • consumedMs — how much of the requested `ms` was absorbed this call.
+  //   • consumedMs ����� how much of the requested `ms` was absorbed this call.
   //   • terminal   — true when no more time can be fed (bomb locked / disabled /
   //                  frozen / no armed bomb). The caller must stop on terminal.
   //
@@ -4658,7 +4928,7 @@ async function recoverState(){
         console.log(`[RECOVERY-ROLLOVER] KEPT wakeReplayDate=${sdk} (bomb just exploded)`);
       }
     }
-    BombEngine.resetDailyLifelines(state); // hearts→1, dailyLifelinesEarned──0 (single lifeline authority)
+    BombEngine.resetDailyLifelines(state); // hearts→1, dailyLifelinesEarned��������0 (single lifeline authority)
     state.bombLocked = false;         // Task 6.5: day-rollover clears the persisted flag; syncFreezeReasons() exits BOMB_LOCK on next poll
     state.bombExplodedToday = 0;      // fresh explosion counter for the new Study Day
     // Stamp the streak baseline so reconcileDailyStudySeconds can re-derive today's contribution.
@@ -4913,7 +5183,7 @@ async function startSession(type, task, topic){
       }
     } else {
       // A non-bomb activity is currently running (or paused). Commit the current segment exactly
-      // as stopSession does — wallSegmentStartTs is the start of this segment (reset on every resume).
+      // as stopSession does �� wallSegmentStartTs is the start of this segment (reset on every resume).
       // Any prior segments were already committed by pauseResumeSession when the user paused.
       // FIX: Do NOT commit a segment for a REVIEW_PENDING Pomodoro. submitReview() is the
       // sole authority for writing the final timeline entry of a completed Pomodoro.
@@ -5187,7 +5457,7 @@ function renderHeader(){
   const ag = calcAge(STATE.settings.dob);
   document.getElementById('ageVal').textContent = ag ? `${ag.years}Y • ${ag.months}M • ${ag.days}D` : 'Set DOB in Settings';
 
-  // ── HOME WIDGET: Study Complete By / Max Study Today ─────────────────────────
+  // ── HOME WIDGET: Study Complete By / Max Study Today ──────�������─────���───��────────
   // 4 possible states, all owned by Home screen, rendered from cachedFinishByText
   const goalBadgeEl = document.getElementById('hdrGoalBadge');
   const goalLabelEl = document.getElementById('hdrGoalLabel');
@@ -5272,7 +5542,7 @@ function renderHeader(){
     return;
   }
 
-  // ── Hearts rendering ────────────────────────────────────────────────────────
+  // ── Hearts rendering ─────────────────────────────────────────���──────────────
   const heartsWrap = document.getElementById('hdrHearts');
   heartsWrap.innerHTML='';
   const max = STATE.settings.heartsMaxPerDay;
@@ -5342,7 +5612,7 @@ function updateStreakBar(){
 
 // Returns the currently-selected task for the active category tab, falling back to the first task in the list
 function pickSelectedTask(){
-  const list = CACHED_TASKS.filter(t=>t.category===selectedCategory);
+  const list = CACHED_TASKS.filter(t=>(t.uiCategory||t.category)===selectedCategory);
   if(!list.find(t=>t.id===selectedTaskId)) selectedTaskId = list.length? list[0].id : null;
   return list.find(t=>t.id===selectedTaskId) || null;
 }
@@ -5350,15 +5620,16 @@ function pickSelectedTask(){
 // Shows a preview of the Pomodoro card (icon/time/label) for the selected task before any timer is started
 function renderPomoIdlePreview(){
   const task = pickSelectedTask();
-  const icon = (task && task.icon) || CAT_ICON[selectedCategory];
+  const resolvedCat = selectedCategory==='revision' ? 'study' : selectedCategory;
+  const icon = (task && task.icon) || CAT_ICON[resolvedCat];
   document.getElementById('pomoTopIc').textContent = icon;
   document.getElementById('pomoLabelIc').textContent = icon;
-  document.getElementById('pomoLabelText').textContent = selectedCategory==='study' ? 'POMODORO TIMER' : (selectedCategory.toUpperCase()+' TIMER');
+  document.getElementById('pomoLabelText').textContent = (resolvedCat==='study') ? 'POMODORO TIMER' : (resolvedCat.toUpperCase()+' TIMER');
   const consumed = task ? getEffectiveConsumedSec(task) : 0;
   const remaining = task ? Math.max(0, task.duration - consumed) : 0;
   document.getElementById('pomoTime').textContent = task ? fmtClock(remaining) : '--:--';
-  document.getElementById('pomoSub').textContent = task ? task.name : CAT_LABEL[selectedCategory];
-  document.getElementById('pomoEmoji').textContent = selectedCategory==='study' ? EMOJI.seedling : (selectedCategory==='routine'?EMOJI.coffee:(selectedCategory==='health'?EMOJI.muscle:EMOJI.dots));
+  document.getElementById('pomoSub').textContent = task ? task.name : (selectedCategory==='revision' ? 'REVISION TIME' : CAT_LABEL[resolvedCat]);
+  document.getElementById('pomoEmoji').textContent = resolvedCat==='study' ? EMOJI.seedling : (resolvedCat==='routine'?EMOJI.coffee:(resolvedCat==='health'?EMOJI.muscle:EMOJI.dots));
   // Resume note — makes it obvious this task will pick back up instead of restarting from scratch
   const progEl = document.getElementById('pomoProgress');
   if(task && task.completionStatus){
@@ -5694,13 +5965,13 @@ function hsTaskRow(t, opts){
     + `<div class="hs-pg">${fmtBudget(consumed)} / ${fmtBudget(t.duration)}</div>${btn}</div>`;
 }
 // Renders the compact list into #hsTaskList, honoring the expand state and current sort mode.
-const HS_TOPIC_LABEL = {study:'Choose the "STUDY" topic', routine:'Choose the "ROUTINE" task', health:'Choose the "HEALTH" task', others:'Choose the "OTHERS" task'};
+const HS_TOPIC_LABEL = {study:'Choose the "STUDY" topic', revision:'Choose the "REVISION" topic', routine:'Choose the "ROUTINE" task', health:'Choose the "HEALTH" task', others:'Choose the "OTHERS" task'};
 function renderHomeTaskList(){
   const picker = document.getElementById('hsPicker'); if(!picker) return;
-  const cat = selectedCategory;
+  const cat = selectedCategory==='revision' ? 'study' : selectedCategory; // For data/icon lookups
   // Only Study supports Subject sorting; everyone else is always grouped by Time Slot.
   if(cat!=='study') hsSortMode = 'slot';
-  document.getElementById('hsTriggerLabel').textContent = HS_TOPIC_LABEL[cat] || 'Choose the Topic';
+  document.getElementById('hsTriggerLabel').textContent = HS_TOPIC_LABEL[selectedCategory] || 'Choose the Topic';
   picker.classList.toggle('open', hsExpanded);
   document.getElementById('hsPanel').style.display = hsExpanded ? 'block' : 'none';
   // Sort control is shown only for Study; hidden for Routine / Health / Others.
@@ -5711,7 +5982,7 @@ function renderHomeTaskList(){
   const listEl = document.getElementById('hsTaskList');
   const at = STATE && STATE.activeTimer;
   const runningId = (at && at.type!=='bomb' && at.state!=='REVIEW_PENDING') ? at.taskId : null;
-  const all = CACHED_TASKS.filter(t=>t.category===cat); all.forEach(ensureTaskProgressFields);
+  const all = CACHED_TASKS.filter(t=>(t.uiCategory||t.category)===selectedCategory); all.forEach(ensureTaskProgressFields);
   const isDone = t => !!t.completionStatus || (t.consumedSec||0) >= t.duration;
   const pending = all.filter(t=>!isDone(t) && t.id!==runningId);
   const completed = all.filter(t=>isDone(t) && t.id!==runningId);
@@ -5846,7 +6117,7 @@ function renderHome(){
     const _idleAnchorTs = STATE.bombLocked && STATE.bombLockedTs
       ? STATE.bombLockedTs  // post-explosion idle: anchor to explosion moment
       : STATE._idleStartTs || Date.now(); // normal idle: anchor to when last activity ended
-    if(!STATE.activeTimer){
+    if(!STATE.activeTimer && document.getElementById('screen-history').classList.contains('active')){
       if(!STATE._idleStartTs) STATE._idleStartTs = _idleAnchorTs;
       const idleTick = async ()=>{
         if(STATE.activeTimer) return; // activity started — stop ticking
@@ -6027,12 +6298,12 @@ function renderHome(){
 
 // Renders the per-category "X out of Y" task-count label under each Select Task tab.
 // X = UNIQUE tasks in that category that reached completion (counted once each, straight from the
-// task list itself — never from timeline entries, so duplicate/partial history rows can't inflate it).
+// task list itself �� never from timeline entries, so duplicate/partial history rows can't inflate it).
 // X can therefore never exceed Y.
 async function renderCategoryCounts(){
-  const cats = ['study','routine','health','others'];
+  const cats = ['study','revision','routine','health','others'];
   cats.forEach(cat=>{
-    const inCat = CACHED_TASKS.filter(t=>t.category===cat);
+    const inCat = CACHED_TASKS.filter(t=>(t.uiCategory||t.category)===cat);
     const total = inCat.length;
     const completed = inCat.filter(t=> !!t.completionStatus || (t.consumedSec||0) >= (t.duration||Infinity)).length;
     const elId = 'count'+cat.charAt(0).toUpperCase()+cat.slice(1);
@@ -6079,7 +6350,7 @@ function sleepIntervalsInWindow(windowStart, now){
 //   • IDLE    🔵 ─ only when the Bomb countdown is NOT running: the stretch right after Wake-up before the
 //               very first task starts, the frozen period after an explosion (BOMB_LOCK) until reset,
 //               and (Bomb Mode off) any awake gap with nothing running.
-// ────────────────────────────────────────────────────────────────────────────────
+// ──────���─────────────────────────────────��────────��──────────────────────────────
 
 // Returns the timestamp of the most recent Wake-up moment (getWakeHour()) on or before `now`.
 function todayWakeTs(now){
@@ -6176,7 +6447,7 @@ function buildFullDayTimeline(entries){
     cursor = Math.max(cursor, end);
   }
 
-  // ── LIVE ACTIVE TIMER ────────────────────────────────────────────────────────
+  // ── LIVE ACTIVE TIMER ─────────────���──────────────────────────────────────────
   // Bomb is an Activity. Identical treatment to Study, Routine, Health, etc.
   // There is NO special bomb branch. The activeTimer — whatever its type — owns
   // the trailing interval [wallSegmentStartTs → now]. Trailing gap before it = Idle.
@@ -6191,8 +6462,8 @@ function buildFullDayTimeline(entries){
     : null;
   const _trailingEnd = (_liveRunning && _liveSegStart > cursor) ? _liveSegStart : windowEnd;
 
-  // ── TRAILING GAP (cursor → trailingEnd) ──────────────────────────────────
-  // Always Idle (or Sleep). No activity owns this interval — it is dead time.
+  // ── TRAILING GAP (cursor → trailingEnd) ──────────��──────��────────────────
+  // Always Idle (or Sleep). No activity owns this interval �� it is dead time.
   // The live activity entry is appended separately below and does NOT overlap here.
   if(_trailingEnd - cursor > GAP_THRESHOLD_MS){
     const _trailingEntries = fillGap(cursor, _trailingEnd, sleeps);
@@ -6232,7 +6503,7 @@ function buildFullDayTimeline(entries){
   return full;
 }
 
-// Reflection Summary — aggregates today's Pomodoro Log reflections (Study Task Progress data ONLY)
+// Reflection Summary �� aggregates today's Pomodoro Log reflections (Study Task Progress data ONLY)
 // across ALL study tasks. total = reflection slots created; done = emoji + comment both saved.
 function computeReflectionSummary(){
   const out = {total:0, done:0, good:0, ok:0, bad:0};
@@ -6271,7 +6542,7 @@ function renderHistDateHeader(){
 async function renderHistSummary(){
   const grid = document.getElementById('histSummaryGrid');
   if(!grid) return;
-  const all = await idbAll('timeline');
+  const all = await getTimelineEntries();
   const today = todayStr();
   const L = STATE.settings.labels;
   const cats = [
@@ -6309,7 +6580,7 @@ async function renderHistSummary(){
 async function renderTimeline(){
   renderHistDateHeader();
   await renderHistSummary();
-  const _allRaw = await idbAll('timeline');
+  const _allRaw = await getTimelineEntries();
   // When bomb feature is disabled, bomb entries do not exist — treat them as noact entries
   const all = !bombModeOn(STATE)
     ? _allRaw.map(e => e.category === 'bomb' ? {...e, category:'noact', task:'Idle', topic:'No Activity'} : e)
@@ -6345,16 +6616,17 @@ async function renderTimeline(){
   const filteredFull = full.filter(e => e._isLive || e.duration >= _effectiveThreshold);
   wrap.innerHTML = bombStatHtml + filteredFull.map(e=>{
     const cat = e.category;
+    const displayCat = e.uiCategory || cat;
     const name = cat === 'noact' ? 'Idle'
                : e.task;
     const sub  = cat === 'noact' ? 'No Activity'
                : cat === 'sleep' ? 'Sleep'
-               : (e.topic || (cat==='study' ? 'Study session' : cat==='routine' ? 'Routine' : cat==='health' ? 'Health activity' : cat==='bomb' ? 'Bomb' : 'Activity'));
+               : (e.topic || displayCat);
     const tot  = '';
     return `<div class="tl-row">
       <div class="tl-dotline"><div class="tl-dot ${cat}"></div></div>
       <div class="tl-act">
-        <div class="tl-act-ic" style="background:${HIST_COLOR_LIGHT[cat]};color:${HIST_COLOR[cat]}">${HIST_ICON[cat]}</div>
+        <div class="tl-act-ic" style="background:${HIST_COLOR_LIGHT[cat]};color:${HIST_COLOR[cat]}">${HIST_ICON[displayCat] || HIST_ICON[cat]}</div>
         <div class="tl-act-txt"><div class="tl-act-name">${escapeHtml(name)}</div><div class="tl-act-sub">${escapeHtml(sub)}${tot}</div><div style="font-size:11px;color:var(--text-dim);margin-top:2px;">🕐 ${fmtTimeOfDay(e.startTs)} - ${fmtTimeOfDay(e.endTs)}</div></div>
       </div>
       <div class="tl-row-dur" style="color:${HIST_COLOR[cat]}">${
@@ -6391,13 +6663,14 @@ function renderTimelineGrouped(full, wrap, bombStatHtml){
   const groupMap = new Map(); // key -> { cat, name, sub, totalSec, entries[] }
   full.forEach(e => {
     const cat  = e.category;
+    const displayCat = e.uiCategory || cat;
     const key  = (cat === 'noact' || cat === 'sleep') ? cat : (e.task || cat);
     const name = cat === 'noact' ? 'Idle'
                : e.task;
     const sub  = cat === 'noact' ? 'No Activity'
                : cat === 'sleep' ? 'Sleep'
-               : (e.topic || (cat==='study' ? 'Study session' : cat==='routine' ? 'Routine' : cat==='health' ? 'Health activity' : cat==='bomb' ? 'Bomb' : 'Activity'));
-    if(!groupMap.has(key)) groupMap.set(key, { cat, name, sub, totalSec: 0, entries: [] });
+               : (e.topic || displayCat);
+    if(!groupMap.has(key)) groupMap.set(key, { cat, displayCat, name, sub, totalSec: 0, entries: [] });
     const g = groupMap.get(key);
     g.totalSec += e.duration;
     g.entries.push(e);
@@ -6435,7 +6708,7 @@ function renderTimelineGrouped(full, wrap, bombStatHtml){
         <div class="tl-act-group-chev" data-groupkey="${escapeHtml(g.name + cat)}" style="color:${HIST_COLOR[cat]};font-size:18px">▸</div>
         <div class="tl-act-data">
           <div class="tl-act">
-            <div class="tl-act-ic" style="background:${HIST_COLOR_LIGHT[cat]};color:${HIST_COLOR[cat]}">${HIST_ICON[cat]}</div>
+            <div class="tl-act-ic" style="background:${HIST_COLOR_LIGHT[cat]};color:${HIST_COLOR[cat]}">${HIST_ICON[g.displayCat] || HIST_ICON[cat]}</div>
             <div class="tl-act-txt"><div class="tl-act-name">${escapeHtml(g.name)}</div><div class="tl-act-sub">${escapeHtml(g.sub)}</div></div>
           </div>
         </div>
@@ -6462,7 +6735,7 @@ function renderTimelineGrouped(full, wrap, bombStatHtml){
     });
   });
 }
-// ────────────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────────────────────���────
 
 let openPomoLogId = null; // which task's Pomodoro Log dropdown is open — only one at a time
 let pomoPopTarget = null; // {taskId, idx} of the reflection row being filled in the popup
@@ -6681,13 +6954,17 @@ function seedTomorrow(state){
   const tasks=[];
   for(const t of CACHED_TASKS){
     const persistent=(t.category==='routine'||t.category==='health');
-    tasks.push({tid:nextTid(),category:t.category,name:t.name,duration:t.duration,countAs:t.countAs||'others',icon:t.icon,color:t.color,pending:!persistent});
+    if(persistent) tasks.push({tid:nextTid(),category:t.category,name:t.name,duration:t.duration,countAs:t.countAs||'others',icon:t.icon,color:t.color,pending:false});
   }
   state.tomorrow={key:tomorrowKey(),tasks};
 }
 async function ensureTomorrow(state){
   let changed=false;
   if(!state.tomorrow||!Array.isArray(state.tomorrow.tasks)){ seedTomorrow(state); changed=true; }
+  else {
+    const confirmed = state.tomorrow.tasks.filter(t=>!t.pending);
+    if(confirmed.length!==state.tomorrow.tasks.length){ state.tomorrow.tasks=confirmed; changed=true; }
+  }
   if(state.lastWakeKey===undefined){ state.lastWakeKey=studyDayKey(); changed=true; }
   if(changed) await saveState(state);
 }
@@ -6697,8 +6974,28 @@ function catUsedFrom(list,cat){ return list.filter(t=>t.category===cat).reduce((
 function budgetViewList(){ return planMode==='tomorrow' ? tomorrowConfirmed() : CACHED_TASKS; }
 // At Wake-up Time, Tomorrow becomes Today: confirmed tasks form the new (fresh-progress) today
 // plan, pending reusable ones are discarded, and a brand new blank Tomorrow is seeded.
+async function carryUnfinishedStudyToPlanner(state){
+  if(!Array.isArray(state.plannerPending)) state.plannerPending=[];
+  if(!state.activePlannerId) return;
+  const sourceDay = state.lastWakeKey || studyDayKey();
+  for(const task of CACHED_TASKS){
+    if(task.category!=='study') continue;
+    const remaining = Math.max(0, (task.duration||0) - Math.min(task.duration||0, task.consumedSec||0));
+    const carryKey = `${sourceDay}:${task.id}`;
+    if(!remaining || task.completionStatus==='completed' || state.plannerPending.some(p=>p.plannerId===state.activePlannerId && p.carryKey===carryKey)) continue;
+    state.plannerPending.push({id:'pending-'+Date.now()+'-'+Math.random().toString(36).slice(2,7), plannerId:state.activePlannerId, carryKey, category:'study', name:task.name, subject:task.subject||null, duration:remaining, icon:task.icon, color:task.color, createdOn:studyDayKey(), reuseDisabled:false});
+  }
+}
 async function promoteTomorrow(state){
   const confirmed=(state.tomorrow&&state.tomorrow.tasks||[]).filter(t=>!t.pending);
+  const wakeKey=studyDayKey();
+  // This checkpoint makes the wake-up sequence resumable. Once Pending is committed,
+  // retries rebuild Today only; they never inspect the rebuilt tasks as yesterday's work.
+  if(!state.wakePromotion || state.wakePromotion.key!==wakeKey){
+    await carryUnfinishedStudyToPlanner(state);
+    state.wakePromotion={key:wakeKey,stage:'pendingCommitted'};
+    await saveState(state);
+  }
   const all=await idbAll('tasks');
   for(const t of all){ await idbDelete('tasks', t.id); }
   for(const t of confirmed){
@@ -6706,7 +7003,8 @@ async function promoteTomorrow(state){
   }
   CACHED_TASKS=await loadTasks();
   seedTomorrow(state);
-  state.lastWakeKey=studyDayKey();
+  state.lastWakeKey=wakeKey;
+  state.wakePromotion=null;
   await saveState(state);
 }
 let _promotingWake = false; // re-entrancy guard: boot + visibilitychange/pageshow + 3s poll all call this simultaneously at wake-up boundary → promoteTomorrow() ran multiple times → duplicate tasks
@@ -6740,7 +7038,7 @@ function updatePlanTabsUI(){
   const td=document.getElementById('planTodayDate'); if(td) td.textContent=formatDateKeyLong(todayStudyDay);
   const tm=document.getElementById('planTomorrowDate'); if(tm) tm.textContent=formatDateKeyLong(tomorrowStudyDay);
   document.querySelectorAll('#planTabs .plan-tab').forEach(c=>c.classList.toggle('active', c.getAttribute('data-plan')===planMode));
-  const note=document.getElementById('tomorrowNote'); if(note) note.style.display = planMode==='tomorrow' ? 'block' : 'none';
+  const note=document.getElementById('tomorrowNote'); if(note) note.style.display = 'none';
   // Tomorrow-only editing banner: visible only on the Tomorrow tab, date recomputed live so it
   // always shows the real tomorrow (never carries over into Today after the day rolls over).
   const teb=document.getElementById('tomorrowEditBanner');
@@ -6807,16 +7105,19 @@ function renderTasks(){
   const wrap = document.getElementById('taskListArea');
   const isTom = planMode==='tomorrow';
   const src = isTom ? tomorrowList() : CACHED_TASKS;
-  const list = src.filter(t=>t.category===currentTaskTab);
+  const list = src.filter(t=>(t.uiCategory||t.category)===currentTaskTab);
   const countN = isTom ? list.filter(t=>!t.pending).length : list.length;
   const L = (STATE && STATE.settings.labels) || DEFAULT_SETTINGS.labels;
-  const catLabelMap = {study:L.catStudy, routine:L.catRoutine, health:L.catHealth, others:L.catOthers};
+  const catLabelMap = {study:L.catStudy, revision:'Revision', routine:L.catRoutine, health:L.catHealth, others:L.catOthers};
   // Update task count badge
   const _countEl = document.getElementById('taskCountVal');
   if(_countEl) _countEl.textContent = countN;
   // Update "Add <Category> Task" button label
   const _addLbl = document.getElementById('addTaskCatLabel');
   if(_addLbl) _addLbl.textContent = catLabelMap[currentTaskTab];
+  // Show cart button only for Study and Revision tabs
+  const _cartBtn = document.getElementById('cartBtn');
+  if(_cartBtn) _cartBtn.style.display = (currentTaskTab==='study' || currentTaskTab==='revision') ? 'flex' : 'none';
   // Update duration badge — sum of all task durations in current category
   const _catDurSec = list.reduce((s,t)=>s+(t.duration||0),0);
   const _durEl = document.getElementById('taskDurVal');
@@ -6827,8 +7128,6 @@ function renderTasks(){
   const INFO = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11.5v5"/><path d="M12 7.75h.01"/></svg>';
   // Green circular tick — display-only status shown once an activity has been Completed (normally or early).
   const CHECK = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.25 12.25l2.5 2.5 5-5.5"/></svg>';
-  const REUSE = '<svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>';
-  const TRASH = '<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>';
   const lockToday = STATE && STATE.settings.lockTodayEditing && studyDayActive();
   // Lock notice banner (UI only) — shown only on the Today view while editing is actually locked;
   // disappears automatically when the setting is turned off or the Study Day lock window ends.
@@ -6837,9 +7136,6 @@ function renderTasks(){
     const clr = t.color||CAT_COLOR_DEFAULT[t.category];
     let dur = `<span class="dur" style="color:${clr}">${fmtHMu(t.duration)}</span>`;
     if(isTom){
-      if(t.pending){
-        return dur+`<button class="rt-btn" data-reuse="${t.tid}" aria-label="Reuse task">${REUSE}Reuse</button><button class="rt-btn del" data-tdelete="${t.tid}" aria-label="Delete task">${TRASH}Delete</button>`;
-      }
       return dur+`<button class="icon-btn" data-tedit="${t.tid}" aria-label="Edit task">${PENCIL}</button>`;
     }
     // Today
@@ -7014,7 +7310,7 @@ function renderSettings(){
   renderBombConfigVisibility();
 }
 
-// ── Live Formula Debugging ────────────────────────────────────────────────────
+// ── Live Formula Debugging ──────���───────────────────────────�����─────��────���─��────
 // Accordion toggle for Home Widget debugging card (reuses standard .expanded class pattern).
 // On expand: renders the card once via one-shot call. On collapse: nothing happens (dormant).
 document.getElementById('dbgHomeCard')?.addEventListener('click', function(e){
@@ -7355,7 +7651,7 @@ async function getStudySecondsInRange(fromKey, toKey){
   let sum = 0;
   for(const k in bank){ if(k>=fromKey && k<=toKey) sum += bank[k]||0; }
   // Live timeline entries — only for days NOT already banked, so nothing is ever double-counted
-  const all = await idbAll('timeline');
+  const all = await getTimelineEntries();
   return all.reduce((s,e)=>{
     if(e.category==='study' && e.date>=fromKey && e.date<=toKey && bank[e.date]===undefined) return s+(e.duration||0);
     return s;
@@ -7472,7 +7768,7 @@ async function computeGoalMetrics(){
   //   fracHours = (absOffsetDays − wholeDays) × Daily Target   ← always ≥ 0 (Final Day Study)
   // Step 3: Apply direction to the deadline.
   //   Offset < 0 (behind)  → add wholeDays to deadline  → Projected Finish AFTER deadline
-  //   Offset = 0 (on time) → no shift                   → Projected Finish = deadline
+  //   Offset = 0 (on time) ������ no shift                   → Projected Finish = deadline
   //   Offset > 0 (ahead)   → subtract wholeDays          → Projected Finish BEFORE deadline
   //
   // Verified with examples:
@@ -7505,9 +7801,9 @@ async function computeGoalMetrics(){
   // but recovery is still mathematically possible before the day ends.
   let liveStatus = 'ontime';
   if(started && offset < 0){
-    const _w = await computeStudyCompletionWidget();
+    const _w = cachedWidgetData || await computeStudyCompletionWidget();
     if(_w){
-      // freeCapacitySeconds: Remaining Day ──── Remaining Non-Study (lost time NOT subtracted).
+      // freeCapacitySeconds: Remaining Day ����── Remaining Non-Study (lost time NOT subtracted).
       const availableHours = _w.freeCapacitySeconds / 3600;
       const hoursBehind    = -offset; // offset < 0, so negating gives positive magnitude
       liveStatus = hoursBehind <= availableHours ? 'canRecover' : 'delayed';
@@ -7579,37 +7875,33 @@ async function computeStudyCompletionWidget(){
   // "Max Study Today" / "Study Complete By" whenever study tasks exist,
   // and "No Study Planned Today" when none exist. No goal required.
 
-  // FOOLPROOF CACHE SYNC: Reload tasks fresh from IndexedDB before computing.
-  // This eliminates the intermittent bug where a newly-added task wasn't visible in the
-  // home widget because CACHED_TASKS was stale from before the task was saved.
-  // The cache is always reloaded here (not just on render), so even if the 3s auto-render
-  // fires faster than the task-save's loadTasks() completes, this ensures the widget sees it.
-  try { CACHED_TASKS = await loadTasks(); } catch(e){ console.warn('[widget] task sync failed', e); }
+  // CACHED_TASKS is refreshed after every task write and before the first render. Rendering must
+  // remain memory-only: a database read here made every visible refresh wait for IndexedDB.
 
-  // §1 — Planned Study Today ────────🔵 ◇ ────────────────────────────────────────
+  // §1 — Planned Study Today ────────🔵 ◇ ──────────────────────────────��─────────
   // Sum of every today's task whose effective credit category is 'study'.
   // homeDayTargetSec() already filters by creditCat(t)==='study', which includes
   // Others tasks configured as "Count as Study". Returns seconds directly.
   const plannedStudySeconds = homeDayTargetSec();
 
-  // §2 🔵 Completed Study ────────────—───────────────────────────────────────────
+  // §2 🔵 Completed Study ────────────—──────────────────────────────��────────────
   // Committed sessions banked in dailyStudySeconds plus the live running session
   // delta. Continuously increases while the user is actively studying.
   // liveTodayStudySec() returns seconds directly.
   const completedStudySeconds = liveTodayStudySec(state);
 
-  // §3 — Remaining Study ──────────────────────🔵───────────────────────────────────────────
+  // §3 — Remaining Study ──────────────────────��─────────────���─────────────────────────────
   // Planned − Completed. Clamped to zero; never negative.
   const remainingStudySeconds = Math.max(0, plannedStudySeconds - completedStudySeconds);
 
   // §4 — Remaining Non-Study ─────────🔵───────────────────────────────────────
   // Remaining time across every today's task whose effective credit category is
-  // NOT 'study'. Uses creditCat(t) so that Others → "Count as Study" tasks are
+  // NOT 'study'. Uses creditCat(t) so that Others �� "Count as Study" tasks are
   // excluded here and counted only in §1/§2/§3.
   // Now accounts for live session delta to prevent false "time decay" while running.
   const remainingNonStudySeconds = effectiveRemainingNonStudySec(STATE);
 
-  // §5 — Lost Time ───────────────────────────────────────────📚────────────────────
+  // §5 — Lost Time ───────────────��───────────────────────────📚────────────────────
   // Bomb + Inactivity time already consumed today. Irreversible; shrinks the
   // available window. Uses existing buildFullDayTimeline path unchanged.
   const tlEntries = await getTimelineEntries(); // uses in-memory cache; invalidated on every write
@@ -7618,14 +7910,14 @@ async function computeStudyCompletionWidget(){
   const noactSeconds = fullDay.filter(e => e.category === 'noact').reduce((s, e) => s + e.duration, 0);
   const lostTimeSeconds = bombSeconds + noactSeconds;
 
-  // §6 — Day End Boundary & Remaining Day ───────────────────────────────────
+  // §6 ������� Day End Boundary & Remaining Day ───────────────────────────────────
   const resetHour = getDayResetHour();
   const dayEndTime = new Date();
   dayEndTime.setHours(resetHour, 0, 0, 0);
   if(dayEndTime.getTime() <= Date.now()) dayEndTime.setDate(dayEndTime.getDate() + 1);
   const remainingDaySeconds = Math.max(0, (dayEndTime.getTime() - Date.now()) / 1000);
 
-  // §7 — Free Capacity ───────────────────────────────────────────────────────────
+  // §7 — Free Capacity ──��────────────────────────────────────────────��───────────
   // The maximum amount of Study time that can still physically fit into today.
   // Formula: Remaining Day − Remaining Non-Study obligations.
   // Lost Time (bombSeconds + noactSeconds) is a historical record of the past;
@@ -7635,7 +7927,7 @@ async function computeStudyCompletionWidget(){
   // return value for analytics, reports and debugging only.
   const freeCapacitySeconds = Math.max(0, remainingDaySeconds - remainingNonStudySeconds);
 
-  // §8 — Max Study Today ──────────────────────────────────🔵───────────────────
+  // §8 — Max Study Today ─���────────────────────────────────🔵────────������─�����───�����──
   // The maximum total Study the user can possibly complete before the day ends.
   // Independent of the Goal system.
   const maxStudyTodaySeconds = completedStudySeconds + freeCapacitySeconds;
@@ -7643,7 +7935,7 @@ async function computeStudyCompletionWidget(){
   // ──9 — Decision: can the plan still be completed today? ────────────────────
   const canFinishToday = maxStudyTodaySeconds >= plannedStudySeconds;
 
-  // §10 — Projected Finish Time ──────────────────────🔵───────────────────────
+  // §10 — Projected Finish Time ──������──────────────────🔵───────────────────────
   // Clock time at which Study will be complete assuming all remaining work is
   // performed from this moment onward.
   // Formula: now + Remaining Study + Remaining Non-Study.
@@ -7700,6 +7992,7 @@ async function updateFinishByCache(){
     cachedFinishByText = 'NO_STUDY_PLANNED';
     return;
   }
+  cachedWidgetData = data;
 
   // Pre-format helper labels once so the renderer can use them directly
   cachedGoalLabels = {
@@ -7954,7 +8247,26 @@ function updateGoalSettingsPreview(){
 
 // Main render entry point ── re-draws whatever is currently on screen and shows the
 // Chain Broken overlay if a bomb explosion happened since the last render
-async function render(){
+let renderInFlight = null;
+let renderQueued = false;
+
+// Serialize UI refreshes. Timers, navigation, storage callbacks and resume events can all request
+// a render; allowing them to overlap was the source of stale values briefly replacing fresh ones.
+function render(){
+  if(renderInFlight){
+    renderQueued = true;
+    return renderInFlight;
+  }
+  renderInFlight = (async ()=>{
+    do {
+      renderQueued = false;
+      await renderNow();
+    } while(renderQueued);
+  })().finally(()=>{ renderInFlight = null; });
+  return renderInFlight;
+}
+
+async function renderNow(){
   // SELF-HEAL: CACHED_TASKS is only repopulated by action functions (startSession/promoteTomorrow),
   // never by recoverState() or the resume/3s-interval paths. If a render ever fires while the cache
   // is momentarily empty (e.g. a resume race, or before startSession finished its loadTasks), the
@@ -8096,6 +8408,79 @@ document.getElementById('slotListArea').addEventListener('click', async (e)=>{
 let editingTaskId=null; // Task id currently being edited, or null when adding a new task
 let modalCat='study';   // Category the Add/Edit modal is currently working with (Category field was removed)
 let modalCountAs='others'; // OTHERS popup only: which category this task should "Count this Activity as"
+let currentPlanDetailSubject = null; // Subject name currently viewing in the plan detail screen
+let planDetailTasks = []; // Planner chapters filtered for the current subject detail view
+let plannerChapterEditingId = null;
+let editingPendingId = null; // Planner Pending item being edited in the shared task card
+let creatingPending = false;
+let plannerDetailMode = 'subject';
+let planDetailSortMode = 'oldest';
+
+function plannerChapters(){
+  if(!STATE) return [];
+  if(!Array.isArray(STATE.plannerChapters)) STATE.plannerChapters = [];
+  return STATE.activePlannerId ? STATE.plannerChapters.filter(c=>c.plannerId===STATE.activePlannerId) : [];
+}
+function plannerChaptersFor(plannerId){
+  return (!STATE || !Array.isArray(STATE.plannerChapters)) ? [] : STATE.plannerChapters.filter(c=>c.plannerId===plannerId);
+}
+function plannerPending(){
+  if(!STATE || !Array.isArray(STATE.plannerPending)) return [];
+  return STATE.activePlannerId ? STATE.plannerPending.filter(p=>p.plannerId===STATE.activePlannerId) : [];
+}
+function plannerPendingFor(plannerId){
+  return (!STATE || !Array.isArray(STATE.plannerPending)) ? [] : STATE.plannerPending.filter(p=>p.plannerId===plannerId);
+}
+function addPlannerChapter(chapter){
+  if(!STATE || !STATE.activePlannerId) throw new Error('No active planner is selected.');
+  if(!Array.isArray(STATE.plannerChapters)) STATE.plannerChapters=[];
+  chapter.plannerId=STATE.activePlannerId;
+  STATE.plannerChapters.push(chapter);
+  return chapter;
+}
+function plannerSubjects(){
+  const configured = getSubjects ? getSubjects() : [];
+  const stored = plannerChapters().map(c => c.subject).filter(Boolean);
+  return [...new Set([...configured, ...stored])];
+}
+function plannerDateKey(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function formatPlannerDate(dateKey){
+  if(!dateKey) return '';
+  const [y,m,d] = dateKey.split('-').map(Number);
+  return new Date(y, m-1, d).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+}
+// The footer UI is shared, but Planner chapters and direct Tasks each persist
+// their own date-only `createdOn` value in their separate data stores.
+function showCreatedOnFooter(createdOn){
+  const durationHelp = document.getElementById('taskDurationHelp');
+  const subjectHint = document.getElementById('taskSubjectHint');
+  const footer = document.getElementById('plannerCreatedOn');
+  if(durationHelp) durationHelp.style.display = 'none';
+  if(subjectHint) subjectHint.style.display = 'none';
+  if(footer){
+    footer.textContent = createdOn ? `Created on ${formatPlannerDate(createdOn)}` : '';
+    footer.style.display = createdOn ? 'block' : 'none';
+  }
+}
+function filteredPlannerChapters(){
+  return filterPlannerChapterList(planDetailTasks, planDetailSortMode);
+}
+function filterPlannerChapterList(chapters, mode){
+  let list = [...chapters];
+  const byDate = c => c.createdOn || '0000-00-00';
+  if(mode==='oldest') return list.sort((a,b)=>byDate(a).localeCompare(byDate(b)));
+  if(mode==='newest') return list.sort((a,b)=>byDate(b).localeCompare(byDate(a)));
+  if(['hard','medium','easy'].includes(mode)){
+    const colors = {hard:'#EF4444',medium:'#5B4FE8',easy:'#1B1740'};
+    return list.filter(c => c.color===colors[mode]);
+  }
+  if(mode==='completed') return list.filter(c => (c.duration||0)>0 && (c.allocatedSec||0)>=(c.duration||0));
+  if(mode==='running') return list.filter(c => (c.allocatedSec||0)<(c.duration||0));
+  return list;
+}
 // Highlights the chosen "Count this Activity as" radio (does NOT touch the icon — that only changes on a user tap)
 function setCountAsRadio(val){
   modalCountAs = val || 'others';
@@ -8111,18 +8496,39 @@ function setCountAsRadio(val){
     const val = opt.getAttribute('data-countas');
     setCountAsRadio(val);
     document.getElementById('taskIconInput').value = CAT_ICON[val] || CAT_ICON.others;
-    document.getElementById('taskColorInput').value = CAT_COLOR_DEFAULT[val] || CAT_COLOR_DEFAULT.others;
+    populateColorSelect('#5B4FE8', val);
   });
 })();
 // HH:MM helpers for the Duration field + 12-hour display for time slots
 function secToHHMM(sec){ const m=Math.round(sec/60); return Math.floor(m/60)+':'+String(m%60).padStart(2,'0'); }
   // Split-duration helpers: write seconds into the HH/MM boxes and read them back
   function setDurInputs(sec){ const m=Math.round((sec||0)/60); const hh=document.getElementById('taskDurHH'), mm=document.getElementById('taskDurMM'); if(hh) hh.value=String(Math.floor(m/60)).padStart(2,'0'); if(mm) mm.value=String(m%60).padStart(2,'0'); }
+  function setPlannerDurationMode(isPlanner){
+    const overlay = document.getElementById('taskOverlay');
+    const hh = document.getElementById('taskDurHH');
+    const mm = document.getElementById('taskDurMM');
+    const labels = document.querySelectorAll('.dur-split .dur-sub');
+    if(overlay) overlay.dataset.editorMode = isPlanner ? 'planner' : 'task';
+    if(hh){ hh.maxLength = isPlanner ? 3 : 2; hh.placeholder = isPlanner ? '000' : '00'; }
+    if(mm) mm.placeholder = '00';
+    if(labels.length >= 2){ labels[0].textContent = isPlanner ? 'HHH' : 'HH'; labels[1].textContent = 'MM'; }
+    const durationHelp = document.getElementById('taskDurationHelp');
+    const createdOn = document.getElementById('plannerCreatedOn');
+    if(durationHelp) durationHelp.style.display = isPlanner ? 'none' : '';
+    if(createdOn) createdOn.style.display = 'none';
+  }
+  function setPlannerDurInputs(sec){
+    const totalMinutes = Math.round((sec||0)/60);
+    const hh = document.getElementById('taskDurHH'), mm = document.getElementById('taskDurMM');
+    if(hh) hh.value = String(Math.floor(totalMinutes/60)).padStart(3,'0');
+    if(mm) mm.value = String(totalMinutes%60).padStart(2,'0');
+  }
   function getDurSec(){ const h=parseInt(document.getElementById('taskDurHH').value,10)||0; const mi=parseInt(document.getElementById('taskDurMM').value,10)||0; return (h*60+mi)*60; }
-  // Reject invalid values while typing (HH 00–24, MM 00–59, digits only)
+  // Reject invalid values while typing. Daily tasks use HH 00–24; Planner
+  // chapters switch to HH 00–999. Minutes are always 00–59.
   (function(){
     const hh=document.getElementById('taskDurHH'), mm=document.getElementById('taskDurMM');
-    if(hh) hh.addEventListener('input', function(){ let v=this.value.replace(/\D/g,'').slice(0,2); if(v!=='' && parseInt(v,10)>24) v='24'; this.value=v; });
+    if(hh) hh.addEventListener('input', function(){ const plannerMode=document.getElementById('taskOverlay').dataset.editorMode==='planner'; const max=plannerMode?999:24, digits=plannerMode?3:2; let v=this.value.replace(/\D/g,'').slice(0,digits); if(v!=='' && parseInt(v,10)>max) v=String(max); this.value=v; });
     if(mm) mm.addEventListener('input', function(){ let v=this.value.replace(/\D/g,'').slice(0,2); if(v!=='' && parseInt(v,10)>59) v='59'; this.value=v; });
   })();
   function parseHHMM(str){
@@ -8140,6 +8546,13 @@ function getTimeSlots(){ return (STATE && STATE.settings.timeSlots) || DEFAULT_S
 function getSubjects(){ return (STATE && STATE.settings.subjects) || DEFAULT_SETTINGS.subjects; }
 function slotRangeLabel(s){ return fmt12(s.start)+' – '+fmt12(s.end); }
 // Fills the Subject dropdown (Study only) and Preferred Slot dropdown in the Add/Edit Task modal
+function populateColorSelect(selected, cat){
+  const sel = document.getElementById('taskColorInput');
+  const isStudy = cat === 'study' || cat === 'revision';
+  sel.innerHTML = `<option value="#EF4444">${isStudy?'Hard':'Urgent'}</option><option value="#5B4FE8">${isStudy?'Medium':'Normal'}</option><option value="#1B1740">${isStudy?'Easy':'Optional'}</option>`;
+  sel.value = selected||'#5B4FE8';
+  document.getElementById('colorFieldLabel').textContent = isStudy ? 'Difficulty Level' : 'Priority Level';
+}
 function populateSubjectSelect(selected){
   const sel = document.getElementById('taskSubjectInput');
   sel.innerHTML = `<option value="">(No Subject Selected)</option>` + getSubjects().map(s=>`<option value="${s}">${s}</option>`).join('');
@@ -8159,14 +8572,14 @@ function updateSlotRangeHint(){
 document.getElementById('taskSlotInput').addEventListener('change', updateSlotRangeHint);
 // Applies category-specific bits of the modal: title, Subject visibility
 function applyModalCat(cat, isEdit){
-  modalCat = cat;
+  const internalCat = cat==='revision' ? 'study' : cat; // revision maps to study internally
+  modalCat = internalCat;
   const L = STATE.settings.labels;
-  const catName = ({study:L.catStudy, routine:L.catRoutine, health:L.catHealth, others:L.catOthers})[cat] || cat;
+  const uiName = cat==='revision' ? 'Revision' : ({study:L.catStudy, routine:L.catRoutine, health:L.catHealth, others:L.catOthers})[cat] || cat;
   const titleEl = document.getElementById('taskModalTitle');
-  const baseTitle = (isEdit?'Edit Task':'Add Task')+' - '+catName.toUpperCase();
+  const baseTitle = (isEdit?'Edit Task':'Add Task')+' - '+uiName.toUpperCase();
   const saveBtn = document.getElementById('saveTaskBtn');
   if(planMode==='tomorrow'){
-    // Tomorrow section only: TOMORROW badge + light-red themed save button (Today untouched)
     titleEl.innerHTML = escapeHtml(baseTitle)+'<span class="tomorrow-badge">TOMORROW</span>';
     saveBtn.textContent = 'Save Task For Tomorrow';
     saveBtn.style.background = '#FDECEC'; saveBtn.style.color = '#DC2626';
@@ -8175,11 +8588,10 @@ function applyModalCat(cat, isEdit){
     saveBtn.textContent = 'Save Task';
     saveBtn.style.background = ''; saveBtn.style.color = '';
   }
-  const isStudy = cat==='study';
+  const isStudy = internalCat==='study';
   document.getElementById('taskSubjectField').style.display = isStudy?'block':'none';
   document.getElementById('taskSubjectHint').style.display = isStudy?'block':'none';
-  // "Count this Activity as" appears ONLY in the Others Add Task popup — no other category is modified
-  document.getElementById('taskCountAsField').style.display = (cat==='others')?'block':'none';
+  document.getElementById('taskCountAsField').style.display = (internalCat==='others')?'block':'none';
 }
 // Opens the Add/Edit Task modal, pre-filled with an existing task's data if editing.
 // `focusField` optionally focuses one input after the sheet opens (used by the Edit Menu's
@@ -8188,31 +8600,42 @@ function applyModalCat(cat, isEdit){
 // Saving marks the task confirmed (pending=false) so it joins Tomorrow's plan and shows Edit afterward.
 function openTomorrowModal(tid){
   const t = tomorrowList().find(x=>x.tid===tid); if(!t) return;
+  setPlannerDurationMode(false);
+  editingPendingId = null;
   editingTaskId = null; editingTomorrowTid = tid;
   document.getElementById('taskDeleteBtn').style.display = 'block';
   applyModalCat(t.category, true);
   setCountAsRadio(t.countAs||'others');
   document.getElementById('taskNameInput').value = t.name;
   populateSubjectSelect(t.subject);
+  populateColorSelect(t.color||CAT_COLOR_DEFAULT[t.category], t.category);
   populateSlotSelect(t.slotId);
   document.getElementById('taskIconInput').value = t.icon||CAT_ICON[t.category];
-  document.getElementById('taskColorInput').value = t.color||CAT_COLOR_DEFAULT[t.category];
   setDurInputs(t.duration);
   document.getElementById('taskOverlay').classList.add('show');
 }
 function openTaskModal(taskId, focusField){
+  plannerChapterEditingId = null;
+  editingPendingId = null;
+  creatingPending = false;
+  setPlannerDurationMode(false);
   editingTomorrowTid = null;
   editingTaskId = taskId || null;
   const t = taskId ? CACHED_TASKS.find(x=>x.id===taskId) : null;
   const cat = t ? t.category : currentTaskTab;
   document.getElementById('taskDeleteBtn').style.display = t ? 'block' : 'none';
   applyModalCat(cat, !!t);
+  // A new direct task receives this same date when saved; showing it now keeps
+  // the shared editor consistent with its Planner entry point.
+  showCreatedOnFooter(t ? (t.createdOn || plannerDateKey()) : plannerDateKey());
   setCountAsRadio(t ? (t.countAs||'others') : 'others');
   document.getElementById('taskNameInput').value = t ? t.name : '';
-  populateSubjectSelect(t ? t.subject : '');
+  // A task added from a subject page belongs to that subject by default.  This
+  // is what lets the shared Add Task form write back to the planner it came from.
+  populateSubjectSelect(t ? t.subject : (cat==='study' ? currentPlanDetailSubject : ''));
+  populateColorSelect(t ? (t.color||CAT_COLOR_DEFAULT[cat]) : '#5B4FE8', cat);
   populateSlotSelect(t ? t.slotId : '');
-  document.getElementById('taskIconInput').value = t ? (t.icon||CAT_ICON[cat]) : CAT_ICON[cat];
-  document.getElementById('taskColorInput').value = t ? (t.color||CAT_COLOR_DEFAULT[cat]) : CAT_COLOR_DEFAULT[cat];
+  document.getElementById('taskIconInput').value = t ? (t.icon||CAT_ICON[cat]||'') : (CAT_ICON[cat]||'');
   setDurInputs(t ? t.duration : STATE.settings.defaultDurations[cat]);
   document.getElementById('taskOverlay').classList.add('show');
   if(focusField){
@@ -8220,6 +8643,71 @@ function openTaskModal(taskId, focusField){
     const el = document.getElementById(map[focusField]);
     if(el) setTimeout(()=>{ el.focus(); el.select && el.select(); }, 220);
   }
+}
+
+// The Planner uses the existing task form only as an editor; it writes a
+// chapter to the permanent Planner bank, never to today's task store.
+function openPlannerChapterModal(chapterId){
+  const chapter = chapterId ? plannerChapters().find(c => String(c.id)===String(chapterId)) : null;
+  plannerChapterEditingId = chapter ? chapter.id : null;
+  editingPendingId = null;
+  creatingPending = false;
+  editingTomorrowTid = null;
+  editingTaskId = null;
+  modalCat = 'study';
+  currentTaskTab = 'study';
+  setPlannerDurationMode(true);
+  document.getElementById('taskDeleteBtn').style.display = 'none';
+  applyModalCat('study', false);
+  const subjectName = chapter ? chapter.subject : currentPlanDetailSubject;
+  document.getElementById('taskModalTitle').textContent = `${chapter ? 'Edit' : 'Add'} ${subjectName || 'Subject'} Chapter`;
+  document.getElementById('saveTaskBtn').textContent = chapter ? 'Save Chapter' : 'Save Chapter';
+  document.getElementById('taskSubjectHint').style.display = 'none';
+  showCreatedOnFooter(chapter && chapter.createdOn);
+  document.getElementById('taskNameInput').value = chapter ? chapter.name : '';
+  populateSubjectSelect(subjectName);
+  populateColorSelect(chapter ? (chapter.color||'#5B4FE8') : '#5B4FE8', 'study');
+  populateSlotSelect('');
+  document.getElementById('taskIconInput').value = chapter ? (chapter.icon||'📖') : '📖';
+  // Planner chapters start independently at 000:00; they never inherit the
+  // Task Create default duration from Settings.
+  setPlannerDurInputs(chapter ? chapter.duration : 0);
+  document.getElementById('taskOverlay').classList.add('show');
+}
+function openPendingTaskModal(pendingId){
+  const task = plannerPending().find(p=>String(p.id)===String(pendingId));
+  if(!task) return;
+  plannerChapterEditingId = null;
+  editingPendingId = task.id;
+  creatingPending = false;
+  editingTomorrowTid = null;
+  editingTaskId = null;
+  setPlannerDurationMode(false);
+  document.getElementById('taskDeleteBtn').style.display = 'none';
+  applyModalCat('study', true);
+  document.getElementById('taskModalTitle').textContent = 'Edit Pending Task';
+  document.getElementById('saveTaskBtn').textContent = 'Save Task';
+  showCreatedOnFooter(task.createdOn);
+  setCountAsRadio('others');
+  document.getElementById('taskNameInput').value = task.name||'';
+  populateSubjectSelect(task.subject);
+  populateColorSelect(task.color||'#5B4FE8', 'study');
+  populateSlotSelect('');
+  document.getElementById('taskIconInput').value = task.icon||CAT_ICON.study;
+  setDurInputs(task.duration);
+  document.getElementById('taskOverlay').classList.add('show');
+}
+function openNewPendingChapterModal(){
+  plannerChapterEditingId=null; editingPendingId=null; creatingPending=true; editingTomorrowTid=null; editingTaskId=null;
+  setPlannerDurationMode(true);
+  document.getElementById('taskDeleteBtn').style.display='none';
+  applyModalCat('study', false);
+  document.getElementById('taskModalTitle').textContent='Add Pending Chapter';
+  document.getElementById('saveTaskBtn').textContent='Save Pending Chapter';
+  showCreatedOnFooter(plannerDateKey());
+  document.getElementById('taskNameInput').value=''; populateSubjectSelect(''); populateColorSelect('#5B4FE8','study'); populateSlotSelect('');
+  document.getElementById('taskIconInput').value=CAT_ICON.study; setPlannerDurInputs(0);
+  document.getElementById('taskOverlay').classList.add('show');
 }
 // Opening Add Task directly is only allowed while today's schedule is still editable
 document.getElementById('addTaskBtn').onclick = async ()=>{
@@ -8236,6 +8724,47 @@ document.getElementById('saveTaskBtn').onclick = async ()=>{
   const slotId = slotVal ? parseInt(slotVal,10) : null;
   const durSec = getDurSec();
   if(!name || isNaN(durSec) || durSec<=0){ showToast('Enter a valid name and duration (HH:MM).'); return; }
+  if(editingPendingId !== null || creatingPending){
+    const pending = plannerPending().find(p=>String(p.id)===String(editingPendingId));
+    if(creatingPending){
+      STATE.plannerPending.push({id:'pending-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),plannerId:STATE.activePlannerId,category:'study',name,subject:subject||null,duration:durSec,icon:icon||CAT_ICON.study,color:color||'#5B4FE8',createdOn:plannerDateKey(),reuseDisabled:false});
+    } else {
+      if(!pending){ showToast('Pending task no longer exists.'); return; }
+      pending.name=name; pending.subject=subject||null; pending.duration=durSec;
+      pending.icon=icon||CAT_ICON.study; pending.color=color||'#5B4FE8'; pending.reuseDisabled=true;
+    }
+    await saveState(STATE);
+    editingPendingId=null; creatingPending=false;
+    document.getElementById('taskOverlay').classList.remove('show');
+    showPlannerPendingScreen(); renderPlanners();
+    return;
+  }
+  if(plannerChapterEditingId !== null || document.getElementById('taskOverlay').dataset.editorMode==='planner'){
+    const chapter = plannerChapterEditingId !== null
+      ? plannerChapters().find(c => String(c.id)===String(plannerChapterEditingId))
+      : null;
+    const planner = (STATE.planners||[]).find(p=>p.id===STATE.activePlannerId);
+    if(planner){
+      const start=new Date(planner.startDate+'T00:00:00'), end=new Date(planner.endDate+'T00:00:00');
+      const capacity=Math.max(0, Math.floor((end-start)/86400000)+1) * ((STATE.settings&&STATE.settings.studyHours)||8) * 3600;
+      const assigned=plannerChapters().filter(c=>!chapter || String(c.id)!==String(chapter.id)).reduce((sum,c)=>sum+(c.duration||0),0);
+      const remaining=Math.max(0,capacity-assigned);
+      if(durSec>remaining){ showToast(`Only ${fmtHMu(remaining)} remaining.`); return; }
+    }
+    const obj = chapter || {id:'planner-'+Date.now()+'-'+Math.random().toString(36).slice(2,7), plannerId:STATE.activePlannerId, allocatedSec:0, createdOn:plannerDateKey()};
+    obj.name = name; obj.subject = subject || currentPlanDetailSubject; obj.duration = durSec;
+    obj.icon = icon || '📖'; obj.color = color || '#5B4FE8';
+    obj.allocatedSec = Math.min(obj.allocatedSec||0, durSec);
+    // plannerChapters() is a filtered view. New records must be appended to
+    // STATE itself or they disappear as soon as the screen is refreshed.
+    if(!chapter) addPlannerChapter(obj);
+    await saveState(STATE);
+    plannerChapterEditingId = null;
+    document.getElementById('taskOverlay').classList.remove('show');
+    showPlanDetailScreen(obj.subject);
+    renderPlanners();
+    return;
+  }
   const b = getBudgetSeconds();
   if(planMode==='tomorrow'){
     const excl = editingTomorrowTid;
@@ -8274,27 +8803,25 @@ document.getElementById('saveTaskBtn').onclick = async ()=>{
     }
   }
   const obj = editingTaskId ? {...CACHED_TASKS.find(x=>x.id===editingTaskId)} : {};
-  obj.category = cat; obj.name = name; obj.duration = durSec;
+  if(!editingTaskId) obj.createdOn = plannerDateKey();
+  obj.category = modalCat; obj.uiCategory = currentTaskTab; obj.name = name; obj.duration = durSec;
   obj.subject = subject||null; obj.slotId = slotId;
-  obj.countAs = (cat==='others') ? modalCountAs : 'others';
-  obj.icon = icon || CAT_ICON[cat]; obj.color = color || CAT_COLOR_DEFAULT[cat];
+  obj.countAs = (modalCat==='others') ? modalCountAs : 'others';
+  obj.icon = icon || CAT_ICON[modalCat]; obj.color = color || CAT_COLOR_DEFAULT[modalCat];
   await idbPut('tasks', obj);
   CACHED_TASKS = await loadTasks();
   // LIVE TOMORROW MIRROR — Study & Others ONLY (never Routine/Health, whose logic is untouched):
   // a brand-new Today task instantly appears in Tomorrow as a pending reusable candidate
   // (Reuse/Delete buttons), so the user doesn't have to wait for sleep time / day change.
-  if(!editingTaskId && (cat==='study'||cat==='others') && STATE.tomorrow && Array.isArray(STATE.tomorrow.tasks)){
-    if(!STATE.tomorrow.tasks.some(t=>t.pending && t.category===cat && t.name===name)){
-      STATE.tomorrow.tasks.push({tid:nextTid(),category:cat,name,duration:durSec,countAs:obj.countAs,icon:obj.icon,color:obj.color,pending:true});
-      await saveState(STATE);
-    }
-  }
   document.getElementById('taskOverlay').classList.remove('show');
   currentTaskTab = cat;
   document.querySelectorAll('#taskTabs .tab').forEach(c=>c.classList.toggle('active', c.getAttribute('data-cat')===cat));
-  renderTasks(); render(); renderCategoryCounts();
+  renderTasks(); render(); renderCategoryCounts(); renderPlanners();
+  // If this save originated from a planner subject page, immediately redraw it
+  // from the same IndexedDB-backed task cache rather than leaving a local-only UI copy.
+  if(currentPlanDetailSubject) showPlanDetailScreen(currentPlanDetailSubject);
 };
-// Handles tapping the pencil icon on a task row — opens the Edit Menu, unless today's
+// Handles tapping the pencil icon on a task row �� opens the Edit Menu, unless today's
 // schedule is already locked (activities logged), in which case it shows the Locked dialog instead.
 document.getElementById('taskListArea').addEventListener('click', async (e)=>{
   // Started activity → circular View/Info icon opens the "Mark as Completed early" confirmation popup.
@@ -8303,15 +8830,9 @@ document.getElementById('taskListArea').addEventListener('click', async (e)=>{
   const editEl = e.target.closest('[data-edit]');
   if(editEl){ await openEditMenu(parseInt(editEl.getAttribute('data-edit'),10)); return; }
   // Tomorrow: Reuse (same Edit dialog) and confirmed-task Edit both open the shared modal
-  const reuseEl = e.target.closest('[data-reuse]') || e.target.closest('[data-tedit]');
-  if(reuseEl){ openTomorrowModal(parseInt((reuseEl.getAttribute('data-reuse')||reuseEl.getAttribute('data-tedit')),10)); return; }
+  const editTomorrowEl = e.target.closest('[data-tedit]');
+  if(editTomorrowEl){ openTomorrowModal(parseInt(editTomorrowEl.getAttribute('data-tedit'),10)); return; }
   // Tomorrow: Delete simply drops the reusable candidate (never enters Tomorrow's plan)
-  const tdelEl = e.target.closest('[data-tdelete]');
-  if(tdelEl && STATE.tomorrow){
-    const tid = parseInt(tdelEl.getAttribute('data-tdelete'),10);
-    STATE.tomorrow.tasks = STATE.tomorrow.tasks.filter(t=>t.tid!==tid);
-    await saveState(STATE); renderTasks(); showToast('Removed from Tomorrow.');
-  }
 });
 // Switches the active category tab on the Tasks screen
   document.getElementById('taskTabs').addEventListener('click',(e)=>{
@@ -8399,7 +8920,7 @@ document.getElementById('taskDeleteBtn').onclick = ()=>{
   document.getElementById('deleteConfirmOverlay').classList.add('show');
 };
 
-// Only place a task can actually be removed from — always requires this explicit confirmation
+// Only place a task can actually be removed from ��� always requires this explicit confirmation
 document.getElementById('delConfirmCancel').onclick = ()=>{ document.getElementById('deleteConfirmOverlay').classList.remove('show'); };
 document.getElementById('delConfirmDelete').onclick = async ()=>{
   document.getElementById('deleteConfirmOverlay').classList.remove('show');
@@ -8513,6 +9034,8 @@ document.getElementById('tgCopyBtn').onclick = async ()=>{
 // Bottom navigation — switches the active screen and re-renders it, with scroll-to-timer support on Home
 document.querySelectorAll('.nav-item').forEach(item=>{
   item.addEventListener('click', async ()=>{
+    // Step 7 — discard any unsaved shop row when leaving the shop screen via nav
+    if(typeof shopEditingId !== 'undefined' && shopEditingId) shopDiscardRow(shopEditingId);
     document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
     item.classList.add('active');
     hsCollapse(); // navigating away ends task selection
@@ -8523,15 +9046,28 @@ document.querySelectorAll('.nav-item').forEach(item=>{
     document.querySelectorAll('.set-sub').forEach(d=>{ d.style.display = 'none'; });
     const _sMain = document.getElementById('settingsMain'); if(_sMain) _sMain.style.display = 'block';
     const _sSave = document.getElementById('saveSettingsBtn'); if(_sSave) _sSave.style.display = 'none';
+    // Close any open Settings modals (Planner edit, Review edit) when leaving Settings
+    document.getElementById('plannerOverlay').classList.remove('show');
+    document.getElementById('reviewOverlay').classList.remove('show');
     const scr = item.getAttribute('data-screen');
+    if(scr !== 'goals' && extraGoalTickHandle){ clearInterval(extraGoalTickHandle); extraGoalTickHandle = null; }
+    if(scr !== 'history' && !STATE.activeTimer && ringTimerHandle){ clearInterval(ringTimerHandle); ringTimerHandle = null; }
     // Never leave the Goal delete bottom-sheet open when switching tabs
     document.getElementById('gsetMenuOverlay').classList.remove('show');
-    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-    document.getElementById('screen-'+scr).classList.add('active');
+    // Prepare expensive pages while the current screen remains visible. Switching first created
+    // a blank app shell during IndexedDB-backed History/Goals rendering.
     if(scr==='history'){ renderHome(); await renderHistoryScreen(); }
     if(scr==='tasks'){ planMode='today'; tasksSortMode='slot'; renderTasks(); } // Always open Tasks on the Today tab, defaulting to Time Slot sort
-    if(scr==='settings') renderSettings();
+    if(scr==='settings'){ 
+      // Ensure all Settings modals are closed when returning to Settings
+      document.getElementById('plannerOverlay').classList.remove('show');
+      document.getElementById('reviewOverlay').classList.remove('show');
+      renderSettings();
+    }
     if(scr==='goals'){ goalEntryConfettiPending = true; await renderGoalsScreen(); } // flag set only on tab entry — enables the one-shot confetti when goal is complete
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screen-'+scr).classList.add('active');
+    if(scr==='history') renderHome(); // Start the live idle row only while History is actually visible.
     if(scr==='home'){
       const scrollTo = item.getAttribute('data-scroll');
       requestAnimationFrame(()=>{
@@ -9024,7 +9560,11 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
       document.getElementById(el.dataset.sub).style.display = 'block';
       // Save button only appears inside sub-pages that hold editable inputs (hidden for About)
       // Save button hidden for read-only/instant-apply sub-pages (About + Application Settings + Formula Debugging)
-      document.getElementById('saveSettingsBtn').style.display = (el.dataset.sub === 'subAbout' || el.dataset.sub === 'subAndroid' || el.dataset.sub === 'subFormulaDebug') ? 'none' : '';
+      document.getElementById('saveSettingsBtn').style.display = (el.dataset.sub === 'subAbout' || el.dataset.sub === 'subAndroid' || el.dataset.sub === 'subFormulaDebug' || el.dataset.sub === 'subMilestonesRevision') ? 'none' : '';
+      // Render Planner cards when opening Planner section
+      if(el.dataset.sub === 'subMilestonesRevision'){
+        renderPlanners();
+      }
       // Save button must start disabled when entering bomb sub-page (no change made yet)
       if(el.dataset.sub === 'subBomb'){
         // Re-sync all fields from STATE so displayed values are always accurate
@@ -9040,6 +9580,1006 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
 }); // close forEach
 
 // Lock Today's Task Editing toggle — save immediately without waiting for Save button
+// Milestones & Revision uses the standard app tab component; this shell intentionally has no feature logic.
+document.getElementById('milestonesRevisionTabs').addEventListener('click', (e)=>{
+  const tab = e.target.closest('.tab[data-mr-tab]');
+  if(!tab) return;
+  document.querySelectorAll('#milestonesRevisionTabs .tab').forEach(item=>{
+    item.classList.toggle('active', item === tab);
+    if(item === tab){
+      item.style.background = 'var(--gp-primary)';
+      item.style.color = '#fff';
+    } else {
+      item.style.background = 'transparent';
+      item.style.color = 'var(--text)';
+    }
+  });
+  const tabType = tab.dataset.mrTab;
+  if(tabType === 'pending'){ showPlannerPendingScreen(); return; }
+  document.getElementById('plannerTabContent').style.display = tabType === 'planner' ? 'block' : 'none';
+  document.getElementById('revisionTabContent').style.display = tabType === 'revision' ? 'block' : 'none';
+  document.getElementById('pendingTabContent').style.display = 'none';
+  // Populate revision duration inputs with saved value when the tab opens
+  if(tabType === 'revision'){
+    const savedSec = (STATE.settings && STATE.settings.avgRevisionSec) || 0;
+    const totalMin = Math.round(savedSec / 60);
+    const hhEl = document.getElementById('revisionDurHH');
+    const mmEl = document.getElementById('revisionDurMM');
+    if(hhEl) hhEl.value = String(Math.floor(totalMin / 60)).padStart(2, '0');
+    if(mmEl) mmEl.value = String(totalMin % 60).padStart(2, '0');
+  }
+});
+
+// Revision card — edit button unlocks inputs and activates Save
+document.getElementById('revisionEditBtn').addEventListener('click', () => {
+  document.getElementById('revisionDurHH').disabled = false;
+  document.getElementById('revisionDurMM').disabled = false;
+  const saveBtn = document.getElementById('saveRevisionDurBtn');
+  saveBtn.disabled = false;
+  saveBtn.style.opacity = '1';
+  saveBtn.style.pointerEvents = 'auto';
+});
+
+// Save Average Daily Revision Duration
+document.getElementById('saveRevisionDurBtn').addEventListener('click', async () => {
+  const hh = parseInt(document.getElementById('revisionDurHH').value, 10) || 0;
+  const mm = parseInt(document.getElementById('revisionDurMM').value, 10) || 0;
+  const sec = (hh * 60 + mm) * 60;
+  const state = await getState();
+  state.settings.avgRevisionSec = sec;
+  await saveState(state);
+  renderPlanners();
+  // Re-lock inputs after saving
+  document.getElementById('revisionDurHH').disabled = true;
+  document.getElementById('revisionDurMM').disabled = true;
+  const saveBtn = document.getElementById('saveRevisionDurBtn');
+  saveBtn.disabled = true;
+  saveBtn.style.opacity = '0.45';
+  saveBtn.style.pointerEvents = 'none';
+  showToast('Revision duration saved.');
+});
+
+// ===== PLANNER FUNCTIONALITY =====
+let editingPlannerIndex = null;
+
+// Open Create Planner dialog
+document.getElementById('createNewPlannerBtn').addEventListener('click', ()=>{
+  editingPlannerIndex = null;
+  document.getElementById('plannerModalTitle').textContent = 'Create Planner';
+  document.getElementById('plannerNameInput').value = '';
+  document.getElementById('plannerStatusInput').value = 'active';
+  document.getElementById('plannerStatusInput').disabled = !(STATE.planners||[]).length;
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('plannerStartDateInput').value = today;
+  document.getElementById('plannerEndDateInput').value = '';
+  document.getElementById('plannerDeleteBtn').style.display = 'none';
+  document.getElementById('savePlannerBtn').disabled = true;
+  document.getElementById('plannerOverlay').classList.add('show');
+});
+
+// Track original planner values for change detection
+let originalPlannerValues = {name: '', status: '', startDate: '', endDate: ''};
+
+// Update end date min constraint when start date changes
+document.getElementById('plannerStartDateInput').addEventListener('change', ()=>{
+  const startDate = document.getElementById('plannerStartDateInput').value;
+  document.getElementById('plannerEndDateInput').min = startDate;
+  validatePlannerDates();
+});
+
+// Validate when end date changes
+document.getElementById('plannerEndDateInput').addEventListener('change', validatePlannerDates);
+
+// Detect changes and enable Save button
+function validatePlannerDates(){
+  const name = document.getElementById('plannerNameInput').value.trim();
+  const status = document.getElementById('plannerStatusInput').value;
+  const startDate = document.getElementById('plannerStartDateInput').value;
+  const endDate = document.getElementById('plannerEndDateInput').value;
+  
+  // Check if any field is empty
+  let hasEmptyField = !name || !endDate || !startDate;
+  
+  // Check if end date is before start date
+  let dateInvalid = false;
+  if(startDate && endDate) {
+    dateInvalid = new Date(endDate) < new Date(startDate);
+  }
+  
+  // Check if any field has changed from original
+  let hasChanged = (name !== originalPlannerValues.name) ||
+                   (status !== originalPlannerValues.status) ||
+                   (startDate !== originalPlannerValues.startDate) ||
+                   (endDate !== originalPlannerValues.endDate);
+  
+  // Enable Save button only if: no empty fields, date is valid, and something has changed
+  const editing = editingPlannerIndex !== null ? STATE.planners[editingPlannerIndex] : null;
+  const wouldLeaveNoActive = !!(editing && editing.id===STATE.activePlannerId && status==='inactive');
+  document.getElementById('savePlannerBtn').disabled = hasEmptyField || dateInvalid || !hasChanged || wouldLeaveNoActive;
+}
+
+// Listen for changes on all fields
+document.getElementById('plannerNameInput').addEventListener('input', validatePlannerDates);
+document.getElementById('plannerStatusInput').addEventListener('change', validatePlannerDates);
+
+// Close Planner sheet
+document.getElementById('plannerOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'plannerOverlay') e.target.classList.remove('show');
+});
+
+// Delete Planner Button
+document.getElementById('plannerDeleteBtn').addEventListener('click', ()=>{
+  if(editingPlannerIndex === null) return;
+  const planner = STATE.planners[editingPlannerIndex];
+  if(!planner) return;
+  document.getElementById('plannerDeleteConfirmCode').value = '';
+  document.getElementById('plannerDeleteDialog').classList.add('show');
+});
+
+// Cancel Planner Delete
+document.getElementById('plannerDeleteCancel').addEventListener('click', ()=>{
+  document.getElementById('plannerDeleteDialog').classList.remove('show');
+});
+
+// Confirm Planner Delete - requires typing "12345"
+document.getElementById('plannerDeleteConfirm').addEventListener('click', async ()=>{
+  const code = document.getElementById('plannerDeleteConfirmCode').value.trim();
+  if(code !== '12345') {
+    showToast('Incorrect code. Please try again.');
+    return;
+  }
+  
+  if(editingPlannerIndex === null || editingPlannerIndex < 0 || editingPlannerIndex >= STATE.planners.length) return;
+  
+  const removedPlanner = STATE.planners[editingPlannerIndex];
+  STATE.planners.splice(editingPlannerIndex, 1);
+  // A planner owns its permanent bank and its Pending queue. Remove only those
+  // scoped records; independently-created daily task copies remain untouched.
+  STATE.plannerChapters=(STATE.plannerChapters||[]).filter(c=>c.plannerId!==removedPlanner.id);
+  STATE.plannerPending=(STATE.plannerPending||[]).filter(p=>p.plannerId!==removedPlanner.id);
+  if(STATE.activePlannerId===removedPlanner.id) STATE.activePlannerId = STATE.planners.length ? STATE.planners[0].id : null;
+  STATE.planners.forEach(p=>p.status = p.id===STATE.activePlannerId ? 'active' : 'inactive');
+  editingPlannerIndex = null;
+  
+  try {
+    await saveState(STATE);
+    document.getElementById('plannerDeleteDialog').classList.remove('show');
+    document.getElementById('plannerOverlay').classList.remove('show');
+    renderPlanners();
+    showToast('Planner deleted.');
+  } catch(e) {
+    console.error('Error deleting planner:', e);
+    showToast('Error deleting planner.');
+  }
+});
+
+// Save Planner
+document.getElementById('savePlannerBtn').addEventListener('click', async ()=>{
+  const plannerName = document.getElementById('plannerNameInput').value.trim();
+  const status = document.getElementById('plannerStatusInput').value;
+  const startDate = document.getElementById('plannerStartDateInput').value;
+  const endDate = document.getElementById('plannerEndDateInput').value;
+  
+  if(!plannerName || !endDate) return;
+  
+  if(!STATE.planners) STATE.planners = [];
+  
+  let savedPlanner;
+  if(editingPlannerIndex !== null && editingPlannerIndex >= 0 && editingPlannerIndex < STATE.planners.length) {
+    // UPDATE existing planner
+    savedPlanner = STATE.planners[editingPlannerIndex];
+    savedPlanner.name = plannerName;
+    savedPlanner.startDate = startDate;
+    savedPlanner.endDate = endDate;
+  } else {
+    // CREATE new planner
+    const newPlanner = {
+      id: Date.now().toString(),
+      name: plannerName,
+      status: status,
+      startDate: startDate,
+      endDate: endDate,
+      createdDate: new Date().toISOString().split('T')[0]
+    };
+    STATE.planners.push(newPlanner);
+    savedPlanner = newPlanner;
+  }
+  if(!STATE.activePlannerId || status==='active') STATE.activePlannerId = savedPlanner.id;
+  STATE.planners.forEach(p=>p.status = p.id===STATE.activePlannerId ? 'active' : 'inactive');
+  
+  try {
+    await saveState(STATE);
+    renderPlanners();
+    document.getElementById('plannerOverlay').classList.remove('show');
+  } catch(e) {
+    console.error('Error saving planner:', e);
+  }
+});
+
+// Render all Planners
+async function renderPlanners(){
+  const container = document.getElementById('plannerCardsContainer');
+  container.innerHTML = '';
+  
+  if(!STATE.planners || STATE.planners.length === 0) return;
+  
+  for(const planner of STATE.planners){
+    const studyTasks = plannerChaptersFor(planner.id);
+    const subjects = plannerSubjects();
+    const totalTaskCount = studyTasks.length;
+    const totalTaskDuration = studyTasks.reduce((sum, t) => sum + (t.duration || 0), 0);
+    const totalConsumedDuration = studyTasks.reduce((sum, t) => sum + Math.min(t.allocatedSec || 0, t.duration || 0), 0);
+    const completedTaskCount = studyTasks.filter(t=>(t.duration||0)>0 && (t.allocatedSec||0)>=(t.duration||0)).length;
+    const pendingTasks = plannerPendingFor(planner.id);
+    const pendingDuration = pendingTasks.reduce((sum,t)=>sum+(t.duration||0),0);
+    const startDate = new Date(planner.startDate + 'T00:00:00');
+    const endDate = new Date(planner.endDate + 'T00:00:00');
+    
+    // Calculate Total Hours
+    const daysCount = Math.floor((endDate - startDate) / (1000*60*60*24)) + 1;
+    const dailyHours = (STATE.settings && STATE.settings.studyHours) || 8;
+    const totalHours = Math.max(0, daysCount) * dailyHours;
+    
+    // Calculate Expected Finish using formula:
+    //   Daily Planner Capacity = Daily Study Hours − Avg Daily Revision Hours
+    //   Remaining Planner Hours = totalTaskDuration (in seconds) − totalConsumedDuration (in seconds)
+    //   Days Required = ceil(Remaining Planner Hours / Daily Planner Capacity)
+    //   Expected Finish = Today + Days Required
+    const avgRevisionSec = (STATE.settings && STATE.settings.avgRevisionSec) || 0;
+    const avgRevisionHours = avgRevisionSec / 3600;
+    const dailyPlannerCapacityHours = Math.max(0, dailyHours - avgRevisionHours);
+    const remainingPlannerSec = Math.max(0, totalTaskDuration - totalConsumedDuration);
+    let expectedFinishDisplay = '—';
+    let expectedFinishSubtext = '';
+    if(dailyPlannerCapacityHours > 0 && remainingPlannerSec > 0){
+      const remainingPlannerHours = remainingPlannerSec / 3600;
+      const daysRequired = Math.ceil(remainingPlannerHours / dailyPlannerCapacityHours);
+      const finishDate = new Date();
+      finishDate.setDate(finishDate.getDate() + daysRequired);
+      const fDay = finishDate.getDate();
+      const fMonth = finishDate.toLocaleDateString('en-US', { month: 'short' });
+      expectedFinishDisplay = fDay + ' ' + fMonth;
+      expectedFinishSubtext = finishDate.getFullYear() + ' • ' + daysRequired + ' day' + (daysRequired===1?'':'s');
+    } else if(remainingPlannerSec === 0 && totalTaskDuration > 0){
+      expectedFinishDisplay = 'Done';
+      expectedFinishSubtext = 'All tasks complete';
+    }
+    
+    // Format hours display (hide zero values)
+    const hrs = Math.floor(totalHours);
+    const mins = Math.round((totalHours - hrs) * 60);
+    let hoursDisplay = '';
+    if (hrs > 0) hoursDisplay += hrs + 'h';
+    if (mins > 0) hoursDisplay += (hoursDisplay ? ' ' : '') + mins + 'm';
+    if (!hoursDisplay) hoursDisplay = '0h';
+    
+    const formatDate = (dateStr) => {
+      const d = new Date(dateStr + 'T00:00:00');
+      const day = d.getDate();
+      const month = d.toLocaleDateString('en-US', { month: 'short' });
+      const year = d.getFullYear();
+      return day + ' ' + month + ' ' + year;
+    };
+    
+    const card = document.createElement('div');
+    card.className = 'plain-card expanded';
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+        <div style="display:flex;align-items:flex-start;gap:8px;flex:1;">
+          <button class="editPlannerBtn" data-id="${planner.id}" style="background:none;border:none;padding:0;cursor:pointer;color:var(--gp-primary);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <div style="flex:1;">
+            <h3 class="planner-card-title">${escapeHtml(planner.name)}</h3>
+            <div style="font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:6px;margin-top:-2px;">
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5;"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              Start: ${formatDate(planner.startDate)} | End: ${formatDate(planner.endDate)} | Total: ${daysCount} day${daysCount === 1 ? '' : 's'}
+            </div>
+          </div>
+        </div>
+        <button class="plannerDropdownBtn" data-id="${planner.id}" style="width:40px;height:40px;border-radius:10px;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);flex-shrink:0;transition:transform .3s ease;margin-left:8px;">
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+      
+      <div class="planner-collapsible">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div style="background:var(--primary-light);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:12px;color:var(--text);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;padding-left:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gp-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>
+            Total Hours
+          </div>
+          <div style="font-size:18px;font-weight:700;color:var(--gp-primary);">${hoursDisplay}</div>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:2px;">Completed <span style="font-size:13px;font-weight:700;color:var(--text);">• ${fmtHMu(totalConsumedDuration)}</span></div>
+        </div>
+        <div style="background:var(--primary-light);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:12px;color:var(--text);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;padding-left:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gp-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 14h.01M13 14h.01M17 14h.01M9 18h.01M13 18h.01M17 18h.01"/></svg>
+            Total Tasks
+          </div>
+          <div style="font-size:20px;font-weight:700;color:var(--gp-primary);">${totalTaskCount}</div>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:2px;">Completed <span style="font-size:13px;font-weight:700;color:var(--text);">• ${completedTaskCount}</span></div>
+        </div>
+        <div style="background:var(--primary-light);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:12px;color:var(--text);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;padding-left:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gp-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            Expected Finish
+          </div>
+          <div style="font-size:${expectedFinishDisplay.length > 6 ? '14px' : '18px'};font-weight:700;color:var(--gp-primary);">${expectedFinishDisplay}</div>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:2px;">${expectedFinishSubtext}</div>
+        </div>
+      </div>
+      
+      <!-- Pending & Completed Card -->
+      <div style="display:none;background:var(--card);border-radius:8px;border:1px solid var(--border-strong);overflow:hidden;margin-bottom:12px;">
+        <div class="planner-pending-row" data-planner-pending style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid var(--border);cursor:pointer;">
+          <div style="display:flex;align-items:center;gap:10px;flex:1;">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--gp-primary);"></div>
+            <span style="font-size:12px;font-weight:700;color:var(--text);">Pending</span>
+            <span style="color:var(--text-dim);font-size:12px;">0 / ${pendingTasks.length}</span>
+          </div>
+          <div style="color:var(--text-dim);font-size:12px;">0<span class="tu">m</span> / ${fmtHMu(pendingDuration)}</div>
+          <span style="color:var(--text-dim);margin-left:8px;">›</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:none;">
+          <div style="display:flex;align-items:center;gap:10px;flex:1;">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--gp-primary);"></div>
+            <span style="font-size:12px;font-weight:700;color:var(--text);">Completed</span>
+            <span style="color:var(--text-dim);font-size:12px;">0 / 0</span>
+          </div>
+          <div style="color:var(--text-dim);font-size:12px;">0<span class="tu">m</span> / 0<span class="tu">m</span></div>
+          <span style="color:var(--text-dim);margin-left:8px;">›</span>
+        </div>
+      </div>
+      
+      <!-- Subjects Card -->
+      <div style="background:var(--card);border-radius:8px;border:1px solid var(--border-strong);overflow:hidden;">
+        ${subjects.map((subject, index) => {
+          const subjectTasks = studyTasks.filter(t => (t.subject || '') === subject);
+          const subjectTotal = subjectTasks.reduce((sum, t) => sum + (t.duration || 0), 0);
+          const subjectUsed = subjectTasks.reduce((sum, t) => sum + Math.min(t.allocatedSec || 0, t.duration || 0), 0);
+          const completed = subjectTasks.filter(t => (t.duration||0)>0 && (t.allocatedSec||0)>=(t.duration||0)).length;
+          return `<div class="planner-subject-row" data-planner-id="${planner.id}" data-subject="${escapeHtml(subject)}" style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:${index < subjects.length - 1 ? '1px solid var(--border)' : 'none'};cursor:pointer;transition:background .2s;user-select:none;"><div style="display:flex;align-items:center;gap:10px;flex:1;"><div style="width:8px;height:8px;border-radius:50%;background:var(--gp-primary);"></div><span style="font-size:12px;font-weight:700;color:var(--text);">${escapeHtml(subject)}</span><span style="color:var(--text-dim);font-size:12px;">${completed} / ${subjectTasks.length}</span></div><div style="color:var(--text-dim);font-size:12px;">${fmtHMu(subjectUsed)} / ${fmtHMu(subjectTotal)}</div><span style="color:var(--text);font-weight:700;margin-left:8px;font-size:18px;">›</span></div>`;
+        }).join('')}
+      </div>
+    `;
+    
+    container.appendChild(card);
+  }
+  
+  // Add event listeners for edit buttons
+  document.querySelectorAll('.editPlannerBtn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = e.currentTarget.dataset.id;
+      const planner = STATE.planners.find(p => p.id === id);
+      if(planner) editPlanner(planner);
+    });
+  });
+  
+  // Add event listeners for dropdown buttons
+  document.querySelectorAll('.plannerDropdownBtn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const plannerCard = e.currentTarget.closest('.plain-card');
+      plannerCard.classList.toggle('expanded');
+      const svg = e.currentTarget.querySelector('svg');
+      svg.style.transform = plannerCard.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
+    });
+  });
+  document.querySelectorAll('[data-planner-pending]').forEach(row => row.addEventListener('click', showPlannerPendingScreen));
+  
+  // Add event listeners for subject rows
+  document.querySelectorAll('.planner-subject-row').forEach(row => {
+    row.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if(e.currentTarget.dataset.plannerId !== STATE.activePlannerId){ showToast('Make this planner active first.'); return; }
+      const subject = e.currentTarget.dataset.subject;
+      console.log('[v0] Planner row clicked, subject:', subject);
+      showPlanDetailScreen(subject);
+    });
+    row.addEventListener('mouseenter', (e) => {
+      e.currentTarget.style.background = 'rgba(88, 63, 236, 0.08)';
+      e.currentTarget.style.borderRadius = '8px';
+    });
+    row.addEventListener('mouseleave', (e) => {
+      e.currentTarget.style.background = 'transparent';
+    });
+  });
+}
+
+function editPlanner(planner){
+  editingPlannerIndex = STATE.planners.indexOf(planner);
+  document.getElementById('plannerModalTitle').textContent = 'Edit Planner';
+  document.getElementById('plannerNameInput').value = planner.name;
+  document.getElementById('plannerStatusInput').value = planner.id===STATE.activePlannerId ? 'active' : 'inactive';
+  document.getElementById('plannerStatusInput').disabled = false;
+  document.getElementById('plannerStartDateInput').value = planner.startDate;
+  document.getElementById('plannerEndDateInput').value = planner.endDate;
+  
+  // Capture original values for change detection
+  originalPlannerValues = {
+    name: planner.name,
+    status: planner.status,
+    startDate: planner.startDate,
+    endDate: planner.endDate
+  };
+  
+  document.getElementById('plannerDeleteBtn').style.display = 'block';
+  document.getElementById('savePlannerBtn').disabled = true; // Disabled until user makes a change
+  document.getElementById('plannerOverlay').classList.add('show');
+}
+
+// Show Plan Detail Screen for a specific subject
+function showPlanDetailScreen(subject){
+  plannerDetailMode = 'subject';
+  currentPlanDetailSubject = subject;
+  document.getElementById('planDetailAddTaskBtn').style.display = '';
+  document.getElementById('planDetailAddTaskBtn').innerHTML = '<span style="font-size:18px;">+</span> Add New Chapter';
+  // Opening a subject always starts with the requested default: Oldest.
+  planDetailSortMode = 'oldest';
+  const sortLabel = document.getElementById('planDetailSortVal');
+  if(sortLabel) sortLabel.textContent = 'Oldest';
+  planDetailTasks = plannerChapters().filter(t => (t.subject || '') === subject);
+  
+  // Update header
+  document.getElementById('planDetailSubjectName').textContent = subject;
+  const taskCount = planDetailTasks.length;
+  document.getElementById('planDetailTaskCount').textContent = taskCount + (taskCount === 1 ? ' Chapter' : ' Chapters');
+  
+  // Calculate duration (used and total)
+  let usedSec = 0;
+  let totalSec = 0;
+  planDetailTasks.forEach(t => {
+    totalSec += (t.duration || 0);
+    usedSec += Math.min(t.allocatedSec || 0, t.duration || 0);
+  });
+  
+  const usedFormatted = fmtHMu(usedSec);
+  const totalFormatted = fmtHMu(totalSec);
+  document.getElementById('planDetailDuration').innerHTML = usedFormatted + ' / ' + totalFormatted;
+  
+  // Render task list
+  renderPlanDetailTasks();
+  
+  // Switch to detail screen
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-planDetail').classList.add('active');
+}
+
+function showPlannerPendingScreen(){
+  plannerDetailMode = 'pending';
+  currentPlanDetailSubject = null;
+  const tasks = plannerPending();
+  document.getElementById('planDetailSubjectName').textContent = 'Pending';
+  document.getElementById('planDetailTaskCount').textContent = tasks.length + (tasks.length===1 ? ' Task' : ' Tasks');
+  document.getElementById('planDetailDuration').innerHTML = `0m / ${fmtHMu(tasks.reduce((s,t)=>s+(t.duration||0),0))}`;
+  const addBtn=document.getElementById('planDetailAddTaskBtn'); addBtn.style.display = ''; addBtn.innerHTML='<span style="font-size:18px;">+</span> Add Pending Chapter';
+  renderPlanDetailTasks();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-planDetail').classList.add('active');
+}
+
+async function reusePendingTask(pendingId){
+  const task = plannerPending().find(p=>String(p.id)===String(pendingId));
+  if(!task || task.reuseDisabled) return;
+  await idbPut('tasks',{category:'study',name:task.name,duration:task.duration,subject:task.subject||null,slotId:null,countAs:'others',icon:task.icon||CAT_ICON.study,color:task.color||'#5B4FE8',createdOn:plannerDateKey(),consumedSec:0,completedAt:null,completionStatus:null,comment:'',cycleStartTs:null});
+  STATE.plannerPending = STATE.plannerPending.filter(p=>String(p.id)!==String(pendingId));
+  await saveState(STATE);
+  CACHED_TASKS = await loadTasks();
+  renderTasks(); renderPlanners(); showPlannerPendingScreen();
+  showToast('Added to Today.');
+}
+
+function renderPlannerPendingTasks(container){
+  const tasks = plannerPending();
+  if(!tasks.length){ container.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:20px;">No pending tasks</div>'; return; }
+  container.innerHTML = tasks.map((t,index)=>{
+    const reuse = '';
+    return `<div class="task-row-plan-detail" style="display:flex;align-items:center;gap:12px;padding:8px;justify-content:space-between;${index<tasks.length-1?'border-bottom:1px solid var(--border);':''}"><div style="display:flex;align-items:center;gap:8px;flex:1;"><div style="width:8px;height:8px;border-radius:50%;background:${t.color||'#5B4FE8'};flex-shrink:0;"></div><div><span style="font-weight:700;color:var(--text);font-size:14px;">${escapeHtml(t.name)}</span>${t.subject?`<div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">${escapeHtml(t.subject)}</div>`:''}</div></div><div style="display:flex;align-items:center;gap:8px;"><div style="color:var(--text-dim);font-size:12px;">${fmtHMu(t.duration)}</div>${reuse}<button class="plan-pending-edit-btn" data-id="${t.id}" aria-label="Edit pending task" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--gp-primary);cursor:pointer;">✎</button></div></div>`;
+  }).join('');
+  container.querySelectorAll('.plan-pending-edit-btn').forEach(btn=>{
+    const task=plannerPending().find(t=>String(t.id)===String(btn.dataset.id));
+    if(!task || !task.createdOn) return;
+    const date=document.createElement('span');
+    date.textContent=formatPlannerDate(task.createdOn);
+    date.style.cssText='font-size:10.5px;color:var(--text-dim);white-space:nowrap;';
+    btn.parentElement.insertBefore(date, btn);
+  });
+  container.querySelectorAll('.plan-pending-reuse-btn').forEach(btn=>btn.addEventListener('click',e=>reusePendingTask(e.currentTarget.dataset.id)));
+  container.querySelectorAll('.plan-pending-edit-btn').forEach(btn=>btn.addEventListener('click',e=>openPendingTaskModal(e.currentTarget.dataset.id)));
+}
+
+// Render tasks in plan detail view
+function renderPlanDetailTasks(){
+  const container = document.getElementById('planDetailTasksContainer');
+  container.innerHTML = '';
+  if(plannerDetailMode==='pending'){ renderPlannerPendingTasks(container); return; }
+  const visibleTasks = filteredPlannerChapters();
+  
+  if(visibleTasks.length === 0){
+    container.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:20px;">No chapters yet</div>';
+    return;
+  }
+  
+  visibleTasks.forEach((t, index) => {
+    const row = document.createElement('div');
+    row.className = 'task-row-plan-detail';
+    row.style.cssText = `display:flex;align-items:center;gap:12px;padding:8px;justify-content:space-between;${index < visibleTasks.length - 1 ? 'border-bottom:1px solid var(--border);' : ''}`;
+    
+    const difficultyColor = t.color || '#5B4FE8';
+    const usedDur = fmtHMu(t.allocatedSec || 0);
+    const totalDur = fmtHMu(t.duration || 0);
+    
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;flex:1;">
+        <div style="width:8px;height:8px;border-radius:50%;background:${difficultyColor};flex-shrink:0;"></div>
+        <span style="font-weight:700;color:var(--text);font-size:14px;">${escapeHtml(t.name)}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <div style="color:var(--text-dim);font-size:12px;text-align:right;">${usedDur} / ${totalDur}</div>
+        <button class="plan-detail-edit-btn" data-id="${t.id}" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gp-primary);flex-shrink:0;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      </div>
+    `;
+    
+    container.appendChild(row);
+  });
+  
+  // Add event listeners for edit buttons — reuse the same openEditMenu path as the Tasks section
+  // so editMenuTaskId is set correctly and Delete/other behaviors are identical.
+  document.querySelectorAll('.plan-detail-edit-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      openPlannerChapterModal(e.currentTarget.dataset.id);
+    });
+  });
+}
+
+// Initialize Planners on load
+renderPlanners();
+
+// Plan Detail Screen event handlers
+document.getElementById('planDetailBackBtn').addEventListener('click', () => {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-settings').classList.add('active');
+  currentPlanDetailSubject = null;
+  planDetailSortMode = 'newest';
+});
+
+document.getElementById('planDetailAddTaskBtn').addEventListener('click', () => {
+  if(plannerDetailMode==='pending') openNewPendingChapterModal(); else openPlannerChapterModal(null);
+  });
+
+  // ── Cart / Shop Screen ─────────────────────────────────────────────────────
+  let shopActiveSubject = null;
+  let shopSortMode = 'oldest';
+  const shopSelections = new Map(); // chapter ID → duration selected for this transfer only
+
+  function openShopScreen(){
+    const subjects = plannerSubjects();
+    shopActiveSubject = subjects[0] || null;
+    shopSortMode = 'oldest';
+    document.getElementById('shopSortVal').textContent = 'Oldest';
+    document.getElementById('shopDayLabel').textContent = planMode==='tomorrow' ? ' • Tomorrow' : ' • Today';
+    renderShopChips(subjects);
+    renderShopChapters();
+    updateShopDurationDisplay();
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-shop').classList.add('active');
+  }
+
+  function renderShopChips(subjects){
+    subjects = [...subjects.filter(s=>s!=='Pending'), 'Pending'];
+    const el = document.getElementById('shopChips');
+    el.innerHTML = subjects.map(s => {
+      if(s==='Pending') return `<span class="shop-chip${s===shopActiveSubject?' active':''}" data-subj="Pending"><span class="chip-radio"></span>${shopPendingSelections.size?`Pending • ${shopPendingSelections.size}`:'Pending'}</span>`;
+      const selectedCount = plannerChapters().filter(t => t.subject === s && (shopSelections.get(String(t.id))||0) > 0).length;
+      // Counts describe this cart's selections, never the total size of a subject.
+      const label = selectedCount ? `${s} • ${selectedCount}` : s;
+      const active = s === shopActiveSubject ? ' active' : '';
+      return `<span class="shop-chip${active}" data-subj="${escapeHtml(s)}"><span class="chip-radio"></span>${escapeHtml(label)}</span>`;
+    }).join('');
+    el.querySelectorAll('.shop-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+    if(shopEditingId) shopDiscardRow(shopEditingId);
+    shopActiveSubject = chip.dataset.subj;
+    renderShopChips(subjects);
+    renderShopChapters();
+    updateShopDurationDisplay();
+    });
+    });
+  }
+
+  // SVG constants — reuse existing pencil path; plus is new (no plus SVG existed anywhere in project)
+  const SHOP_PENCIL_SVG = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`;
+  const SHOP_PLUS_SVG   = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+
+  // Track the currently active edit row id (only one row editable at a time)
+  const shopPendingSelections = new Set();
+  let shopEditingId = null;
+
+  // Compute selected seconds across all subjects for this cart transfer.
+  function shopTotalSavedSec(){
+    return [...shopSelections.values()].reduce((s, sec) => s + sec, 0);
+  }
+
+  function shopSelectedChapterCount(){
+    return plannerChapters().filter(t => (shopSelections.get(String(t.id))||0) > 0).length + shopPendingSelections.size;
+  }
+
+  // Parse multiple formats into total seconds:
+  // - fmtHMu format: "12h", "1h 30m", "45m", "0m", "12h:00m"
+  // - Old HH:MM format: "14:00"
+  function parseHMDisplay(str){
+    const s = (str || '').trim();
+    let h = 0, m = 0;
+    
+    // Check for "h" and "m" markers (fmtHMu format)
+    const hasHMarker = /h/i.test(s);
+    const hasMMarker = /m/i.test(s);
+    
+    if(hasHMarker || hasMMarker){
+      // fmtHMu format: extract hours and minutes
+      const hMatch = s.match(/(\d+)\s*h/i);
+      if(hMatch) h = parseInt(hMatch[1]) || 0;
+      const mMatch = s.match(/(\d+)\s*m/i);
+      if(mMatch) m = parseInt(mMatch[1]) || 0;
+    } else if(s.includes(':')){
+      // Old HH:MM format: split on colon
+      const parts = s.split(':');
+      h = parseInt(parts[0]) || 0;
+      m = parseInt(parts[1]) || 0;
+    }
+    
+    return h * 3600 + m * 60;
+  }
+
+  // Format seconds into compact display e.g. "1h" / "1h 30m" / "45m"
+  function fmtShopSec(sec){
+    const h = Math.floor(Math.abs(sec)/3600), m = Math.round((Math.abs(sec)%3600)/60);
+    if(h && m) return `${h}h ${String(m).padStart(2,'0')}m`;
+    if(h) return `${h}h`;
+    return `${m}m`;
+  }
+
+  // Compute selected seconds across ALL Planner chapters.
+  // liveEditId/liveH/liveM: optionally substitute the currently-typed value for one row (live preview).
+  function shopComputeUsedSec(liveEditId, liveH, liveM){
+    const currentPlan = planMode==='tomorrow' ? tomorrowConfirmed() : CACHED_TASKS;
+    const scheduledStudy = catUsedFrom(currentPlan, 'study');
+    const pendingReuse = plannerPending().filter(t=>shopPendingSelections.has(String(t.id))).reduce((sum,t)=>sum+(t.duration||0),0);
+    return plannerChapters().reduce((sum, t) => {
+      // dataset values are strings whereas stored task IDs may be numbers.
+      // Compare their string forms so the active row is actually replaced by
+      // the value currently being typed.
+      if(liveEditId != null && String(t.id) === String(liveEditId)){
+        // Use the typed value instead of saved value for preview
+        return sum + ((liveH||0)*3600 + (liveM||0)*60);
+      }
+      return sum + (shopSelections.get(String(t.id)) || 0);
+    }, scheduledStudy + pendingReuse);
+  }
+
+  // Update the shopDuration header and cart button state.
+  // While a row is being edited, its typed value replaces its saved value in this
+  // calculation. Nothing is persisted until the green plus button is pressed.
+  function updateShopDurationDisplay(liveEditId, liveH, liveM){
+    const targetSec    = parseHMDisplay(document.getElementById('studyTargetDisplay').textContent);
+    const usedSec      = shopComputeUsedSec(liveEditId, liveH, liveM);
+    const remSec       = targetSec - usedSec;
+
+    const usedStr      = fmtShopSec(usedSec);
+    const targetStr    = fmtShopSec(targetSec);
+    const el           = document.getElementById('shopDuration');
+    const cartBtn      = document.getElementById('shopCartBtn');
+
+    if(remSec < 0){
+      // A typed value may exceed the fixed daily allowance. Keep the entered
+      // saved time visible, show the negative remainder, and block checkout.
+      el.innerHTML = `<strong style="color:var(--red)">${usedStr} / ${targetStr} (rem -${fmtShopSec(Math.abs(remSec))})</strong>`;
+      el.style.color = 'var(--red)';
+      if(cartBtn){ cartBtn.disabled = true; cartBtn.style.opacity = '0.4'; cartBtn.style.filter = 'grayscale(1)'; cartBtn.style.cursor = 'not-allowed'; cartBtn.style.pointerEvents = 'none'; }
+    } else {
+      el.style.color = '';
+      el.textContent = `${usedStr} / ${targetStr} (rem ${fmtShopSec(remSec)})`;
+      // Exactly zero is valid: the available daily time has been fully used.
+      if(cartBtn){ cartBtn.disabled = false; cartBtn.style.opacity = ''; cartBtn.style.filter = ''; cartBtn.style.cursor = 'pointer'; cartBtn.style.pointerEvents = ''; }
+    }
+  }
+
+  function renderShopChapters(){
+    const subjectName = shopActiveSubject || '';
+    document.getElementById('shopSubjectName').textContent = subjectName;
+    if(subjectName==='Pending'){ renderShopPending(); return; }
+    const tasks = filterPlannerChapterList(plannerChapters().filter(t => t.subject === subjectName), shopSortMode);
+    const list = document.getElementById('shopChapterList');
+    const badge = document.getElementById('shopCartBadge');
+    const selectedCount = shopSelectedChapterCount();
+    badge.textContent = selectedCount;
+    badge.style.display = selectedCount ? 'flex' : 'none';
+    shopEditingId = null;
+
+    if(!tasks.length){
+      list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">No tasks in this subject</div>`;
+      return;
+    }
+
+    list.innerHTML = tasks.map(t => {
+      const savedSec = shopSelections.get(String(t.id)) || 0;
+      const sh = Math.floor(savedSec / 3600);
+      const sm = Math.round((savedSec % 3600) / 60);
+      const hasValue = sh > 0 || sm > 0;
+      // The picker shows what can still be taken from this permanent chapter,
+      // not its original full duration.
+      const totalHtml = fmtHMu(Math.max(0, (t.duration || 0) - (t.allocatedSec || 0)));
+      const color = t.color || 'var(--primary)';
+      const hVal = sh > 0 ? String(sh).padStart(2,'0') : '';
+      const mVal = sm > 0 ? String(sm).padStart(2,'0') : '';
+      const pencilColor = hasValue ? 'var(--green)' : 'var(--primary)';
+      const pencilBg    = hasValue ? 'var(--green-light)' : 'var(--primary-light)';
+      return `<div class="shop-row" data-task-id="${t.id}">
+        <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></div>
+        <span style="font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(t.name)}</span>
+        <div class="shop-dur">
+          <input class="shop-inp" type="text" inputmode="numeric" maxlength="2" value="${hVal}" placeholder="" readonly style="pointer-events:none;">
+          <span class="shop-unit">h</span>
+          <input class="shop-inp" type="text" inputmode="numeric" maxlength="2" value="${mVal}" placeholder="" readonly style="pointer-events:none;">
+          <span class="shop-unit">m</span>
+          <span class="shop-total">/ ${totalHtml}</span>
+          <button class="shop-action-btn" data-task-id="${t.id}" data-mode="pencil"
+            style="width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:${pencilBg};color:${pencilColor};cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,color .15s;">
+            ${SHOP_PENCIL_SVG}
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Attach event listeners
+    list.querySelectorAll('.shop-action-btn').forEach(btn => {
+      btn.addEventListener('click', e => shopHandleActionBtn(e.currentTarget));
+    });
+    list.querySelectorAll('.shop-inp').forEach(inp => {
+      inp.addEventListener('input', e => shopHandleInput(e.target));
+      inp.addEventListener('focus', e => { e.target.select(); });
+      inp.addEventListener('keydown', e => {
+        // Only allow digits, backspace, delete, arrows, tab
+        if(!['Backspace','Delete','ArrowLeft','ArrowRight','Tab'].includes(e.key) && !/^\d$/.test(e.key)) e.preventDefault();
+      });
+    });
+  }
+
+  function renderShopPending(){
+    const list=document.getElementById('shopChapterList');
+    const tasks=plannerPending().filter(t=>!t.reuseDisabled);
+    if(!tasks.length){ list.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">No reusable pending tasks</div>'; return; }
+    list.innerHTML=tasks.map(t=>{const on=shopPendingSelections.has(String(t.id)); return `<div class="shop-row"><div style="width:8px;height:8px;border-radius:50%;background:${t.color||'#5B4FE8'};"></div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">${escapeHtml(t.name)}</div>${t.subject?`<div style="font-size:10.5px;color:var(--text-dim);">${escapeHtml(t.subject)}</div>`:''}</div><span class="shop-total">${fmtHMu(t.duration)}</span><button class="shop-pending-btn" data-id="${t.id}" style="border:none;border-radius:7px;padding:7px 11px;background:${on?'var(--primary-light)':'var(--green-light)'};color:${on?'var(--gp-primary)':'var(--green-dark)'};font-weight:700;">${on?'Undo':'Reuse'}</button></div>`;}).join('');
+    list.querySelectorAll('.shop-pending-btn').forEach(b=>b.addEventListener('click',e=>{const id=String(e.currentTarget.dataset.id); shopPendingSelections.has(id)?shopPendingSelections.delete(id):shopPendingSelections.add(id); renderShopChips([...plannerSubjects(),'Pending']); renderShopPending();}));
+  }
+  function shopHandleActionBtn(btn){
+    const taskId = btn.dataset.taskId;
+    const mode = btn.dataset.mode; // 'pencil' or 'plus'
+
+    if(mode === 'plus'){
+      // Save the row
+      shopSaveRow(taskId);
+    } else {
+      // Pencil tapped — discard any currently editing row first, then enter edit mode
+      if(shopEditingId && shopEditingId !== taskId) shopDiscardRow(shopEditingId);
+      shopEnterEditMode(taskId);
+    }
+  }
+
+  function shopEnterEditMode(taskId){
+  shopEditingId = taskId;
+  const row = document.querySelector(`.shop-row[data-task-id="${taskId}"]`);
+  if(!row) return;
+  const inputs = row.querySelectorAll('.shop-inp');
+  inputs.forEach(inp => { inp.removeAttribute('readonly'); inp.style.pointerEvents = ''; });
+  // Immediately show green plus when entering edit mode — stays until user clicks plus or discards
+  const btn = row.querySelector('.shop-action-btn');
+  btn.dataset.mode = 'plus';
+  btn.style.background = 'var(--green-light)';
+  btn.style.color = 'var(--green)';
+  btn.innerHTML = SHOP_PLUS_SVG;
+  shopValidateRow(row);
+  inputs[0].focus();
+  }
+
+  // Clamp each field to a valid clock value and allow the green plus only when
+  // the selected portion still fits inside this chapter's unallocated balance.
+  function shopValidateRow(row){
+    const taskId = row.dataset.taskId;
+    const inputs = row.querySelectorAll('.shop-inp');
+    const hVal = Math.min(24, Math.max(0, parseInt(inputs[0].value, 10) || 0));
+    const mVal = Math.min(59, Math.max(0, parseInt(inputs[1].value, 10) || 0));
+    if(inputs[0].value && parseInt(inputs[0].value, 10) !== hVal) inputs[0].value = String(hVal);
+    if(inputs[1].value && parseInt(inputs[1].value, 10) !== mVal) inputs[1].value = String(mVal);
+    const chapter = plannerChapters().find(t => String(t.id) === String(taskId));
+    const available = chapter ? Math.max(0, (chapter.duration||0) - (chapter.allocatedSec||0)) : 0;
+    const exceedsAvailable = hVal * 3600 + mVal * 60 > available;
+    const btn = row.querySelector('.shop-action-btn');
+    if(btn && btn.dataset.mode === 'plus'){
+      btn.disabled = exceedsAvailable;
+      btn.style.opacity = exceedsAvailable ? '0.42' : '';
+      btn.style.cursor = exceedsAvailable ? 'not-allowed' : 'pointer';
+      btn.style.filter = exceedsAvailable ? 'grayscale(1)' : '';
+    }
+    return {hVal, mVal, exceedsAvailable};
+  }
+
+  function shopHandleInput(inp){
+    const row = inp.closest('.shop-row');
+    if(!row) return;
+    const taskId = row.dataset.taskId;
+    const inputs = row.querySelectorAll('.shop-inp');
+    const {hVal, mVal} = shopValidateRow(row);
+
+  // Button always stays green plus during edit mode — never auto-reverts to pencil while editing.
+  // Only shopSaveRow or shopDiscardRow decide the final button state.
+
+  // Step 4.2 — live preview: update the "saved time" part of the header as user types
+  updateShopDurationDisplay(taskId, hVal, mVal);
+  }
+
+  function shopSaveRow(taskId){
+    const row = document.querySelector(`.shop-row[data-task-id="${taskId}"]`);
+    if(!row) return;
+    const inputs = row.querySelectorAll('.shop-inp');
+    const hVal = Math.min(24, Math.max(0, parseInt(inputs[0].value) || 0));
+    const mVal = Math.min(59, Math.max(0, parseInt(inputs[1].value) || 0));
+    const totalSec = hVal * 3600 + mVal * 60;
+    const hasValue = hVal > 0 || mVal > 0;
+
+    // Persist to task object (in memory — no new DB writes needed, just the shopSavedSec field)
+    const task = plannerChapters().find(t => String(t.id) === String(taskId));
+    if(task){
+      const remainingInPlanner = Math.max(0, (task.duration||0) - (task.allocatedSec||0));
+      if(totalSec > remainingInPlanner){
+        showToast(`Only ${fmtShopSec(remainingInPlanner)} remains in ${task.name}.`);
+        return;
+      }
+      shopSelections.set(String(task.id), totalSec);
+      renderShopChips(plannerSubjects());
+      const badge = document.getElementById('shopCartBadge');
+      const selectedCount = shopSelectedChapterCount();
+      badge.textContent = selectedCount;
+      badge.style.display = selectedCount ? 'flex' : 'none';
+    }
+
+    // Display saved values (blank when zero)
+    inputs[0].value = hVal > 0 ? String(hVal).padStart(2,'0') : '';
+    inputs[1].value = mVal > 0 ? String(mVal).padStart(2,'0') : '';
+
+    // Lock inputs
+    inputs.forEach(inp => { inp.setAttribute('readonly',''); inp.style.pointerEvents = 'none'; });
+
+    // Update button back to pencil with correct color
+    const btn = row.querySelector('.shop-action-btn');
+    btn.dataset.mode = 'pencil';
+    btn.style.background = hasValue ? 'var(--green-light)' : 'var(--primary-light)';
+    btn.style.color      = hasValue ? 'var(--green)'       : 'var(--primary)';
+    btn.innerHTML = SHOP_PENCIL_SVG;
+
+    shopEditingId = null;
+    updateShopDurationDisplay();
+  }
+
+  function shopDiscardRow(taskId){
+    const row = document.querySelector(`.shop-row[data-task-id="${taskId}"]`);
+    if(!row) return;
+    const task = plannerChapters().find(t => String(t.id) === String(taskId));
+    const savedSec = task ? (shopSelections.get(String(task.id)) || 0) : 0;
+    const sh = Math.floor(savedSec / 3600);
+    const sm = Math.round((savedSec % 3600) / 60);
+    const hasValue = sh > 0 || sm > 0;
+
+    const inputs = row.querySelectorAll('.shop-inp');
+    inputs[0].value = sh > 0 ? String(sh).padStart(2,'0') : '';
+    inputs[1].value = sm > 0 ? String(sm).padStart(2,'0') : '';
+    inputs.forEach(inp => { inp.setAttribute('readonly',''); inp.style.pointerEvents = 'none'; });
+
+    const btn = row.querySelector('.shop-action-btn');
+    btn.dataset.mode = 'pencil';
+    btn.style.background = hasValue ? 'var(--green-light)' : 'var(--primary-light)';
+    btn.style.color      = hasValue ? 'var(--green)'       : 'var(--primary)';
+    btn.innerHTML = SHOP_PENCIL_SVG;
+
+    shopEditingId = null;
+  }
+
+  document.getElementById('cartBtn').addEventListener('click', openShopScreen);
+
+  // One-way handoff: selected Planner portions become independent daily tasks.
+  // Later edits or deletion of those daily tasks never touch the Planner chapter.
+  document.getElementById('shopCartBtn').addEventListener('click', async () => {
+    if(document.getElementById('shopCartBtn').disabled) return;
+    const selected = plannerChapters().filter(c => (shopSelections.get(String(c.id))||0) > 0);
+    const pendingSelected=plannerPending().filter(p=>shopPendingSelections.has(String(p.id)));
+    if(!selected.length && !pendingSelected.length){ showToast('Choose a study duration first.'); return; }
+    const target = parseHMDisplay(document.getElementById('studyTargetDisplay').textContent);
+    if(shopComputeUsedSec() > target){ showToast('Selected time exceeds today\'s study allowance.'); return; }
+    const previousAllocations=selected.map(chapter=>({chapter,allocatedSec:chapter.allocatedSec||0}));
+    const previousPending=STATE.plannerPending;
+    const previousTomorrowTasks=planMode==='tomorrow' ? STATE.tomorrow.tasks.slice() : null;
+    const taskCopies=[];
+    for(const chapter of selected){
+      const duration = shopSelections.get(String(chapter.id));
+      const copy = {
+        category:'study', uiCategory:'study', name:chapter.name, duration,
+        subject:chapter.subject, icon:chapter.icon||'📖', color:chapter.color||'#5B4FE8',
+        countAs:'others', consumedSec:0, completedAt:null, completionStatus:null,
+        plannerChapterId:chapter.id
+      };
+      chapter.allocatedSec = Math.min(chapter.duration||0, (chapter.allocatedSec||0) + duration);
+      if(planMode==='tomorrow'){
+        STATE.tomorrow.tasks.push({...copy, tid:nextTid(), pending:false});
+      } else {
+        taskCopies.push(copy);
+      }
+    }
+    for(const task of pendingSelected){
+      const copy={category:'study',uiCategory:'study',name:task.name,duration:task.duration,subject:task.subject||null,slotId:null,countAs:'others',icon:task.icon||CAT_ICON.study,color:task.color||'#5B4FE8',createdOn:plannerDateKey(),consumedSec:0,completedAt:null,completionStatus:null,comment:'',cycleStartTs:null};
+      if(planMode==='tomorrow') STATE.tomorrow.tasks.push({...copy,tid:nextTid(),pending:false});
+      else taskCopies.push(copy);
+    }
+    if(pendingSelected.length) STATE.plannerPending=STATE.plannerPending.filter(p=>!shopPendingSelections.has(String(p.id)));
+    try{
+      if(planMode==='tomorrow') await saveState(STATE);
+      else await idbCommitPlannerCart(taskCopies, STATE);
+    }catch(err){
+      previousAllocations.forEach(({chapter,allocatedSec})=>{ chapter.allocatedSec=allocatedSec; });
+      STATE.plannerPending=previousPending;
+      if(planMode==='tomorrow') STATE.tomorrow.tasks=previousTomorrowTasks;
+      console.error('Planner cart transfer failed:',err);
+      showToast('Could not save the selected study tasks. Nothing was transferred.');
+      return;
+    }
+    if(planMode!=='tomorrow') CACHED_TASKS = await loadTasks();
+    shopSelections.clear();
+    shopPendingSelections.clear();
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-tasks').classList.add('active');
+    renderTasks(); renderCategoryCounts(); renderPlanners();
+    showToast('Study tasks added from Planner.');
+  });
+
+  document.getElementById('shopBackBtn').addEventListener('click', () => {
+    if(shopEditingId) shopDiscardRow(shopEditingId);
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-tasks').classList.add('active');
+    renderTasks();
+  });
+
+// One sort-control initializer is shared by the Planner detail and cart
+// selection screens. The markup and options remain visually identical.
+function bindPlannerSortControl(toggleId, menuId, labelId, onSelect){
+  const toggle = document.getElementById(toggleId);
+  const menu = document.getElementById(menuId);
+  const label = document.getElementById(labelId);
+  if(!toggle || !menu || !label) return;
+  toggle.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = menu.style.display === 'none' || !menu.style.display;
+    menu.style.display = open ? 'block' : 'none';
+    toggle.parentElement.classList.toggle('open', open);
+  });
+  menu.addEventListener('click', e => {
+    const option = e.target.closest('.hs-sortopt'); if(!option) return;
+    label.textContent = option.textContent;
+    menu.style.display = 'none'; toggle.parentElement.classList.remove('open');
+    onSelect(option.dataset.sort);
+  });
+  document.addEventListener('click', e => {
+    if(!e.target.closest('#'+toggleId) && !e.target.closest('#'+menuId)){
+      menu.style.display = 'none'; toggle.parentElement.classList.remove('open');
+    }
+  });
+}
+bindPlannerSortControl('planDetailSortToggle','planDetailSortMenu','planDetailSortVal', mode => {
+  planDetailSortMode = mode; renderPlanDetailTasks();
+});
+bindPlannerSortControl('shopSortToggle','shopSortMenu','shopSortVal', mode => {
+  shopSortMode = mode; renderShopChapters();
+});
+
 document.getElementById('setLockTodayEditing').addEventListener('change', async ()=>{
   const isNowLocked = document.getElementById('setLockTodayEditing').checked;
   const state = STATE || {};
@@ -9395,7 +10935,7 @@ GOAL_LOCKED_FIELD_IDS.forEach(id=>{
   });
 });
 document.getElementById('goalLockedOk').onclick = ()=> document.getElementById('goalLockedDialog').classList.remove('show');
-// Save Goal — creates a new Goal or overwrites the single active one (per spec: only one Goal
+// Save Goal �� creates a new Goal or overwrites the single active one (per spec: only one Goal
 // at a time; creating/saving always replaces whatever existed before).
 document.getElementById('gsetSaveBtn').onclick = async ()=>{
   // Hard guard: if the campaign has started, the core fields are always taken from the stored
@@ -9513,7 +11053,7 @@ document.getElementById('breachOkBtn').onclick = async ()=>{
     // If that happens, recoverState() reads the OLD IDB state (still has the exploded bomb's
     // wallStartTs from when the bomb was first armed), overwrites STATE with it, and our freshly
     // armed bomb is silently discarded. The next recoverState() then sees the old wallStartTs and
-    // computes missedMs ≈ "original elapsed" — making the bomb jump backward by that amount the
+    // computes missedMs �� "original elapsed" — making the bomb jump backward by that amount the
     // instant the race resolves. Setting _recovering = true here causes any concurrent
     // recoverState() call to return immediately (via its re-entrancy guard), guaranteeing that
     // STATE stays ours until saveState() durably commits the new bomb lifecycle to IDB.
@@ -9644,7 +11184,7 @@ function monotonicNow(){
   // Browser fallback: performance.now() delta from the load-time anchor.
   return _monoAnchor.wall + (performance.now() - _monoAnchor.perf);
 }
-// ───────────────────────────────────────────────🔵──────────────────────────────────────────
+// ────────────��──────────────────────────────────🔵──────────────────────────────────────────
 
 // HTML-side Android preferences (native flags cover the rest). Stored inside
 // STATE.settings.android so they ride along with normal state persistence + backup.
@@ -9658,8 +11198,8 @@ function andCfg(){
   return c;
 }
 
-/* —───────🔵────────────────────────────────────────────────────────────────────────
-   SoundController — the single, centralized owner of completion-sound
+/* —───────🔵─────────────────────���─────────────────���────────────────────────────────
+   SoundController �� the single, centralized owner of completion-sound
    playback for the whole app.
 
    → Every completion sound (session complete, review, bomb, settings preview)
@@ -9673,7 +11213,7 @@ function andCfg(){
    • Browser fallback: with no Android shell, a WebAudio tone is used so the
      controller (and the Test/Stop toggle + duration) still work in a plain
      browser preview.
-   ───────────────────────────────────────────────────────────────────────────────── */
+   ──────────────��────────────��───────────────────────────────────────────────────── */
 const SoundController = {
   _stopTimer: null,     // duration timer -> hard stop
   _btn: null,           // currently active preview <button>, if any
@@ -9817,7 +11357,7 @@ function andFmtBomb(sec){
 // It pulls every field from the shared caComputeView() view-model — nothing is recomputed here.
 // Formatting rules (no "RUNNING"/"PAUSED" words — the emoji is the status):
 //   🟢 = Study category running · 🔵 = any other category running · 🟡 = anything paused · 🔴 = bomb.
-//   Separator between fields is " — "; the Left value is preceded by " 🔵— ".
+//   Separator between fields is " �� "; the Left value is preceded by " 🔵— ".
 // Layout:
 //   Study  →  Line1: 🟢 Topic — Subject      Line2: 28:07 — 1/7 —— Left 26m
 //   Other  →  Line1: 🔵 Activity             Line2: 53:04 —— Left 53m
@@ -10576,12 +12116,20 @@ async function boot(){
   await openDB();
   await ensureDefaultTasks();
   STATE = await recoverState();
-  await maybeSendScheduledReport(); // before promotion so a Wake report still sees the finished day's tasks
-  await maybeWakePromotion();
-  await ensureTomorrow(STATE);
-  retryPendingReports();
-  render();
-  andInit(); // Android shell integration — a safe no-op when running in a normal browser
+  // First paint is based on the recovered in-memory snapshot. Network work and maintenance must
+  // never delay the first interactive screen or expose its default placeholder values.
+  await render();
+  document.body.classList.remove('app-booting');
+  void (async ()=>{
+    try{
+      await maybeSendScheduledReport();
+      await maybeWakePromotion();
+      await ensureTomorrow(STATE);
+      retryPendingReports();
+      await render();
+    }catch(e){ console.warn('[boot] background maintenance failed:', e); }
+  })();
+  setTimeout(andInit, 0); // Native mirroring performs full-store reads; never compete with first paint.
   // Browser-native safety net for the freeze-on-resume fix: the moment the page
   // becomes visible again (or is restored from the bfcache), reconcile + re-render
   // immediately instead of waiting for the throttled setInterval timers to wake up.
@@ -10591,7 +12139,10 @@ async function boot(){
     document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) gtResumeResync(); });
     window.addEventListener('pageshow', ()=> gtResumeResync());
   }catch(e){ console.warn('[resume] could not attach visibility listeners', e); }
-  setInterval(()=>{ maybeAwardLiveLifeline(); renderHeader(); }, 1000);
+  setInterval(()=>{
+    maybeAwardLiveLifeline(); // business rule: must remain live while a study timer is running
+    if(document.getElementById('screen-home').classList.contains('active')) renderHeader();
+  }, 1000);
   setInterval(async ()=>{
     if(RESETTING) return;
     // DORMANT GUARD: only run when a real event (boot, resume, new day, password) marked
@@ -10614,7 +12165,11 @@ async function boot(){
     }
   }, 3000);
 }
-boot();
+boot().catch((e)=>{
+  console.error('[boot] failed:', e);
+  const splash = document.querySelector('.app-startup-card span:last-child');
+  if(splash) splash.textContent = 'Unable to load saved data. Please reopen the app.';
+});
 
 })();
 </script>
