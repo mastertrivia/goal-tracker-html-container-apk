@@ -53,6 +53,8 @@ object SoundLibrary {
     //   "completion" -> played when a session/pomodoro completes
     //   "bombwarn"   -> played when the Bomb reaches zero
     const val SLOT_COMPLETION = "completion"
+    const val SLOT_SESSION_END = "sessionend"
+    const val SLOT_TASK_COMPLETE = "taskcomplete"
     const val SLOT_BOMB = "bombwarn"
 
     // Selection types.

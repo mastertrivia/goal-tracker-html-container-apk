@@ -285,6 +285,11 @@ class JsBridge(private val activity: MainActivity) {
         }
     }
 
+    @JavascriptInterface
+    fun cancelAllAlarms() {
+        safe("cancelAllAlarms", Unit) { AlarmScheduler.cancelAll(activity) }
+    }
+
     // ---------------- Foreground timer service ----------------
 
     /** Respects the "timerNotificationEnabled" flag. */
@@ -540,7 +545,6 @@ class JsBridge(private val activity: MainActivity) {
      * clip still rings like a real alarm; short notification tones play once.
      */
     private fun playNamedSoundInternal(name: String): Boolean {
-        if (!Flags.get(activity, "soundEnabled")) return false
         releasePlayer()
 
         val slot = name  // "completion" / "bombwarn" map 1:1 to SoundLibrary slots
@@ -706,9 +710,11 @@ class JsBridge(private val activity: MainActivity) {
         }
     }
 
-    private fun normalizeSlot(slot: String): String =
-        if (slot == SoundLibrary.SLOT_BOMB) SoundLibrary.SLOT_BOMB
-        else SoundLibrary.SLOT_COMPLETION
+    private fun normalizeSlot(slot: String): String = when (slot) {
+        SoundLibrary.SLOT_SESSION_END, SoundLibrary.SLOT_TASK_COMPLETE,
+        SoundLibrary.SLOT_BOMB, SoundLibrary.SLOT_COMPLETION -> slot
+        else -> SoundLibrary.SLOT_COMPLETION
+    }
 
     private fun clearSlotFile(slot: String) {
         val f = if (slot == "completion") soundFile else namedSoundFile(slot)

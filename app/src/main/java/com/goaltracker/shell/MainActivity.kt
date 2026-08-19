@@ -229,7 +229,7 @@ class MainActivity : AppCompatActivity() {
                     """
                     (function(){
                       try{
-                        var map={andSoundFile:'completion',andBombSoundFile:'bombwarn'};
+                        var map={andSessionSoundFile:'sessionend',andTaskSoundFile:'taskcomplete',andBombSoundFile:'bombwarn'};
                         Object.keys(map).forEach(function(id){
                           var el=document.getElementById(id);
                           if(el && !el.__slotTagged){
@@ -374,9 +374,11 @@ class MainActivity : AppCompatActivity() {
 
     /** Called from the bridge when a specific HTML sound input is tapped. */
     fun setPendingSoundSlot(slot: String) {
-        pendingSoundSlot =
-            if (slot == SoundLibrary.SLOT_BOMB) SoundLibrary.SLOT_BOMB
-            else SoundLibrary.SLOT_COMPLETION
+        pendingSoundSlot = when (slot) {
+            SoundLibrary.SLOT_SESSION_END, SoundLibrary.SLOT_TASK_COMPLETE,
+            SoundLibrary.SLOT_BOMB, SoundLibrary.SLOT_COMPLETION -> slot
+            else -> SoundLibrary.SLOT_COMPLETION
+        }
     }
 
     // ---------- v2.3: native sound chooser ----------

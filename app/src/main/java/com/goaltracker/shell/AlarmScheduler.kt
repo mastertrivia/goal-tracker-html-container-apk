@@ -44,6 +44,12 @@ object AlarmScheduler {
             .edit().remove(id.toString()).apply()
     }
 
+    /** Cancel every persisted OS alarm. Used by the master Alarms switch. */
+    fun cancelAll(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        prefs.all.keys.forEach { key -> key.toIntOrNull()?.let { cancel(context, it) } }
+    }
+
     /** Called from BootReceiver: re-schedule future alarms, drop past ones. */
     fun rescheduleAll(context: Context) {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)

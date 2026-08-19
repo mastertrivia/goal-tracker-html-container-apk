@@ -84,7 +84,11 @@ class TimerService : Service() {
         // already computed. NOT authoritative and involves NO native bomb math.
         // bombPreviewMs < 0 means "no bomb line available".
         val bombPreviewMs: Long = -1L,
-        val bombPreviewLine: String = ""
+        val bombPreviewLine: String = "",
+        // Running identity supplied by HTML (green Study / blue other).
+        // It lets native notification actions render the correct yellow
+        // paused status and restore the original colour on resume.
+        val statusEmoji: String = "🔵"
     )
 
     private val handler = Handler(Looper.getMainLooper())
@@ -256,8 +260,16 @@ class TimerService : Service() {
             newClocks = sessionClocks
             newTemplate = baseTemplate
         }
-        applyState(s.copy(paused = paused, template = newTemplate, clocks = newClocks))
+        applyState(s.copy(
+            paused = paused,
+            title = withStatusEmoji(s.title, if (paused) "🟡" else s.statusEmoji),
+            template = newTemplate,
+            clocks = newClocks
+        ))
     }
+
+    private fun withStatusEmoji(title: String, emoji: String): String =
+        title.replaceFirst(Regex("^[🟢🔵🟡]\\s*"), "$emoji ")
 
     private fun nativeStopFeedback() {
         val s = state ?: loadState()
@@ -366,7 +378,8 @@ class TimerService : Service() {
             bombPreviewMs = bp.optDouble("remainMs", -1.0).toLong()
             bombPreviewLine = bp.optString("line", "")
         }
-        return State(running, paused, title, template, clocks, bombPreviewMs, bombPreviewLine)
+        return State(running, paused, title, template, clocks, bombPreviewMs, bombPreviewLine,
+            o.optString("statusEmoji", "🔵"))
     }
 
     private fun legacyState(intent: Intent, paused: Boolean): State {
@@ -400,6 +413,7 @@ class TimerService : Service() {
             o.put("clocks", arr)
             o.put("bombPreviewMs", s.bombPreviewMs)
             o.put("bombPreviewLine", s.bombPreviewLine)
+            o.put("statusEmoji", s.statusEmoji)
             getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(KEY_STATE, o.toString()).apply()
         } catch (_: Exception) {
         }
@@ -433,7 +447,8 @@ class TimerService : Service() {
                 template = o.optString("template", ""),
                 clocks = clocks,
                 bombPreviewMs = o.optLong("bombPreviewMs", -1L),
-                bombPreviewLine = o.optString("bombPreviewLine", "")
+                bombPreviewLine = o.optString("bombPreviewLine", ""),
+                statusEmoji = o.optString("statusEmoji", "🔵")
             )
         } catch (_: Exception) {
             null

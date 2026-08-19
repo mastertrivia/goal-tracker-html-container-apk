@@ -2134,7 +2134,7 @@ body.bomb-danger{background-color:#EF4444;}
           <div class="subtext" style="margin-bottom:0;margin-top:10px;">This is the same preference as Settings → General → Pop-up Messages, exposed here for convenience.</div>
         </div>
 
-        <!-- Alarms -->
+        <!-- Scheduled alarms: one master gate plus one self-contained card per alarm. -->
         <div class="plain-card" id="cardAlarms">
           <h3>Alarms</h3>
           <div class="subtext" style="margin-top:0;">Alarms fire with sound and vibration even if the app is closed or the phone is locked.</div>
@@ -2142,30 +2142,17 @@ body.bomb-danger{background-color:#EF4444;}
             <div class="ar-txt"><div class="ar-t1">Alarms</div><div class="ar-t2">Master switch for all scheduled alarms</div></div>
             <label class="tg-switch"><input type="checkbox" id="andFlagAlarms"><span class="slider"></span></label>
           </div>
+        </div>
+
+        <div class="plain-card" id="cardSessionAlarm">
+          <h3>Pomodoro Session End Alarm</h3>
           <div class="and-row">
-            <div class="ar-txt"><div class="ar-t1">Pomodoro Session End Alarm</div><div class="ar-t2">Ring after every completed Pomodoro session (1/5, 2/5, etc.).</div></div>
+            <div class="ar-txt"><div class="ar-t1">Enabled</div><div class="ar-t2">Ring after every completed Pomodoro session.</div></div>
             <label class="tg-switch"><input type="checkbox" id="andSetSessionAlarm"><span class="slider"></span></label>
           </div>
           <div class="and-row">
-            <div class="ar-txt"><div class="ar-t1">Task Completion Alarm</div><div class="ar-t2">Ring only once when the entire task is completed. Intermediate Pomodoro sessions remain silent.</div></div>
-            <label class="tg-switch"><input type="checkbox" id="andSetTaskCompletionAlarm"><span class="slider"></span></label>
-          </div>
-          <div class="and-row">
-            <div class="ar-txt"><div class="ar-t1">Bomb Explosion Alarm</div><div class="ar-t2">Ring when the Bomb reaches 00:00 so an explosion never happens silently</div></div>
-            <label class="tg-switch"><input type="checkbox" id="andSetBombAlarm"><span class="slider"></span></label>
-          </div>
-        </div>
-
-        <!-- Completion sound -->
-        <div class="plain-card" id="cardSound">
-          <h3>Completion Sound</h3>
-          <div class="and-row">
-            <div class="ar-txt"><div class="ar-t1">Sound</div><div class="ar-t2">Master switch for the custom completion sound</div></div>
-            <label class="tg-switch"><input type="checkbox" id="andFlagSound"><span class="slider"></span></label>
-          </div>
-          <div class="and-row" id="rowSoundDuration">
-            <div class="ar-txt"><div class="ar-t1">Sound Duration</div><div class="ar-t2">How long the completion sound keeps playing</div></div>
-            <select id="andSoundDuration" class="task-select" style="width:auto;min-width:120px;margin-bottom:0;padding:10px 12px;">
+            <div class="ar-txt"><div class="ar-t1">Sound Duration</div><div class="ar-t2">How long this alarm keeps playing.</div></div>
+            <select id="andSessionSoundDuration" class="task-select" style="width:auto;min-width:120px;margin-bottom:0;padding:10px 12px;">
               <option value="5">5 seconds</option>
               <option value="10">10 seconds</option>
               <option value="15">15 seconds</option>
@@ -2173,20 +2160,29 @@ body.bomb-danger{background-color:#EF4444;}
               <option value="60">60 seconds</option>
             </select>
           </div>
-          <div class="subtext" id="andSoundStatus" style="margin-top:10px;">No custom sound set.</div>
-          <input type="file" id="andSoundFile" accept="audio/*" style="display:none;">
+          <div class="subtext" id="andSessionSoundStatus" style="margin-top:10px;">No custom sound set.</div>
+          <input type="file" id="andSessionSoundFile" accept="audio/*" style="display:none;">
           <div class="and-btn-row" style="margin-top:4px;">
-            <button class="btn-full ghost" id="andSoundPick">Choose Sound</button>
-            <button class="btn-full ghost" id="andSoundTest">Test</button>
-            <button class="btn-full danger" id="andSoundClear">Remove</button>
+            <button class="btn-full ghost" id="andSessionSoundPick">Choose Sound</button>
+            <button class="btn-full ghost" id="andSessionSoundTest">Test</button>
+            <button class="btn-full danger" id="andSessionSoundClear">Remove</button>
           </div>
-          <div class="subtext" style="margin-bottom:0;margin-top:10px;">Max 1 MB. Played when a Pomodoro or task completes.</div>
+          <div class="subtext" style="margin-bottom:0;margin-top:10px;">Max 1 MB. This sound belongs only to Pomodoro session ends.</div>
         </div>
 
-        <!-- Bomb warning sound (separate from the completion sound) -->
+        <div class="plain-card" id="cardTaskCompletionAlarm">
+          <h3>Task Complete Alarm</h3>
+          <div class="and-row"><div class="ar-txt"><div class="ar-t1">Enabled</div><div class="ar-t2">Ring once when the entire task reaches 100%.</div></div><label class="tg-switch"><input type="checkbox" id="andSetTaskCompletionAlarm"><span class="slider"></span></label></div>
+          <div class="and-row"><div class="ar-txt"><div class="ar-t1">Sound Duration</div><div class="ar-t2">How long this alarm keeps playing.</div></div><select id="andTaskSoundDuration" class="task-select" style="width:auto;min-width:120px;margin-bottom:0;padding:10px 12px;"><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="15">15 seconds</option><option value="30">30 seconds</option><option value="60">60 seconds</option></select></div>
+          <div class="subtext" id="andTaskSoundStatus" style="margin-top:10px;">No custom sound set.</div>
+          <input type="file" id="andTaskSoundFile" accept="audio/*" style="display:none;">
+          <div class="and-btn-row" style="margin-top:4px;"><button class="btn-full ghost" id="andTaskSoundPick">Choose Sound</button><button class="btn-full ghost" id="andTaskSoundTest">Test</button><button class="btn-full danger" id="andTaskSoundClear">Remove</button></div>
+          <div class="subtext" style="margin-bottom:0;margin-top:10px;">Max 1 MB. Intermediate Pomodoro sessions remain silent.</div>
+        </div>
+
         <div class="plain-card" id="cardBombSound">
-          <h3>Bomb Warning Sound</h3>
-          <div class="subtext" style="margin-top:0;">A separate sound played when the Bomb explodes. Falls back to the completion sound if the shell is too old, or the device notification tone if none is set.</div>
+          <h3>Bomb Explosion Alarm</h3>
+          <div class="and-row"><div class="ar-txt"><div class="ar-t1">Enabled</div><div class="ar-t2">Ring when the Bomb reaches 00:00.</div></div><label class="tg-switch"><input type="checkbox" id="andSetBombAlarm"><span class="slider"></span></label></div>
           <div class="subtext" id="andBombSoundStatus" style="margin-top:10px;">No custom bomb sound set.</div>
           <input type="file" id="andBombSoundFile" accept="audio/*" style="display:none;">
           <div class="and-btn-row" style="margin-top:4px;">
@@ -2194,7 +2190,7 @@ body.bomb-danger{background-color:#EF4444;}
             <button class="btn-full ghost" id="andBombSoundTest">Test</button>
             <button class="btn-full danger" id="andBombSoundClear">Remove</button>
           </div>
-          <div class="subtext" style="margin-bottom:0;margin-top:10px;">Max 1 MB. Uses the master Sound switch above.</div>
+          <div class="subtext" style="margin-bottom:0;margin-top:10px;">Max 1 MB. This sound belongs only to Bomb explosions.</div>
         </div>
 
         <!-- Backup -->
@@ -3264,7 +3260,7 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
 const CAT_COLOR_DEFAULT = {study:'#5B4FE8', routine:'#22C55E', health:'#EF4444', bomb:'#F97316', others:'#8B87A6'}; // Default dot/accent color per task category
 const CAT_NAME = {study:'Study', routine:'Routine', health:'Health', bomb:'Bomb Challenge', others:'Others'}; // Human-readable category name (for the "Count as" info popup)
 
-// ── "Others → Count this Activity as" ────────────────��─��──────🔵───────────────────
+// ── "Others → Count this Activity as" ─────────────����������──��─��──────🔵───────────────────
 // An Others task may be CREDITED to another category (Study / Routine / Health) for every
 // time-based calculation, while remaining STORED and DISPLAYED only under Others.
 //   • creditCat(t)   → the category this task's TIME should be credited to.
@@ -4350,7 +4346,7 @@ const BombEngine = {
   // 2.1 ARM: install the Bomb as the active idle timer using the persisted day-clock
   // (state.bombRemainingMs), never a full reset. The clock only gets a fresh full duration at
   // day-rollover or after an explosion; starting/stopping sessions merely pause/resume it.
-  arm(state, overflowMs){
+  arm(state, overflowMs, wallStartOverride){
     const st = state || STATE;
     const remainMs = Math.max(0, this.baseMs(st));
     // wallStartTs: wall-clock anchor set at arm time. Used by recoverState() to detect background
@@ -4376,7 +4372,12 @@ const BombEngine = {
     const wakeAnchor = (isMode1 && st.wakeReplayDate === null && st.wakeAnchorTs && st.wakeAnchorTs > 0 && st.wakeAnchorTs <= now)
       ? st.wakeAnchorTs : null;
     const safeOverflow = Math.max(0, Math.min(overflowMs || 0, remainMs));
-    const wallStart = wakeAnchor ? (wakeAnchor - safeOverflow) : (now - safeOverflow);
+    // A recovered productive completion supplies its exact completion time.
+    // Unlike a bounded elapsed offset, this remains correct even when several
+    // Bomb/lifeline deadlines passed while Android had stopped the process.
+    const exactStart = Number.isFinite(wallStartOverride) && wallStartOverride > 0
+      ? wallStartOverride : null;
+    const wallStart = exactStart || (wakeAnchor ? (wakeAnchor - safeOverflow) : (now - safeOverflow));
     st.activeTimer = { type:'bomb', startTs: monotonicNow(), duration: remainMs/1000, wallStartTs: wallStart };
   },
   // 2.2 ARM FOR NEW DAY: one of the only two places the Bomb clock is refilled to a fresh FULL
@@ -4389,7 +4390,7 @@ const BombEngine = {
     // If bomb feature is disabled, do not arm it — it doesn't exist as an activity
     if(!this.isEnabled(st)) return;
     st.bombRemainingMs = this.fullClockMs(st); // only day-rollover / explosion earn a fresh full clock
-    if(st.activeTimer) this.arm(st);
+    this.arm(st);
   },
   // 2.3 EXPLODE (idle path): the single owner of what happens when the ACTIVE (idle) Bomb reaches 00:00.
   // Rule: if a Lifeline is available, spend it (consumeLifeline) for +extra minutes and the streak
@@ -4721,8 +4722,8 @@ function bombLiveRemainingMs(state){ return BombEngine.liveRemainingMs(state); }
 // starting/stopping sessions just pauses/resumes it, it never silently refills.
 // overflowMs (optional): when the immediately-preceding session overran its end time (app was backgrounded),
 // the bomb's wallStartTs is pre-offset backward by this many ms so msRemaining() is correct on first read.
-// (Thin delegate → BombEngine.arm is the single owner of arming.)
-function armBomb(state, overflowMs){ BombEngine.arm(state, overflowMs); }
+// (Thin delegate �� BombEngine.arm is the single owner of arming.)
+function armBomb(state, overflowMs, wallStartOverride){ BombEngine.arm(state, overflowMs, wallStartOverride); }
 
 // Called when a Routine/Health timer finishes naturally — logs it to the Timeline, then re-arms the Bomb.
 // Rule: the Bomb must be on immediately whenever no productive timer is running.
@@ -4750,7 +4751,10 @@ async function completeNonStudySession(state){
   //   (b) overflow >= bomb duration → remaining <= 0 → handleBombExpired() → explode() fires.
   // No advanceElapsed() needed here — the while-loop IS the catch-up mechanism.
   const overflowMs = Math.max(0, -msRemaining(at)); // ms past 00:00 the session ran
-  armBomb(state, overflowMs);
+  // The Bomb begins at the exact productive-session deadline, not at the
+  // foreground time minus a clamped offset. This allows recovery to replay
+  // every missed Bomb/lifeline boundary at its real timestamp.
+  armBomb(state, overflowMs, endTs);
   await saveState(state);
   // (item 2) Per-session Telegram auto-logging removed — Telegram now only sends the automatic Daily Study Report.
 }
@@ -4803,6 +4807,71 @@ async function handleBombExpiredPaused(state){
   await BombEngine.explodePaused(state);
 }
 
+// Rebuild idle-Bomb transitions against their actual wall-clock deadlines.
+// Completed rows remain immutable; exact-boundary de-duplication makes every
+// foreground retry safe after an interrupted reconstruction.
+async function reconstructIdleBombTo(state, now){
+  let st = state || STATE;
+  let guard = 0;
+  while(st && !st.bombLocked && st.activeTimer?.type==='bomb' && guard++ < 64){
+    const at = st.activeTimer;
+    const start = at.wallStartTs || now;
+    const durationMs = Math.max(0, Math.round((at.duration||0) * 1000));
+    const end = start + durationMs;
+    if(now < end){
+      st.bombRemainingMs = Math.max(0, end-now);
+      at.startTs = monotonicNow() - Math.max(0, now-start);
+      await saveState(st);
+      return st;
+    }
+    if(durationMs > 0){
+      await addTimelineEntry({ category:'bomb', task:'Bomb', startTs:start, endTs:end, duration:durationMs/1000, bombRemSec:0 });
+    }
+    if(BombEngine.consumeLifeline(st)){
+      const extension = BombEngine.extensionMs(st);
+      st.activeTimer = { type:'bomb', startTs:monotonicNow(), duration:extension/1000, wallStartTs:end };
+      st.bombRemainingMs = extension;
+      await saveState(st);
+      continue;
+    }
+    st.bombExplodedFromHours = Math.floor((st.hourStreakSec||0)/3600);
+    st.bombLocked = true;
+    st.bombLockedTs = end;
+    st.bombExplodedToday = (st.bombExplodedToday||0) + 1;
+    st.activeTimer = null;
+    await saveState(st);
+    return st;
+  }
+  return st;
+}
+
+// Finalize the one live Idle interval owned by a Bomb explosion.  This MUST
+// happen before the password-reset Bomb is armed: otherwise clearing
+// bombLocked would remove the only anchor from which the Timeline can render
+// the already elapsed Idle time.  It is retry-safe across a crash between the
+// IDB write and saveState(): an existing row with this exact start is extended
+// in place because it is still the same *unfinalized* explosion interval.
+async function finalizeExplosionIdle(state, endTs = Date.now()){
+  const st = state || STATE;
+  const startTs = st && st.bombLockedTs;
+  if(!startTs || endTs - startTs < 1000) return;
+  const existing = (await getTimelineEntries()).find(e =>
+    e.category === 'noact' && e.task === 'Idle' && e.startTs === startTs
+  );
+  if(existing){
+    if((existing.endTs || 0) < endTs){
+      existing.endTs = endTs;
+      existing.duration = (endTs - startTs) / 1000;
+      await idbPut('timeline', existing);
+      invalidateTimelineCache();
+    }
+  } else {
+    await addTimelineEntry({ category:'noact', task:'Idle', startTs, endTs, duration:(endTs-startTs)/1000 });
+  }
+  st.bombLockedIdleFinalizedTs = endTs;
+  await saveState(st);
+}
+
 // Reconciles saved state against the real clock on every load/poll: handles day rollover
 // (Lifelines + Bomb clock reset daily) and fast-forwards through any timers that expired
 // while the app was closed/backgrounded (bomb explosions, session completions, etc).
@@ -4849,15 +4918,17 @@ async function recoverState(){
   try{
   let state = await getState();
 
-  // If bomb is already locked (exploded), do not process recovery — return immediately.
-  // But FIRST sync FreezeManager so renderCurrentActivity() can read the correct lock status.
-  if(state.bombLocked){
-    syncFreezeReasons(state);
+  const today = appDayKey(); // global day-boundary key — NOT raw midnight, respects Settings → Day Boundary
+  // A Bomb lock is terminal only for the study day in which it exploded.  Do
+  // not replay an explosion on ordinary recovery, but do allow the next
+  // wake-up rollover to create one fresh Bomb for its new study day.
+  syncFreezeReasons(state);
+  const sleepingOnEntry = FreezeManager.has(FREEZE.SLEEP);
+  if(state.bombLocked && (state.lastActiveDate === today || sleepingOnEntry)){
     _recovering = false;
     return state;
   }
-  
-  const today = appDayKey(); // global day-boundary key — NOT raw midnight, respects Settings → Day Boundary
+
   // ONE-TIME MIGRATION — clean up legacy Time Inconsistency state that may exist in persisted data
   // from app versions that had the TI feature. Safe to run on every boot: the delete is a no-op if
   // the properties don't exist.
@@ -4872,7 +4943,7 @@ async function recoverState(){
   // The central freeze halts ALL timer advancement. Bomb Explosion (BOMB_LOCK) joins Sleep here so its
   // freeze behaves identically: the running/paused timer is hard-paused, the bomb tick baseline is banked
   // & dropped, the daily reset is deferred, and no internal elapsed leaks.
-  const frozen = FreezeManager.has(FREEZE.SLEEP) || FreezeManager.has(FREEZE.BOMB_LOCK);
+  let frozen = FreezeManager.has(FREEZE.SLEEP) || FreezeManager.has(FREEZE.BOMB_LOCK);
   // Safe "now" for the freeze math (ROOT-CAUSE FIX for the "+8h Hour Streak" bug).
   // Freeze at the LAST TRUSTED wall time, not at the instant this poll happens to run.
   // lastSeenWall only advances while the app is awake, so if the app was CLOSED across Sleep Start
@@ -4893,7 +4964,9 @@ async function recoverState(){
   }
   // Advance the last trusted wall time every poll while the app is awake.
   state.lastSeenWall = Date.now();
-  if(state.lastActiveDate !== today && !frozen){
+  // Sleep deliberately defers the rollover. A prior day's BOMB_LOCK must not:
+  // its lock is cleared by this one fresh-day reset, rather than blocking it.
+  if(state.lastActiveDate !== today && !sleeping){
     // Home Day Streak break check — if the day that just ended never hit its full Study allocation, the chain breaks.
     if(state.homeDayStreakLastAward !== state.lastActiveDate) state.homeDayStreak = 0;
     state.completedPomodorosToday = 0; state.lastActiveDate = today;
@@ -4911,25 +4984,33 @@ async function recoverState(){
       state.wakeAnchorTs = null;                             // Mode 2: no wake anchor needed
     } else {
       state.bombDormant = false;                             // Mode 1: never dormant
-      BombEngine.armForNewDay(state);                        // fresh full Bomb clock + re-arm — new Study Day starts clean (single owner)
       // Store the wake anchor: the exact moment the bomb was armed for today.
       // applyWakeElapsedOnStart() uses this to calculate elapsed since wake-up on the first START press.
       const now = Date.now();
       const wakeTs = todayWakeTs(now);
       state.wakeAnchorTs = (wakeTs != null && wakeTs <= now) ? wakeTs : now;
-      // DO NOT clear wakeReplayDate if it was set by applyExplosionReset (password entry).
-      // Only clear if it's null or from a PREVIOUS study day — this prevents re-triggering
-      // the wake-up deduction after a bomb explosion when recovery runs again.
+      // A marker from yesterday must not prevent today's Bomb from using the
+      // Wake-up anchor. Keep only the marker created by an explosion today.
       const sdk = studyDayKey();
       if(state.wakeReplayDate !== sdk){
-        state.wakeReplayDate = null; // clear marker so the new day's deduction can run
+        state.wakeReplayDate = null;
         console.log(`[RECOVERY-ROLLOVER] Cleared wakeReplayDate (was not today)`);
       } else {
         console.log(`[RECOVERY-ROLLOVER] KEPT wakeReplayDate=${sdk} (bomb just exploded)`);
       }
+      // Arm after anchoring so a late foreground recovery reconstructs from
+      // the actual Wake-up time instead of the WebView-open time.
+      BombEngine.armForNewDay(state);
+      // DO NOT clear wakeReplayDate if it was set by applyExplosionReset (password entry).
+      // Only clear if it's null or from a PREVIOUS study day — this prevents re-triggering
+      // the wake-up deduction after a bomb explosion when recovery runs again.
     }
     BombEngine.resetDailyLifelines(state); // hearts→1, dailyLifelinesEarned��������0 (single lifeline authority)
-    state.bombLocked = false;         // Task 6.5: day-rollover clears the persisted flag; syncFreezeReasons() exits BOMB_LOCK on next poll
+    state.bombLocked = false;         // Task 6.5: day-rollover clears the persisted flag
+    // We entered recovery carrying yesterday's BOMB_LOCK. Refresh immediately
+    // so this fresh Bomb is evaluated normally in this same recovery pass.
+    syncFreezeReasons(state);
+    frozen = FreezeManager.has(FREEZE.SLEEP) || FreezeManager.has(FREEZE.BOMB_LOCK);
     state.bombExplodedToday = 0;      // fresh explosion counter for the new Study Day
     // Stamp the streak baseline so reconcileDailyStudySeconds can re-derive today's contribution.
     state.hourStreakSecAtDayStart = (state.hourStreakSec || 0);
@@ -5001,6 +5082,14 @@ async function recoverState(){
   if(!frozen && bombModeOn(state) && !state.bombLocked && !state.bombDormant){
     const at = state.activeTimer;
     const wallNow = Date.now();
+    // Reconstruct every missed idle-Bomb deadline before the normal live
+    // bookkeeping. This preserves exact Bomb/Idle ownership after process death.
+    if(at && at.type === 'bomb'){
+      state = await reconstructIdleBombTo(state, wallNow);
+      if(state && state.settings?.bombWakeTrigger === 'wake-time') state.wakeReplayDate = studyDayKey();
+      await saveState(state);
+      STATE = state;
+    }
     const lastWall = state.lastSeenWall; // set a few lines above to Date.now() on this tick
     // We need the wall time from the PREVIOUS tick, stored before we updated lastSeenWall.
     // state.lastSeenWall was already updated above to wallNow, so we use the prev value we can
@@ -5102,6 +5191,17 @@ async function recoverState(){
     // BOMB_LOCK latched (explosion frozen, awaiting the Restart Hour Streak flow): nothing may advance
     // or (re-)expire while locked, so the bomb can never explode a second time before it is unlocked.
     if(state.bombLocked) break;
+    // A productive session may have completed while the process was dead and
+    // armed a Bomb with enough overflow to cross one or more Bomb deadlines.
+    // Route that path through the same exact-deadline reconstruction rather
+    // than letting the generic loop stamp the transition at foreground time.
+    if(state.activeTimer.type === 'bomb'){
+      state = await reconstructIdleBombTo(state, Date.now());
+      STATE = state;
+      if(state && state.settings?.bombWakeTrigger === 'wake-time') state.wakeReplayDate = studyDayKey();
+      await saveState(state);
+      break;
+    }
     if(state.activeTimer.pausedAt){
       // Bomb Mode: the visible activity is paused, but the Bomb keeps ticking underneath it.
       // Fast-forward any bomb explosions that happened while paused/closed WITHOUT touching the
@@ -6937,16 +7037,21 @@ let _tidSeq = Date.now();
 function nextTid(){ return ++_tidSeq; }
 function tomorrowDate(){ return new Date(Date.now()+24*3600*1000); }
 function tomorrowKey(){ return appDayKey(tomorrowDate()); }
-// Study-day identity anchored at the Wake-up hour, so it flips exactly once per day at Wake-up Time
-function studyDayKey(){ 
-  const now = new Date(); 
-  const currentHour = now.getHours(); 
-  const wakeHour = getWakeHour(); 
-  // If current time is before wake-up hour, we're still in yesterday's study day
-  if(currentHour < wakeHour) {
-    return todayStr(new Date(Date.now()-24*3600*1000)); 
+// Study-day identity anchored at the exact configured Wake-up time. Wake-up supports
+// half-hour values, so comparing only getHours() would turn 8:30 into 8:00.
+// An optional time makes boundary behaviour directly testable without changing the clock.
+function studyDayKey(now){
+  now = now || new Date();
+  const wakeHour = getWakeHour();
+  const wakeH = Math.floor(wakeHour);
+  const wakeM = Math.round((wakeHour - wakeH) * 60);
+  const wakeTs = new Date(now.getFullYear(), now.getMonth(), now.getDate(), wakeH, wakeM, 0, 0).getTime();
+  if(now.getTime() < wakeTs){
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate()-1);
+    return todayStr(yesterday);
   }
-  return todayStr(now); 
+  return todayStr(now);
 }
 // Builds a fresh Tomorrow list from Today's tasks: Routine/Health are persistent (confirmed &
 // counted), Study/Others are reusable candidates (pending — shown with Reuse/Delete, not counted).
@@ -7008,6 +7113,7 @@ async function promoteTomorrow(state){
   await saveState(state);
 }
 let _promotingWake = false; // re-entrancy guard: boot + visibilitychange/pageshow + 3s poll all call this simultaneously at wake-up boundary → promoteTomorrow() ran multiple times → duplicate tasks
+let _wakeRolloverBusy = false;
 // Runs on the background loop: promotes Tomorrow→Today the first time each Wake-up boundary is crossed
 async function maybeWakePromotion(){
   if(_promotingWake) return;
@@ -7021,6 +7127,23 @@ async function maybeWakePromotion(){
     await promoteTomorrow(state);
   }finally{
     _promotingWake = false;
+  }
+}
+// The recovery loop is intentionally dormant except after a real event. That means a
+// continuously-open app would otherwise have no work scheduled at the wake boundary.
+// This lightweight heartbeat wakes reconciliation exactly when the Study Day key changes;
+// gtResumeResync owns the normal ordering (recover → report → promotion → render).
+async function checkWakeRollover(){
+  if(RESETTING || _wakeRolloverBusy || gtResumeBusy || !STATE || isSleepActive()) return;
+  const wakeKey = studyDayKey();
+  if(STATE.lastWakeKey === undefined || STATE.lastWakeKey === wakeKey) return;
+  _wakeRolloverBusy = true;
+  try{
+    await gtResumeResync();
+  }catch(e){
+    console.warn('[wake-rollover] reconciliation failed; will retry', e);
+  }finally{
+    _wakeRolloverBusy = false;
   }
 }
 // A Today task is edit-locked once its Pomodoro has started (any consumed time / active / finalized)
@@ -8657,7 +8780,7 @@ function openPlannerChapterModal(chapterId){
   modalCat = 'study';
   currentTaskTab = 'study';
   setPlannerDurationMode(true);
-  document.getElementById('taskDeleteBtn').style.display = 'none';
+  document.getElementById('taskDeleteBtn').style.display = chapter ? 'block' : 'none';
   applyModalCat('study', false);
   const subjectName = chapter ? chapter.subject : currentPlanDetailSubject;
   document.getElementById('taskModalTitle').textContent = `${chapter ? 'Edit' : 'Add'} ${subjectName || 'Subject'} Chapter`;
@@ -8683,7 +8806,7 @@ function openPendingTaskModal(pendingId){
   editingTomorrowTid = null;
   editingTaskId = null;
   setPlannerDurationMode(false);
-  document.getElementById('taskDeleteBtn').style.display = 'none';
+  document.getElementById('taskDeleteBtn').style.display = 'block';
   applyModalCat('study', true);
   document.getElementById('taskModalTitle').textContent = 'Edit Pending Task';
   document.getElementById('saveTaskBtn').textContent = 'Save Task';
@@ -8888,7 +9011,7 @@ function showSleepPopup(feature){
   document.getElementById('editLockedNextDate').textContent = hourLabel(getWakeHour());
   document.getElementById('editLockedOverlay').classList.add('show');
 }
-// ── TIME INCONSISTENCY dialog + resume ────────────🔵──────────🔵────────────────
+// ── TIME INCONSISTENCY dialog + resume ────────────🔵──────────🔵──────────��─────
 // Shared action gate: blocks a timer action while frozen for ANY reason and shows the right popup.
 function blockIfFrozen(feature){
   syncFreezeReasons(STATE); // consult the central Freeze Manager (same conditions, same order)
@@ -8912,6 +9035,8 @@ document.getElementById('taskDeleteBtn').onclick = ()=>{
   const catLabelMap = {study:L.catStudy, routine:L.catRoutine, health:L.catHealth, others:L.catOthers};
   let t;
   if(editingTomorrowTid!=null){ t = tomorrowList().find(x=>x.tid===editingTomorrowTid); }
+  else if(plannerChapterEditingId!=null){ t = plannerChapters().find(x=>x.id===plannerChapterEditingId); }
+  else if(editingPendingId!=null){ t = plannerPending().find(x=>x.id===editingPendingId); }
   else { t = CACHED_TASKS.find(x=>x.id===editingTaskId); editMenuTaskId = editingTaskId; }
   if(!t) return;
   document.getElementById('delConfirmCat').textContent = catLabelMap[t.category]||t.category;
@@ -8928,6 +9053,20 @@ document.getElementById('delConfirmDelete').onclick = async ()=>{
     STATE.tomorrow.tasks = STATE.tomorrow.tasks.filter(t=>t.tid!==editingTomorrowTid);
     editingTomorrowTid = null;
     await saveState(STATE); renderTasks(); showToast('Task deleted.');
+    return;
+  }
+  if(plannerChapterEditingId!=null){
+    STATE.plannerChapters = STATE.plannerChapters.filter(c=>c.id!==plannerChapterEditingId);
+    plannerChapterEditingId = null;
+    await saveState(STATE); renderTasks(); render(); renderCategoryCounts(); renderPlanners();
+    showToast('Chapter deleted.');
+    return;
+  }
+  if(editingPendingId!=null){
+    STATE.plannerPending = STATE.plannerPending.filter(p=>p.id!==editingPendingId);
+    editingPendingId = null;
+    await saveState(STATE); renderTasks(); render(); renderCategoryCounts(); renderPlanners();
+    showToast('Pending task deleted.');
     return;
   }
   if(editMenuTaskId==null) return;
@@ -9553,14 +9692,25 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
 };
 
   /* ============ SETTINGS: FOLDER-STYLE CATEGORY NAVIGATION ============ */
+  // One shared Save Settings button is intentionally used by the ordinary settings
+  // sections. Its enabled state must nevertheless belong to the section currently
+  // open: Bomb owns its dirty/validation state, while every other editable section
+  // starts with a usable Save button. This prevents Bomb's disabled state from
+  // leaking into Task Create, Home, or Other Settings after navigation.
+  const SETTINGS_SAVE_READONLY_SUBS = new Set(['subAbout','subAndroid','subFormulaDebug','subMilestonesRevision']);
+  function setSettingsSaveButtonForSection(sectionId){
+    const btn = document.getElementById('saveSettingsBtn');
+    if(!btn) return;
+    const editable = !!sectionId && !SETTINGS_SAVE_READONLY_SUBS.has(sectionId);
+    btn.style.display = editable ? '' : 'none';
+    if(sectionId !== 'subBomb') btn.disabled = false;
+  }
   // Opens a settings sub-page (Home Section, Bomb Challenge, Task Create, All Other, About)
   document.querySelectorAll('#settingsMain .goal-settings-launch[data-sub]').forEach(el=>{
     el.addEventListener('click', ()=>{
       document.getElementById('settingsMain').style.display = 'none';
       document.getElementById(el.dataset.sub).style.display = 'block';
-      // Save button only appears inside sub-pages that hold editable inputs (hidden for About)
-      // Save button hidden for read-only/instant-apply sub-pages (About + Application Settings + Formula Debugging)
-      document.getElementById('saveSettingsBtn').style.display = (el.dataset.sub === 'subAbout' || el.dataset.sub === 'subAndroid' || el.dataset.sub === 'subFormulaDebug' || el.dataset.sub === 'subMilestonesRevision') ? 'none' : '';
+      setSettingsSaveButtonForSection(el.dataset.sub);
       // Render Planner cards when opening Planner section
       if(el.dataset.sub === 'subMilestonesRevision'){
         renderPlanners();
@@ -9572,7 +9722,7 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
         // renderSettings() shows settingsMain — flip back to subBomb
         document.getElementById('settingsMain').style.display = 'none';
         document.getElementById('subBomb').style.display = 'block';
-        document.getElementById('saveSettingsBtn').style.display = '';
+        setSettingsSaveButtonForSection('subBomb');
         document.getElementById('saveSettingsBtn').disabled = true;
       }
     window.scrollTo(0,0);
@@ -9845,14 +9995,24 @@ async function renderPlanners(){
       expectedFinishSubtext = 'All tasks complete';
     }
     
-    // Format hours display (hide zero values)
+    // Format hours display (hide zero values) — used in planner header line only
     const hrs = Math.floor(totalHours);
     const mins = Math.round((totalHours - hrs) * 60);
     let hoursDisplay = '';
     if (hrs > 0) hoursDisplay += hrs + 'h';
     if (mins > 0) hoursDisplay += (hoursDisplay ? ' ' : '') + mins + 'm';
     if (!hoursDisplay) hoursDisplay = '0h';
+
+    // Planned card: sum of all subjects' durations (in seconds → hours/minutes)
+    const subjectsTotalSec = totalTaskDuration; // already summed above
+    const stHrs = Math.floor(subjectsTotalSec / 3600);
+    const stMins = Math.round((subjectsTotalSec % 3600) / 60);
+    let subjectsTotalDisplay = '';
+    if (stHrs > 0) subjectsTotalDisplay += stHrs + 'h';
+    if (stMins > 0) subjectsTotalDisplay += (subjectsTotalDisplay ? ':' : '') + stMins + 'm';
+    if (!subjectsTotalDisplay) subjectsTotalDisplay = '0h';
     
+    // Full date with year — kept for any existing uses elsewhere
     const formatDate = (dateStr) => {
       const d = new Date(dateStr + 'T00:00:00');
       const day = d.getDate();
@@ -9860,6 +10020,28 @@ async function renderPlanners(){
       const year = d.getFullYear();
       return day + ' ' + month + ' ' + year;
     };
+    // Short date WITHOUT year — used in the planner header line
+    const formatDateShort = (dateStr) => {
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.getDate() + ' ' + d.toLocaleDateString('en-US', { month: 'short' });
+    };
+
+    // Effective New calculation
+    // Effective Total Hours = totalHours − (avgRevisionHours × daysCount)
+    const effectiveTotalHours = Math.max(0, totalHours - avgRevisionHours * daysCount);
+    // Effective Days = effectiveHours / dailyHours — using the FIXED study hours from settings
+    // e.g. 230h ÷ 14h/day (from settings) = 16.4 days
+    const effectiveDays = dailyHours > 0 ? Math.round((effectiveTotalHours / dailyHours) * 10) / 10 : 0;
+    const effTotalHrs = Math.floor(totalHours);
+    const effAvgRevH = Math.round(avgRevisionHours * 10) / 10;
+    const effResult = Math.round(effectiveTotalHours * 10) / 10;
+    const effAvgRevDisplay = effAvgRevH + 'h';
+    const effResultDisplay = Number.isInteger(effResult) ? effResult + 'h' : effResult + 'h';
+    const effectiveDaysDisplay = effectiveDays === 0 ? '0 days' : effectiveDays === 1 ? '1 day' : (Number.isInteger(effectiveDays) ? Math.floor(effectiveDays) + ' days' : effectiveDays.toFixed(1) + ' days');
+    const effectiveLine = `${effTotalHrs}h \u2212 (${effAvgRevDisplay} \u00d7 ${daysCount}d) = ${effResultDisplay} | ${effectiveDaysDisplay}`;
+
+    // Is this planner the active one?
+    const isActivePlanner = planner.id === STATE.activePlannerId;
     
     const card = document.createElement('div');
     card.className = 'plain-card expanded';
@@ -9872,30 +10054,36 @@ async function renderPlanners(){
           <div style="flex:1;">
             <h3 class="planner-card-title">${escapeHtml(planner.name)}</h3>
             <div style="font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:6px;margin-top:-2px;">
-              <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5;"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-              Start: ${formatDate(planner.startDate)} | End: ${formatDate(planner.endDate)} | Total: ${daysCount} day${daysCount === 1 ? '' : 's'}
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5;flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              Start: ${formatDateShort(planner.startDate)} | End: ${formatDateShort(planner.endDate)} | ${hoursDisplay} | ${daysCount} day${daysCount === 1 ? '' : 's'}
+            </div>
+            <div style="font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:6px;margin-top:2px;">
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5;flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+              Effective: ${effectiveLine}
             </div>
           </div>
         </div>
-        <button class="plannerDropdownBtn" data-id="${planner.id}" style="width:40px;height:40px;border-radius:10px;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);flex-shrink:0;transition:transform .3s ease;margin-left:8px;">
+        ${isActivePlanner ? '' : `<button class="plannerDropdownBtn" data-id="${planner.id}" style="width:40px;height:40px;border-radius:10px;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);flex-shrink:0;transition:transform .3s ease;margin-left:8px;">
           <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;"><path d="m6 9 6 6 6-6"/></svg>
-        </button>
+        </button>`}
       </div>
       
       <div class="planner-collapsible">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
-        <div style="background:var(--primary-light);border-radius:10px;padding:12px;text-align:center;">
+        ${(()=>{ const plannedExceeds = subjectsTotalSec > effectiveTotalHours * 3600; const plannedBg = plannedExceeds ? 'rgba(239,68,68,0.12)' : 'var(--primary-light)'; const plannedColor = plannedExceeds ? '#ef4444' : 'var(--gp-primary)'; return `
+        <div style="background:${plannedBg};border-radius:10px;padding:12px;text-align:center;">
           <div style="font-size:12px;color:var(--text);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;padding-left:0;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gp-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>
-            Total Hours
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${plannedColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>
+            <span style="color:inherit;">Planned</span>
           </div>
-          <div style="font-size:18px;font-weight:700;color:var(--gp-primary);">${hoursDisplay}</div>
+          <div style="font-size:18px;font-weight:700;color:${plannedColor};">${subjectsTotalDisplay}</div>
           <div style="font-size:10px;color:var(--text-dim);margin-top:2px;">Completed <span style="font-size:13px;font-weight:700;color:var(--text);">• ${fmtHMu(totalConsumedDuration)}</span></div>
         </div>
+        `; })()}
         <div style="background:var(--primary-light);border-radius:10px;padding:12px;text-align:center;">
           <div style="font-size:12px;color:var(--text);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;padding-left:0;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gp-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 14h.01M13 14h.01M17 14h.01M9 18h.01M13 18h.01M17 18h.01"/></svg>
-            Total Tasks
+            Chapters
           </div>
           <div style="font-size:20px;font-weight:700;color:var(--gp-primary);">${totalTaskCount}</div>
           <div style="font-size:10px;color:var(--text-dim);margin-top:2px;">Completed <span style="font-size:13px;font-weight:700;color:var(--text);">• ${completedTaskCount}</span></div>
@@ -10148,7 +10336,7 @@ document.getElementById('planDetailAddTaskBtn').addEventListener('click', () => 
   if(plannerDetailMode==='pending') openNewPendingChapterModal(); else openPlannerChapterModal(null);
   });
 
-  // ── Cart / Shop Screen ─────────────────────────────────────────────────────
+  // ── Cart / Shop Screen ───────────────────────────────���─────────────────────
   let shopActiveSubject = null;
   let shopSortMode = 'oldest';
   const shopSelections = new Map(); // chapter ID → duration selected for this transfer only
@@ -10723,7 +10911,7 @@ document.getElementById('taskLockBannerSettings').addEventListener('click', ()=>
   document.getElementById('settingsMain').style.display = 'none';
   document.querySelectorAll('.set-sub').forEach(d=>{ d.style.display = 'none'; });
   document.getElementById('subTaskCreate').style.display = 'block';
-  document.getElementById('saveSettingsBtn').style.display = '';
+  setSettingsSaveButtonForSection('subTaskCreate');
   window.scrollTo(0,0);
 });
 // Back buttons on every settings sub-page → return to the main folder list
@@ -11059,6 +11247,10 @@ document.getElementById('breachOkBtn').onclick = async ()=>{
     // STATE stays ours until saveState() durably commits the new bomb lifecycle to IDB.
     _recovering = true;
     try {
+      // Commit the currently-live post-explosion Idle interval before the reset
+      // clears bombLocked/bombLockedTs. This makes the old Bomb → Idle boundary
+      // durable and prevents the new Bomb from ever claiming that past time.
+      await finalizeExplosionIdle(STATE, Date.now());
       // Mandatory order (step 6): the DEFERRED consequences of the explosion run HERE, only now that the
       // password flow is complete — reset the Hour Streak, forfeit earned Lifelines, install a fresh Bomb clock.
       BombEngine.applyExplosionReset(STATE);
@@ -11137,7 +11329,7 @@ const AND = {
   }
 };
 
-// ─── Monotonic clock ───────🔵────────────────────────────────────────────────────────
+// ─── Monotonic clock ───────🔵��───────────────────────────────────────────────��───────
 // Replaces Date.now() as the source of truth for all elapsed-time anchors
 // (timer startTs, pausedAt, bombTickTs). Calendar timestamps (history records,
 // wake/sleep times, alarm scheduling, daily-reset comparisons) continue to use
@@ -11188,12 +11380,15 @@ function monotonicNow(){
 
 // HTML-side Android preferences (native flags cover the rest). Stored inside
 // STATE.settings.android so they ride along with normal state persistence + backup.
-const AND_CFG_DEFAULTS = { bombNotif:true, sessionAlarm:true, taskCompletionAlarm:false, bombAlarm:true, vibrate:false, soundDurationSec:60 };
+const AND_CFG_DEFAULTS = { bombNotif:true, sessionAlarm:true, taskCompletionAlarm:false, bombAlarm:true, vibrate:false, sessionSoundDurationSec:60, taskSoundDurationSec:60 };
 const SOUND_DURATION_CHOICES = [5, 10, 15, 30, 60];
 function andCfg(){
   if(!STATE) return {...AND_CFG_DEFAULTS};
   if(!STATE.settings.android) STATE.settings.android = {...AND_CFG_DEFAULTS};
   const c = STATE.settings.android;
+  // One-time migration from the former shared completion-sound duration.
+  if(c.sessionSoundDurationSec===undefined) c.sessionSoundDurationSec = c.soundDurationSec || 60;
+  if(c.taskSoundDurationSec===undefined) c.taskSoundDurationSec = c.soundDurationSec || 60;
   for(const k in AND_CFG_DEFAULTS) if(c[k]===undefined) c[k] = AND_CFG_DEFAULTS[k];
   return c;
 }
@@ -11221,8 +11416,8 @@ const SoundController = {
   _wa: null,            // WebAudio fallback handle {ctx, gain}
 
   // Chosen duration in ms (defaults/clamps to a valid choice).
-  durationMs(){
-    let s = andCfg().soundDurationSec;
+  durationMs(name){
+    let s = name === 'sessionend' ? andCfg().sessionSoundDurationSec : andCfg().taskSoundDurationSec;
     if(SOUND_DURATION_CHOICES.indexOf(s) === -1) s = 60;
     return s * 1000;
   },
@@ -11285,7 +11480,7 @@ const SoundController = {
     this._resetBtn();
     this._clearTimer();
     const ok = this._startEngine(name);
-    if(ok) this._stopTimer = setTimeout(()=> this.stop(), this.durationMs());
+    if(ok) this._stopTimer = setTimeout(()=> this.stop(), this.durationMs(name));
     return ok;
   },
 
@@ -11311,7 +11506,7 @@ const SoundController = {
     btn.textContent = 'Stop';
     btn.classList.add('is-playing');
     this._clearTimer();
-    this._stopTimer = setTimeout(()=> this.stop(), this.durationMs());
+    this._stopTimer = setTimeout(()=> this.stop(), this.durationMs(name));
     return 'playing';
   }
 };
@@ -11419,7 +11614,9 @@ function andBuildSessionState(at){
     tmpl += '\n'+EMOJI.red_circle+' Bomb Ticking '+EMOJI.bomb+' — {c2} remaining';
     clocks.push({ id:'c2', fmt:'bomb', remainMs:Math.max(0,bombLiveRemainingMs(STATE)), ticking:true });
   }
-  return { title, template:tmpl, clocks };
+  // The native service keeps this identity so its Pause/Resume actions can
+  // change the status dot even when the WebView process is gone.
+  return { title, template:tmpl, clocks, statusEmoji:emoji };
 }
 function andBuildBombState(at){
   // The notification bomb clock is driven DIRECTLY by the Bomb engine, never an independent countdown.
@@ -11520,7 +11717,9 @@ function andSetAlarm(id, triggerMs, title, text){
   andAlarms[id] = triggerMs;
 }
 function andClearAlarm(id){
-  if(andAlarms[id]!==undefined){ AND.call('cancelAlarm', id); delete andAlarms[id]; }
+  // Always ask native to cancel: a WebView reload loses andAlarms, while the
+  // OS may still hold the persisted alarm from before that reload.
+  AND.call('cancelAlarm', id); delete andAlarms[id];
 }
 function andSyncAlarms(){
   if(!AND.on || !STATE || !AND.has('scheduleAlarm')) return;
@@ -11535,7 +11734,8 @@ function andSyncAlarms(){
     if(!at || at.type!=='study') return true; // non-study tasks have one session — always "final"
     try{ const v = caComputeView(at); return v && v.cur >= v.total; }catch(e){ return true; }
   })();
-  const shouldAlarm = alarmActive && (cfg.sessionAlarm || (cfg.taskCompletionAlarm && isFinalSession));
+  const masterAlarms = AND.call('getFlag', 'alarmsEnabled', true);
+  const shouldAlarm = masterAlarms && alarmActive && (cfg.sessionAlarm || (cfg.taskCompletionAlarm && isFinalSession));
   if(shouldAlarm){
     const remain = msRemaining(at);
     if(remain > 3000){
@@ -11545,7 +11745,7 @@ function andSyncAlarms(){
   } else andClearAlarm(AND_ALARM_SESSION);
   // Bomb explosion alarm — whenever the bomb is genuinely ticking (idle bomb OR a paused session
   // in Bomb Mode), so an explosion still fires if the app is killed while paused.
-  if(cfg.bombAlarm && bombIsTicking(STATE)){
+  if(masterAlarms && cfg.bombAlarm && bombIsTicking(STATE)){
     const remain = bombLiveRemainingMs(STATE);
     if(remain > 3000) andSetAlarm(AND_ALARM_BOMB, Date.now()+remain, EMOJI.bomb+EMOJI.explosion+EMOJI.red_circle+' Bomb reached 00:00!', 'Open Goal Tracker now — your streak is at stake.');
     else andClearAlarm(AND_ALARM_BOMB);
@@ -11553,18 +11753,18 @@ function andSyncAlarms(){
 }
 
 // ---- Completion notifications + sound + vibration ----
-function andNotifyCompletion(id, title, text){
+function andNotifyCompletion(id, title, text, soundSlot){
   AND.call('showNotification', id, title, text);
-  SoundController.play('completion'); // centralized: honors the Sound Duration setting
+  if(AND.call('getFlag', 'alarmsEnabled', true) && soundSlot) SoundController.play(soundSlot);
   const cfg = andCfg();
   if(cfg.vibrate && navigator.vibrate){ try{ navigator.vibrate([220,110,220]); }catch(e){} }
 }
 // Session-complete review notification with native ADD/CANCEL action buttons (v2.2).
 // Falls back to a plain notification on older shells that lack showReviewNotification.
-function andNotifyReview(id, title, text){
+function andNotifyReview(id, title, text, soundSlot){
   if(AND.has('showReviewNotification')) AND.call('showReviewNotification', id, title, text);
   else AND.call('showNotification', id, title, text);
-  SoundController.play('completion'); // centralized: honors the Sound Duration setting
+  if(AND.call('getFlag', 'alarmsEnabled', true) && soundSlot) SoundController.play(soundSlot);
   const cfg = andCfg();
   if(cfg.vibrate && navigator.vibrate){ try{ navigator.vibrate([220,110,220]); }catch(e){} }
 }
@@ -11574,7 +11774,7 @@ function andNotifyReview(id, title, text){
 function andPlayBombSound(){
   // Centralized playback: prefers the dedicated "bombwarn" sound, falls back to
   // "completion" on older shells; either way the Sound Duration setting applies.
-  SoundController.play(AND.has('playNamedSound') ? 'bombwarn' : 'completion');
+  if(AND.call('getFlag', 'alarmsEnabled', true) && andCfg().bombAlarm) SoundController.play('bombwarn');
 }
 
 // ---- Observer: diffs STATE once per second to derive every native event ----
@@ -11612,18 +11812,18 @@ function andDetectEvents(){
       const v = at ? caComputeView(at) : null;
       const cfg = andCfg();
       const isFinalPomo = v && (v.cur >= v.total); // final Pomodoro also completes the task
-      // Sound logic: sessionAlarm → play on every Pomodoro end; taskCompletionAlarm → only play on final
-      // (sound for the final session is deferred to event #3 to avoid double-playing).
-      // If neither alarm is set, still send the notification/banner (just no sound).
-      const playNow = cfg.sessionAlarm && !cfg.taskCompletionAlarm;
+      // Session End and Task Complete are independent. The session sound plays
+      // for every completed Pomodoro; the task sound is emitted once below when
+      // the task itself becomes complete, avoiding a double ring on the final one.
+      const playNow = cfg.sessionAlarm;
       if(v){
         andSaveReviewTarget({ taskId: at.taskId, idx: Math.max(0, v.cur - 1) });
         const title = EMOJI.check+' ' + v.cur + '/' + v.total + ' completed — Add Reflection '+EMOJI.party_face;
         const body  = v.activity + (v.subject ? ' — ' + v.subject : '');
         // Native notification (Android bridge)
         if(AND.on){
-          if(playNow || (isFinalPomo && cfg.taskCompletionAlarm)){
-            andNotifyReview(AND_NOTIF_REVIEW, title, body);
+          if(playNow){
+            andNotifyReview(AND_NOTIF_REVIEW, title, body, 'sessionend');
           } else if(AND.has('showReviewNotification')){
             AND.call('showReviewNotification', AND_NOTIF_REVIEW, title, body); // notification only, no sound
           } else {
@@ -11635,13 +11835,13 @@ function andDetectEvents(){
           { taskId: at.taskId, idx: Math.max(0, v.cur - 1) });
       } else {
         andSaveReviewTarget(null);
-        if(AND.on){ andNotifyReview(AND_NOTIF_REVIEW, EMOJI.check+' Session completed — Add Reflection '+EMOJI.party_face, (p.task||'Session')); }
+        if(AND.on){ andNotifyReview(AND_NOTIF_REVIEW, EMOJI.check+' Session completed — Add Reflection '+EMOJI.party_face, (p.task||'Session'), playNow ? 'sessionend' : null); }
         showReviewBanner('✓ Session completed.', null);
       }
       // If neither flag is set, still play once as neutral feedback (original behavior)
-      if(playNow && !AND.on) SoundController.play('completion');
+      if(playNow && !AND.on) SoundController.play('sessionend');
     } else {
-      andNotifyCompletion(AND_NOTIF_REVIEW, icon+' Session complete', (p.task||'Session')+' finished.');
+      andNotifyCompletion(AND_NOTIF_REVIEW, icon+' Session complete', (p.task||'Session')+' finished.', cfg.sessionAlarm ? 'sessionend' : null);
     }
   }
   // 2) Daily Study target reached (Home Day Streak awarded for today)
@@ -11655,7 +11855,7 @@ function andDetectEvents(){
       if(t.completedAt && !prevSet.has(String(t.id))){
         AND.call('showNotification', 3, EMOJI.checkmark+' Task complete', (CAT_ICON[t.category]||'')+' '+t.name+' reached 100%.');
         // Task Completion Alarm: play sound once when the entire task finishes (not on intermediate Pomodoros)
-        if(andCfg().taskCompletionAlarm) SoundController.play('completion');
+        if(AND.call('getFlag', 'alarmsEnabled', true) && andCfg().taskCompletionAlarm) SoundController.play('taskcomplete');
       }
     });
   }
@@ -11891,7 +12091,6 @@ function andRenderSettings(){
   document.getElementById('andFlagNotifications').checked = fl('notificationsEnabled');
   document.getElementById('andFlagTimerNotif').checked = fl('timerNotificationEnabled');
   document.getElementById('andFlagAlarms').checked = fl('alarmsEnabled');
-  document.getElementById('andFlagSound').checked = fl('soundEnabled');
   // Toast preference (shared master switch with Settings → General → Pop-up Messages)
   const andToastEl = document.getElementById('andToastEnabled');
   if(andToastEl) andToastEl.checked = !(STATE.settings && STATE.settings.toastsEnabled===false);
@@ -11902,16 +12101,20 @@ function andRenderSettings(){
   document.getElementById('andSetSessionAlarm').checked = !!cfg.sessionAlarm;
   document.getElementById('andSetTaskCompletionAlarm').checked = !!cfg.taskCompletionAlarm;
   document.getElementById('andSetBombAlarm').checked = !!cfg.bombAlarm;
-  const durSel = document.getElementById('andSoundDuration');
-  if(durSel){ const s = cfg.soundDurationSec; durSel.value = String(SOUND_DURATION_CHOICES.indexOf(s) === -1 ? 60 : s); }
+  const sessionDur = document.getElementById('andSessionSoundDuration');
+  const taskDur = document.getElementById('andTaskSoundDuration');
+  if(sessionDur) sessionDur.value = String(SOUND_DURATION_CHOICES.includes(cfg.sessionSoundDurationSec) ? cfg.sessionSoundDurationSec : 60);
+  if(taskDur) taskDur.value = String(SOUND_DURATION_CHOICES.includes(cfg.taskSoundDurationSec) ? cfg.taskSoundDurationSec : 60);
   // Capability-gated cards
   document.getElementById('cardAlarms').style.opacity = AND.has('scheduleAlarm') ? '' : '.45';
   document.getElementById('rowVibrate').classList.toggle('disabled', !navigator.vibrate);
-  document.getElementById('andSoundStatus').textContent = d.customSoundSet ? 'Custom sound is set.' : 'No custom sound set.';
+  const namedOk = AND.has('saveNamedSound');
+  const setStatus = (id, slot, label)=>{ const node=document.getElementById(id); if(node) node.textContent = !namedOk ? 'Requires Android shell v2.2 or newer.' : (AND.call('hasNamedSound', slot) ? `Custom ${label} sound is set.` : `No custom ${label} sound set.`); };
+  setStatus('andSessionSoundStatus', 'sessionend', 'session');
+  setStatus('andTaskSoundStatus', 'taskcomplete', 'task-complete');
   // Bomb warning sound (named sound "bombwarn"; requires a v2.2+ shell)
   const bombCard = document.getElementById('cardBombSound');
   if(bombCard){
-    const namedOk = AND.has('saveNamedSound');
     bombCard.style.opacity = namedOk ? '' : '.45';
     const hasBomb = namedOk && !!AND.call('hasNamedSound', 'bombwarn');
     document.getElementById('andBombSoundStatus').textContent = !namedOk
@@ -11934,25 +12137,20 @@ function andBindSettings(){
   const bindFlag = (id, key)=>{ el(id).onchange = (e)=>{ AND.call('setFlag', key, !!e.target.checked); if(key==='timerNotificationEnabled' && !e.target.checked){ AND.call('stopTimer'); andNotifState='none'; andLastSig=''; andLastNotifText=''; } }; };
   bindFlag('andFlagNotifications', 'notificationsEnabled');
   bindFlag('andFlagTimerNotif', 'timerNotificationEnabled');
-  bindFlag('andFlagAlarms', 'alarmsEnabled');
-  bindFlag('andFlagSound', 'soundEnabled');
+  el('andFlagAlarms').onchange = (e)=>{
+    const enabled = !!e.target.checked;
+    AND.call('setFlag', 'alarmsEnabled', enabled);
+    // Cancel already-scheduled OS alarms immediately when the master switch is off.
+    if(!enabled){ AND.call('cancelAllAlarms'); andAlarms={}; SoundController.stop(); }
+    else andSyncAlarms();
+  };
   // HTML-side prefs persist through normal state saving
-  const bindCfg = (id, key)=>{ el(id).onchange = async (e)=>{ andCfg()[key] = !!e.target.checked; await saveState(STATE); if(key==='bombNotif' && !e.target.checked && andNotifState!=='none' && STATE.activeTimer && STATE.activeTimer.type==='bomb'){ AND.call('stopTimer'); andNotifState='none'; andLastSig=''; andLastNotifText=''; } }; };
+  const bindCfg = (id, key)=>{ el(id).onchange = async (e)=>{ andCfg()[key] = !!e.target.checked; await saveState(STATE); andSyncAlarms(); if(key==='bombNotif' && !e.target.checked && andNotifState!=='none' && STATE.activeTimer && STATE.activeTimer.type==='bomb'){ AND.call('stopTimer'); andNotifState='none'; andLastSig=''; andLastNotifText=''; } }; };
   bindCfg('andSetBombNotif', 'bombNotif');
   bindCfg('andSetVibrate', 'vibrate');
-  // Pomodoro Session End Alarm & Task Completion Alarm are mutually exclusive — enabling one disables the other.
-  el('andSetSessionAlarm').onchange = async (e)=>{
-    const cfg = andCfg();
-    cfg.sessionAlarm = !!e.target.checked;
-    if(cfg.sessionAlarm){ cfg.taskCompletionAlarm = false; el('andSetTaskCompletionAlarm').checked = false; }
-    await saveState(STATE);
-  };
-  el('andSetTaskCompletionAlarm').onchange = async (e)=>{
-    const cfg = andCfg();
-    cfg.taskCompletionAlarm = !!e.target.checked;
-    if(cfg.taskCompletionAlarm){ cfg.sessionAlarm = false; el('andSetSessionAlarm').checked = false; }
-    await saveState(STATE);
-  };
+  // The three alarm types are independent; alarmsEnabled is the sole master gate.
+  bindCfg('andSetSessionAlarm', 'sessionAlarm');
+  bindCfg('andSetTaskCompletionAlarm', 'taskCompletionAlarm');
   bindCfg('andSetBombAlarm', 'bombAlarm');
   // Toast master switch — writes the same STATE.settings.toastsEnabled used everywhere, keeps the
   // General settings checkbox in sync, and mirrors the preference into the native shell.
@@ -11974,36 +12172,22 @@ function andBindSettings(){
       AND.call('showToast', 'Native toast test.');
     };
   }
-  // Completion sound
-  el('andSoundPick').onclick = ()=> el('andSoundFile').click();
-  el('andSoundFile').onchange = (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    if(f.size > 1024*1024){ showToast('Sound too large — max 1 MB.'); e.target.value=''; return; }
-    const rd = new FileReader();
-    rd.onload = ()=>{
-      const b64 = String(rd.result).split(',')[1] || '';
-      const ok = AND.call('saveSoundFile', b64);
-      showToast(ok ? 'Completion sound saved.' : 'Could not save the sound.');
-      andRenderSettings();
+  // Two independent completion alarm sound slots. Bomb keeps its dedicated slot below.
+  const bindSoundSlot = (slot, prefix, cfgKey, label)=>{
+    el(prefix+'Pick').onclick = ()=> el(prefix+'File').click();
+    el(prefix+'File').onchange = (e)=>{
+      const f=e.target.files && e.target.files[0]; if(!f) return;
+      if(f.size>1024*1024){ showToast('Sound too large — max 1 MB.'); e.target.value=''; return; }
+      const rd=new FileReader();
+      rd.onload=()=>{ const ok=AND.call('saveNamedSound',slot,String(rd.result).split(',')[1]||''); showToast(ok ? `${label} sound saved.` : 'Could not save the sound.'); andRenderSettings(); };
+      rd.onerror=()=>showToast('Could not read the file.'); rd.readAsDataURL(f); e.target.value='';
     };
-    rd.onerror = ()=> showToast('Could not read the file.');
-    rd.readAsDataURL(f);
-    e.target.value='';
+    el(prefix+'Test').onclick=(e)=>{ const r=SoundController.togglePreview(slot,e.currentTarget); if(r===false) showToast('Could not play this sound.'); };
+    el(prefix+'Clear').onclick=()=>{ SoundController.stop(); AND.call('clearNamedSound',slot); showToast(`Custom ${label.toLowerCase()} sound removed.`); andRenderSettings(); };
+    el(prefix+'Duration').onchange=async(e)=>{ const v=parseInt(e.target.value,10); andCfg()[cfgKey]=SOUND_DURATION_CHOICES.includes(v)?v:60; await saveState(STATE); };
   };
-  el('andSoundTest').onclick = (e)=>{
-    const r = SoundController.togglePreview('completion', e.currentTarget);
-    if(r === false) showToast('No sound set (or Sound is switched off).');
-  };
-  el('andSoundClear').onclick = ()=>{ SoundController.stop(); AND.call('clearSoundFile'); showToast('Custom sound removed.'); andRenderSettings(); };
-  // Sound Duration — centralized: SoundController reads andCfg().soundDurationSec everywhere.
-  if(el('andSoundDuration')){
-    el('andSoundDuration').onchange = async (e)=>{
-      const v = parseInt(e.target.value, 10);
-      andCfg().soundDurationSec = SOUND_DURATION_CHOICES.indexOf(v) === -1 ? 60 : v;
-      await saveState(STATE);
-    };
-  }
+  bindSoundSlot('sessionend','andSessionSound','sessionSoundDurationSec','Pomodoro session');
+  bindSoundSlot('taskcomplete','andTaskSound','taskSoundDurationSec','Task-complete');
   // Bomb warning sound — a SEPARATE named sound ("bombwarn"), v2.2+ shell only
   if(el('andBombSoundPick')){
     el('andBombSoundPick').onclick = ()=>{
@@ -12141,6 +12325,7 @@ async function boot(){
   }catch(e){ console.warn('[resume] could not attach visibility listeners', e); }
   setInterval(()=>{
     maybeAwardLiveLifeline(); // business rule: must remain live while a study timer is running
+    void checkWakeRollover(); // keeps Tomorrow → Today reliable while the app stays open overnight
     if(document.getElementById('screen-home').classList.contains('active')) renderHeader();
   }, 1000);
   setInterval(async ()=>{
