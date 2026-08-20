@@ -522,6 +522,16 @@ class JsBridge(private val activity: MainActivity) {
         playNamedSoundInternal(name)
     }
 
+    /**
+     * Plays a named alarm for its caller-selected window (5–60 seconds).
+     * Keeping this stop timer native makes the chosen duration survive a
+     * paused/throttled WebView after playback has started.
+     */
+    @JavascriptInterface
+    fun playNamedSoundForDuration(name: String, durationMs: Long): Boolean = safe("playNamedSoundForDuration", false) {
+        playNamedSoundInternal(name, durationMs.coerceIn(5_000L, 60_000L))
+    }
+
     private fun saveNamedSoundInternal(name: String, base64: String): Boolean {
         val bytes = Base64.decode(base64, Base64.DEFAULT)
         if (bytes.size > 1_000_000) {
@@ -541,15 +551,15 @@ class JsBridge(private val activity: MainActivity) {
      *   2. The native selection: a bundled res/raw sound, or a device Uri.
      *   3. The bundled default for the slot (guaranteed to exist).
      *
-     * Long/alarm sounds LOOP and auto-stop after RING_DURATION_MS so a short
-     * clip still rings like a real alarm; short notification tones play once.
+     * Every selected clip loops for [ringDurationMs], so the user-selected
+     * duration means the same thing for short and long sounds alike.
      */
-    private fun playNamedSoundInternal(name: String): Boolean {
+    private fun playNamedSoundInternal(name: String, ringDurationMs: Long = RING_DURATION_MS): Boolean {
         releasePlayer()
 
         val slot = name  // "completion" / "bombwarn" map 1:1 to SoundLibrary slots
         val file = if (slot == "completion") soundFile else namedSoundFile(slot)
-        var loop = SoundLibrary.shouldLoop(activity, slot)
+        var loop = true
 
         val p = MediaPlayer()
         try {
@@ -565,7 +575,7 @@ class JsBridge(private val activity: MainActivity) {
             if (file.exists()) {
                 // Legacy: a custom file was uploaded from the HTML settings.
                 p.setDataSource(file.absolutePath)
-                loop = (slot == SoundLibrary.SLOT_BOMB) // bomb file still loops
+                loop = true
             } else {
                 val sel = SoundLibrary.getSelection(activity, slot)
                 if (sel.type == SoundLibrary.TYPE_DEVICE) {
@@ -594,19 +604,19 @@ class JsBridge(private val activity: MainActivity) {
                 stopSoundRunnable?.let { soundHandler.removeCallbacks(it) }
                 val stop = Runnable { releasePlayer() }
                 stopSoundRunnable = stop
-                soundHandler.postDelayed(stop, RING_DURATION_MS)
+                soundHandler.postDelayed(stop, ringDurationMs)
             }
             return true
         } catch (e: Exception) {
             try { p.release() } catch (_: Exception) {}
             ErrorLog.log(activity, "playNamedSound", e.message ?: e.javaClass.simpleName)
             // Last resort: never leave the alarm silent - try the built-in default.
-            return playBuiltinFallback(slot)
+            return playBuiltinFallback(slot, ringDurationMs)
         }
     }
 
     /** Absolute last-resort playback of a guaranteed-present bundled sound. */
-    private fun playBuiltinFallback(slot: String): Boolean {
+    private fun playBuiltinFallback(slot: String, ringDurationMs: Long = RING_DURATION_MS): Boolean {
         return try {
             releasePlayer()
             val b = SoundLibrary.builtinByKey(
@@ -622,7 +632,7 @@ class JsBridge(private val activity: MainActivity) {
             activity.resources.openRawResourceFd(b.resId).use { afd ->
                 p.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
             }
-            val loop = slot == SoundLibrary.SLOT_BOMB || b.isLong
+            val loop = true
             p.isLooping = loop
             p.setOnErrorListener { _, _, _ -> releasePlayer(); true }
             if (!loop) p.setOnCompletionListener { releasePlayer() }
@@ -633,7 +643,7 @@ class JsBridge(private val activity: MainActivity) {
                 stopSoundRunnable?.let { soundHandler.removeCallbacks(it) }
                 val stop = Runnable { releasePlayer() }
                 stopSoundRunnable = stop
-                soundHandler.postDelayed(stop, RING_DURATION_MS)
+                soundHandler.postDelayed(stop, ringDurationMs)
             }
             true
         } catch (e: Exception) {

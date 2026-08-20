@@ -2183,6 +2183,7 @@ body.bomb-danger{background-color:#EF4444;}
         <div class="plain-card" id="cardBombSound">
           <h3>Bomb Explosion Alarm</h3>
           <div class="and-row"><div class="ar-txt"><div class="ar-t1">Enabled</div><div class="ar-t2">Ring when the Bomb reaches 00:00.</div></div><label class="tg-switch"><input type="checkbox" id="andSetBombAlarm"><span class="slider"></span></label></div>
+          <div class="and-row"><div class="ar-txt"><div class="ar-t1">Sound Duration</div><div class="ar-t2">How long this alarm keeps playing.</div></div><select id="andBombSoundDuration" class="task-select" style="width:auto;min-width:120px;margin-bottom:0;padding:10px 12px;"><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="15">15 seconds</option><option value="30">30 seconds</option><option value="60">60 seconds</option></select></div>
           <div class="subtext" id="andBombSoundStatus" style="margin-top:10px;">No custom bomb sound set.</div>
           <input type="file" id="andBombSoundFile" accept="audio/*" style="display:none;">
           <div class="and-btn-row" style="margin-top:4px;">
@@ -4717,6 +4718,21 @@ function bombIsTicking(state){ return BombEngine.isTicking(state); }
 // Live remaining Bomb ms, valid for both the armed-bomb case and the paused-session case.
 function bombLiveRemainingMs(state){ return BombEngine.liveRemainingMs(state); }
 
+// The muted value in History is a snapshot of the *whole runway to a real
+// explosion*: live clock plus the extensions represented by currently-held
+// Lifelines.  It must be written with the entry, never recalculated later
+// from today's hearts (which made old rows flicker/change/disappear).
+function bombTotalRemainingSec(state, remainingMs){
+  const st = state || STATE;
+  const baseMs = Math.max(0, remainingMs == null ? bombLiveRemainingMs(st) : remainingMs);
+  const extensionSec = Math.max(0, (st?.settings?.lifelineExtraMinutes || 0) * 60);
+  return baseMs / 1000 + Math.max(0, st?.hearts || 0) * extensionSec;
+}
+function bombTimelineSnapshot(state, remainingMs){
+  const baseMs = Math.max(0, remainingMs == null ? bombLiveRemainingMs(state) : remainingMs);
+  return { bombRemSec:baseMs/1000, bombTotalRemSec:bombTotalRemainingSec(state, baseMs) };
+}
+
 // Arms the Bomb using the persisted day-clock (state.bombRemainingMs) instead of a full reset.
 // Rule: the bomb only ever gets a fresh full duration at day-rollover (recoverState) or after an explosion —
 // starting/stopping sessions just pauses/resumes it, it never silently refills.
@@ -4789,7 +4805,7 @@ async function handleBombExpired(state){
   const _bombStartTs = state.activeTimer?.wallStartTs || _bombEndTs;
   const _bombDurSec = Math.max(0, (_bombEndTs - _bombStartTs) / 1000);
   if(_bombDurSec >= 1 && state.activeTimer?.type === 'bomb'){
-    await addTimelineEntry({ category: 'bomb', task: 'Bomb', startTs: _bombStartTs, endTs: _bombEndTs, duration: _bombDurSec, bombRemSec: state.bombRemainingMs / 1000 });
+    await addTimelineEntry({ category: 'bomb', task: 'Bomb', startTs: _bombStartTs, endTs: _bombEndTs, duration: _bombDurSec, ...bombTimelineSnapshot(state, state.bombRemainingMs) });
   }
   await BombEngine.explode(state);
 }
@@ -4801,7 +4817,7 @@ async function handleBombExpiredPaused(state){
   const _bombStartTs = state.activeTimer?.wallStartTs || _bombEndTs;
   const _bombDurSec = Math.max(0, (_bombEndTs - _bombStartTs) / 1000);
   if(_bombDurSec >= 1 && state.activeTimer?.type === 'bomb'){
-    await addTimelineEntry({ category: 'bomb', task: 'Bomb', startTs: _bombStartTs, endTs: _bombEndTs, duration: _bombDurSec, bombRemSec: state.bombRemainingMs / 1000 });
+    await addTimelineEntry({ category: 'bomb', task: 'Bomb', startTs: _bombStartTs, endTs: _bombEndTs, duration: _bombDurSec, ...bombTimelineSnapshot(state, state.bombRemainingMs) });
   }
   // NOW proceed with explosion logic (this is separate from history writing)
   await BombEngine.explodePaused(state);
@@ -4825,7 +4841,7 @@ async function reconstructIdleBombTo(state, now){
       return st;
     }
     if(durationMs > 0){
-      await addTimelineEntry({ category:'bomb', task:'Bomb', startTs:start, endTs:end, duration:durationMs/1000, bombRemSec:0 });
+      await addTimelineEntry({ category:'bomb', task:'Bomb', startTs:start, endTs:end, duration:durationMs/1000, ...bombTimelineSnapshot(st, 0) });
     }
     if(BombEngine.consumeLifeline(st)){
       const extension = BombEngine.extensionMs(st);
@@ -5279,7 +5295,7 @@ async function startSession(type, task, topic){
       const _bombStartTs = _prev.wallStartTs || _prevEndTs;
       const _bombDurSec = Math.max(0, (_prevEndTs - _bombStartTs) / 1000);
       if(_bombDurSec >= 1){
-        await addTimelineEntry({ category: 'bomb', task: 'Bomb', startTs: _bombStartTs, endTs: _prevEndTs, duration: _bombDurSec, bombRemSec: state.bombRemainingMs / 1000 });
+        await addTimelineEntry({ category: 'bomb', task: 'Bomb', startTs: _bombStartTs, endTs: _prevEndTs, duration: _bombDurSec, ...bombTimelineSnapshot(state, state.bombRemainingMs) });
       }
     } else {
       // A non-bomb activity is currently running (or paused). Commit the current segment exactly
@@ -5352,7 +5368,7 @@ async function startExtraStudySession(durationMinutes){
       const _bombStartTs = _prev.wallStartTs || _prevEndTs;
       const _bombDurSec = Math.max(0, (_prevEndTs - _bombStartTs) / 1000);
       if(_bombDurSec >= 1){
-        await addTimelineEntry({ category: 'bomb', task: 'Bomb', startTs: _bombStartTs, endTs: _prevEndTs, duration: _bombDurSec, bombRemSec: state.bombRemainingMs / 1000 });
+        await addTimelineEntry({ category: 'bomb', task: 'Bomb', startTs: _bombStartTs, endTs: _prevEndTs, duration: _bombDurSec, ...bombTimelineSnapshot(state, state.bombRemainingMs) });
       }
     } else {
       // FIX: Same REVIEW_PENDING guard as startSession — submitReview() owns that write.
@@ -6163,8 +6179,7 @@ function updateBombCardLive(){
       const _base = parseFloat(_hla.dataset.committedSec || 0);
       _hla.textContent = fmtHM(_base + _liveSec); // Activity card: compiled HH:MM only, no live seconds
     }
-    const _lifelineBufSec = (STATE.hearts||0) * ((STATE.settings&&STATE.settings.lifelineExtraMinutes||0) * 60);
-    const _remText = '-' + fmtClock((live / 1000) + _lifelineBufSec);
+    const _remText = '-' + fmtClock(bombTotalRemainingSec(STATE, live));
     const _hlr = document.getElementById('hist-live-rem');
     if(_hlr) _hlr.textContent = _remText;
     const _hlra = document.getElementById('hist-live-rem-act');
@@ -6552,15 +6567,20 @@ function buildFullDayTimeline(entries){
   // There is NO special bomb branch. The activeTimer — whatever its type — owns
   // the trailing interval [wallSegmentStartTs → now]. Trailing gap before it = Idle.
   //
-  // Paused sessions are NOT live: their endTs is frozen at pause time. The bomb
-  // (when active) is always unpaused (_at.pausedAt is null).
   const _at          = STATE && STATE.activeTimer;
-  // Activity is live if running and not paused.
-  const _liveRunning = _at && !_at.pausedAt;
-  const _liveSegStart = _liveRunning
-    ? (_at.wallSegmentStartTs || _at.wallStartTs || Date.now())
+  // A paused productive session itself is not live, but its Bomb is. Claim
+  // that interval as Bomb instead of allowing the generic gap filler to call
+  // it Idle.
+  const _pausedSessionBomb = !!(_at && _at.type !== 'bomb' && _at.pausedAt && bombIsTicking(STATE));
+  const _liveRunning = !!(_at && (!_at.pausedAt || _pausedSessionBomb));
+  const _rawLiveStart = _liveRunning
+    ? (_pausedSessionBomb ? (_at.wallPausedTs || Date.now()) : (_at.wallSegmentStartTs || _at.wallStartTs || Date.now()))
     : null;
-  const _trailingEnd = (_liveRunning && _liveSegStart > cursor) ? _liveSegStart : windowEnd;
+  // If a just-committed row overlaps its replacement by milliseconds, the
+  // committed row owns up to cursor and the live timer owns only after cursor.
+  // Never manufacture an Idle row for that overlap.
+  const _liveSegStart = _liveRunning ? Math.max(cursor, _rawLiveStart) : null;
+  const _trailingEnd = _liveRunning ? _liveSegStart : windowEnd;
 
   // ── TRAILING GAP (cursor → trailingEnd) ──────────��──────��────────────────
   // Always Idle (or Sleep). No activity owns this interval �� it is dead time.
@@ -6581,11 +6601,11 @@ function buildFullDayTimeline(entries){
   // Append the currently-running activity (any type, including bomb) as a live
   // synthetic entry. Same code for every activity type — no branching on type.
   if(_liveRunning){
-    const _wallSeg    = _at.wallSegmentStartTs || _at.wallStartTs || Date.now();
+    const _wallSeg    = _liveSegStart;
     const _segElapsed = Math.max(0, (Date.now() - _wallSeg) / 1000);
     if(_segElapsed > 0){
       // If bomb feature is disabled, never treat as bomb — show as idle instead
-      const _isBomb = _at.type === 'bomb' && BombEngine.isEnabled(STATE);
+      const _isBomb = (_at.type === 'bomb' || _pausedSessionBomb) && BombEngine.isEnabled(STATE);
       full.push({
         category: _isBomb ? 'bomb' : (_at.type === 'bomb' ? 'noact' : _at.type),
         task:     _isBomb ? 'Bomb' : (_at.task || _at.subject || ''),
@@ -6593,8 +6613,9 @@ function buildFullDayTimeline(entries){
         startTs:  _wallSeg,
         endTs:    Date.now(),
         duration: _segElapsed,
-        // bombRemSec only for bomb entries — used by the "-MM:SS" countdown annotation
-        ...(_isBomb ? { bombRemSec: bombLiveRemainingMs(STATE) / 1000 } : {}),
+        // Live rows calculate their current runway once per History tick;
+        // completed rows instead carry the immutable snapshot written to IDB.
+        ...(_isBomb ? bombTimelineSnapshot(STATE) : {}),
         _isLive:  true
       });
     }
@@ -6735,8 +6756,11 @@ async function renderTimeline(){
           ? `<span id="hist-live-dur">${fmtHMS(e.duration)}</span>`
         : fmtHMSmall(e.duration)
       }${
-        cat === 'bomb' && e.bombRemSec != null && e.bombRemSec > 0 
-          ? `<div${e._isLive ? ' id="hist-live-rem"' : ''} style="font-size:10.5px;color:#888;font-weight:400;flex-basis:100%;text-align:right;">-${fmtMSS(e.bombRemSec + (STATE.hearts||0)*((STATE.settings&&STATE.settings.lifelineExtraMinutes||0)*60))}</div>` 
+        cat === 'bomb' && e.bombRemSec != null
+          // New entries contain an immutable total runway snapshot. Older
+          // entries did not, so show their recorded base clock stably rather
+          // than incorrectly applying today's hearts to yesterday's row.
+          ? `<div${e._isLive ? ' id="hist-live-rem"' : ''} style="font-size:10.5px;color:#888;font-weight:400;flex-basis:100%;text-align:right;">-${fmtMSS(e._isLive ? bombTotalRemainingSec(STATE) : (e.bombTotalRemSec ?? e.bombRemSec))}</div>`
           : ''
       }</div>
     </div>`;
@@ -8838,7 +8862,12 @@ document.getElementById('addTaskBtn').onclick = async ()=>{
 };
 // Validates and saves the Add/Edit Task form to IndexedDB, then refreshes the task list
 document.getElementById('saveTaskBtn').onclick = async ()=>{
-  const name = document.getElementById('taskNameInput').value.trim();
+  const taskTabAtOpen = currentTaskTab; // retain Revision's UI identity (internal category is Study)
+  const enteredName = document.getElementById('taskNameInput').value.trim();
+  // Revision is a Study subtype internally, but new tasks created from its tab
+  // are visibly named as Revision tasks. Never add the prefix twice.
+  const name = !editingTaskId && taskTabAtOpen==='revision' && enteredName && !/^Rev-\s*/i.test(enteredName)
+    ? `Rev- ${enteredName}` : enteredName;
   const cat = modalCat;
   const icon = document.getElementById('taskIconInput').value.trim();
   const color = document.getElementById('taskColorInput').value;
@@ -8906,8 +8935,8 @@ document.getElementById('saveTaskBtn').onclick = async ()=>{
     task.icon=icon||CAT_ICON[cat]; task.color=color||CAT_COLOR_DEFAULT[cat]; task.pending=false;
     await saveState(STATE);
     document.getElementById('taskOverlay').classList.remove('show');
-    currentTaskTab = cat;
-    document.querySelectorAll('#taskTabs .tab').forEach(c=>c.classList.toggle('active', c.getAttribute('data-cat')===cat));
+    currentTaskTab = taskTabAtOpen==='revision' ? 'revision' : cat;
+    document.querySelectorAll('#taskTabs .tab').forEach(c=>c.classList.toggle('active', c.getAttribute('data-cat')===currentTaskTab));
     editingTomorrowTid = null;
     renderTasks();
     return;
@@ -8927,7 +8956,7 @@ document.getElementById('saveTaskBtn').onclick = async ()=>{
   }
   const obj = editingTaskId ? {...CACHED_TASKS.find(x=>x.id===editingTaskId)} : {};
   if(!editingTaskId) obj.createdOn = plannerDateKey();
-  obj.category = modalCat; obj.uiCategory = currentTaskTab; obj.name = name; obj.duration = durSec;
+  obj.category = modalCat; obj.uiCategory = taskTabAtOpen; obj.name = name; obj.duration = durSec;
   obj.subject = subject||null; obj.slotId = slotId;
   obj.countAs = (modalCat==='others') ? modalCountAs : 'others';
   obj.icon = icon || CAT_ICON[modalCat]; obj.color = color || CAT_COLOR_DEFAULT[modalCat];
@@ -8937,8 +8966,8 @@ document.getElementById('saveTaskBtn').onclick = async ()=>{
   // a brand-new Today task instantly appears in Tomorrow as a pending reusable candidate
   // (Reuse/Delete buttons), so the user doesn't have to wait for sleep time / day change.
   document.getElementById('taskOverlay').classList.remove('show');
-  currentTaskTab = cat;
-  document.querySelectorAll('#taskTabs .tab').forEach(c=>c.classList.toggle('active', c.getAttribute('data-cat')===cat));
+  currentTaskTab = taskTabAtOpen==='revision' ? 'revision' : cat;
+  document.querySelectorAll('#taskTabs .tab').forEach(c=>c.classList.toggle('active', c.getAttribute('data-cat')===currentTaskTab));
   renderTasks(); render(); renderCategoryCounts(); renderPlanners();
   // If this save originated from a planner subject page, immediately redraw it
   // from the same IndexedDB-backed task cache rather than leaving a local-only UI copy.
@@ -11380,7 +11409,7 @@ function monotonicNow(){
 
 // HTML-side Android preferences (native flags cover the rest). Stored inside
 // STATE.settings.android so they ride along with normal state persistence + backup.
-const AND_CFG_DEFAULTS = { bombNotif:true, sessionAlarm:true, taskCompletionAlarm:false, bombAlarm:true, vibrate:false, sessionSoundDurationSec:60, taskSoundDurationSec:60 };
+const AND_CFG_DEFAULTS = { bombNotif:true, sessionAlarm:true, taskCompletionAlarm:false, bombAlarm:true, vibrate:false, sessionSoundDurationSec:60, taskSoundDurationSec:60, bombSoundDurationSec:60 };
 const SOUND_DURATION_CHOICES = [5, 10, 15, 30, 60];
 function andCfg(){
   if(!STATE) return {...AND_CFG_DEFAULTS};
@@ -11389,6 +11418,7 @@ function andCfg(){
   // One-time migration from the former shared completion-sound duration.
   if(c.sessionSoundDurationSec===undefined) c.sessionSoundDurationSec = c.soundDurationSec || 60;
   if(c.taskSoundDurationSec===undefined) c.taskSoundDurationSec = c.soundDurationSec || 60;
+  if(c.bombSoundDurationSec===undefined) c.bombSoundDurationSec = c.soundDurationSec || 60;
   for(const k in AND_CFG_DEFAULTS) if(c[k]===undefined) c[k] = AND_CFG_DEFAULTS[k];
   return c;
 }
@@ -11417,7 +11447,9 @@ const SoundController = {
 
   // Chosen duration in ms (defaults/clamps to a valid choice).
   durationMs(name){
-    let s = name === 'sessionend' ? andCfg().sessionSoundDurationSec : andCfg().taskSoundDurationSec;
+    let s = name === 'sessionend' ? andCfg().sessionSoundDurationSec
+      : name === 'bombwarn' ? andCfg().bombSoundDurationSec
+      : andCfg().taskSoundDurationSec;
     if(SOUND_DURATION_CHOICES.indexOf(s) === -1) s = 60;
     return s * 1000;
   },
@@ -11429,6 +11461,7 @@ const SoundController = {
   _startEngine(name){
     name = name || 'completion';
     if(AND.on){
+      if(name !== 'completion' && AND.has('playNamedSoundForDuration')) return AND.call('playNamedSoundForDuration', name, this.durationMs(name));
       if(name !== 'completion' && AND.has('playNamedSound')) return AND.call('playNamedSound', name);
       return AND.call('playCompletionSound');
     }
@@ -11595,7 +11628,11 @@ function andBuildBombNotif(at){
 function andBuildSessionState(at){
   const v = caComputeView(at);
   const paused = !!at.pausedAt;
-  const emoji = paused ? EMOJI.yellow_circle : (v.isStudy ? EMOJI.green_circle : EMOJI.blue_circle);
+  // Keep the activity identity separate from its temporary paused appearance.
+  // The native notification action needs this to restore the correct colour
+  // after Resume while the WebView is not running.
+  const statusEmoji = v.isStudy ? EMOJI.green_circle : EMOJI.blue_circle;
+  const emoji = paused ? EMOJI.yellow_circle : statusEmoji;
   const title = emoji + ' ' + v.activity + (v.subject ? ' — ' + v.subject : '');
   const clocks = [];
   let tmpl;
@@ -11616,7 +11653,7 @@ function andBuildSessionState(at){
   }
   // The native service keeps this identity so its Pause/Resume actions can
   // change the status dot even when the WebView process is gone.
-  return { title, template:tmpl, clocks, statusEmoji:emoji };
+  return { title, template:tmpl, clocks, statusEmoji };
 }
 function andBuildBombState(at){
   // The notification bomb clock is driven DIRECTLY by the Bomb engine, never an independent countdown.
@@ -11675,7 +11712,7 @@ function andSyncNotificationNative(){
   const sig = st.title+'|'+st.template+'|'+paused+'|'+
     st.clocks.map(c=>c.id+':'+c.fmt+':'+c.ticking+':'+(c.ticking?'~':c.remainMs)).join(',');
   if(sig!==andLastSig){
-    AND.call('setTimerState', JSON.stringify({ running:true, paused:paused, title:st.title, template:st.template, clocks:st.clocks, bombPreview:bombPreview }));
+    AND.call('setTimerState', JSON.stringify({ running:true, paused:paused, title:st.title, template:st.template, clocks:st.clocks, bombPreview:bombPreview, statusEmoji:st.statusEmoji }));
     andLastSig = sig; andNotifState = 'running';
   }
 }
@@ -12103,8 +12140,10 @@ function andRenderSettings(){
   document.getElementById('andSetBombAlarm').checked = !!cfg.bombAlarm;
   const sessionDur = document.getElementById('andSessionSoundDuration');
   const taskDur = document.getElementById('andTaskSoundDuration');
+  const bombDur = document.getElementById('andBombSoundDuration');
   if(sessionDur) sessionDur.value = String(SOUND_DURATION_CHOICES.includes(cfg.sessionSoundDurationSec) ? cfg.sessionSoundDurationSec : 60);
   if(taskDur) taskDur.value = String(SOUND_DURATION_CHOICES.includes(cfg.taskSoundDurationSec) ? cfg.taskSoundDurationSec : 60);
+  if(bombDur) bombDur.value = String(SOUND_DURATION_CHOICES.includes(cfg.bombSoundDurationSec) ? cfg.bombSoundDurationSec : 60);
   // Capability-gated cards
   document.getElementById('cardAlarms').style.opacity = AND.has('scheduleAlarm') ? '' : '.45';
   document.getElementById('rowVibrate').classList.toggle('disabled', !navigator.vibrate);
@@ -12188,6 +12227,7 @@ function andBindSettings(){
   };
   bindSoundSlot('sessionend','andSessionSound','sessionSoundDurationSec','Pomodoro session');
   bindSoundSlot('taskcomplete','andTaskSound','taskSoundDurationSec','Task-complete');
+  bindSoundSlot('bombwarn','andBombSound','bombSoundDurationSec','Bomb explosion');
   // Bomb warning sound — a SEPARATE named sound ("bombwarn"), v2.2+ shell only
   if(el('andBombSoundPick')){
     el('andBombSoundPick').onclick = ()=>{
