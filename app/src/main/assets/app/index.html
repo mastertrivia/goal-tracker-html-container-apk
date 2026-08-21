@@ -411,6 +411,10 @@ body.bomb-danger{background-color:#EF4444;}
   .tg-var-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px 4px 3px 9px;}
   .tg-var-chip button{border:none;background:var(--primary);color:#fff;border-radius:6px;font-size:9.5px;font-weight:800;letter-spacing:.03em;padding:3px 7px;cursor:pointer;text-transform:uppercase;}
   .tg-var-chip button:active{background:var(--primary-dark);}
+  /* Manual Progress uses the compact blue action-pill language from the Telegram
+     variable controls, without reusing the wide variable-token container. */
+  .manual-duration-chip{border:none;background:var(--primary);color:#fff;border-radius:6px;font:800 9.5px/1 'Inter',sans-serif;letter-spacing:.03em;padding:4px 8px;cursor:pointer;white-space:nowrap;box-shadow:0 1px 2px rgba(91,79,232,.2);}
+  .manual-duration-chip:active{background:var(--primary-dark);transform:scale(.96);}
   .tg-reset-btn{background:none;border:1px solid var(--border-strong);color:var(--text-dim);font-size:12.5px;font-weight:700;border-radius:12px;padding:11px;width:100%;cursor:pointer;margin-top:2px;}
 
   /* TIMELINE — list of every activity today, gap-free (History screen) */
@@ -1179,7 +1183,7 @@ body.bomb-danger{background-color:#EF4444;}
       </div>
     </div>
 
-    <div class="grid2">
+    <div class="grid2" id="homeTimerGrid">
       <!-- Pomodoro Timer Card - Countdown + Start/Pause/Stop for the active Study/Routine/Health session -->
       <div class="card" id="pomoCard">
         <div class="card-label"><span class="ic" id="pomoLabelIc">📖</span><span id="pomoLabelText">POMODORO TIMER</span></div>
@@ -1199,7 +1203,7 @@ body.bomb-danger{background-color:#EF4444;}
 
       <div class="col-stack">
         <!-- Current Streak Card - Total & today's completed Study Pomodoro hours -->
-        <div class="card streak-card">
+        <div class="card streak-card" id="streakCard">
           <button class="streak-info" id="streakInfoBtn" aria-label="Streak info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></button>
           <div class="card-label"><span id="lblStreak">CURRENT STREAK</span></div>
           <div class="streak-row"><div class="streak-flame-ic" id="streakFlame">🔥</div><div class="streak-num" id="streakNum">0</div></div>
@@ -1209,7 +1213,7 @@ body.bomb-danger{background-color:#EF4444;}
         </div>
 
         <!-- Bomb Timer - Counts idle time between productive activities; explosion resets the streak -->
-        <div class="card break-card" onclick="showToast('Start any new activity to stop the bomb timer.')">
+        <div class="card break-card" id="bombTimerCard" onclick="showToast('Start any new activity to stop the bomb timer.')">
           <div class="card-label" style="color:var(--red);"><span id="lblBreak">BOMB TIMER</span></div>
           <div class="bomb-row">
             <div class="bomb-emoji" id="bombEmoji">💣</div>
@@ -1286,6 +1290,10 @@ body.bomb-danger{background-color:#EF4444;}
         <div id="pcDateD1">—</div>
         <div id="pcDateD2">—</div>
       </div>
+    </div>
+    <div class="plain-card" id="manualModeNotice" style="display:none;margin-bottom:14px;padding:9px 14px;">
+      <div style="font-size:10px;font-weight:800;letter-spacing:.05em;color:var(--primary);text-transform:uppercase;">Manual Task Mode is ON</div>
+      <div class="subtext" style="margin:2px 0 0;font-size:10px;">Log completed time directly from your tasks.</div>
     </div>
   </div>
 
@@ -1842,6 +1850,11 @@ body.bomb-danger{background-color:#EF4444;}
         <h3>Timers</h3>
         <div class="field"><label>Pomodoro Duration (minutes)</label><input type="number" id="setPomo" min="1"></div>
       </div>
+      <div class="plain-card">
+        <h3>Manual Task Mode</h3>
+        <div class="subtext" style="margin-top:0;">Track task progress manually without using the Pomodoro timer.</div>
+        <div class="and-row"><div class="ar-txt"><div class="ar-t1">No Pomodoro Mode</div><div class="ar-t2">Changes apply only when you save Home Settings.</div></div><label class="tg-switch"><input type="checkbox" id="setManualTaskMode"><span class="slider"></span></label></div>
+      </div>
       <!-- Ignore Short Records in History — pure UI filter, never touches stored data -->
       <div class="plain-card">
         <h3>Ignore Short Records in History</h3>
@@ -1863,6 +1876,7 @@ body.bomb-danger{background-color:#EF4444;}
     <!-- Sub-page 2: Bomb Challenge Mode & Lifeline -->
     <div class="set-sub" id="subBomb" style="display:none;">
       <div class="gset-header"><button class="gset-back set-sub-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="gset-title">Bomb Challenge Mode</div><div style="width:34px;"></div></div>
+      <div class="plain-card" id="manualBombNotice" style="display:none;border-color:#C9E0FB;background:#EAF3FE;"><div class="subtext" style="margin:0;color:#2563EB;font-weight:600;">Manual Task Mode is currently ON. Disable it first in Home Section to enable Bomb Challenge Mode.</div></div>
       <!-- Bomb Challenge Mode - master switch for the whole Bomb/Lifeline system -->
       <div class="plain-card">
         <div class="and-row">
@@ -2852,6 +2866,12 @@ body.bomb-danger{background-color:#EF4444;}
   <div class="sheet">
     <div style="display:flex;align-items:center;justify-content:space-between;"><h2 id="taskModalTitle">Add Task</h2><button id="taskDeleteBtn" style="display:none;background:var(--red);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-weight:700;font-size:13px;">Delete</button></div>
     <div class="field"><label>Name</label><input type="text" id="taskNameInput"></div>
+    <div id="manualProgressInfo" style="display:none;">
+      <div class="field" id="manualSubjectInfo"><label>Subject</label><div id="manualSubjectValue" style="padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-weight:600;color:var(--text-dim);"></div></div>
+      <div class="field"><label>ADD TIME</label><div class="dur-split"><div class="dur-box"><input type="text" id="manualAddHH" inputmode="numeric" maxlength="3" placeholder="00"><span class="dur-sub">HH</span></div><span class="dur-colon">:</span><div class="dur-box"><input type="text" id="manualAddMM" inputmode="numeric" maxlength="2" placeholder="00"><span class="dur-sub">MM</span></div></div></div>
+      <div id="manualRecentChips" style="display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 14px;"></div>
+      <div class="subtext" id="manualProgressPreview" style="margin:0 0 12px;font-weight:600;"></div>
+    </div>
     <div class="field" id="taskCountAsField" style="display:none;">
       <label>Count this Activity as</label>
       <div class="ca-radio-group" id="taskCountAsGroup">
@@ -2862,11 +2882,11 @@ body.bomb-danger{background-color:#EF4444;}
       </div>
     </div>
     <div class="field" id="taskSubjectField" style="display:none;"><label>Subject</label><select class="task-select" id="taskSubjectInput" style="margin-bottom:0;"></select></div>
-    <div class="field-row2">
+    <div class="field-row2" id="taskIconColorRow">
       <div class="field"><label>Icon (emoji)</label><input type="text" id="taskIconInput" maxlength="4" placeholder="📖"></div>
       <div class="field"><label id="colorFieldLabel">Difficulty Level</label><select class="task-select" id="taskColorInput" style="margin-bottom:0;"></select></div>
     </div>
-    <div class="field-row2">
+    <div class="field-row2" id="taskDurationSlotRow">
       <div class="field"><label>Duration</label>
         <div class="dur-split">
           <div class="dur-box"><input type="text" id="taskDurHH" inputmode="numeric" maxlength="2" placeholder="00"><span class="dur-sub">HH</span></div>
@@ -3208,6 +3228,9 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
   pomodoroDuration: 30*60,
   bombDuration: 20*60,
   bombChallengeMode: true, // When OFF: hides lifelines, disables the bomb countdown/explosion/streak-reset, and switches the Home streak card to the Goal Day Streak
+  manualTaskMode: false,
+  manualLastEditedTaskId: null,
+  manualLastEditedCategory: null,
   bombWakeTrigger: 'wake-time', // When to arm the Bomb at the start of each Study Day: 'wake-time' (default) arms at Wake-up; 'first-activity' arms only after the first productive session begins
   heartsMaxPerDay: 3,
   dailyFreeLifelines: 1, // free Lifelines (hearts) granted at each new day (0-3, hard max 3). resetDailyLifelines() uses this instead of a hardcoded 1.
@@ -3377,8 +3400,8 @@ function getOtherUsedSeconds(excludeId){
 // are all blocked) until the next day begins.
 async function hasTodayActivityLogged(){
   const all = await getTimelineEntries();
-  const today = appDayKey();
-  return all.some(e=>e.date===today);
+  const today = studyDayKey();
+  return all.some(e=>timelineStudyDayKey(e)===today);
 }
 // Formats the moment editing re-opens (the start of the next day, i.e. the next midnight) as
 // "09 July 2026 — 00:00 AM", used in the Editing-Locked dialog
@@ -3520,6 +3543,9 @@ async function getState(){
   if(s.settings.wakeHour===undefined) s.settings.wakeHour = DEFAULT_SETTINGS.wakeHour;
   if(s.settings.lockTodayEditing===undefined) s.settings.lockTodayEditing = DEFAULT_SETTINGS.lockTodayEditing;
   if(s.settings.bombChallengeMode===undefined) s.settings.bombChallengeMode = DEFAULT_SETTINGS.bombChallengeMode;
+  if(s.settings.manualTaskMode===undefined) s.settings.manualTaskMode = DEFAULT_SETTINGS.manualTaskMode;
+  if(s.settings.manualLastEditedTaskId===undefined) s.settings.manualLastEditedTaskId = null;
+  if(s.settings.manualLastEditedCategory===undefined) s.settings.manualLastEditedCategory = null;
   if(s.settings.bombWakeTrigger===undefined) s.settings.bombWakeTrigger = DEFAULT_SETTINGS.bombWakeTrigger;
  if(!s.settings.subjects) s.settings.subjects = [...DEFAULT_SETTINGS.subjects];
  if(!s.settings.timeSlots) s.settings.timeSlots = JSON.parse(JSON.stringify(DEFAULT_SETTINGS.timeSlots));
@@ -3685,9 +3711,18 @@ async function getTimelineEntries(){
 }
 function invalidateTimelineCache(){ _tlCache = null; }
 
+// Compatibility reader for timeline records created before `entry.date` was
+// corrected to the wake-based Study Day. Never trust that legacy stored key.
+function timelineStudyDayKey(entry){
+  return studyDayKey(new Date(entry.endTs || entry.startTs));
+}
+
 // Timeline stores every completed activity (Study/Routine/Health) for the History screen and daily Summary
 async function addTimelineEntry(entry){
-  entry.date = appDayKey(new Date(entry.startTs));
+  // All user-facing daily progress is a Study Day, which changes at Wake-up.
+  // An entry ends within its owning day (timers are frozen through Sleep), so
+  // its end timestamp is the stable key for both normal and manual logging.
+  entry.date = studyDayKey(new Date(entry.endTs || entry.startTs));
   // DUPLICATE PROTECTION (data level): a completed session creates exactly ONE record.
   // If an entry with the same task + start + end already exists, silently skip the write.
   const existing = await getTimelineEntries();
@@ -4185,10 +4220,10 @@ function liveTodayStudySec(state){
 // Calling this on every recoverState() tick self-heals any drift in under 3 seconds.
 // Returns true if a correction was made (caller should re-save state).
 async function reconcileDailyStudySeconds(state){
-  const today = appDayKey();
+  const today = studyDayKey();
   const entries = await getTimelineEntries();
   const idbSec = entries
-    .filter(e => e.date === today && e.category === 'study')
+    .filter(e => timelineStudyDayKey(e) === today && e.category === 'study')
     .reduce((s, e) => s + (e.duration || 0), 0);
   let changed = false;
 
@@ -4934,7 +4969,7 @@ async function recoverState(){
   try{
   let state = await getState();
 
-  const today = appDayKey(); // global day-boundary key — NOT raw midnight, respects Settings → Day Boundary
+  const today = studyDayKey(); // daily state advances at Wake-up
   // A Bomb lock is terminal only for the study day in which it exploded.  Do
   // not replay an explosion on ordinary recovery, but do allow the next
   // wake-up rollover to create one fresh Bomb for its new study day.
@@ -5044,13 +5079,14 @@ async function recoverState(){
     const oldTl = await idbAll('timeline');
     const dayBank = {};
     for(const e of oldTl){
-      if(e.date !== today && e.category==='study') dayBank[e.date] = (dayBank[e.date]||0) + (e.duration||0);
+      const entryDay = timelineStudyDayKey(e);
+      if(entryDay !== today && e.category==='study') dayBank[entryDay] = (dayBank[entryDay]||0) + (e.duration||0);
     }
     for(const d in dayBank){ if(state.studyDayTotals[d]===undefined) state.studyDayTotals[d] = dayBank[d]; }
     await idbPut('meta', state); STATE = state; // persist bank BEFORE deleting (direct put — never skipped)
-    for(const e of oldTl){ if(e.date !== today) await idbDelete('timeline', e.id); } invalidateTimelineCache();
+    for(const e of oldTl){ if(timelineStudyDayKey(e) !== today) await idbDelete('timeline', e.id); } invalidateTimelineCache();
     const oldSs = await idbAll('sessions');
-    for(const s2 of oldSs){ if(appDayKey(new Date(s2.startTs||0)) !== today) await idbDelete('sessions', s2.id); }
+    for(const s2 of oldSs){ if(studyDayKey(new Date(s2.startTs||0)) !== today) await idbDelete('sessions', s2.id); }
   }
   // ENGINE FIX: reconcile dailyStudySeconds against IDB timeline (ground truth) so that
   // liveTodayStudySec() is always exact — matching what History has always shown — even
@@ -6062,6 +6098,8 @@ const HS_PLAY = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
 const HS_STOP = '<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
 const TBTN_PLAY_ICO = '<svg viewBox="0 0 24 24"><path d="M7 4.8c0-1.4 1.5-2.2 2.7-1.5l11 6.4c1.2.7 1.2 2.4 0 3.1l-11 6.4c-1.2.7-2.7-.1-2.7-1.5V4.8z"/></svg>';
 const TBTN_PAUSE_ICO = '<svg viewBox="0 0 24 24"><rect x="5" y="3.5" width="5" height="17" rx="1.8"/><rect x="14" y="3.5" width="5" height="17" rx="1.8"/></svg>';
+const MANUAL_PROGRESS_ICO = '<svg viewBox="0 0 24 24"><path d="M5 12.5 9.2 16.7 19 7"/><path d="M4 4h16v16H4z"/></svg>';
+function manualTaskModeOn(){ return !!(STATE && STATE.settings && STATE.settings.manualTaskMode); }
 // One compact row. Button color: blue = never started, yellow = started before, red stop = running.
 function hsTaskRow(t, opts){
   opts = opts || {};
@@ -6074,8 +6112,11 @@ function hsTaskRow(t, opts){
   } else if(opts.completed){
     cls += ' hs-completed';
   } else {
-    const color = (consumed>0) ? 'yellow' : 'blue';
-    btn = `<button class="hs-pbtn ${color}" data-hsplay="${t.id}" aria-label="Start task">${HS_PLAY}</button>`;
+    const color = manualTaskModeOn() && String(STATE?.settings?.manualLastEditedTaskId)===String(t.id)
+      ? 'red' : ((consumed>0) ? 'yellow' : 'blue');
+    btn = manualTaskModeOn()
+      ? `<button class="hs-pbtn ${color}" data-manualprogress="${t.id}" aria-label="Log task progress">${MANUAL_PROGRESS_ICO}</button>`
+      : `<button class="hs-pbtn ${color}" data-hsplay="${t.id}" aria-label="Start task">${HS_PLAY}</button>`;
   }
   return `<div class="${cls}"><div class="hs-nm"><span class="bk">${icon}</span>${escapeHtml(t.name)}${badge}</div>`
     + `<div class="hs-pg">${fmtBudget(consumed)} / ${fmtBudget(t.duration)}</div>${btn}</div>`;
@@ -6125,7 +6166,7 @@ function renderHomeTaskList(){
   if(completed.length) html += `<div class="hs-group-hd"><span class="g-name">Completed</span></div>` + completed.map(t=>hsTaskRow(t, {completed:true})).join('');
   listEl.innerHTML = html;
 }
-function hsCollapse(){ if(hsExpanded){ hsExpanded = false; hsSortMode = 'slot'; renderHomeTaskList(); } }
+function hsCollapse(){ if(manualTaskModeOn()) return; if(hsExpanded){ hsExpanded = false; hsSortMode = 'slot'; renderHomeTaskList(); } }
 // Live-refresh only the running row's progress text on each timer tick (no full re-render, keeps it cheap).
 function hsUpdateRunningProgress(at){
   if(!hsExpanded || !at || at.taskId==null) return;
@@ -6187,6 +6228,18 @@ function updateBombCardLive(){
   }
 }
 function renderHome(){
+  const manual = !!STATE?.settings?.manualTaskMode;
+  if(manual){
+    const lastCategory = STATE.settings.manualLastEditedCategory;
+    if(lastCategory && CACHED_TASKS.some(t=>(t.uiCategory||t.category)===lastCategory)) selectedCategory = lastCategory;
+    hsExpanded = true;
+  }
+  // Manual Mode hides only normal activity/no-task controls. The meaningful
+  // Good Morning and Sleep status states remain visible and usable.
+  const keepStatusCard = isSleepActive() || (isGoodMorningLocked() && !isSleepActive());
+  document.getElementById('manualModeNotice').style.display = manual ? '' : 'none';
+  document.getElementById('currentActivityCard').style.display = (manual && !keepStatusCard) ? 'none' : '';
+  document.getElementById('homeTimerGrid').style.display = manual ? 'none' : '';
   renderCurrentActivity();
   if(ringTimerHandle){ clearInterval(ringTimerHandle); ringTimerHandle = null; }
   // Initialize bomb boundary-crossing tracker: ensures explosions only fire once per cycle
@@ -6533,7 +6586,13 @@ function buildFullDayTimeline(entries){
   // It never carries yesterday's sleep forward and never leaks into tomorrow.
   const wakeTs  = todayWakeTs(now);
   const sleepTs = nextSleepTs(wakeTs);
-  const windowEnd = Math.min(sleepTs, now);
+  // A manual log always ends "now". Keep such real entries visible even when
+  // they are logged after the normal Sleep-start boundary.
+  const lastManualEnd = entries.reduce((latest, e) =>
+    e && e.manual && e.endTs > wakeTs && e.startTs < now
+      ? Math.max(latest, Math.min(e.endTs, now))
+      : latest, 0);
+  const windowEnd = Math.max(Math.min(sleepTs, now), lastManualEnd);
 
   // Only wake→sleep interval is ever shown — anything outside is a different day's concern.
   if(windowEnd <= wakeTs) return [];
@@ -6664,7 +6723,7 @@ async function renderHistSummary(){
   const grid = document.getElementById('histSummaryGrid');
   if(!grid) return;
   const all = await getTimelineEntries();
-  const today = todayStr();
+  const today = studyDayKey();
   const L = STATE.settings.labels;
   const cats = [
     {key:'study', label:L.catStudy, icon:'📖'},
@@ -6679,7 +6738,7 @@ async function renderHistSummary(){
   const liveRunningCat = (at && at.state !== 'REVIEW_PENDING') ? at.type : null;
   const liveRunningSec = liveRunningCat ? sessionElapsedSec(at) : 0;
   grid.innerHTML = cats.map(c=>{
-    let committedSec = all.filter(e=>e.date===today && e.category===c.key).reduce((s,e)=>s+(e.duration||0),0);
+    let committedSec = all.filter(e=>timelineStudyDayKey(e)===today && e.category===c.key).reduce((s,e)=>s+(e.duration||0),0);
     // For study: use liveTodayStudySec() — it already combines dailyStudySeconds + running delta
     // For all other categories: add the running delta directly when a matching session is live
     const consumedSec = c.key === 'study'
@@ -7299,6 +7358,9 @@ function renderTasks(){
     if(isCompleted){
       return dur+`<span class="icon-btn done-tick" role="img" aria-label="Completed">${CHECK}</span>`;
     }
+    if(!isTom && manualTaskModeOn()){
+      return dur+`<button class="icon-btn" data-manualprogress="${t.id}" aria-label="Log task progress">${CHECK}</button>`;
+    }
     // Locked-editing setting wins over everything: hide the pencil AND the new View/Info icon.
     if(lockToday) return dur; // Edit/View hidden during the active Study Day
     // Once an activity has been started, replace the pencil with a circular View/Info icon that
@@ -7377,6 +7439,11 @@ function renderSettings(){
   updateAvailableHoursFromSleep();
   updateOtherHoursPreview();
   document.getElementById('setPomo').value = Math.round(STATE.settings.pomodoroDuration/60);
+  document.getElementById('setManualTaskMode').checked = !!STATE.settings.manualTaskMode;
+  const manualOn = !!STATE.settings.manualTaskMode;
+  document.getElementById('manualBombNotice').style.display = manualOn ? '' : 'none';
+  document.getElementById('setBombMode').disabled = manualOn;
+  document.getElementById('setBombMode').closest('.plain-card').style.opacity = manualOn ? '.55' : '';
   document.getElementById('setToastsEnabled').checked = STATE.settings.toastsEnabled !== false;
 
   // BOMB CONFIGURATION: Reset working state to saved state, then initialize UI
@@ -7393,7 +7460,7 @@ function renderSettings(){
   
   // Initialize UI from SAVED state (not working state)
   const setBombEl = document.getElementById('setBomb');
-  const bombModeEnabled = BOMB_SAVED_STATE.enabled;
+  const bombModeEnabled = manualOn ? false : BOMB_SAVED_STATE.enabled;
   
   // Set toggle to SAVED state
   document.getElementById('setBombMode').checked = bombModeEnabled;
@@ -7787,9 +7854,7 @@ function fmtHoursMinutes(h){
 // Wake-up. Safe for data queries: timers are frozen during sleep, so no session is ever keyed
 // to a day this function hasn't reached yet.
 function goalTodayKey(d){
-  d = d || new Date();
-  const k = appDayKey(d);
-  return isSleepActive(d) ? addDaysToKey(k, -1) : k;
+  return studyDayKey(d || new Date());
 }
 
 async function getStudySecondsInRange(fromKey, toKey){
@@ -7800,7 +7865,8 @@ async function getStudySecondsInRange(fromKey, toKey){
   // Live timeline entries — only for days NOT already banked, so nothing is ever double-counted
   const all = await getTimelineEntries();
   return all.reduce((s,e)=>{
-    if(e.category==='study' && e.date>=fromKey && e.date<=toKey && bank[e.date]===undefined) return s+(e.duration||0);
+    const entryDay = timelineStudyDayKey(e);
+    if(e.category==='study' && entryDay>=fromKey && entryDay<=toKey && bank[entryDay]===undefined) return s+(e.duration||0);
     return s;
   }, sum);
 }
@@ -8554,6 +8620,67 @@ document.getElementById('slotListArea').addEventListener('click', async (e)=>{
 /* ============ TASK MODAL ============ */
 let editingTaskId=null; // Task id currently being edited, or null when adding a new task
 let modalCat='study';   // Category the Add/Edit modal is currently working with (Category field was removed)
+let manualProgressTaskId = null;
+
+function manualAddSeconds(){
+  const h = Math.max(0, parseInt(document.getElementById('manualAddHH').value,10) || 0);
+  const m = Math.max(0, parseInt(document.getElementById('manualAddMM').value,10) || 0);
+  return h*3600 + Math.min(59,m)*60;
+}
+function setManualAddSeconds(sec){
+  sec=Math.max(0,Math.round(sec||0));
+  document.getElementById('manualAddHH').value = String(Math.floor(sec/3600)).padStart(2,'0');
+  document.getElementById('manualAddMM').value = String(Math.floor(sec/60)%60).padStart(2,'0');
+  renderManualProgressPreview();
+}
+function manualRecentDurations(){ return Array.isArray(STATE?.settings?.manualRecentDurations) ? STATE.settings.manualRecentDurations : []; }
+function fmtManualTime(sec){
+  sec=Math.max(0,Math.round(sec||0));
+  const h=Math.floor(sec/3600), m=Math.floor(sec/60)%60;
+  if(h) return m ? `${h}h ${m}m` : `${h}h`;
+  return `${m}m`;
+}
+function renderManualProgressPreview(){
+  const task=CACHED_TASKS.find(t=>t.id===manualProgressTaskId); if(!task) return;
+  const current=getEffectiveConsumedSec(task), add=manualAddSeconds(), preview=Math.min(task.duration,current+add);
+  const left=Math.max(0,task.duration-preview);
+  document.getElementById('manualProgressPreview').textContent=`Progress = ${fmtManualTime(preview)} / ${fmtManualTime(task.duration)}`;
+  const title=document.getElementById('taskModalTitle');
+  title.style.cssText='display:flex;align-items:baseline;justify-content:space-between;gap:12px;';
+  title.innerHTML=`<span>Log Progress — ${escapeHtml((task.uiCategory||task.category)==='revision'?'Revision':(task.category==='study'?'Study':task.name))}</span><span style="font-size:15px;color:var(--text);font-weight:800;white-space:nowrap;">−${fmtManualTime(left)}</span>`;
+}
+function renderManualRecentChips(){
+  const host=document.getElementById('manualRecentChips');
+  const fmt=sec=>`+${fmtManualTime(sec)}`;
+  host.innerHTML=manualRecentDurations().map(sec=>`<button type="button" class="manual-duration-chip" data-manualchip="${sec}">${fmt(sec)}</button>`).join('')+
+    '<button type="button" class="manual-duration-chip" data-manualdone="1">✓ DONE</button>';
+}
+function openManualProgress(taskId){
+  const t=CACHED_TASKS.find(x=>x.id===taskId); if(!t) return;
+  if(STATE.activeTimer && STATE.activeTimer.type!=='bomb'){
+    showToast('Stop the active timer before logging manual progress.'); return;
+  }
+  manualProgressTaskId=taskId; editingTaskId=null; editingTomorrowTid=null; editingPendingId=null; creatingPending=false;
+  document.getElementById('taskDeleteBtn').style.display='none';
+  document.getElementById('taskNameInput').value=t.name;
+  document.getElementById('taskNameInput').readOnly=true;
+  document.getElementById('taskNameInput').closest('.field').style.display='block';
+  document.getElementById('manualProgressInfo').style.display='block';
+  document.getElementById('manualSubjectInfo').style.display=t.category==='study'?'block':'none';
+  document.getElementById('manualSubjectValue').textContent=t.subject||'(No Subject Selected)';
+  ['taskCountAsField','taskSubjectField','taskIconColorRow','taskDurationSlotRow','taskSubjectHint','plannerCreatedOn'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
+  document.getElementById('saveTaskBtn').textContent='Save Progress';
+  document.getElementById('manualAddHH').value=''; document.getElementById('manualAddMM').value='';
+  renderManualRecentChips(); renderManualProgressPreview();
+  document.getElementById('taskOverlay').classList.add('show');
+}
+function closeManualProgressMode(){
+  manualProgressTaskId=null;
+  document.getElementById('taskNameInput').readOnly=false;
+  document.getElementById('taskModalTitle').style.cssText='';
+  document.getElementById('manualProgressInfo').style.display='none';
+  ['taskCountAsField','taskSubjectField','taskIconColorRow','taskDurationSlotRow','taskSubjectHint','plannerCreatedOn'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display=''; });
+}
 let modalCountAs='others'; // OTHERS popup only: which category this task should "Count this Activity as"
 let currentPlanDetailSubject = null; // Subject name currently viewing in the plan detail screen
 let planDetailTasks = []; // Planner chapters filtered for the current subject detail view
@@ -8762,6 +8889,7 @@ function openTomorrowModal(tid){
   document.getElementById('taskOverlay').classList.add('show');
 }
 function openTaskModal(taskId, focusField){
+  if(manualProgressTaskId !== null) closeManualProgressMode();
   plannerChapterEditingId = null;
   editingPendingId = null;
   creatingPending = false;
@@ -8862,6 +8990,34 @@ document.getElementById('addTaskBtn').onclick = async ()=>{
 };
 // Validates and saves the Add/Edit Task form to IndexedDB, then refreshes the task list
 document.getElementById('saveTaskBtn').onclick = async ()=>{
+  if(manualProgressTaskId !== null){
+    const task=CACHED_TASKS.find(t=>t.id===manualProgressTaskId);
+    const add=manualAddSeconds();
+    if(!task || add<=0){ showToast('Enter completed time to log progress.'); return; }
+    const current=getEffectiveConsumedSec(task), remaining=Math.max(0,task.duration-current);
+    if(add>remaining){ showToast(`Only ${fmtManualTime(remaining)} remaining for this task.`); return; }
+    const now=Date.now(), start=now-add;
+    task.consumedSec=current+add;
+    if(task.consumedSec>=task.duration){ task.consumedSec=task.duration; task.completionStatus='completed'; task.completedAt=now; }
+    await idbPut('tasks', task);
+    await addTimelineEntry({category:task.category, task:task.name, topic:null, startTs:start, endTs:now, duration:add, manual:true});
+    const state=await getState();
+    if(task.category==='study'){
+      state.dailyStudySeconds=(state.dailyStudySeconds||0)+add;
+      // With Bomb forced off this feeds the existing Day Streak / goals path,
+      // while leaving the normal Pomodoro-only Hour Streak untouched.
+      // Bomb is forced off in Manual Task Mode, so no Lifeline award is due.
+    }
+    const recents=[add,...manualRecentDurations().filter(v=>v!==add)].slice(0,5);
+    state.settings.manualRecentDurations=recents;
+    state.settings.manualLastEditedTaskId=task.id;
+    state.settings.manualLastEditedCategory=task.uiCategory||task.category;
+    await saveState(state); CACHED_TASKS=await loadTasks();
+    closeManualProgressMode(); document.getElementById('taskOverlay').classList.remove('show');
+    showToast('Progress saved.'); renderTasks(); render(); renderCategoryCounts();
+    if(document.getElementById('screen-history').classList.contains('active')) await renderHistoryScreen();
+    return;
+  }
   const taskTabAtOpen = currentTaskTab; // retain Revision's UI identity (internal category is Study)
   const enteredName = document.getElementById('taskNameInput').value.trim();
   // Revision is a Study subtype internally, but new tasks created from its tab
@@ -8976,6 +9132,8 @@ document.getElementById('saveTaskBtn').onclick = async ()=>{
 // Handles tapping the pencil icon on a task row �� opens the Edit Menu, unless today's
 // schedule is already locked (activities logged), in which case it shows the Locked dialog instead.
 document.getElementById('taskListArea').addEventListener('click', async (e)=>{
+  const manualEl=e.target.closest('[data-manualprogress]');
+  if(manualEl){ openManualProgress(parseInt(manualEl.getAttribute('data-manualprogress'),10)); return; }
   // Started activity → circular View/Info icon opens the "Mark as Completed early" confirmation popup.
   const infoEl = e.target.closest('[data-earlyinfo]');
   if(infoEl){ openEarlyCompleteDialog(parseInt(infoEl.getAttribute('data-earlyinfo'),10)); return; }
@@ -8993,7 +9151,17 @@ document.getElementById('taskListArea').addEventListener('click', async (e)=>{
   tab.classList.add('active'); currentTaskTab = tab.getAttribute('data-cat'); renderTasks();
   });
 
-document.getElementById('taskOverlay').addEventListener('click',(e)=>{ if(e.target.id==='taskOverlay') e.target.classList.remove('show'); });
+document.getElementById('taskOverlay').addEventListener('click',(e)=>{ if(e.target.id==='taskOverlay'){ closeManualProgressMode(); e.target.classList.remove('show'); } });
+document.getElementById('manualAddHH').addEventListener('input', renderManualProgressPreview);
+document.getElementById('manualAddMM').addEventListener('input', renderManualProgressPreview);
+document.getElementById('manualRecentChips').addEventListener('click',(e)=>{
+  const chip=e.target.closest('[data-manualchip]');
+  if(chip){ setManualAddSeconds(parseInt(chip.getAttribute('data-manualchip'),10)||0); return; }
+  if(e.target.closest('[data-manualdone]')){
+    const task=CACHED_TASKS.find(t=>t.id===manualProgressTaskId);
+    if(task) setManualAddSeconds(Math.max(0,task.duration-getEffectiveConsumedSec(task)));
+  }
+});
 // Streak info (ⓘ) — explains the currently active streak rule as a brief 1-second toast.
 document.getElementById('streakInfoBtn').addEventListener('click',(e)=>{
   e.stopPropagation();
@@ -9131,7 +9299,10 @@ document.getElementById('taskTabsHome').addEventListener('click',(e)=>{
   renderHome();
 });
 // Compact task picker: whole trigger row toggles expand/collapse.
-document.getElementById('hsTrigger').addEventListener('click',()=>{ hsExpanded = !hsExpanded; renderHomeTaskList(); });
+document.getElementById('hsTrigger').addEventListener('click',()=>{
+  hsExpanded = manualTaskModeOn() ? true : !hsExpanded;
+  renderHomeTaskList();
+});
 // Sort button opens a small dropdown menu (Time Slot / Subject) instead of toggling directly.
 function hsCloseSortMenu(){ const w=document.getElementById('hsSortToggle').parentElement; w.classList.remove('open'); document.getElementById('hsSortMenu').style.display='none'; }
 document.getElementById('hsSortToggle').addEventListener('click',(e)=>{
@@ -9147,6 +9318,8 @@ document.getElementById('hsSortMenu').addEventListener('click',(e)=>{
   hsCloseSortMenu(); renderHomeTaskList(); // and auto-close the menu
 });
 document.getElementById('hsTaskList').addEventListener('click', async (e)=>{
+  const manual=e.target.closest('[data-manualprogress]');
+  if(manual){ openManualProgress(parseInt(manual.getAttribute('data-manualprogress'),10)); return; }
   const play = e.target.closest('[data-hsplay]');
   const stop = e.target.closest('[data-hsstop]');
   if(play){
@@ -9596,7 +9769,9 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
   const bomb = parseInt(document.getElementById('setBomb').value,10);
   
   // STEP 3: Bomb Configuration Validation - When Bomb Mode is ON, all fields must be filled
-  const bombModeEnabled = document.getElementById('setBombMode').checked;
+  const manualTaskMode = document.getElementById('setManualTaskMode').checked;
+  // Manual mode takes effect only on this Save and always turns Bomb Mode off.
+  const bombModeEnabled = manualTaskMode ? false : document.getElementById('setBombMode').checked;
   if(bombModeEnabled){
     const dailyFree = parseInt(document.getElementById('setDailyFree').value, 10);
     const heartsEvery = parseFloat(document.getElementById('setHeartsEvery').value);
@@ -9609,6 +9784,7 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
   }
   
   state.settings.pomodoroDuration = (pomo>0?pomo:30)*60;
+  state.settings.manualTaskMode = manualTaskMode;
   state.settings.bombChallengeMode = bombModeEnabled;
   
   // When Bomb Mode is ON, use filled values. When OFF, clear to 0.
