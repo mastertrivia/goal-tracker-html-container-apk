@@ -101,7 +101,34 @@ body.bomb-danger{background-color:#EF4444;}
   .pomo-inner .top-ic{font-size:22px;margin-bottom:6px;}
   .pomo-time{font-family:'Poppins',sans-serif;font-weight:800;font-size:clamp(28px,11vw,52px);white-space:nowrap;color:var(--text);letter-spacing:-0.01em;line-height:1;font-variant-numeric:tabular-nums;display:inline-block;min-width:4.6ch;text-align:center;}
   .pomo-sub{font-size:12.5px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.09em;margin-top:8px;}
-  .pomo-emoji{font-size:16px;margin-top:8px;}
+  /* The former middle task emoji is intentionally removed; task identity is already carried by the heading/sub-label. */
+  .pomo-session-separator{width:82%;height:1px;margin:5px auto 1px;background:linear-gradient(90deg,transparent,rgba(139,135,166,0.24),transparent);opacity:.55;filter:blur(.12px);flex:0 0 auto;}
+  /* STEP 11/12: Study Session Counter — reuse the Goal Campaign typography exactly.
+     The numeric line intentionally uses the same goal-campaign classes so its typography,
+     weight, spacing, and muted "of/total" treatment stay identical to Campaign Progress.
+     Only the placement is adapted for the Home Pomodoro card. */
+  #studySessionCounter{
+    display:none;
+    width:100%;
+    justify-content:center;
+    margin-top:8px;
+    text-align:center;
+    overflow:visible;
+  }
+  #studySessionCounter.goal-campaign-top{
+    display:none;
+    align-items:baseline;
+    justify-content:center;
+    gap:4px;
+    width:100%;
+  }
+  #studySessionCounter .goal-campaign-nums{
+    white-space:nowrap;
+    display:inline-block;
+    transform-origin:center center;
+    will-change:transform;
+  }
+
   .btn-row{display:flex;gap:8px;}
   .tbtn{flex:1;border:none;border-radius:14px;padding:13px 0;font-weight:700;font-size:13.5px;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:transform .12s cubic-bezier(.4,0,.2,1), opacity .15s, box-shadow .15s;}
   .tbtn:active{transform:scale(0.96);}
@@ -270,6 +297,7 @@ body.bomb-danger{background-color:#EF4444;}
   .hdr-goal-none{display:none;}
   /* Helper text — matches .hdr-hearts .lbl typography: ultra-compact, bold, uppercase, tight spacing */
   .hdr-goal-helper{font-size:9.5px;font-weight:700;color:var(--text-dim);line-height:1.2;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;letter-spacing:0.05em;opacity:0.9;}
+  .hdr-session-sep{display:inline-block;margin:0 8px;color:currentColor;font-weight:600;opacity:.82;}
   /* Info button on the study widget — inline with label, 20% smaller, subtle grey */
   .hdr-goal-info{width:14px;height:14px;padding:0;border:none;background:transparent;color:var(--text-dim);cursor:pointer;opacity:0.5;display:flex;align-items:center;justify-content:center;transition:opacity .15s;flex-shrink:0;}
   .hdr-goal-info:hover{opacity:0.85;}
@@ -588,7 +616,6 @@ body.bomb-danger{background-color:#EF4444;}
   .hist-reset-btn{width:100%;border:1.5px solid var(--border);background:var(--card);color:var(--text-dim);font-weight:700;font-size:12.5px;padding:10px 0;border-radius:12px;cursor:pointer;margin-top:8px;}
   .hist-reset-btn:active{transform:scale(0.97);}
   /* Home screen resume/progress note shown under the Pomodoro card when a task has partial progress saved */
-  .pomo-progress{font-size:11.5px;font-weight:600;color:var(--primary);margin-top:6px;}
 
   /* TASK MANAGEMENT — rows on the Tasks screen listing user-defined tasks per category */
   .task-row{display:flex;justify-content:space-between;align-items:center;padding:13px 2px;border-bottom:1px solid var(--border);gap:10px;transition:background .15s;}
@@ -1112,6 +1139,7 @@ body.bomb-danger{background-color:#EF4444;}
   #subFormulaDebug .dbg-header > div:first-child > div:first-child{font-size:14px !important;line-height:1.3;}
   #subFormulaDebug .dbg-label{font-size:13px;font-weight:700;line-height:1.35;margin-bottom:5px;}
   #subFormulaDebug .dbg-eq{font-size:12.5px;line-height:1.5;margin:2px 0;}
+  #subFormulaDebug .dbg-permanent-rule{font-size:9px !important;line-height:1.2 !important;color:var(--text-dim) !important;opacity:.62;margin-top:1px !important;margin-bottom:1px !important;}
   #subFormulaDebug .dbg-formula,
   #subFormulaDebug .dbg-intermediate{color:var(--text-dim);}
   #subFormulaDebug .dbg-val{font-weight:700;color:var(--primary);}
@@ -1186,13 +1214,17 @@ body.bomb-danger{background-color:#EF4444;}
     <div class="grid2" id="homeTimerGrid">
       <!-- Pomodoro Timer Card - Countdown + Start/Pause/Stop for the active Study/Routine/Health session -->
       <div class="card" id="pomoCard">
-        <div class="card-label"><span class="ic" id="pomoLabelIc">📖</span><span id="pomoLabelText">POMODORO TIMER</span></div>
+        <div class="card-label"><span class="ic" id="pomoLabelIc">📖</span><span id="pomoLabelText">STUDY</span></div>
         <div class="pomo-inner">
           <div class="top-ic" id="pomoTopIc">🍅</div>
           <div class="pomo-time num" id="pomoTime">30:00</div>
           <div class="pomo-sub" id="pomoSub">FOCUS TIME</div>
-          <div class="pomo-emoji" id="pomoEmoji">🌱</div>
-          <div class="pomo-progress" id="pomoProgress" style="display:none;"></div>
+          <!-- Ultra-subtle separator between task identity and Study session progress. -->
+          <div class="pomo-session-separator" aria-hidden="true"></div>
+          <!-- STEP 11: Reuse Goal Campaign Progress typography exactly; only the values/label differ. -->
+          <div id="studySessionCounter" class="goal-campaign-top" style="display:none;">
+            <div class="goal-campaign-nums"><span id="studySessionDone">0</span> <span class="of">/ <span id="studySessionTotal">0</span> study</span></div>
+          </div>
         </div>
         <div class="btn-row">
           <button class="tbtn start" id="btnStart"><svg viewBox="0 0 24 24"><path d="M7 4.8c0-1.4 1.5-2.2 2.7-1.5l11 6.4c1.2.7 1.2 2.4 0 3.1l-11 6.4c-1.2.7-2.7-.1-2.7-1.5V4.8z"/></svg><span>START</span></button>
@@ -1571,27 +1603,47 @@ body.bomb-danger{background-color:#EF4444;}
           </div>
           <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
 
-          <!-- §7 Max Study Today (renumbered from ──8) -->
+          <!-- §7 Comparison -->
           <div class="dbg-section">
-            <div class="dbg-label">§7 &nbsp; Maximum Study Possible Today</div>
-            <div class="dbg-eq dbg-formula">= Study Completed Today + Available Study Time Today</div>
-            <div class="dbg-eq dbg-intermediate">= <span id="dbgCompleted3" class="dbg-dim">—</span> + <span id="dbgFree2" class="dbg-dim">—</span></div>
-            <div class="dbg-eq">= <span id="dbgMaxStudy" class="dbg-val">—</span></div>
-          </div>
-          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
-
-          <!-- §8 Verdict (renumbered from §9) -->
-          <div class="dbg-section">
-            <div class="dbg-label">§8 &nbsp; Comparison</div>
+            <div class="dbg-label">§7 &nbsp; Comparison</div>
             <div class="dbg-eq dbg-formula">&there4; &nbsp; Available Study Time Today <span id="dbgCmpOp" class="dbg-dim">—</span> Today's Remaining Study</div>
             <div class="dbg-eq dbg-intermediate">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="dbgFree3" class="dbg-dim">—</span> <span id="dbgCmpOp2" class="dbg-dim">—</span> <span id="dbgRemStudy2" class="dbg-dim">—</span></div>
+            <div class="dbg-eq dbg-intermediate">Hence, Status = "<span id="dbgStatus" class="dbg-dim">—</span>"</div>
+            <div class="dbg-eq dbg-permanent-rule">If §6 ≥ §3 → Study Complete By</div>
+            <div class="dbg-eq dbg-permanent-rule">If §6 &lt; §3 → Max Study Today</div>
           </div>
           <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.35;"></div>
 
-          <!-- §9 Result (renumbered from §10) -->
+          <!-- §8 Result — conditional: exactly one status calculation is shown -->
           <div class="dbg-section">
-            <div class="dbg-label">§9 &nbsp; <span id="dbgWidgetLabel" style="font-weight:700;">—</span></div>
-            <div class="dbg-eq">= <span id="dbgResult" class="dbg-val dbg-result-val">—</span></div>
+            <div class="dbg-label">§8 &nbsp; <span id="dbgWidgetLabel" style="font-weight:700;">—</span></div>
+            <div id="dbgFinishTimeBlock">
+              <div class="dbg-eq dbg-formula">= (Current Time + §4) + §3</div>
+              <div class="dbg-eq dbg-intermediate">= (<span id="dbgNow8" class="dbg-dim">—</span> + <span id="dbgNonStudy8" class="dbg-dim">—</span>) + <span id="dbgRemStudy8" class="dbg-dim">—</span></div>
+              <div class="dbg-eq dbg-intermediate">= <span id="dbgAfterNonStudy8" class="dbg-dim">—</span> + <span id="dbgRemStudy8b" class="dbg-dim">—</span></div>
+              <div class="dbg-eq">= <span id="dbgFinishResult" class="dbg-val dbg-result-val">—</span></div>
+            </div>
+            <div id="dbgMaxStudyBlock" style="display:none;">
+              <div class="dbg-eq dbg-formula">= §2 + §6</div>
+              <div class="dbg-eq dbg-intermediate">= <span id="dbgCompleted8" class="dbg-dim">—</span> + <span id="dbgFree8" class="dbg-dim">—</span></div>
+              <div class="dbg-eq">= <span id="dbgMaxStudyResult" class="dbg-val dbg-result-val">—</span></div>
+            </div>
+          </div>
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.55;"></div>
+
+          <!-- §9 Session Counter — only one status branch is shown -->
+          <div class="dbg-section">
+            <div class="dbg-label">§9 &nbsp; Session Counter</div>
+            <div class="dbg-eq dbg-formula">&there4; Status = "<span id="dbgSessionStatus" class="dbg-dim">—</span>"</div>
+            <div id="dbgSessionCompleteBlock">
+              <div class="dbg-eq dbg-intermediate">→ ie. All planned sessions can be completed today</div>
+              <div class="dbg-eq">→ <span id="dbgSessionCompleteValue" class="dbg-val">—</span></div>
+            </div>
+            <div id="dbgSessionMaxBlock" style="display:none;">
+              <div class="dbg-eq dbg-intermediate">→ Maximum Study Possible Today ÷ Pomodoro Duration</div>
+              <div class="dbg-eq dbg-intermediate">→ <span id="dbgSessionMaxStudy" class="dbg-dim">—</span> ÷ <span id="dbgSessionPomo" class="dbg-dim">—</span></div>
+              <div class="dbg-eq">→ <span id="dbgSessionMaxValue" class="dbg-val">—</span> out of <span id="dbgSessionTotalValue" class="dbg-dim">—</span> sessions</div>
+            </div>
           </div>
 
           <!-- Manual Refresh — the only way to update; no background polling -->
@@ -1849,6 +1901,7 @@ body.bomb-danger{background-color:#EF4444;}
       <div class="plain-card">
         <h3>Timers</h3>
         <div class="field"><label>Pomodoro Duration (minutes)</label><input type="number" id="setPomo" min="1"></div>
+        <div class="and-row"><div class="ar-txt"><div class="ar-t1">Study Session Counter</div><div class="ar-t2">When enabled, show your Study progress as a Pomodoro-based count on the Home screen.</div></div><label class="tg-switch"><input type="checkbox" id="setStudySessionCounter"><span class="slider"></span></label></div>
       </div>
       <div class="plain-card">
         <h3>Manual Task Mode</h3>
@@ -3074,7 +3127,10 @@ function syncFreezeReasons(state){
   // bombLocked is persisted on state so BOMB_LOCK survives a force-kill and app restart.
   // syncFreezeReasons is the ONLY place that mirrors state.bombLocked into FreezeManager,
   // keeping a single source of truth: the persisted flag drives the in-memory Set, never the reverse.
-  if(st && st.bombLocked) FreezeManager.enter(FREEZE.BOMB_LOCK); else FreezeManager.exit(FREEZE.BOMB_LOCK);
+  // A persisted lock from an earlier Bomb-enabled day must never freeze the app
+  // after Bomb Mode has been turned off. Bomb Mode is the master authority for
+  // every bomb consequence, including the post-explosion lock.
+  if(st && bombModeOn(st) && st.bombLocked) FreezeManager.enter(FREEZE.BOMB_LOCK); else FreezeManager.exit(FREEZE.BOMB_LOCK);
   return FreezeManager;
 }
 // Returns the YYYY-MM-DD "app day" that a given moment belongs to, shifted by the
@@ -3245,6 +3301,7 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
   avgRevisionSec: 0, // Temporary: average daily revision duration in seconds used for Expected Finish estimation
   lockTodayEditing: true, // Hide Edit button for Today's tasks during the active Study Day
   historyShortFilter: 0, // Minimum duration (seconds) for a history row to appear in the Timeline/Activity view. 0 = Off (show all).
+  studySessionCounter: false, // Home Study Session Counter display preference
 
   telegramBotToken: "8801704479:AAH2f4mJzl5wE8Fz8lRXHYtv3nRX4vaq4PY",
   telegramChatId: "-1003886064150",
@@ -3522,6 +3579,7 @@ async function getState(){
   if(s.settings.defaultDurations.others===undefined) s.settings.defaultDurations.others = DEFAULT_SETTINGS.defaultDurations.others;
   if(s.settings.totalAvailableHours===undefined) s.settings.totalAvailableHours = DEFAULT_SETTINGS.totalAvailableHours;
   if(s.settings.studyHours===undefined) s.settings.studyHours = DEFAULT_SETTINGS.studyHours;
+  if(s.settings.studySessionCounter===undefined) s.settings.studySessionCounter = DEFAULT_SETTINGS.studySessionCounter;
   if(s.settings.avgRevisionSec===undefined) s.settings.avgRevisionSec = DEFAULT_SETTINGS.avgRevisionSec;
   if(s.settings.userName===undefined) s.settings.userName = DEFAULT_SETTINGS.userName;
   if(s.settings.dob===undefined) s.settings.dob = DEFAULT_SETTINGS.dob;
@@ -3704,6 +3762,9 @@ async function ensureDefaultTasks(){
 // This thin cache stores the last result and is invalidated whenever a write actually occurs,
 // so the 3-second widget read is effectively free when no session is in progress.
 let _tlCache = null;   // cached Array of timeline entries (or null when stale)
+// A timeline append is a read/check/write transaction. IndexedDB does not make
+// those separate awaits atomic, so serialize append attempts in this renderer.
+let _timelineWriteTail = Promise.resolve();
 async function getTimelineEntries(){
   if(_tlCache !== null) return _tlCache;
   _tlCache = await idbAll('timeline');
@@ -3718,7 +3779,7 @@ function timelineStudyDayKey(entry){
 }
 
 // Timeline stores every completed activity (Study/Routine/Health) for the History screen and daily Summary
-async function addTimelineEntry(entry){
+async function _addTimelineEntry(entry){
   // All user-facing daily progress is a Study Day, which changes at Wake-up.
   // An entry ends within its owning day (timers are frozen through Sleep), so
   // its end timestamp is the stable key for both normal and manual logging.
@@ -3726,9 +3787,27 @@ async function addTimelineEntry(entry){
   // DUPLICATE PROTECTION (data level): a completed session creates exactly ONE record.
   // If an entry with the same task + start + end already exists, silently skip the write.
   const existing = await getTimelineEntries();
+  if(entry.segmentKey && existing.some(e=>e.segmentKey === entry.segmentKey)) return;
   if(existing.some(e=> e.task===entry.task && e.category===entry.category && e.startTs===entry.startTs && Math.abs((e.endTs||0)-(entry.endTs||0))<1000 )) return;
   await idbPut('timeline', entry);
   invalidateTimelineCache(); // new entry written — next read must go to IDB
+}
+
+// Serialize the whole read/check/write sequence above. Without this queue,
+// concurrent lifecycle handlers can each read the same old list and append the
+// same physical interval before either write becomes visible.
+function addTimelineEntry(entry){
+  const queued = _timelineWriteTail.then(
+    ()=>_addTimelineEntry(entry),
+    ()=>_addTimelineEntry(entry)
+  );
+  _timelineWriteTail = queued.catch(()=>{});
+  return queued;
+}
+
+function activeSegmentKey(at, startTs){
+  const session = at && (at.wallStartTs || at.startTs || at.taskId || at.task || 'unknown');
+  return `timer:${at && at.type || 'unknown'}:${session}:${startTs}`;
 }
 
 /* ============ TELEGRAM ============ */
@@ -4787,7 +4866,7 @@ async function completeNonStudySession(state){
   // reconcileDailyStudySeconds then sums both, doubling time across all counters.
   const _wallStart = at.wallSegmentStartTs || at.wallStartTs || Date.now();
   const endTs = _wallStart + at.duration * 1000;
-  const entry = { category: at.type, task: at.task, startTs: _wallStart, endTs, duration: at.duration };
+  const entry = { category: at.type, task: at.task, startTs: _wallStart, endTs, duration: at.duration, segmentKey: activeSegmentKey(at, _wallStart) };
   await addTimelineEntry(entry);
   await syncActiveTaskProgress(state); // task just hit 100% — persist the checkpoint before the Bomb re-arms
 
@@ -4969,13 +5048,23 @@ async function recoverState(){
   try{
   let state = await getState();
 
+  // Bomb Mode is the master switch. A persisted lock from an older
+  // Bomb-enabled day must not revive a card or freeze the app after the mode
+  // was disabled.
+  if(!bombModeOn(state) && state.bombLocked){
+    state.bombLocked = false;
+    state.bombLockedTs = null;
+    state.bombLockedIdleFinalizedTs = null;
+    state.bombExplodedFromHours = null;
+    await saveState(state);
+  }
+
   const today = studyDayKey(); // daily state advances at Wake-up
-  // A Bomb lock is terminal only for the study day in which it exploded.  Do
-  // not replay an explosion on ordinary recovery, but do allow the next
-  // wake-up rollover to create one fresh Bomb for its new study day.
+  // An exploded Bomb is a hard gate, not a one-day visual. Sleeping or crossing
+  // Wake-up can never dismiss it or preserve the pre-explosion Hour Streak.
+  // Only the password-confirmed restart flow may clear this persisted lock.
   syncFreezeReasons(state);
-  const sleepingOnEntry = FreezeManager.has(FREEZE.SLEEP);
-  if(state.bombLocked && (state.lastActiveDate === today || sleepingOnEntry)){
+  if(state.bombLocked){
     _recovering = false;
     return state;
   }
@@ -5006,6 +5095,10 @@ async function recoverState(){
   // the completed Study Day's records intact.
   if(frozen && state.activeTimer && !state.activeTimer.pausedAt){
     state.activeTimer.pausedAt = monotonicNow();
+    // On a cold restart effectiveElapsedMs relies on the wall-clock pause
+    // anchor. Without it, an auto-freeze is interpreted as running until the
+    // next app-open.
+    state.activeTimer.wallPausedAt = freezeNow;
   }
   // Also freezes a bomb that was ticking under an already-PAUSED session: bank its live value
   // and drop the tick baseline so the whole frozen window doesn't get subtracted from the clock.
@@ -5017,7 +5110,25 @@ async function recoverState(){
   state.lastSeenWall = Date.now();
   // Sleep deliberately defers the rollover. A prior day's BOMB_LOCK must not:
   // its lock is cleared by this one fresh-day reset, rather than blocking it.
+  // Defence in depth for a partially persisted older build: even if its
+  // lastActiveDate was already advanced, a productive timer whose wall-clock
+  // start predates today's Wake-up is invalid and must not be recovered.
+  const wakeBoundaryTs = todayWakeTs(Date.now());
+  if(!sleeping && state.activeTimer && state.activeTimer.type !== 'bomb' && state.activeTimer.state !== 'REVIEW_PENDING'
+     && state.activeTimer.wallStartTs && state.activeTimer.wallStartTs < wakeBoundaryTs){
+    if(!state.activeTimer || state.activeTimer.state !== 'REVIEW_PENDING') state.activeTimer = null;
+    state._idleStartTs = wakeBoundaryTs;
+    await saveState(state);
+  }
   if(state.lastActiveDate !== today && !sleeping){
+    // A productive activity belongs to the Study Day in which it was started;
+    // no productive timer is allowed to cross Wake-up. This must happen before
+    // the Bomb branch because armForNewDay() intentionally does nothing while
+    // Bomb Mode is off. A completed Pomodoro awaiting reflection is not a
+    // running timer, so keep its existing review flow; all live activity is
+    // discarded at the Study-Day boundary.
+    if(!state.activeTimer || state.activeTimer.state !== 'REVIEW_PENDING') state.activeTimer = null;
+    state._idleStartTs = todayWakeTs(Date.now());
     // Home Day Streak break check — if the day that just ended never hit its full Study allocation, the chain breaks.
     if(state.homeDayStreakLastAward !== state.lastActiveDate) state.homeDayStreak = 0;
     state.completedPomodorosToday = 0; state.lastActiveDate = today;
@@ -5066,6 +5177,9 @@ async function recoverState(){
     // Stamp the streak baseline so reconcileDailyStudySeconds can re-derive today's contribution.
     state.hourStreakSecAtDayStart = (state.hourStreakSec || 0);
     state.dailyStudySeconds = 0;
+    // Make the new-day boundary durable before the slower history-bank cleanup.
+    // A process death here must resume the boundary, never replay an old timer.
+    await saveState(state);
     // History Lifecycle — completely wipe the previous Study Day's History (timeline + pomodoro
     // sessions). Only the current Study Day is ever retained inside the application.
     // GOAL PROGRESS BANK — before deleting, permanently bank each finished day's Study seconds
@@ -5348,7 +5462,7 @@ async function startSession(type, task, topic){
         const _segStart = _prev.wallSegmentStartTs || _prev.wallStartTs || _prevEndTs;
         const _segDurSec = Math.max(0, (_prevEndTs - _segStart) / 1000);
         if(_segDurSec >= 1){
-          await addTimelineEntry({ category: _prev.type, task: _prev.task, topic: _prev.topic||null, startTs: _segStart, endTs: _prevEndTs, duration: _segDurSec });
+          await addTimelineEntry({ category: _prev.type, task: _prev.task, topic: _prev.topic||null, startTs: _segStart, endTs: _prevEndTs, duration: _segDurSec, segmentKey: activeSegmentKey(_prev, _segStart) });
         }
       }
       // Bank any bomb time that burned during this activity's pause (if it was paused).
@@ -5412,7 +5526,7 @@ async function startExtraStudySession(durationMinutes){
         const _segStart = _prev.wallSegmentStartTs || _prev.wallStartTs || _prevEndTs;
         const _segDurSec = Math.max(0, (_prevEndTs - _segStart) / 1000);
         if(_segDurSec >= 1){
-          await addTimelineEntry({ category: _prev.type, task: _prev.task, topic: _prev.topic||null, startTs: _segStart, endTs: _prevEndTs, duration: _segDurSec });
+          await addTimelineEntry({ category: _prev.type, task: _prev.task, topic: _prev.topic||null, startTs: _segStart, endTs: _prevEndTs, duration: _segDurSec, segmentKey: activeSegmentKey(_prev, _segStart) });
         }
       }
       BombEngine.bankBombClockFromPause(state);
@@ -5470,7 +5584,7 @@ async function pauseResumeSession(){
     const segEndTs = Date.now();
     const segDurSec = Math.max(0, (segEndTs - segStart) / 1000);
     if(segDurSec >= 1){
-      addTimelineEntry({ category: at.type, task: at.task, topic: at.topic||null, startTs: segStart, endTs: segEndTs, duration: segDurSec });
+      await addTimelineEntry({ category: at.type, task: at.task, topic: at.topic||null, startTs: segStart, endTs: segEndTs, duration: segDurSec, segmentKey: activeSegmentKey(at, segStart) });
     }
   }
   await syncActiveTaskProgress(state); // checkpoint the task's consumed/remaining time on every pause/resume
@@ -5493,7 +5607,7 @@ async function stopSession(){
     // Using wallStartTs here would create an entry spanning the entire session (original start → now),
     // which overlaps every already-committed segment and makes bomb entries between them disappear.
     const wallStart = at.wallSegmentStartTs || at.wallStartTs || endTs - actualDurationSec * 1000;
-    await addTimelineEntry({ category: at.type, task: at.task, topic: at.topic||null, startTs: wallStart, endTs, duration: actualDurationSec });
+    await addTimelineEntry({ category: at.type, task: at.task, topic: at.topic||null, startTs: wallStart, endTs, duration: actualDurationSec, segmentKey: activeSegmentKey(at, wallStart) });
   }
   await syncActiveTaskProgress(state); // save exactly how much of the task was consumed so it resumes correctly next time
   // Bank the partial Study time BEFORE the bomb re-arms, so the Hour Streak progress, the Lifeline
@@ -5540,7 +5654,7 @@ async function submitReview(focus, energy, mood, notes){
   // and wrong across reloads. A completed Pomodoro has no prior pause-committed segments so wallSegmentStartTs
   // equals wallStartTs here, but using wallSegmentStartTs is consistent with every other commit path.
   const _reviewSegStart = at.wallSegmentStartTs || at.wallStartTs || endTs - actualDuration * 1000;
-  await addTimelineEntry({ category:'study', task: at.subject, topic: at.topic, startTs: _reviewSegStart, endTs, duration: actualDuration });
+  await addTimelineEntry({ category:'study', task: at.subject, topic: at.topic, startTs: _reviewSegStart, endTs, duration: actualDuration, segmentKey: activeSegmentKey(at, _reviewSegStart) });
 
   // Updates today's streak and lifetime totals
   state.completedPomodorosToday += 1;
@@ -5594,6 +5708,16 @@ function maybeAwardLiveLifeline(){
   if(awarded){ BombEngine.persistAward(STATE); showToast(EMOJI.heart+' New Lifeline earned!'); } // 4.2: serialized, ordered persist — no clobber
 }
 // Renders the top bar every second: goal finish widget, and Lifeline hearts (filled vs dim/locked + progress caption)
+function formatStudySessionCount(value){
+  const n = Number(value);
+  if(!Number.isFinite(n) || n <= 0) return '0';
+  if(Math.abs(n - Math.round(n)) < 0.000001) return String(Math.round(n));
+  return String(Math.floor(n * 10) / 10);
+}
+function sessionWord(value){
+  return Math.abs(Number(value) - 1) < 0.000001 ? 'session' : 'sessions';
+}
+
 function renderHeader(){
   const now = new Date();
 
@@ -5637,8 +5761,19 @@ function renderHeader(){
       goalBadgeEl.className = 'hdr-goal-badge green';
       goalLabelEl.className = 'hdr-goal-label green';
       goalLabelEl.textContent = 'Study Complete By';
-      goalValueEl.textContent = timeStr;
-      if(goalHelperEl){ goalHelperEl.style.display = ''; goalHelperEl.textContent = 'Planned: ' + cachedGoalLabels.planned; }
+      if(STATE?.settings?.studySessionCounter){
+        // Study Complete By means the existing widget has already established that
+        // today's available Study time is sufficient to finish all remaining Study.
+        // Therefore every planned Pomodoro session is achievable — show the full total.
+        const m = getStudySessionCounterMetrics();
+        const done = formatStudySessionCount(m.totalSessions);
+        const total = formatStudySessionCount(m.totalSessions);
+        goalValueEl.innerHTML = `${escapeHtml(timeStr)}<span class="hdr-session-sep">|</span><span>${escapeHtml(done)}</span>`;
+        if(goalHelperEl){ goalHelperEl.style.display = ''; goalHelperEl.innerHTML = `PLANNED: ${escapeHtml(cachedGoalLabels.planned)}<span class="hdr-session-sep">|</span><span>${escapeHtml(total)} ${sessionWord(total)}</span>`; }
+      } else {
+        goalValueEl.textContent = timeStr;
+        if(goalHelperEl){ goalHelperEl.style.display = ''; goalHelperEl.textContent = 'Planned: ' + cachedGoalLabels.planned; }
+      }
       if(infoBtn) infoBtn.style.display = '';
     } 
     else if(state.startsWith('MAX_STUDY|')){
@@ -5647,8 +5782,22 @@ function renderHeader(){
       goalBadgeEl.className = 'hdr-goal-badge red';
       goalLabelEl.className = 'hdr-goal-label red';
       goalLabelEl.textContent = 'Max Study Today';
-      goalValueEl.textContent = maxHours;
-      if(goalHelperEl){ goalHelperEl.style.display = ''; goalHelperEl.textContent = 'Planned: ' + cachedGoalLabels.planned; }
+      if(STATE?.settings?.studySessionCounter){
+        // Max Study Today means the existing widget has already established that
+        // available Study time is insufficient to finish all remaining Study.
+        // Use exactly §2 Completed Study + §6 Available Study, then convert that
+        // achievable Study time into Pomodoro units. No predictor logic is rebuilt.
+        const m = getStudySessionCounterMetrics();
+        const w = cachedWidgetData;
+        const achievableSec = (Number(w?.completedStudySeconds) || 0) + (Number(w?.freeCapacitySeconds) || 0);
+        const done = formatStudySessionCount(achievableSec / m.pomoSec);
+        const total = formatStudySessionCount(m.totalSessions);
+        goalValueEl.innerHTML = `${escapeHtml(maxHours)}<span class="hdr-session-sep">|</span><span>${escapeHtml(done)}</span>`;
+        if(goalHelperEl){ goalHelperEl.style.display = ''; goalHelperEl.innerHTML = `PLANNED: ${escapeHtml(cachedGoalLabels.planned)}<span class="hdr-session-sep">|</span><span>${escapeHtml(total)} ${sessionWord(total)}</span>`; }
+      } else {
+        goalValueEl.textContent = maxHours;
+        if(goalHelperEl){ goalHelperEl.style.display = ''; goalHelperEl.textContent = 'Planned: ' + cachedGoalLabels.planned; }
+      }
       if(infoBtn) infoBtn.style.display = '';
     }
     else if(state === 'TODAY_COMPLETE'){
@@ -5656,10 +5805,20 @@ function renderHeader(){
       goalBadgeEl.className = 'hdr-goal-badge green';
       goalLabelEl.className = 'hdr-goal-label green';
       goalLabelEl.textContent = 'Today\'s Study Complete';
-      goalValueEl.textContent = 'All Done';
-      if(goalHelperEl){
-        goalHelperEl.style.display = '';
-        goalHelperEl.textContent = 'Completed: ' + cachedGoalLabels.completed + ' \u00a0/\u00a0 ' + cachedGoalLabels.planned;
+      if(STATE?.settings?.studySessionCounter){
+        const m = getStudySessionCounterMetrics();
+        const done = formatStudySessionCount(m.progressSessions);
+        goalValueEl.innerHTML = `All Done<span class="hdr-session-sep">|</span><span>${escapeHtml(done)}</span>`;
+        if(goalHelperEl){
+          goalHelperEl.style.display = '';
+          goalHelperEl.innerHTML = `COMPLETED: ${escapeHtml(cachedGoalLabels.completed)}<span class="hdr-session-sep">|</span><span>${escapeHtml(formatStudySessionCount(m.totalSessions))} ${sessionWord(m.totalSessions)}</span>`;
+        }
+      } else {
+        goalValueEl.textContent = 'All Done';
+        if(goalHelperEl){
+          goalHelperEl.style.display = '';
+          goalHelperEl.textContent = 'Completed: ' + cachedGoalLabels.completed + ' \u00a0/\u00a0 ' + cachedGoalLabels.planned;
+        }
       }
       if(clockIcon) clockIcon.style.display = 'none';
       if(checkIcon) checkIcon.style.display = '';
@@ -5769,34 +5928,27 @@ function pickSelectedTask(){
   return list.find(t=>t.id===selectedTaskId) || null;
 }
 
+// Returns a task icon only when it is valid Unicode; corrupted stored emoji data falls back
+// to the centralized category icon so replacement/question-mark glyphs can never reach the Home timer.
+function safeTaskIcon(task, category){
+  const raw = task && typeof task.icon === 'string' ? task.icon : '';
+  if(raw && !/\uFFFD/.test(raw) && !/\?{2,}/.test(raw)) return raw;
+  return CAT_ICON[category] || EMOJI.dots;
+}
+
 // Shows a preview of the Pomodoro card (icon/time/label) for the selected task before any timer is started
 function renderPomoIdlePreview(){
   const task = pickSelectedTask();
-  const resolvedCat = selectedCategory==='revision' ? 'study' : selectedCategory;
-  const icon = (task && task.icon) || CAT_ICON[resolvedCat];
+  const headingCat = selectedCategory || 'study';
+  const resolvedCat = headingCat==='revision' ? 'study' : headingCat;
+  const icon = CAT_ICON[resolvedCat] || safeTaskIcon(task, resolvedCat);
   document.getElementById('pomoTopIc').textContent = icon;
   document.getElementById('pomoLabelIc').textContent = icon;
-  document.getElementById('pomoLabelText').textContent = (resolvedCat==='study') ? 'POMODORO TIMER' : (resolvedCat.toUpperCase()+' TIMER');
+  document.getElementById('pomoLabelText').textContent = headingCat==='revision' ? 'REVISION' : (headingCat.toUpperCase());
   const consumed = task ? getEffectiveConsumedSec(task) : 0;
   const remaining = task ? Math.max(0, task.duration - consumed) : 0;
   document.getElementById('pomoTime').textContent = task ? fmtClock(remaining) : '--:--';
   document.getElementById('pomoSub').textContent = task ? task.name : (selectedCategory==='revision' ? 'REVISION TIME' : CAT_LABEL[resolvedCat]);
-  document.getElementById('pomoEmoji').textContent = resolvedCat==='study' ? EMOJI.seedling : (resolvedCat==='routine'?EMOJI.coffee:(resolvedCat==='health'?EMOJI.muscle:EMOJI.dots));
-  // Resume note — makes it obvious this task will pick back up instead of restarting from scratch
-  const progEl = document.getElementById('pomoProgress');
-  if(task && task.completionStatus){
-    progEl.textContent = '✓ Finalized — start a new cycle from Task History';
-    progEl.style.display = 'block';
-  } else if(task && consumed > 0 && consumed < task.duration){
-    const pct = Math.round((consumed/task.duration)*100);
-    progEl.textContent = `⏵ Resuming — ${pct}% already done`;
-    progEl.style.display = 'block';
-  } else if(task && consumed >= task.duration){
-    progEl.textContent = EMOJI.party+' 100% done — finalize it in Task History';
-    progEl.style.display = 'block';
-  } else {
-    progEl.style.display = 'none';
-  }
 }
 
 // Pushes the user's custom Settings labels onto every titled section across the app
@@ -6227,7 +6379,56 @@ function updateBombCardLive(){
     if(_hlra) _hlra.textContent = _remText;
   }
 }
+function updateStudySessionCounterVisibility(){
+  const el = document.getElementById('studySessionCounter');
+  if(!el) return;
+  el.style.display = STATE?.settings?.studySessionCounter ? 'flex' : 'none';
+  if(el.style.display !== 'none') requestAnimationFrame(fitStudySessionCounter);
+}
+
+window.addEventListener('resize', ()=>requestAnimationFrame(fitStudySessionCounter));
+
+// Step 10/11: Keep the Study Session Counter live using the existing 500ms Home timer heartbeat.
+// Step 11 deliberately reuses the Goal Campaign Progress number markup/styles exactly.
+// No second interval is created.
+//
+// Future-proof layout guard: the complete counter is one visual group. It remains at its
+// existing size while it fits; only when the group would exceed the available width is the
+// entire group uniformly scaled down. No child is resized independently and no wrapping occurs.
+function fitStudySessionCounter(){
+  const wrap = document.getElementById('studySessionCounter');
+  const nums = wrap?.querySelector('.goal-campaign-nums');
+  if(!wrap || !nums || getComputedStyle(wrap).display==='none') return;
+  nums.style.transform = 'scale(1)';
+  const available = Math.max(0, wrap.clientWidth);
+  const natural = nums.scrollWidth;
+  if(!available || !natural) return;
+  const scale = Math.min(1, available / natural);
+  nums.style.transform = `scale(${scale})`;
+}
+
+function updateStudySessionCounterLive(){
+  const el = document.getElementById('studySessionCounter');
+  if(!el || !STATE?.settings?.studySessionCounter) return;
+  const metrics = getStudySessionCounterMetrics();
+  const doneEl = document.getElementById('studySessionDone');
+  const totalEl = document.getElementById('studySessionTotal');
+  if(!doneEl || !totalEl) return;
+
+  const progress = Number.isFinite(metrics.progressSessions) ? Math.max(0, metrics.progressSessions) : 0;
+  const total = Number.isFinite(metrics.totalSessions) ? Math.max(0, metrics.totalSessions) : 0;
+
+  // Exact Goal Campaign visual format: main Poppins value + smaller muted "/ total".
+  // Keep the live decimal for now in the same main value slot; Step 12 will finalize edge cases.
+  const doneText = Number.isInteger(progress) ? String(progress) : String(Math.round(progress * 10) / 10);
+  const totalText = Number.isInteger(total) ? String(total) : String(Math.round(total * 10) / 10);
+  doneEl.textContent = doneText;
+  totalEl.textContent = totalText;
+  fitStudySessionCounter();
+}
+
 function renderHome(){
+  updateStudySessionCounterVisibility();
   const manual = !!STATE?.settings?.manualTaskMode;
   if(manual){
     const lastCategory = STATE.settings.manualLastEditedCategory;
@@ -6252,6 +6453,7 @@ function renderHome(){
   const runningNonBomb = at && at.type!=='bomb' && !(at.type==='pomodoro' && at.state==='REVIEW_PENDING');
 
   if(!at || at.type==='bomb'){
+    updateStudySessionCounterLive();
     renderPomoIdlePreview();
     // Disable Start while the Good Morning gate is active — Unlock is the only exit
     btnStart.disabled = isGoodMorningLocked() && !isSleepActive();
@@ -6303,16 +6505,21 @@ function renderHome(){
       }
     }
   } else if(at.type==='pomodoro' && at.state==='REVIEW_PENDING'){
+    updateStudySessionCounterLive();
     document.getElementById('pomoTime').textContent = '00:00';
     document.getElementById('pomoSub').textContent = 'REVIEW PENDING';
     btnStart.disabled = true; btnPause.disabled = true; btnStop.disabled = true;
     openReviewModal();
   } else {
-    document.getElementById('pomoTopIc').textContent = CAT_ICON[at.type] || '📖';
-    document.getElementById('pomoLabelIc').textContent = CAT_ICON[at.type] || '📖';
-    document.getElementById('pomoLabelText').textContent = (at.type==='study'?'POMODORO':at.type.toUpperCase())+' TIMER';
+    updateStudySessionCounterLive();
+    const activeTask = at.taskId != null ? CACHED_TASKS.find(t=>t.id===at.taskId) : null;
+    const headingCat = (activeTask && (activeTask.uiCategory||activeTask.category)) || selectedCategory || at.type;
+    const resolvedCat = headingCat==='revision' ? 'study' : headingCat;
+    const headingIcon = CAT_ICON[resolvedCat] || '📖';
+    document.getElementById('pomoTopIc').textContent = headingIcon;
+    document.getElementById('pomoLabelIc').textContent = headingIcon;
+    document.getElementById('pomoLabelText').textContent = headingCat==='revision' ? 'REVISION' : (headingCat.toUpperCase());
     document.getElementById('pomoSub').textContent = at.task || CAT_LABEL[at.type];
-    document.getElementById('pomoEmoji').textContent = at.type==='study' ? '🌱' : (at.type==='routine'?'☕':(at.type==='health'?'💪':'⋯'));
     btnStart.disabled = true;
     // STEP 2: Disable Pause/Resume when Bomb Mode is ENABLED
     // Check if Bomb Mode is enabled — if yes, disable pause button for entire Bomb Mode duration
@@ -6320,6 +6527,7 @@ function renderHome(){
     btnStop.disabled = false;
     // Ticks the Pomodoro countdown every 500ms using timestamps (not a naive counter) so it survives tab throttling
     const tick = async ()=>{
+      updateStudySessionCounterLive();
       const remain = msRemaining(at);
       if(remain <= 0){
         clearInterval(ringTimerHandle); ringTimerHandle = null;
@@ -6716,6 +6924,34 @@ function renderHistDateHeader(){
     <div class="refl-blk">${pomoMoodSvg('bad',24)}<span class="refl-num" style="color:#EF4444">${r.bad}</span></div>`;
 }
 
+// Shared History Study summary source for the Study Session Counter.
+// IMPORTANT: this uses the exact same underlying values that the History Study card displays,
+// while leaving History's visible formatting and other category calculations untouched.
+function getHistoryStudySummary(){
+  const consumedSec = liveTodayStudySec(STATE);
+  const plannedSec = (CACHED_TASKS || [])
+    .filter(t => t.category === 'study')
+    .reduce((s, t) => s + (t.duration || 0), 0);
+  return { consumedSec, plannedSec };
+}
+
+// Step 9: Convert the History Study seconds into the configured Pomodoro-session units.
+// Pure calculation only — this step intentionally does NOT update or format the Home UI yet.
+function getStudySessionCounterMetrics(){
+  const { consumedSec, plannedSec } = getHistoryStudySummary();
+  const configuredPomoSec = Number(STATE?.settings?.pomodoroDuration);
+  const pomoSec = Number.isFinite(configuredPomoSec) && configuredPomoSec > 0
+    ? Math.max(60, configuredPomoSec)
+    : 30 * 60;
+  return {
+    consumedSec,
+    plannedSec,
+    pomoSec,
+    progressSessions: consumedSec / pomoSec,
+    totalSessions: plannedSec / pomoSec
+  };
+}
+
 // Renders the 4 Summary cards (Study/Routine/Health/Others): time actually consumed today (from real,
 // non-bomb Timeline entries) plus the planned total configured in the Task section for that category.
 // Uses the live engine (same source as Goal) so Study shown here always matches Today's Progress.
@@ -6731,20 +6967,24 @@ async function renderHistSummary(){
     {key:'health', label:L.catHealth, icon:'❤️'},
     {key:'others', label:L.catOthers, icon:'⋯'}
   ];
+  // Shared Study source: this is the same consumed/planned pair represented by the History Study card.
+  const historyStudy = getHistoryStudySummary();
   // One shared live source: add the running session's elapsed seconds to the committed IDB total
-  // for whichever category is currently active. Study uses liveTodayStudySec() (which already
-  // includes dailyStudySeconds + live delta) so it stays perfectly in sync with the Goal section.
+  // for whichever category is currently active. Study uses the shared History Study source above;
+  // all other categories keep their existing calculation unchanged.
   const at = STATE && STATE.activeTimer;
   const liveRunningCat = (at && at.state !== 'REVIEW_PENDING') ? at.type : null;
   const liveRunningSec = liveRunningCat ? sessionElapsedSec(at) : 0;
   grid.innerHTML = cats.map(c=>{
     let committedSec = all.filter(e=>timelineStudyDayKey(e)===today && e.category===c.key).reduce((s,e)=>s+(e.duration||0),0);
-    // For study: use liveTodayStudySec() — it already combines dailyStudySeconds + running delta
-    // For all other categories: add the running delta directly when a matching session is live
+    // For study: use the shared History Study source — it already combines committed + live time.
+    // For all other categories: add the running delta directly when a matching session is live.
     const consumedSec = c.key === 'study'
-      ? liveTodayStudySec(STATE)
+      ? historyStudy.consumedSec
       : committedSec + (liveRunningCat === c.key ? liveRunningSec : 0);
-    const plannedSec = CACHED_TASKS.filter(t=>t.category===c.key).reduce((s,t)=>s+(t.duration||0),0);
+    const plannedSec = c.key === 'study'
+      ? historyStudy.plannedSec
+      : CACHED_TASKS.filter(t=>t.category===c.key).reduce((s,t)=>s+(t.duration||0),0);
     const totalCaption = fmtTotalPlanned(plannedSec);
     return `<div class="hist-sum-card" style="background:${HIST_COLOR_LIGHT[c.key]}">
       <div class="hist-sum-ic" style="background:${HIST_COLOR[c.key]}22;color:${HIST_COLOR[c.key]}">${c.icon}</div>
@@ -7164,14 +7404,17 @@ function budgetViewList(){ return planMode==='tomorrow' ? tomorrowConfirmed() : 
 // plan, pending reusable ones are discarded, and a brand new blank Tomorrow is seeded.
 async function carryUnfinishedStudyToPlanner(state){
   if(!Array.isArray(state.plannerPending)) state.plannerPending=[];
-  if(!state.activePlannerId) return;
+  // Pending is a separate carry-forward bank.  It must work even before the
+  // user has created/selected a Planner: manual Pending entries already allow
+  // that state, so dropping wake-up carries here would silently lose work.
+  const plannerId = state.activePlannerId || null;
   const sourceDay = state.lastWakeKey || studyDayKey();
   for(const task of CACHED_TASKS){
     if(task.category!=='study') continue;
     const remaining = Math.max(0, (task.duration||0) - Math.min(task.duration||0, task.consumedSec||0));
     const carryKey = `${sourceDay}:${task.id}`;
-    if(!remaining || task.completionStatus==='completed' || state.plannerPending.some(p=>p.plannerId===state.activePlannerId && p.carryKey===carryKey)) continue;
-    state.plannerPending.push({id:'pending-'+Date.now()+'-'+Math.random().toString(36).slice(2,7), plannerId:state.activePlannerId, carryKey, category:'study', name:task.name, subject:task.subject||null, duration:remaining, icon:task.icon, color:task.color, createdOn:studyDayKey(), reuseDisabled:false});
+    if(!remaining || task.completionStatus==='completed' || state.plannerPending.some(p=>(p.plannerId||null)===plannerId && p.carryKey===carryKey)) continue;
+    state.plannerPending.push({id:'pending-'+Date.now()+'-'+Math.random().toString(36).slice(2,7), plannerId, carryKey, category:'study', name:task.name, subject:task.subject||null, duration:remaining, icon:task.icon, color:task.color, createdOn:studyDayKey(), reuseDisabled:false});
   }
 }
 async function promoteTomorrow(state){
@@ -7440,6 +7683,7 @@ function renderSettings(){
   updateOtherHoursPreview();
   document.getElementById('setPomo').value = Math.round(STATE.settings.pomodoroDuration/60);
   document.getElementById('setManualTaskMode').checked = !!STATE.settings.manualTaskMode;
+  document.getElementById('setStudySessionCounter').checked = !!STATE.settings.studySessionCounter;
   const manualOn = !!STATE.settings.manualTaskMode;
   document.getElementById('manualBombNotice').style.display = manualOn ? '' : 'none';
   document.getElementById('setBombMode').disabled = manualOn;
@@ -7581,44 +7825,66 @@ async function renderHomeWidgetDebugCard(){
   const nowStr    = fmtTimeOfDay(now.getTime());
   // §6 Free capacity
   const free      = fmt(data.freeCapacitySeconds);
-  // §7 Max study today
-  const maxStudy  = fmt(data.maxStudyTodaySeconds);
-  
-  // §8 Comparison — COMPLETELY DYNAMIC based on current widget state
-  // When "Study Complete By" (canFinishToday=true): Available Study Time ≥ Today's Remaining Study
-  // When "Max Study Today" (canFinishToday=false): Available Study Time < Today's Remaining Study
-  let cmpOp, cmpLeftVal, cmpRightVal, cmpLabel;
+
+  // §7 Comparison — the existing predictor verdict is the sole status authority.
+  // No new predictor logic is created here.
+  let cmpOp, cmpLeftVal, cmpRightVal, statusLabel;
   if(data.canFinishToday){
-    cmpOp       = '\u2265';  // ≥ (greater-than-or-equal)
-    cmpLabel    = 'Available Study Time Today ≥ Today\'s Remaining Study';
-    cmpLeftVal  = free;      // Available study time
-    cmpRightVal = remStudy;  // Remaining study
+    cmpOp       = '\u2265';
+    cmpLeftVal  = free;
+    cmpRightVal = remStudy;
+    statusLabel = 'Study Complete By';
   } else {
-    cmpOp       = '<';       // < (less-than)
-    cmpLabel    = 'Available Study Time Today < Today\'s Remaining Study';
-    cmpLeftVal  = free;      // Available study time
-    cmpRightVal = remStudy;  // Remaining study (now exceeds available, hence "max")
+    cmpOp       = '<';
+    cmpLeftVal  = free;
+    cmpRightVal = remStudy;
+    statusLabel = 'Max Study Today';
   }
-  
-  // §9 Result + widget label
+
+  // §8 Result — exactly one status calculation is rendered, determined only by §7.
+  const maxStudy  = fmt(data.maxStudyTodaySeconds);
   let widgetLabel, resultVal, resultColor;
-  if(data.completedStudySeconds >= data.plannedStudySeconds && data.plannedStudySeconds > 0){
-    widgetLabel  = 'Today Complete';
-    resultVal    = planned + ' done';
-    resultColor  = 'var(--green,#34C759)';
-  } else if(data.canFinishToday){
-    const h = data.projectedFinishTime.getHours();
-    const mn = data.projectedFinishTime.getMinutes();
+  const finishTimeBlock = document.getElementById('dbgFinishTimeBlock');
+  const maxStudyBlock = document.getElementById('dbgMaxStudyBlock');
+
+  const fmtClock = (date) => {
+    const h = date.getHours();
+    const mn = date.getMinutes();
     const ap = h >= 12 ? 'PM' : 'AM';
     const h12 = (h % 12) === 0 ? 12 : h % 12;
-    const tStr = mn === 0 ? `${h12} ${ap}` : `${h12}:${String(mn).padStart(2,'0')} ${ap}`;
+    return mn === 0 ? `${h12} ${ap}` : `${h12}:${String(mn).padStart(2,'0')} ${ap}`;
+  };
+
+  if(data.canFinishToday){
     widgetLabel = 'Study Complete By';
-    resultVal   = tStr;
+    resultVal   = fmtClock(data.projectedFinishTime);
     resultColor = 'var(--green,#34C759)';
+    if(finishTimeBlock) finishTimeBlock.style.display = '';
+    if(maxStudyBlock) maxStudyBlock.style.display = 'none';
   } else {
     widgetLabel = 'Max Study Today';
     resultVal   = maxStudy;
     resultColor = 'var(--warn,#FF9F0A)';
+    if(finishTimeBlock) finishTimeBlock.style.display = 'none';
+    if(maxStudyBlock) maxStudyBlock.style.display = '';
+  }
+
+  // §9 Session Counter — only the branch matching the predictor status is visible.
+  const sessionMetrics = getStudySessionCounterMetrics();
+  const totalSessions = formatStudySessionCount(sessionMetrics.totalSessions);
+  let sessionDone = '0';
+  const sessionMaxBlock = document.getElementById('dbgSessionMaxBlock');
+  const sessionCompleteBlock = document.getElementById('dbgSessionCompleteBlock');
+
+  if(data.canFinishToday){
+    sessionDone = totalSessions;
+    if(sessionCompleteBlock) sessionCompleteBlock.style.display = '';
+    if(sessionMaxBlock) sessionMaxBlock.style.display = 'none';
+  } else {
+    const achievableSec = (Number(data.completedStudySeconds) || 0) + (Number(data.freeCapacitySeconds) || 0);
+    sessionDone = formatStudySessionCount(achievableSec / sessionMetrics.pomoSec);
+    if(sessionCompleteBlock) sessionCompleteBlock.style.display = 'none';
+    if(sessionMaxBlock) sessionMaxBlock.style.display = '';
   }
 
   // Update subtitle (collapsed line)
@@ -7640,15 +7906,30 @@ async function renderHomeWidgetDebugCard(){
   set('dbgRemDay2',    remDay);
   set('dbgNonStudy2',  nonStudy);
   set('dbgFree',       free);
-  set('dbgCompleted3', completed);
-  set('dbgFree2',      free);
-  set('dbgMaxStudy',   maxStudy);
   set('dbgCmpOp',      cmpOp);
   set('dbgCmpOp2',     cmpOp);
-  set('dbgFree3',      cmpLeftVal);
+  set('dbgFree3',       cmpLeftVal);
   set('dbgRemStudy2',  cmpRightVal);
+  set('dbgStatus',     statusLabel);
   set('dbgWidgetLabel', widgetLabel);
+
+  // §8 dynamic formula values — only the active status branch is visible.
+  set('dbgNow8', nowStr);
+  set('dbgNonStudy8', nonStudy);
+  set('dbgRemStudy8', remStudy);
+  set('dbgRemStudy8b', remStudy);
+  set('dbgAfterNonStudy8', fmtClock(new Date(now.getTime() + data.remainingNonStudySeconds * 1000)));
+  set('dbgFinishResult', fmtClock(data.projectedFinishTime));
+  set('dbgCompleted8', completed);
+  set('dbgFree8', free);
+  set('dbgMaxStudyResult', maxStudy);
   set('dbgResult',     resultVal);
+  set('dbgSessionStatus', statusLabel);
+  set('dbgSessionCompleteValue', `${totalSessions} ${sessionWord(totalSessions)} out of ${totalSessions}`);
+  set('dbgSessionMaxStudy', maxStudy);
+  set('dbgSessionPomo', fmt(sessionMetrics.pomoSec));
+  set('dbgSessionMaxValue', sessionDone);
+  set('dbgSessionTotalValue', totalSessions);
   setColor('dbgResult', resultColor);
 }
 
@@ -8700,7 +8981,11 @@ function plannerChaptersFor(plannerId){
 }
 function plannerPending(){
   if(!STATE || !Array.isArray(STATE.plannerPending)) return [];
-  return STATE.activePlannerId ? STATE.plannerPending.filter(p=>p.plannerId===STATE.activePlannerId) : [];
+  // Unassigned Pending records are valid when no Planner exists yet.  They
+  // must remain visible/reusable instead of appearing to vanish after wake-up.
+  return STATE.activePlannerId
+    ? STATE.plannerPending.filter(p=>p.plannerId===STATE.activePlannerId)
+    : STATE.plannerPending.filter(p=>!p.plannerId);
 }
 function plannerPendingFor(plannerId){
   return (!STATE || !Array.isArray(STATE.plannerPending)) ? [] : STATE.plannerPending.filter(p=>p.plannerId===plannerId);
@@ -9785,6 +10070,7 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
   
   state.settings.pomodoroDuration = (pomo>0?pomo:30)*60;
   state.settings.manualTaskMode = manualTaskMode;
+  state.settings.studySessionCounter = document.getElementById('setStudySessionCounter').checked;
   state.settings.bombChallengeMode = bombModeEnabled;
   
   // When Bomb Mode is ON, use filled values. When OFF, clear to 0.
