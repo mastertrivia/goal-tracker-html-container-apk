@@ -188,6 +188,34 @@ class MainActivity : AppCompatActivity() {
         }
 
         webView.webViewClient = object : WebViewClientCompat() {
+            override fun shouldOverrideUrlLoading(
+                view: WebView,
+                request: WebResourceRequest
+            ): Boolean {
+                // A backup is data, never a WebView document.  Some Android
+                // document providers can hand a selected JSON Uri back through
+                // WebView navigation; without this guard Chromium renders the
+                // raw JSON over the app, exactly like a broken HTML page.
+                // Keep the app on its trusted internal HTTPS origin instead.
+                if (request.isForMainFrame) {
+                    val uri = request.url
+                    val isInternalApp = uri.scheme == "https" &&
+                        uri.host == "appassets.androidplatform.net" &&
+                        (uri.path ?: "").startsWith("/app/")
+                    if (!isInternalApp) {
+                        ErrorLog.log(
+                            this@MainActivity,
+                            "WebView.blockedMainFrameNavigation",
+                            uri.toString()
+                        )
+                        view.post { loadApp() }
+                        toast("File was not opened as a page", force = true)
+                        return true
+                    }
+                }
+                return false
+            }
+
             override fun shouldInterceptRequest(
                 view: WebView,
                 request: WebResourceRequest
@@ -918,7 +946,13 @@ class MainActivity : AppCompatActivity() {
             val text = contentResolver.openInputStream(uri)!!
                 .bufferedReader().use { it.readText() }
             val backup = JSONObject(text)
+            if (backup.optString("app") != "goal-tracker-shell") {
+                throw IllegalArgumentException("This is not a Goal Tracker backup")
+            }
             val data = backup.getJSONObject("data")
+            if (!data.has("gt_backup") || data.opt("gt_backup") !is String) {
+                throw IllegalArgumentException("Backup has no Goal Tracker data")
+            }
             for (key in data.keys()) {
                 File(appDataDir, "$key.json").writeText(data.getString(key))
             }

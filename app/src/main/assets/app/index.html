@@ -3543,7 +3543,7 @@ async function getState(){
     s = {
       key:'state', currentStreakHours:0, bestStreakHours:0, streakPomodoros:0,
       completedPomodorosToday:0, completedPomodorosLifetime:0,
-      hearts: 1, lastActiveDate: todayStr(),
+      hearts: 1, lastActiveDate: todayStr(), dailyStudyKey: studyDayKey(),
       dailyStudySeconds: 0, dailyLifelinesEarned: 0,
       activeTimer: null, missionText: '',
       bombRemainingMs: DEFAULT_SETTINGS.bombDuration*1000,
@@ -3663,7 +3663,7 @@ async function factoryReset(){
   const fresh = {
     key:'state', currentStreakHours:0, bestStreakHours:0, streakPomodoros:0,
     completedPomodorosToday:0, completedPomodorosLifetime:0,
-    hearts: 1, lastActiveDate: todayStr(),
+    hearts: 1, lastActiveDate: todayStr(), dailyStudyKey: studyDayKey(),
     dailyStudySeconds: 0, dailyLifelinesEarned: 0,
     activeTimer: null, missionText: '',
     bombRemainingMs: DEFAULT_SETTINGS.bombDuration*1000,
@@ -4287,11 +4287,24 @@ function sessionElapsedSec(at){
 function liveTodayStudySec(state){
   const st = state || STATE;
   const at = st && st.activeTimer;
+  const today = studyDayKey();
+  // Never render yesterday's persisted accumulator while the wake transaction
+  // is still waiting to run.  This is deliberately a read-only guard: recovery
+  // remains responsible for banking/clearing data, but no screen may display
+  // fictitious Study time in the intervening moment.
+  const accumulatorBelongsToToday = !!st && (
+    st.dailyStudyKey != null
+      ? st.dailyStudyKey === today
+      : (st.lastWakeKey == null || st.lastWakeKey === today)
+  );
   // Only count study/activity timers that are actively accumulating time.
   // Exclude: bomb timers (type==='bomb'), sessions pending review, null/missing timers.
-  const live = (at && at.type!=='bomb' && at.subject && at.state!=='REVIEW_PENDING')
+  // A productive timer from before Wake-up is likewise never part of today,
+  // even if a delayed recovery has not discarded it yet.
+  const live = (at && at.type!=='bomb' && at.subject && at.state!=='REVIEW_PENDING'
+    && (!at.wallStartTs || at.wallStartTs >= todayWakeTs(Date.now())))
     ? sessionElapsedSec(at) : 0;
-  return (st.dailyStudySeconds||0) + live;
+  return (accumulatorBelongsToToday ? (st.dailyStudySeconds||0) : 0) + live;
 }
 // Reconciles state.dailyStudySeconds against today's committed IDB timeline entries.
 // IDB is the ground truth: each session writes its entry atomically before banking to
@@ -5120,7 +5133,20 @@ async function recoverState(){
     state._idleStartTs = wakeBoundaryTs;
     await saveState(state);
   }
-  if(state.lastActiveDate !== today && !sleeping){
+  // `lastActiveDate` is legacy state which historically mixed calendar-day and
+  // Study-Day meanings.  Never let it alone decide whether daily Study data is
+  // reset: a calendar-day value can already equal `today` before Wake-up and
+  // would otherwise leak yesterday's accumulator into an empty new timeline.
+  // `dailyStudyKey` is the explicit owner of daily counters.  For saved data
+  // created before it existed, an unpromoted `lastWakeKey` is the reliable
+  // proof that the Wake-up boundary still has to be processed.
+  const legacyWakeRollover = state.dailyStudyKey == null
+    && state.lastWakeKey != null
+    && state.lastWakeKey !== today;
+  const needsDailyStudyRollover = state.dailyStudyKey != null
+    ? state.dailyStudyKey !== today
+    : (state.lastActiveDate !== today || legacyWakeRollover);
+  if(needsDailyStudyRollover && !sleeping){
     // A productive activity belongs to the Study Day in which it was started;
     // no productive timer is allowed to cross Wake-up. This must happen before
     // the Bomb branch because armForNewDay() intentionally does nothing while
@@ -5131,7 +5157,7 @@ async function recoverState(){
     state._idleStartTs = todayWakeTs(Date.now());
     // Home Day Streak break check — if the day that just ended never hit its full Study allocation, the chain breaks.
     if(state.homeDayStreakLastAward !== state.lastActiveDate) state.homeDayStreak = 0;
-    state.completedPomodorosToday = 0; state.lastActiveDate = today;
+    state.completedPomodorosToday = 0; state.lastActiveDate = today; state.dailyStudyKey = today;
     state.pomoLogs = {}; // Pomodoro Log follows the same daily lifecycle — fresh empty log each new day
     // WAKE-UP BOMB TRIGGER — two behaviours share the SAME wake-up reset (fresh full Bomb clock):
     //  → 'wake-time' (Mode 1): arm the Bomb live immediately (it starts counting at Wake-up).
