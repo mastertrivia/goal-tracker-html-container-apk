@@ -90,6 +90,46 @@ body.bomb-danger{background-color:#EF4444;}
   .col-stack .break-time{font-size:clamp(20px,6.5vw,32px);min-width:0;line-height:1.1;}
   .col-stack .streak-num{font-size:clamp(28px,8.5vw,41px);}
 
+  /* REALITY CHECK — compact rating layer linked to the existing Pomodoro Log. */
+  .rc-card{margin-bottom:10px;padding:11px 14px 12px;position:relative;}
+  .rc-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+  .rc-title{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase;line-height:1;}
+  .rc-deadline{display:inline-flex;align-items:center;gap:5px;color:var(--red);font-family:'Poppins',sans-serif;font-size:16px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;animation:rcPulse 1.2s ease-in-out infinite;}
+  .rc-deadline svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round;}
+  @keyframes rcPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.72;transform:scale(.98)}}
+  .rc-ratings{display:flex;justify-content:center;gap:7px;width:100%;}
+  .rc-rating{flex:0 0 54px;width:54px;height:40px;border:1.5px solid transparent;border-radius:12px;background:var(--bg);font-family:'Poppins',sans-serif;font-size:19px;font-weight:800;line-height:1;cursor:pointer;box-shadow:0 1px 2px rgba(33,29,69,.03);transition:transform .14s cubic-bezier(.2,.8,.2,1),box-shadow .16s,border-color .16s,opacity .16s,filter .16s;position:relative;overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation;}
+  .rc-rating:active{transform:scale(.91);box-shadow:0 1px 3px rgba(33,29,69,.18);filter:brightness(.96);}
+  .rc-rating.selected{transform:translateY(-1px) scale(1.08);z-index:2;}
+  .rc-rating.selected:active{transform:translateY(0) scale(1.01);}
+  .rc-ratings.has-selection .rc-rating:not(.selected){transform:scale(.94);opacity:.34;filter:grayscale(.72);}
+  .rc-ratings.has-selection .rc-rating:not(.selected):active{transform:scale(.89);opacity:.42;}
+
+  .rc-rating::after{content:"";position:absolute;inset:0;border-radius:inherit;background:rgba(255,255,255,.28);opacity:0;pointer-events:none;transition:opacity .08s;}
+  .rc-rating:active::after{opacity:1;}
+  .rc-rating.r1{color:#B91C1C;background:#FEE2E2;border-color:rgba(185,28,28,.30);}
+  .rc-rating.r2{color:#EF4444;background:#FFF1F2;border-color:rgba(239,68,68,.25);}
+  .rc-rating.r3{color:#D89400;background:#FFF7E0;border-color:rgba(245,166,35,.28);}
+  .rc-rating.r4{color:#16A34A;background:#E9F9EF;border-color:rgba(34,197,94,.28);}
+  .rc-rating.r5{color:#B77900;background:linear-gradient(155deg,#FFF4C7 0%,#FFE08A 100%);border-color:rgba(217,155,20,.42);box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),0 2px 7px rgba(217,155,20,.12);}
+  .rc-rating.selected{transform:translateY(1px) scale(.985);filter:saturate(1.08) brightness(.97);}
+  .rc-rating.r1.selected{border-color:#B91C1C;box-shadow:inset 0 -3px 0 rgba(127,29,29,.28),0 0 0 2px rgba(185,28,28,.20),0 3px 7px rgba(185,28,28,.14);}
+  .rc-rating.r2.selected{border-color:#EF4444;box-shadow:inset 0 -3px 0 rgba(185,28,28,.20),0 0 0 2px rgba(239,68,68,.18),0 3px 7px rgba(239,68,68,.12);}
+  .rc-rating.r3.selected{border-color:#D89400;box-shadow:inset 0 -3px 0 rgba(180,110,0,.22),0 0 0 2px rgba(216,148,0,.18),0 3px 7px rgba(216,148,0,.12);}
+  .rc-rating.r4.selected{border-color:#16A34A;box-shadow:inset 0 -3px 0 rgba(21,128,61,.24),0 0 0 2px rgba(34,197,94,.18),0 3px 7px rgba(34,197,94,.12);}
+  .rc-rating.r5.selected{border-color:#B77900;box-shadow:inset 0 -3px 0 rgba(161,98,7,.26),0 0 0 2px rgba(217,155,20,.22),0 3px 9px rgba(217,155,20,.18);filter:saturate(1.12) brightness(.96);}
+  .rc-title.rc-preview{letter-spacing:.025em;display:flex;align-items:center;gap:5px;}
+  .rc-preview-emoji{font-size:14px;line-height:1;display:inline-flex;align-items:center;}
+  .rc-title.rc-preview svg{flex:0 0 auto;}
+  .rc-rating.rc-locked{opacity:.45;pointer-events:none;}
+  .rc-done.rc-locked{opacity:.45;pointer-events:auto;cursor:pointer;}
+  .rc-input-row{display:grid;grid-template-columns:minmax(0,3fr) minmax(92px,.72fr);gap:8px;margin-top:8px;}
+  .rc-note{width:100%;height:40px;border:1.5px solid var(--border);border-radius:12px;background:var(--card);padding:0 12px;font:500 12.5px 'Inter',sans-serif;color:var(--text);min-width:0;}
+  .rc-note::placeholder{color:var(--text-dim);opacity:.85;}
+  .rc-note:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,79,232,.10);}
+  .rc-done{height:40px;border:none;border-radius:12px;background:linear-gradient(155deg,#6E63EF 0%,var(--primary) 100%);color:#fff;font:800 12.5px 'Inter',sans-serif;box-shadow:0 6px 14px rgba(91,79,232,.22);cursor:pointer;}
+  .rc-done:active{transform:scale(.97);}
+  @media (max-width:360px){.rc-input-row{grid-template-columns:minmax(0,1fr) 86px;gap:7px}.rc-ratings{gap:6px}.rc-rating{flex-basis:50px;width:50px;height:39px;font-size:18px;}}
   /* Generic card shell reused by most Home screen widgets */
   .card{background:var(--card);border:var(--card-border);border-radius:22px;box-shadow:var(--shadow);padding:18px;}
   .card-label{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:14px;}
@@ -303,7 +343,7 @@ body.bomb-danger{background-color:#EF4444;}
   .hdr-goal-info:hover{opacity:0.85;}
   .hdr-goal-info svg{width:12px;height:12px;}
   /* CURRENT ACTIVITY CARD — live session overview with auto Pomodoro split progress */
-  .ca-card{margin-bottom:16px;padding-top:9px;padding-bottom:7px;position:relative;z-index:2;overflow:visible;}
+  .ca-card{margin-bottom:10px;padding-top:9px;padding-bottom:7px;position:relative;z-index:2;overflow:visible;}
   /* STATE 3 (No Task) & STATE 4 (Sleep) — compact, full-width status card (no left/right shrink) */
   .ca-card.idle{width:100%;margin:0 0 16px;padding:0;background:transparent;border:none;box-shadow:none;}
   .ca-card.idle .ca-head{display:none;}
@@ -577,6 +617,89 @@ body.bomb-danger{background-color:#EF4444;}
 .pomo-n{flex:0 0 14px;font-size:10px;font-weight:800;color:var(--text-dim);text-align:center;}
 .pomo-c{flex:1;font-size:10.5px;line-height:1.35;color:var(--text);word-break:break-word;}
 .pomo-c.empty{color:var(--text-dim);}
+/* THOUGHT LOGGER — compact premium dropdown. Reuses the same visual language as the Goal
+   "Why This Goal Matters" disclosure and the existing Pomodoro log rows. */
+.thought-card{padding:0;overflow:hidden;margin-bottom:16px;}
+.thought-toggle{width:100%;border:0;background:transparent;display:flex;align-items:center;gap:10px;padding:11px 14px;text-align:left;color:var(--text);cursor:pointer;font-family:'Inter',sans-serif;}
+.thought-toggle:active{background:rgba(91,79,232,.035);}
+.thought-toggle-main{flex:1;min-width:0;}
+.thought-toggle-title{font-family:'Poppins',sans-serif;font-size:12px;font-weight:800;letter-spacing:.07em;color:var(--text-dim);text-transform:uppercase;line-height:1.2;}
+.thought-total{font-size:11px;font-weight:800;color:var(--text-dim);white-space:nowrap;line-height:1;}
+.thought-chevron{width:34px;height:34px;border-radius:11px;background:#fff;border:none;box-shadow:0 2px 8px rgba(20,21,43,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--primary);transition:transform .25s ease,background .15s ease;}
+.thought-chevron svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+.thought-card.open .thought-chevron{transform:rotate(180deg);}
+.thought-panel{display:none;padding:0 8px 8px;}
+.thought-card.open .thought-panel{display:block;animation:fadeIn .16s ease;}
+.thought-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:7px;background:var(--card);border-radius:7px;padding:3px 5px;margin-bottom:3px;min-height:29px;}
+.thought-row:last-child{margin-bottom:0;}
+.thought-label{min-width:0;font-size:10.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:2px;line-height:1.2;}
+.thought-counter{display:flex;align-items:center;gap:4px;flex:0 0 auto;}
+.thought-count-btn{width:23px;height:23px;border:none;border-radius:6px;background:var(--primary-light);color:var(--primary);font-size:15px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;flex:0 0 23px;}
+.thought-count-btn:active{transform:scale(.92);}
+.thought-count-input{width:40px;height:23px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text);font:800 10.5px/1 'Poppins',sans-serif;text-align:center;outline:none;padding:0 2px;font-variant-numeric:tabular-nums;}
+.thought-count-input:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(91,79,232,.08);}
+.thought-empty{font-size:10.5px;color:var(--text-dim);padding:7px 4px;}
+.thought-no-row{display:flex;align-items:center;gap:8px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.14);border-radius:8px;padding:4px 6px;margin-bottom:4px;min-height:29px;cursor:pointer;}
+/* STEP 5.1 — compact No Thoughts / Done split + tighter session rows */
+.thought-no-wrap{display:grid;grid-template-columns:max-content 1fr auto;gap:8px;margin-bottom:3px;align-items:stretch;}
+.thought-no-row{margin-bottom:0;min-width:0;padding:2px 5px;min-height:27px;}
+.thought-card.open .thought-toggle{padding-top:8px;padding-bottom:4px;}
+.thought-session-done{border:0;border-radius:8px;background:var(--primary);color:#fff;font:800 10.5px/1 'Poppins',sans-serif;min-height:29px;padding:0 10px;cursor:pointer;box-shadow:0 3px 9px rgba(91,79,232,.16);white-space:nowrap;}
+.thought-session-done:active{transform:scale(.98);}
+.thought-session-done[hidden]{display:none!important;}
+.thought-count-input{max-width:40px;}
+.thought-row{min-height:27px;padding:2px 5px;margin-bottom:2px;}
+.thought-counter{gap:3px;}
+.thought-count-btn{width:22px;height:22px;flex-basis:22px;}
+.thought-count-input{width:38px;height:22px;}
+.thought-panel{padding:0 7px 7px;}
+ .thought-card{margin-bottom:8px;}
+/* THOUGHT SETTINGS — transactional editor: changes stay local until Save Changes. */
+.thought-settings-row{display:grid;grid-template-columns:24px 30px minmax(0,1fr) 34px;align-items:center;gap:7px;margin-bottom:8px;padding:5px 6px;border:1px solid var(--border);border-radius:11px;background:var(--card);transition:opacity .15s ease,filter .15s ease,background .15s ease;}
+.thought-settings-row.dragging{box-shadow:0 8px 22px rgba(20,21,43,.14);transform:scale(1.01);}
+.thought-settings-row.pending-delete{opacity:.72;filter:grayscale(.15);background:rgba(239,68,68,.055);border-color:rgba(239,68,68,.18);}
+.thought-settings-row.pending-delete .thought-settings-input{color:var(--red);background:rgba(239,68,68,.035);text-decoration:line-through;}
+.thought-settings-row.pending-delete .thought-settings-handle{opacity:.35;pointer-events:none;}
+.thought-settings-restore{width:auto;min-width:62px;height:30px;border:0;border-radius:8px;background:rgba(91,79,232,.10);color:var(--primary);font:800 10px/1 'Poppins',sans-serif;padding:0 8px;cursor:pointer;}
+.thought-settings-restore:active{transform:scale(.95);}
+.thought-settings-pending-divider{display:flex;align-items:center;gap:8px;margin:10px 2px 7px;color:var(--red);font:800 9.5px/1 'Poppins',sans-serif;letter-spacing:.05em;text-transform:uppercase;}
+.thought-settings-pending-divider::before,.thought-settings-pending-divider::after{content:'';height:1px;background:rgba(239,68,68,.16);flex:1;}
+.thought-settings-pending-note{font-size:10px;color:var(--red);line-height:1.35;margin:-2px 2px 8px;opacity:.8;}
+.thought-settings-order{font-size:10px;font-weight:800;color:var(--text-dim);text-align:center;}
+.thought-settings-handle{width:30px;height:30px;border:0;border-radius:8px;background:rgba(91,79,232,.08);color:var(--text-dim);display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;}
+.thought-settings-handle:active{cursor:grabbing;background:rgba(91,79,232,.14);}
+.thought-settings-handle svg{width:15px;height:15px;fill:currentColor;}
+.thought-settings-input{width:100%;min-width:0;padding:9px 10px;border-radius:9px;border:1.5px solid var(--border);background:#fff;color:var(--text);font-size:13.5px;font-family:'Inter',sans-serif;outline:none;}
+.thought-settings-input:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(91,79,232,.08);}
+.thought-settings-delete{width:30px;height:30px;border:0;border-radius:8px;background:rgba(239,68,68,.08);color:var(--red);font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.thought-settings-delete:active{transform:scale(.94);}
+.thought-settings-empty{font-size:12px;color:var(--text-dim);padding:10px 2px;}
+.thought-settings-note{font-size:11px;color:var(--text-dim);line-height:1.45;margin-top:8px;}
+
+.thought-no-row:active{transform:scale(.995);}
+.thought-no-toggle{width:21px;height:21px;border:1.5px solid rgba(239,68,68,0.34);border-radius:6px;background:#fff;color:transparent;display:flex;align-items:center;justify-content:center;flex:0 0 23px;padding:0;font-size:14px;font-weight:900;line-height:1;}
+.thought-no-row.selected .thought-no-toggle{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 2px 7px rgba(239,68,68,.22);}
+.thought-no-label{font-size:10.5px;font-weight:800;color:var(--red);line-height:1.2;}
+.thought-rows.disabled{filter:blur(1.8px);opacity:.38;pointer-events:none;user-select:none;}
+.thought-reader-card{padding:0;overflow:hidden;margin-bottom:12px;}
+.thought-reader-toggle{width:100%;border:0;background:transparent;display:flex;align-items:center;gap:10px;padding:11px 14px;text-align:left;cursor:pointer;font-family:'Inter',sans-serif;color:var(--text);}
+.thought-reader-toggle:active{background:rgba(91,79,232,.035);}
+.thought-reader-main{flex:1;min-width:0;}
+.thought-reader-title{font-family:'Poppins',sans-serif;font-size:12px;font-weight:800;letter-spacing:.07em;color:var(--text-dim);text-transform:uppercase;line-height:1.2;}
+.thought-reader-icon{width:28px;height:28px;border-radius:9px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;flex:0 0 28px;font-size:16px;line-height:1;box-shadow:inset 0 0 0 1px rgba(91,79,232,.06);}
+#goalThoughtCard .thought-reader-title{font-size:12px;}
+.thought-reader-total{font-size:11px;font-weight:800;color:var(--text-dim);white-space:nowrap;line-height:1;}
+.thought-reader-chevron{width:34px;height:34px;border-radius:11px;background:#fff;border:none;box-shadow:0 2px 8px rgba(20,21,43,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--primary);transition:transform .25s ease;}
+.thought-reader-chevron svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+.thought-reader-card.open .thought-reader-chevron{transform:rotate(180deg);}
+.thought-reader-panel{display:none;padding:0 8px 8px;}
+.thought-reader-card.open .thought-reader-panel{display:block;animation:fadeIn .16s ease;}
+.thought-reader-row{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--card);border-radius:7px;padding:4px 6px;margin-bottom:3px;min-height:28px;}
+.thought-reader-row:last-child{margin-bottom:0;}
+.thought-reader-label{min-width:0;flex:1;font-size:10.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.thought-reader-value{font-family:'Poppins',sans-serif;font-size:11px;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums;min-width:22px;text-align:right;}
+.thought-reader-empty{font-size:10.5px;color:var(--text-dim);padding:7px 4px;}
+
 .pomo-m{flex:0 0 18px;display:flex;align-items:center;justify-content:center;}
 .pomo-add{border:none;background:rgba(91,79,232,0.08);color:#8B87A6;width:17px;height:17px;border-radius:6px;font-size:11px;font-weight:700;line-height:1;padding:0;}
 /* Reflection popup — small premium modal */
@@ -1211,6 +1334,41 @@ body.bomb-danger{background-color:#EF4444;}
       </div>
     </div>
 
+    <!-- STEP 1 — Reality Check visual layer. Functional gating/countdown will be wired later. -->
+    <div class="card rc-card" id="realityCheckCard">
+      <div class="rc-head">
+        <div class="rc-title" id="rcTitle">REALITY CHECK</div>
+        <div class="rc-deadline" id="rcDeadline" aria-label="Reality Check time remaining">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.7v4.8l3.1 1.8"></path></svg>
+          <span>--:--</span>
+        </div>
+      </div>
+      <div class="rc-ratings" aria-label="Reality Check rating">
+        <button type="button" class="rc-rating r1">1</button>
+        <button type="button" class="rc-rating r2">2</button>
+        <button type="button" class="rc-rating r3">3</button>
+        <button type="button" class="rc-rating r4">4</button>
+        <button type="button" class="rc-rating r5">5</button>
+      </div>
+      <div class="rc-input-row">
+        <input class="rc-note" id="rcNote" type="text" maxlength="120" placeholder="Comment or note…" aria-label="Comment or note">
+        <button type="button" class="rc-done" id="rcDone">Done</button>
+      </div>
+    </div>
+
+    <!-- THOUGHT LOGGER — compact persistent category dropdown. Counts are independent of the active task. -->
+    <div class="card thought-card" id="thoughtCard">
+      <button type="button" class="thought-toggle" id="thoughtToggle" aria-expanded="false">
+        <span class="thought-reader-icon" aria-hidden="true">💭</span>
+        <div class="thought-toggle-main">
+          <div class="thought-toggle-title">THOUGHTS</div>
+        </div>
+        <span class="thought-total" id="thoughtTotal">0 total</span>
+        <span class="thought-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9.5 6 6 6-6"/></svg></span>
+      </button>
+      <div class="thought-panel" id="thoughtPanel"></div>
+    </div>
+
     <div class="grid2" id="homeTimerGrid">
       <!-- Pomodoro Timer Card - Countdown + Start/Pause/Stop for the active Study/Routine/Health session -->
       <div class="card" id="pomoCard">
@@ -1341,6 +1499,15 @@ body.bomb-danger{background-color:#EF4444;}
       <div class="plain-card">
         <div class="refl-strip" id="reflStrip"></div>
         <div class="hist-sum-grid" id="histSummaryGrid"></div>
+      </div>
+      <div class="card thought-reader-card" id="historyThoughtCard">
+        <button type="button" class="thought-reader-toggle" id="historyThoughtToggle" aria-expanded="false">
+          <span class="thought-reader-icon" aria-hidden="true">💭</span>
+          <div class="thought-reader-main"><div class="thought-reader-title">Thoughts</div></div>
+          <span class="thought-reader-total" id="historyThoughtTotal">0 total</span>
+          <span class="thought-reader-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9.5 6 6 6-6"/></svg></span>
+        </button>
+        <div class="thought-reader-panel" id="historyThoughtPanel"></div>
       </div>
       <div class="plain-card">
         <div class="tl-headrow"><div class="tl-mode-menu-wrap"><button class="tl-mode-btn tl-mode-opt" id="tlModeTimeline" data-mode="timeline" type="button">⏱ TIMELINE</button><button class="tl-mode-btn tl-mode-opt" id="tlModeActivity" data-mode="activity" type="button">≡ ACTIVITY</button></div><div class="h-dur">DURATION</div></div>
@@ -1512,7 +1679,15 @@ body.bomb-danger{background-color:#EF4444;}
           <div class="gl-chev">›</div>
         </div>
       </div>
-      <!-- 8. About -->
+      <!-- 8. Thought Logger — persistent user-defined thought headings and master toggle -->
+      <div class="plain-card">
+        <div class="goal-settings-launch" data-sub="subThoughts">
+          <div class="gl-ic" style="background:linear-gradient(155deg,#7C5CFC 0%,#5B4FE8 100%);box-shadow:0 6px 14px rgba(91,79,232,0.28);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5.2 11.2c0-4 3.2-6.7 7.3-6.7 4.2 0 7.3 2.8 7.3 6.7 0 3.8-3.1 6.5-7.3 6.5-1.1 0-2.1-.2-3-.6L6 19l.8-2.6c-1-1.3-1.6-3-1.6-5.2Z"/><path d="M9 10.5h.01M12.5 10.5h.01M16 10.5h.01"/></svg></div>
+          <div class="gl-txt"><div class="gl-t1">Thought Logger</div><div class="gl-t2" id="thoughtLaunchSub">Categories, counters &amp; logging</div></div>
+          <div class="gl-chev">›</div>
+        </div>
+      </div>
+      <!-- 9. About -->
       <div class="plain-card">
         <div class="goal-settings-launch" data-sub="subAbout">
           <div class="gl-ic" style="background:linear-gradient(155deg,#5AC8FA 0%,#2F9BD6 100%);box-shadow:0 6px 14px rgba(47,155,214,0.28);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r="0.4" fill="#fff"/></svg></div>
@@ -1520,7 +1695,7 @@ body.bomb-danger{background-color:#EF4444;}
           <div class="gl-chev">›</div>
         </div>
       </div>
-      <!-- 9. Live Formula Debugging -->
+      <!-- 10. Live Formula Debugging -->
       <div class="plain-card">
         <div class="goal-settings-launch" data-sub="subFormulaDebug">
           <div class="gl-ic" style="background:linear-gradient(155deg,#30B0C7 0%,#1A8FA8 100%);box-shadow:0 6px 14px rgba(26,143,168,0.28);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg></div>
@@ -1904,6 +2079,13 @@ body.bomb-danger{background-color:#EF4444;}
         <div class="and-row"><div class="ar-txt"><div class="ar-t1">Study Session Counter</div><div class="ar-t2">When enabled, show your Study progress as a Pomodoro-based count on the Home screen.</div></div><label class="tg-switch"><input type="checkbox" id="setStudySessionCounter"><span class="slider"></span></label></div>
       </div>
       <div class="plain-card">
+        <h3>Reality Check</h3>
+        <div class="subtext" style="margin-top:0;">Show the compact Reality Check layer on the Home screen after Current Activity.</div>
+        <div class="and-row"><div class="ar-txt"><div class="ar-t1">Enable Reality Check</div><div class="ar-t2">When enabled, the Reality Check is the same Pomodoro reflection entry shown by the old + button.</div></div><label class="tg-switch"><input type="checkbox" id="setRealityCheckEnabled"><span class="slider"></span></label></div>
+        <div class="field" style="margin-top:12px;"><label>Reality Check Duration (minutes)</label><input type="number" id="setRealityCheckDuration" min="1" step="1"></div>
+        <div class="subtext" id="realityCheckDurationHint" style="margin:-2px 0 0;font-size:10.5px;line-height:1.45;">Maximum: one minute less than the current Pomodoro Duration.</div>
+      </div>
+      <div class="plain-card">
         <h3>Manual Task Mode</h3>
         <div class="subtext" style="margin-top:0;">Track task progress manually without using the Pomodoro timer.</div>
         <div class="and-row"><div class="ar-txt"><div class="ar-t1">No Pomodoro Mode</div><div class="ar-t2">Changes apply only when you save Home Settings.</div></div><label class="tg-switch"><input type="checkbox" id="setManualTaskMode"><span class="slider"></span></label></div>
@@ -2021,6 +2203,13 @@ body.bomb-danger{background-color:#EF4444;}
         </div>
         <div class="subtext" style="margin-top:8px;font-size:11px;color:#ff9800;font-weight:600;">⚡ TOGGLE IS IMMEDIATE</div>
       </div>
+      <!-- Revision tab visibility — UI only; Revision tasks/data remain untouched. -->
+      <div class="plain-card">
+        <div class="and-row">
+          <div class="ar-txt"><div class="ar-t1">Show REV Tab</div><div class="ar-t2">Show or hide only the Revision (REV) tab on Home and Tasks. Revision tasks and their data are never changed.</div></div>
+          <label class="tg-switch"><input type="checkbox" id="setShowRevisionTab"><span class="slider"></span></label>
+        </div>
+      </div>
       <!-- Subjects (Study Add-Task dropdown) + fully customizable Preferred Time slots -->
       <div class="plain-card">
         <h3>Edit Task Subjects &amp; Preferred Time</h3>
@@ -2119,6 +2308,31 @@ body.bomb-danger{background-color:#EF4444;}
           <div class="field"><label>Others icon</label><input type="text" id="setIconOthers" maxlength="4" style="text-align:center;"></div>
           <div class="field"><label>Others category name</label><input type="text" id="setLblCatOthers"></div>
         </div>
+      </div>
+    </div>
+
+    <!-- Sub-page: Thought Logger — persistent user-defined headings. -->
+    <div class="set-sub" id="subThoughts" style="display:none;">
+      <div class="gset-header"><button class="gset-back set-sub-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="gset-title">Thought Logger</div><div style="width:34px;"></div></div>
+      <div class="plain-card">
+        <div class="and-row" style="padding-top:2px;">
+          <div class="ar-txt"><div class="ar-t1">Thought Logging</div><div class="ar-t2">Show the compact Thoughts dropdown on the Home screen.</div></div>
+          <label class="tg-switch"><input type="checkbox" id="setThoughtsEnabled"><span class="slider"></span></label>
+        </div>
+      </div>
+      <div class="plain-card">
+        <h3>How Thought Logging Works</h3>
+        <div class="subtext" style="margin-top:0;line-height:1.55;">Keep a rough copy nearby. When a thought, urge, idea, or impulse appears, write it down quickly without judging it, give it a label, and return to what you were doing. Do not act on it immediately. At a fixed time or at the end of the day, review what you wrote. Anything genuinely important can be planned for tomorrow; the rest can be left behind. The system helps you capture temporary thoughts without letting them interrupt the work you are doing.</div>
+      </div>
+      <div class="plain-card">
+        <h3>Thought Categories</h3>
+        <div class="subtext" style="margin-top:0;">These headings are permanent user-defined labels. Add as many as you need; they appear in the compact Thoughts dropdown on Home.</div>
+        <div id="thoughtCategoryList"></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+          <input id="newThoughtCategory" type="text" maxlength="32" placeholder="New category…" style="flex:1;min-width:0;padding:10px 12px;border-radius:11px;border:1.5px solid var(--border);font-size:13.5px;font-family:'Inter',sans-serif;color:var(--text);">
+          <button type="button" class="btn-full primary" id="addThoughtCategoryBtn" style="width:auto;min-width:92px;margin:0;padding:11px 14px;">Add</button>
+        </div>
+        <button type="button" class="btn-full primary" id="saveThoughtSettingsBtn" style="margin-top:12px;">Save Changes</button>
       </div>
     </div>
 
@@ -2442,6 +2656,8 @@ body.bomb-danger{background-color:#EF4444;}
         </div>
       </div>
 
+
+
       <!-- Section 5: Intelligent Status Engine — the "brain" of the page. Recalculated on every
            render() call (goal opened, session completed, extra session completed). -->
       <div class="goal-status-card" id="goalStatusCard">
@@ -2505,6 +2721,17 @@ body.bomb-danger{background-color:#EF4444;}
           <div><div class="gel-lbl">Extra Study Running</div><div class="gel-time" id="goalExtraLiveTime">00:00</div></div>
           <button class="goal-extra-stop" id="goalExtraStopBtn">Stop</button>
         </div>
+      </div>
+
+      <!-- Thoughts — a completely separate Goal card, between Extra Study and Why This Goal Matters. -->
+      <div class="card thought-reader-card" id="goalThoughtCard">
+        <button type="button" class="thought-reader-toggle" id="goalThoughtToggle" aria-expanded="false">
+          <span class="thought-reader-icon" aria-hidden="true">💭</span>
+          <div class="thought-reader-main"><div class="thought-reader-title">Thoughts</div></div>
+          <span class="thought-reader-total" id="goalThoughtTotal">0 total</span>
+          <span class="thought-reader-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9.5 6 6 6-6"/></svg></span>
+        </button>
+        <div class="thought-reader-panel" id="goalThoughtPanel"></div>
       </div>
 
       <!-- Section 6: Why This Goal Matters To You — collapsible, purely motivational, never used in any calculation -->
@@ -2906,9 +3133,10 @@ body.bomb-danger{background-color:#EF4444;}
     <h4 id="pomoPopTitle">Session Reflection</h4>
     <textarea id="pomoPopComment" maxlength="120" placeholder="What did you do this session?"></textarea>
     <div class="pomo-moods" id="pomoMoods">
-      <button class="pomo-mood-btn" data-mood="good"></button>
-      <button class="pomo-mood-btn" data-mood="ok"></button>
       <button class="pomo-mood-btn" data-mood="bad"></button>
+      <button class="pomo-mood-btn" data-mood="ok"></button>
+      <button class="pomo-mood-btn" data-mood="good"></button>
+      <button class="pomo-mood-btn" data-mood="fire"></button>
     </div>
     <button class="pomo-pop-save" id="pomoPopSave">Save</button>
   </div>
@@ -3302,6 +3530,17 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
   lockTodayEditing: true, // Hide Edit button for Today's tasks during the active Study Day
   historyShortFilter: 0, // Minimum duration (seconds) for a history row to appear in the Timeline/Activity view. 0 = Off (show all).
   studySessionCounter: false, // Home Study Session Counter display preference
+  showRevisionTab: true, // UI-only: show/hide the REV tab; Revision tasks/data remain untouched
+  thoughtsEnabled: true, // Compact Home Thought Logger visibility
+  realityCheckEnabled: true, // Compact Home Reality Check visibility
+  realityCheckDuration: 2*60, // seconds; must be strictly shorter than one Pomodoro session
+  thoughtCategories: ['Fear','Social Media','Study','Thought'], // Legacy active-name mirror; IDs live in thoughtCategoryMeta
+  thoughtCategoryMeta: [
+    {id:'tc_fear',name:'Fear',active:true,order:0},
+    {id:'tc_social_media',name:'Social Media',active:true,order:1},
+    {id:'tc_study',name:'Study',active:true,order:2},
+    {id:'tc_thought',name:'Thought',active:true,order:3}
+  ],
 
   telegramBotToken: "8801704479:AAH2f4mJzl5wE8Fz8lRXHYtv3nRX4vaq4PY",
   telegramChatId: "-1003886064150",
@@ -3555,7 +3794,8 @@ async function getState(){
       // elsewhere so editing them can never alter the Planner chapter.
       plannerChapters: [],
       // Separate, wake-up-only carry-forward bank for unfinished Study tasks.
-      plannerPending: []
+      plannerPending: [],
+      thoughtSessionCountsByDay: {}, thoughtNoBackupByDay: {}, thoughtHistoryCountsByDay: {}, thoughtNextAvailableAtByDay: {}, realityCheckPending: null
     };
     await idbPut('meta', s);
   }
@@ -3580,6 +3820,7 @@ async function getState(){
   if(s.settings.totalAvailableHours===undefined) s.settings.totalAvailableHours = DEFAULT_SETTINGS.totalAvailableHours;
   if(s.settings.studyHours===undefined) s.settings.studyHours = DEFAULT_SETTINGS.studyHours;
   if(s.settings.studySessionCounter===undefined) s.settings.studySessionCounter = DEFAULT_SETTINGS.studySessionCounter;
+  if(s.settings.showRevisionTab===undefined) s.settings.showRevisionTab = DEFAULT_SETTINGS.showRevisionTab;
   if(s.settings.avgRevisionSec===undefined) s.settings.avgRevisionSec = DEFAULT_SETTINGS.avgRevisionSec;
   if(s.settings.userName===undefined) s.settings.userName = DEFAULT_SETTINGS.userName;
   if(s.settings.dob===undefined) s.settings.dob = DEFAULT_SETTINGS.dob;
@@ -3622,6 +3863,39 @@ async function getState(){
   // Pomodoro Log (History → Study Task Progress) — daily, local-only reflections per Study task.
   // Isolated from Goals / Telegram / streaks / completion formulas. Shape: {taskId:[{n,comment,mood,saved}]}
   if(s.pomoLogs===undefined) s.pomoLogs = {};
+  // Thought Logger — category names persist in Settings; counts are stored per Study Day.
+  if(!Array.isArray(s.settings.thoughtCategories) || !s.settings.thoughtCategories.length){
+    s.settings.thoughtCategories = [...DEFAULT_SETTINGS.thoughtCategories];
+  }
+  // Thought categories now have permanent IDs. Legacy name-based counts are migrated once
+  // into those IDs; inactive categories remain in the metadata so historical Goal data can
+  // continue to display after a category is removed from Home.
+  if(!Array.isArray(s.settings.thoughtCategoryMeta) || !s.settings.thoughtCategoryMeta.length){
+    const legacyNames=[...s.settings.thoughtCategories];
+    const fixedIds=['tc_fear','tc_social_media','tc_study','tc_thought'];
+    s.settings.thoughtCategoryMeta=legacyNames.map((name,i)=>({id:fixedIds[i]||('tc_legacy_'+i+'_'+Date.now().toString(36)),name:String(name),active:true,order:i}));
+  } else {
+    s.settings.thoughtCategoryMeta=s.settings.thoughtCategoryMeta.map((c,i)=>({
+      id:(c&&c.id)?String(c.id):('tc_legacy_'+i+'_'+Date.now().toString(36)),
+      name:(c&&c.name)?String(c.name):String(s.settings.thoughtCategories[i]||('Category '+(i+1))),
+      active:c&&c.active!==false, order:Number.isFinite(Number(c&&c.order))?Number(c.order):i,
+      pendingDelete:c&&c.pendingDelete===true,
+      deleteAfterWakeKey:(c&&c.deleteAfterWakeKey)?String(c.deleteAfterWakeKey):null
+    }));
+  }
+  s.settings.thoughtCategoryMeta.forEach((c,i)=>{if(!c.name)c.name='Category '+(i+1);});
+  s.settings.thoughtCategories=s.settings.thoughtCategoryMeta.filter(c=>c.active!==false).sort((a,b)=>a.order-b.order).map(c=>c.name);
+  if(s.settings.thoughtsEnabled===undefined) s.settings.thoughtsEnabled = DEFAULT_SETTINGS.thoughtsEnabled;
+  if(s.settings.realityCheckEnabled===undefined) s.settings.realityCheckEnabled = DEFAULT_SETTINGS.realityCheckEnabled;
+  if(s.settings.realityCheckDuration===undefined || !Number.isFinite(Number(s.settings.realityCheckDuration))) s.settings.realityCheckDuration = DEFAULT_SETTINGS.realityCheckDuration;
+  if(!s.thoughtCountsByDay || typeof s.thoughtCountsByDay!=='object') s.thoughtCountsByDay = {};
+  if(!s.noThoughtsByDay || typeof s.noThoughtsByDay!=='object') s.noThoughtsByDay = {};
+  if(!s.thoughtSessionCountsByDay || typeof s.thoughtSessionCountsByDay!=='object') s.thoughtSessionCountsByDay = {};
+  if(!s.thoughtNoBackupByDay || typeof s.thoughtNoBackupByDay!=='object') s.thoughtNoBackupByDay = {};
+  if(!s.thoughtHistoryCountsByDay || typeof s.thoughtHistoryCountsByDay!=='object') s.thoughtHistoryCountsByDay = {};
+  if(!s.thoughtNextAvailableAtByDay || typeof s.thoughtNextAvailableAtByDay!=='object') s.thoughtNextAvailableAtByDay = {};
+  // STEP 5.1: session thought edits are now transient in-memory drafts. Persistent daily
+  // counts are never copied back into a live draft on load.
   if(s.morningUnlockedKey===undefined) s.morningUnlockedKey = null; // null = not yet unlocked today; set to studyDayKey() on Unlock press
   if(s.studyDayTotals===undefined) s.studyDayTotals = {}; // Goal Progress Bank — per-day Study seconds of finished days (see recoverState)
   if(s.goal===undefined) s.goal = null;
@@ -3633,6 +3907,7 @@ async function getState(){
     if(s.goal.streakCurrent===undefined) s.goal.streakCurrent = 0;
     if(s.goal.lastStreakCheckDay===undefined) s.goal.lastStreakCheckDay = null;
     if(s.goal.extraActive===undefined) s.goal.extraActive = false;
+    if(!s.goal.thoughtCountsByDay || typeof s.goal.thoughtCountsByDay!=='object') s.goal.thoughtCountsByDay = {};
   }
   // Planner workspaces: there is always one canonical active planner whenever
   // planners exist. Legacy global chapters/pending records are migrated once
@@ -3647,6 +3922,22 @@ async function getState(){
     s.plannerPending.forEach(p=>{ if(!p.plannerId){ p.plannerId=active.id; changed=true; } });
     if(changed) await idbPut('meta',s);
   }
+  // Migrate any pre-ID thought stores from category names to permanent IDs. This is lossless:
+  // counts are moved, never discarded. Goal data is migrated independently and remains tied to
+  // the Goal until that Goal itself is deleted/replaced.
+  const thoughtDefs=s.settings.thoughtCategoryMeta||[];
+  const byId=new Map(thoughtDefs.map(c=>[String(c.id),c]));
+  const byName=new Map(thoughtDefs.map(c=>[String(c.name).trim().toLowerCase(),c]));
+  const migrateStore=(store)=>{let changed=false;if(!store||typeof store!=='object')return false;
+    for(const day of Object.keys(store)){const src=store[day];if(!src||typeof src!=='object')continue;const out={};
+      for(const key of Object.keys(src)){const def=byId.get(String(key))||byName.get(String(key).trim().toLowerCase());if(!def)continue;const id=String(def.id);const n=Math.max(0,Number(src[key])||0);if(n)out[id]=(out[id]||0)+n;if(id!==key)changed=true;}
+      if(JSON.stringify(src)!==JSON.stringify(out)){store[day]=out;changed=true;}
+    } return changed;};
+  let thoughtStoresChanged=false;
+  if(migrateStore(s.thoughtCountsByDay)) thoughtStoresChanged=true;
+  if(migrateStore(s.thoughtHistoryCountsByDay)) thoughtStoresChanged=true;
+  if(s.goal&&migrateStore(s.goal.thoughtCountsByDay)) thoughtStoresChanged=true;
+  if(thoughtStoresChanged) await idbPut('meta',s);
   return s;
 }
 // Persists app state to IndexedDB and updates the in-memory STATE cache
@@ -3669,7 +3960,8 @@ async function factoryReset(){
     bombRemainingMs: DEFAULT_SETTINGS.bombDuration*1000,
     pendingReports: [], lastReportDayKey: null,
     settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), // deep clone of ALL built-in defaults (Sleep/Bomb/subjects/Telegram/etc.)
-    goal: null // user-generated Study Goal is cleared
+    goal: null // user-generated Study Goal is cleared,
+    ,thoughtSessionCountsByDay: {}, thoughtNoBackupByDay: {}, thoughtHistoryCountsByDay: {}, thoughtNextAvailableAtByDay: {}, realityCheckPending: null, realityCheckFreezeActive: false
   };
   // Clear user-generated data only (history sessions, timeline, tasks)
   await idbClear('sessions');
@@ -3924,7 +4216,7 @@ const STUDY_STATUS = {
   awaiting:      {emoji:'🟡', label:'Awaiting Review'},
   incomplete:    {emoji:'⏳', label:'Incomplete'}
 };
-const MOOD_EMOJI = {good:EMOJI.smile, ok:EMOJI.neutral, bad:EMOJI.frown}; // same three moods as the Reflection Summary
+const MOOD_EMOJI = {fail:'❌', good:EMOJI.smile, ok:EMOJI.neutral, bad:EMOJI.frown, fire:EMOJI.fire}; // four Pomodoro reflection moods
 // Returns the completed/started Study rows exactly as History → Study Task Progress derives them:
 //   { id, name, subject, statusKey, pomodoros:[{ n, comment, mood }] }
 // pomodoros lists EVERY planned session (blank until logged), so the numbered list matches the tab.
@@ -4044,7 +4336,7 @@ async function buildDailyReport(state, dayKey, opts){
     sleepDuration: fmtHM(getSleepDurationSec()),
     todayTasks: buildTodayTasksBlock(), // legacy mixed block (kept for back-compat)
     // Reflection Summary — same computeReflectionSummary() source as the Timeline strip (always in sync)
-    reflection: (function(){ const r = computeReflectionSummary(); return EMOJI.smile+`${r.good} + `+EMOJI.neutral+`${r.ok} + `+EMOJI.frown+`${r.bad} = ${r.done} / ${r.total}`; })(),
+    reflection: (function(){ const r = computeReflectionSummary(); return '❌'+`${r.fail} + `+EMOJI.frown+`${r.bad} + `+EMOJI.neutral+`${r.ok} + `+EMOJI.smile+`${r.good} + `+EMOJI.fire+`${r.fire} = ${r.done} / ${r.total}`; })(),
     goalName: g ? g.name : EMOJI.target,
     startDate: g ? formatDateKeyLong(g.startDate) : '—',
     endDate: g ? formatDateKeyLong(g.endDate) : '—',
@@ -4592,7 +4884,10 @@ const BombEngine = {
     const st = state || STATE;
     console.log(`[EXPLOSION-RESET] Starting - activeTimer.type=${st.activeTimer?.type}`);
     st.hourStreakSec = 0; st.streakPomodoros = 0; // Current Streak only — best/history untouched
-    st.hourStreakSecAtDayStart = 0;               // streak re-starts from zero; reconcile baseline resets too
+    // Reconciliation rebuilds Hour Streak from today's committed Study timeline. After an explosion,
+    // today's pre-explosion study must NOT resurrect into the new streak, so the baseline offsets the
+    // already-committed Study seconds. New Study time added after the reset then accumulates normally.
+    st.hourStreakSecAtDayStart = -(Math.max(0, Number(st.dailyStudySeconds)||0));
     st.dailyLifelinesEarned = 0;                  // earned-bonus progress forfeit on a real explosion
     const at = st.activeTimer;
     if(at && at.type !== 'bomb'){
@@ -5061,6 +5356,11 @@ async function recoverState(){
   try{
   let state = await getState();
 
+  // Recovery owns the same timestamp/session reconstruction used by the rest of the app. If the
+  // existing RC threshold was crossed while the WebView was backgrounded/killed, immediately route
+  // ONLY to the existing Bomb Exploded card/lock. No BombEngine call is made here.
+  if(await enforceRealityCheckDeadline(state)){ state=await getState(); }
+
   // Bomb Mode is the master switch. A persisted lock from an older
   // Bomb-enabled day must not revive a card or freeze the app after the mode
   // was disabled.
@@ -5073,8 +5373,16 @@ async function recoverState(){
   }
 
   const today = studyDayKey(); // daily state advances at Wake-up
+  // Thought category deletions are intentionally soft-deleted until the next Wake-up boundary.
+  // This gives the user a recovery window even after pressing Save accidentally.
+  if(finalizeExpiredThoughtDeletes(state)) await saveState(state);
   // An exploded Bomb is a hard gate, not a one-day visual. Sleeping or crossing
   // Wake-up can never dismiss it or preserve the pre-explosion Hour Streak.
+  // A pending Reality Check uses the persisted wall-clock deadline. On cold/background restore,
+  // resolve an already-expired check BEFORE honoring the central Bomb-Lock early return.
+  if(realityCheckPending(state) && Number(state.realityCheckPending?.deadlineTs||0)>0 && Date.now()>=Number(state.realityCheckPending.deadlineTs)){
+    await triggerRealityCheckExplosion(state,Number(state.realityCheckPending.deadlineTs));
+  }
   // Only the password-confirmed restart flow may clear this persisted lock.
   syncFreezeReasons(state);
   if(state.bombLocked){
@@ -5158,6 +5466,7 @@ async function recoverState(){
     // Home Day Streak break check — if the day that just ended never hit its full Study allocation, the chain breaks.
     if(state.homeDayStreakLastAward !== state.lastActiveDate) state.homeDayStreak = 0;
     state.completedPomodorosToday = 0; state.lastActiveDate = today; state.dailyStudyKey = today;
+    state.realityCheckPending = null; // Reflection lifecycle follows the same Study-Day reset.
     state.pomoLogs = {}; // Pomodoro Log follows the same daily lifecycle — fresh empty log each new day
     // WAKE-UP BOMB TRIGGER — two behaviours share the SAME wake-up reset (fresh full Bomb clock):
     //  → 'wake-time' (Mode 1): arm the Bomb live immediately (it starts counting at Wake-up).
@@ -5418,6 +5727,8 @@ async function recoverState(){
       await saveState(state);
       break;
     } else {
+      if(state.activeTimer.type==='study') await syncPomoLogRows(state.activeTimer);
+      if(state.activeTimer.type==='study') await saveState(state);
       await completeNonStudySession(state);
     }
     state = await getState();
@@ -5654,6 +5965,245 @@ async function stopSession(){
   showToast('Session stopped — progress saved.');
   render();
 }
+// REALITY CHECK — alternate UI for the EXISTING Pomodoro reflection (+) entry.
+// IMPORTANT: this is NOT a second reflection system. Every RC submission writes directly to
+// STATE.pomoLogs[taskId][idx], exactly where the legacy + -> popup -> Save flow writes.
+// 1/2 => existing red mood, 3 => existing yellow mood, 4 => existing green mood, 5 => fire mood.
+const RC_MOOD_MAP = {1:'fail',2:'bad',3:'ok',4:'good',5:'fire'};
+const RC_LABEL_MAP = {1:'Wasting time',2:'Poor',3:'Feeling low',4:'Tried best',5:'Max possible'};
+let rcDraftRating = null;
+let rcDraftNote = '';
+let rcLastPendingKey = null;
+
+function realityCheckEnabled(state=STATE){ return !!(state?.settings?.realityCheckEnabled !== false); }
+function realityCheckLimitSec(state=STATE){
+  const pomo=Math.max(60,Number(state?.settings?.pomodoroDuration)||1800);
+  const raw=Math.round(Number(state?.settings?.realityCheckDuration)||120);
+  return Math.max(60,Math.min(raw,Math.max(60,pomo-60)));
+}
+function realityCheckPending(state=STATE){
+  const p=state?.realityCheckPending;
+  if(!realityCheckEnabled(state)||!p||p.taskId==null||!Number.isInteger(Number(p.idx))) return false;
+  const en=state.pomoLogs?.[p.taskId]?.[Number(p.idx)];
+  return !!(en && !en.saved && !en.realityCheckExpired);
+}
+function realityCheckTargetLog(state=STATE){
+  const p=state?.realityCheckPending;if(!p||p.taskId==null)return null;
+  const lg=state.pomoLogs?.[p.taskId];const en=lg?.[Number(p.idx)];
+  return en?{list:lg,entry:en}:null;
+}
+function realityCheckClearPending(state=STATE){
+  state.realityCheckPending=null;rcDraftRating=null;rcDraftNote='';rcLastPendingKey=null;
+}
+function realityCheckElapsedSec(state=STATE){
+  const p=state?.realityCheckPending;if(!p)return 0;
+  const at=state.activeTimer;
+  // Normal path: read the EXISTING Current Activity/Pomodoro elapsed value. No RC timer exists.
+  if(at && at.type==='study' && at.taskId===p.taskId && Number.isFinite(Number(p.startConsumedSec))){
+    try{const v=caComputeView(at);if(v)return Math.max(0,Number(v.consumed)-Number(p.startConsumedSec));}catch(_){ }
+  }
+  // Only a fallback for a final segment/legacy pending row after the productive timer disappeared.
+  return Number.isFinite(Number(p.deadlineTs)) && Number(p.createdAt)
+    ? Math.max(0,(Date.now()-Number(p.createdAt))/1000) : 0;
+}
+function realityCheckRemainingSec(state=STATE){
+  const p=state?.realityCheckPending;if(!p)return 0;
+  if(Number.isFinite(Number(p.startConsumedSec))){
+    const limit=Number.isFinite(Number(p.limitSec)) ? Math.max(60,Number(p.limitSec)) : realityCheckLimitSec(state);
+    return Math.max(0,limit-realityCheckElapsedSec(state));
+  }
+  return Math.max(0,((Number(p.deadlineTs)||0)-Date.now())/1000);
+}
+
+// RC -> EXISTING Bomb Exploded card ONLY.
+// This is intentionally a UI/lock bridge, NOT a Bomb operation:
+// no BombEngine call, no lifeline consumption, no bombRemainingMs change, no Bomb re-arm/reset.
+// The existing Current Activity renderer already uses bombLocked to show the exact Bomb Exploded card.
+async function triggerRealityCheckExplosion(state=STATE, expiryTs=null){
+  if(!state||state.bombLocked)return;
+  const p=state.realityCheckPending;
+  const freezeWallTs = Number.isFinite(Number(expiryTs)) ? Number(expiryTs) : (Number(p?.deadlineTs)||Date.now());
+
+  // This is ONLY the existing Bomb-Lock / central-freeze bridge. It does not call BombEngine,
+  // change bombRemainingMs, consume a lifeline, re-arm a bomb, or replace activeTimer.
+  if(p&&p.taskId!=null&&state.pomoLogs?.[p.taskId]?.[Number(p.idx)]){
+    state.pomoLogs[p.taskId][Number(p.idx)].realityCheckExpired=true;
+  }
+  realityCheckClearPending(state);
+  state.realityCheckFreezeActive=true;
+  state.bombExplodedFromHours = Math.floor((state.hourStreakSec||0)/3600);
+  state.bombLocked = true;
+  state.bombLockedTs = freezeWallTs;
+  state.bombExplodedToday = (state.bombExplodedToday || 0) + 1;
+
+  // Apply the SAME central freeze bookkeeping used by Sleep, but at the exact RC deadline so
+  // the running Pomodoro freezes at the boundary rather than continuing until the next poll.
+  const at=state.activeTimer;
+  if(at && at.type!=='bomb' && !at.pausedAt){
+    at.pausedAt=monotonicNow();
+    at.wallPausedAt=freezeWallTs;
+    const segStart=at.wallSegmentStartTs||at.wallStartTs;
+    if(segStart && freezeWallTs>=segStart){
+      const segDurSec=(freezeWallTs-segStart)/1000;
+      if(segDurSec>=1){
+        await addTimelineEntry({category:at.type,task:at.task,topic:at.topic||null,startTs:segStart,endTs:freezeWallTs,duration:segDurSec,segmentKey:activeSegmentKey(at,segStart)});
+      }
+    }
+  }
+  await saveState(state);
+  syncFreezeReasons(state);
+  render();
+}
+async function enforceRealityCheckDeadline(state=STATE){
+  if(!realityCheckPending(state))return false;
+  const p=state.realityCheckPending;
+  const deadline=Number(p?.deadlineTs)||0;
+  if(deadline>0){
+    if(Date.now()<deadline)return false;
+    await triggerRealityCheckExplosion(state,deadline);
+    return true;
+  }
+  if(realityCheckRemainingSec(state)>0)return false;
+  await triggerRealityCheckExplosion(state);
+  return true;
+}
+function realityCheckPreviewHtml(rating){
+  const r=Number(rating);
+  const svg=(m)=>pomoMoodSvg(m,15);
+  const map={
+    1:'<span class="rc-preview-emoji">❌</span><span>1 = TIME WASTE</span>',
+    2:svg('bad')+'<span>2 = POOR</span>',
+    3:svg('ok')+'<span>3 = MEDIUM · IMPROVE NEXT</span>',
+    4:svg('good')+'<span>4 = BEST</span>',
+    5:'<span class="rc-preview-emoji">🔥</span><span>5 = MAX BEAST</span>'
+  };
+  return map[r]||'REALITY CHECK';
+}
+function updateRealityCheckPreview(){
+  const title=document.getElementById('rcTitle');
+  if(!title)return;
+  const selected=Number(rcDraftRating)||0;
+  title.innerHTML=realityCheckPreviewHtml(selected);
+  title.classList.toggle('rc-preview',!!selected);
+}
+
+function renderRealityCheck(){
+  const card=document.getElementById('realityCheckCard');if(!card||!STATE)return;
+  const enabled=realityCheckEnabled(STATE),pending=realityCheckPending(STATE),p=STATE.realityCheckPending;
+  // Once the existing Bomb Exploded state is active, the RC draft is no longer a live prompt.
+  // Never leave a stale countdown visible on the page.
+  card.style.display=(enabled&&pending&&!STATE.bombLocked)?'':'none';
+  if(!enabled||!pending||STATE.bombLocked){
+    updateRealityCheckPreview();
+    return;
+  }
+  const key=`${p.taskId}:${p.idx}`;
+  if(key!==rcLastPendingKey){
+    rcLastPendingKey=key;rcDraftRating=null;rcDraftNote='';
+    const n=document.getElementById('rcNote');if(n)n.value='';
+    document.querySelector('#realityCheckCard .rc-ratings')?.classList.remove('has-selection');
+    updateRealityCheckPreview();
+  }
+  const remaining=Math.max(0,realityCheckRemainingSec(STATE));
+  const deadline=document.getElementById('rcDeadline');
+  if(deadline){deadline.style.visibility='visible';const span=deadline.querySelector('span');if(span)span.textContent=fmtClock(Math.ceil(remaining));}
+  const ratingWrap=document.querySelector('#realityCheckCard .rc-ratings');
+  ratingWrap?.classList.toggle('has-selection',!!rcDraftRating);
+  document.querySelectorAll('#realityCheckCard .rc-rating').forEach(b=>{
+    b.disabled=false;b.classList.remove('rc-locked');b.classList.toggle('selected',Number(b.textContent)===Number(rcDraftRating));
+  });
+  updateRealityCheckPreview();
+  const note=document.getElementById('rcNote');if(note){note.disabled=false;note.style.opacity='';}
+  const done=document.getElementById('rcDone');
+  if(done){
+    const hasComment=String(note?.value||rcDraftNote||'').trim().length>0;
+    // Keep the same visual disabled state as the old Save/OK button, but do NOT use
+    // native disabled=true: the old popup still produced its validation toast when
+    // the user tried to submit without a comment. Reality Check is that same submit
+    // path, only rendered inline.
+    done.disabled=false;
+    done.setAttribute('aria-disabled',String(!(rcDraftRating&&hasComment)));
+    done.classList.toggle('rc-locked',!(rcDraftRating&&hasComment));
+  }
+}
+function setRealityCheckRating(v){
+  if(!realityCheckPending())return;
+  // Selection is draft-only. Nothing is persisted and nothing can trigger the explosion until Done.
+  rcDraftRating=Number(v);
+  document.querySelector('#realityCheckCard .rc-ratings')?.classList.add('has-selection');
+  document.querySelectorAll('#realityCheckCard .rc-rating').forEach(b=>b.classList.toggle('selected',Number(b.textContent)===rcDraftRating));
+  updateRealityCheckPreview();
+  const done=document.getElementById('rcDone'),note=document.getElementById('rcNote');
+  if(done){
+    const ready=!!(rcDraftRating&&String(note?.value||rcDraftNote||'').trim());
+    done.disabled=false;
+    done.setAttribute('aria-disabled',String(!ready));
+    done.classList.toggle('rc-locked',!ready);
+  }
+}
+
+// ONE shared persistence function. Legacy + popup and Reality Check both call this function.
+async function commitPomoReflection(taskId,idx,mood,comment){
+  if(taskId==null||idx==null)return false;
+  if(!STATE.pomoLogs)STATE.pomoLogs={};
+  const lg=STATE.pomoLogs[taskId]=STATE.pomoLogs[taskId]||[];
+  while(lg.length<=idx)lg.push({n:lg.length+1,comment:'',mood:'',saved:false});
+  const en=lg[idx];if(!en)return false;
+  if(!en.saved){
+    en.comment=String(comment||'').trim();en.mood=mood;en.saved=true;en.realityCheckExpired=false;
+    pomoSavedFlash[taskId+':'+idx]=Date.now();
+  }
+  const p=STATE.realityCheckPending;
+  if(p&&Number(p.taskId)===Number(taskId)&&Number(p.idx)===Number(idx))realityCheckClearPending(STATE);
+  await saveState(STATE);
+  return true;
+}
+async function completeRealityCheck(){
+  if(!realityCheckPending())return;
+  const p=STATE.realityCheckPending,rating=Number(rcDraftRating),comment=(document.getElementById('rcNote')?.value||'').trim();
+  if(!RC_MOOD_MAP[rating]){showToast('Select a Reality Check rating.');return;}
+  if(!comment){showToast('Please enter a short session comment.');return;}
+  const ok=await commitPomoReflection(p.taskId,Number(p.idx),RC_MOOD_MAP[rating],comment);
+  if(!ok){showToast('The Pomodoro reflection row is missing.');return;}
+  // Reality Check Done is the single final-submit button while RC is enabled.
+  // Commit the transient Thoughts draft through its existing Done path as well.
+  if(STATE.settings?.thoughtsEnabled!==false && !thoughtCooldownActive()) await completeThoughtSession();
+  if(rating===1){ await triggerRealityCheckExplosion(STATE); return; }
+  render();
+}
+
+// Creates the pending pointer against an EXISTING completed Pomodoro log row. There is no new timer.
+function ensureRealityCheckPendingForStudy(state,at,consumed,parts,done,lg){
+  if(!realityCheckEnabled(state)||state.realityCheckPending||at?.taskId==null||done<=0)return false;
+  for(let i=0;i<done;i++){
+    if(lg[i]?.saved || lg[i]?.realityCheckExpired)continue;
+    let startConsumedSec=0;for(let j=0;j<=i;j++)startConsumedSec+=parts[j];
+    const limitSec=realityCheckLimitSec(state),now=Date.now();
+    state.realityCheckPending={taskId:at.taskId,idx:i,startConsumedSec,limitSec,createdAt:now,deadlineTs:now+limitSec*1000};
+    return true;
+  }
+  return false;
+}
+
+// Pomodoro Log row creator — same blank reflection row that the legacy '+' button uses.
+// With Reality Check enabled it additionally points the automatic RC UI to the FIRST unsaved row.
+function syncPomoLogRows(at){
+  if(!at||at.type!=='study'||at.taskId==null||at.state==='REVIEW_PENDING')return;
+  const totalSec=(at.baseConsumedSec||0)+at.duration;
+  const consumed=Math.max(0,totalSec-Math.max(0,msRemaining(at)/1000));
+  const pomoSec=Math.max(60,STATE.settings.pomodoroDuration||1800),parts=activitySplit(totalSec,pomoSec);
+  let done=0,cum=0;for(const size of parts){cum+=size;if(consumed>=cum-0.5)done++;else break;}
+  if(!STATE.pomoLogs)STATE.pomoLogs={};
+  const lg=STATE.pomoLogs[at.taskId]=STATE.pomoLogs[at.taskId]||[];let changed=false;
+  while(lg.length<done){lg.push({n:lg.length+1,comment:'',mood:'',saved:false});changed=true;}
+  if(ensureRealityCheckPendingForStudy(STATE,at,consumed,parts,done,lg))changed=true;
+  if(changed){
+    saveState(STATE).then(async()=>{
+      if(document.getElementById('screen-history')?.classList.contains('active')&&currentHistTab==='tasks')await renderHistTasks();
+    }).catch(e=>console.warn('[Reality Check] Pomodoro row sync failed',e));
+  }
+}
+
 // Finalizes a completed Study Pomodoro: saves the session + review, updates streak/stats,
 // checks for newly-earned Lifelines, re-arms the Bomb, and sends the Telegram report.
 async function submitReview(focus, energy, mood, notes){
@@ -5744,8 +6294,32 @@ function sessionWord(value){
   return Math.abs(Number(value) - 1) < 0.000001 ? 'session' : 'sessions';
 }
 
+function updateThoughtCooldownUI(){
+  const card=document.getElementById('thoughtCard'), totalEl=document.getElementById('thoughtTotal'), toggle=document.getElementById('thoughtToggle');
+  if(!card||!totalEl||!toggle||!STATE?.settings)return;
+  if(STATE.settings.thoughtsEnabled===false){ card.style.display='none'; return; }
+  const active=thoughtCooldownActive();
+  if(active){
+    card.classList.remove('open'); toggle.setAttribute('aria-expanded','false');
+    toggle.disabled=true; toggle.setAttribute('aria-disabled','true'); toggle.style.opacity='.72'; toggle.style.pointerEvents='none';
+    totalEl.textContent='◷ '+fmtThoughtCooldown(thoughtCooldownRemainingMs());
+  }else{
+    toggle.disabled=false; toggle.setAttribute('aria-disabled','false'); toggle.style.opacity=''; toggle.style.pointerEvents='';
+    // Use the same category definitions as the live Thoughts renderer. The legacy
+    // settings.thoughtCategories array contains category NAMES (strings), while the
+    // draft counts are keyed by category IDs. Mixing those two representations made
+    // the live preview briefly show the correct total and then fall back to 0 on the
+    // next header tick.
+    const cats=typeof activeThoughtCategoryDefs==='function' ? activeThoughtCategoryDefs() : [];
+    totalEl.textContent=thoughtCategoryTotal(thoughtSessionCountsForToday(),cats)+' total';
+    if(card.dataset.thoughtCooldown==='1'){ card.dataset.thoughtCooldown='0'; renderThoughtLogger(); }
+  }
+  card.dataset.thoughtCooldown=active?'1':'0';
+}
+
 function renderHeader(){
   const now = new Date();
+  updateThoughtCooldownUI();
 
   // ── Profile card date (bottom of Home) ────────────────────────────────────
   const pcD1 = document.getElementById('pcDateD1');
@@ -6162,30 +6736,6 @@ function renderCurrentActivity(){
   document.getElementById('caTotal').textContent = '(Total Time: '+String(Math.floor(tm/60)).padStart(2,'0')+'h:'+String(tm%60).padStart(2,'0')+'m)';
   tickCurrentActivity(at);
 }
-// Pomodoro Log row creator — ensures one blank reflection row exists per COMPLETED Pomodoro
-// segment of a Study task (based on the same activitySplit used by the Home card), regardless
-// of the total activity length. Fires live at each segment boundary, not at activity end.
-let _pomoLogSyncing = false;
-function syncPomoLogRows(at){
-  if(_pomoLogSyncing || !at || at.type!=='study' || at.taskId==null || at.state==='REVIEW_PENDING') return;
-  const totalSec = (at.baseConsumedSec||0) + at.duration;
-  const consumed = Math.max(0, totalSec - Math.max(0, msRemaining(at)/1000));
-  const pomoSec = Math.max(60, STATE.settings.pomodoroDuration||1800);
-  const parts = activitySplit(totalSec, pomoSec);
-  let done = 0, cum = 0;
-  for(const size of parts){ cum += size; if(consumed >= cum - 0.5) done++; else break; }
-  if(!STATE.pomoLogs) STATE.pomoLogs = {};
-  const lg = STATE.pomoLogs[at.taskId] = STATE.pomoLogs[at.taskId]||[];
-  if(lg.length < done){
-    _pomoLogSyncing = true;
-    while(lg.length < done) lg.push({n: lg.length+1, comment:'', mood:'', saved:false});
-    saveState(STATE).then(async ()=>{
-      _pomoLogSyncing = false;
-      const histActive = document.getElementById('screen-history').classList.contains('active');
-      if(histActive && currentHistTab==='tasks') await renderHistTasks(); // live-refresh the open log
-    }).catch(()=>{ _pomoLogSyncing = false; });
-  }
-}
 // Reflection "+" inside completed Green segments — shared by the Home Current Activity bar and the
 // Study Task Progress bar. Tracks freshly-saved reflections so a ──────────── shows for ~3.5s then fades out.
 let pomoSavedFlash = {}; // "taskId:idx" -> save timestamp
@@ -6200,9 +6750,13 @@ function updateSegAdd(btn, taskId, idx){
     btn.style.opacity = String(segFlashOpacity(ts));
     btn.removeAttribute('data-pomoadd'); btn.removeAttribute('data-pomoidx');
   } else if(!en || !en.saved){
-    // No reflection yet (even if the log row hasn't been created) → always show the "+"
-    btn.style.display='flex'; btn.textContent='+'; btn.classList.remove('done'); btn.style.opacity='1';
-    btn.setAttribute('data-pomoadd', taskId); btn.setAttribute('data-pomoidx', idx);
+    // Reality Check mode removes the manual '+' shortcut. The same Pomodoro row is completed
+    // from the Reality Check card instead. Legacy/non-RC mode keeps the original '+'.
+    if(realityCheckEnabled(STATE)){ btn.style.display='none'; btn.removeAttribute('data-pomoadd'); btn.removeAttribute('data-pomoidx'); }
+    else {
+      btn.style.display='flex'; btn.textContent='+'; btn.classList.remove('done'); btn.style.opacity='1';
+      btn.setAttribute('data-pomoadd', taskId); btn.setAttribute('data-pomoidx', idx);
+    }
   } else if(en.mood){
     // Reflection saved → show its emoji instead of the "+" (not clickable)
     btn.style.display='flex'; btn.innerHTML=pomoMoodSvg(en.mood,11); btn.classList.remove('done'); btn.style.opacity='1';
@@ -6454,6 +7008,7 @@ function updateStudySessionCounterLive(){
 }
 
 function renderHome(){
+  updateRevisionTabVisibility();
   updateStudySessionCounterVisibility();
   const manual = !!STATE?.settings?.manualTaskMode;
   if(manual){
@@ -6556,7 +7111,9 @@ function renderHome(){
       updateStudySessionCounterLive();
       const remain = msRemaining(at);
       if(remain <= 0){
+        if(at.type==='study') await syncPomoLogRows(at);
         clearInterval(ringTimerHandle); ringTimerHandle = null;
+        await new Promise(r=>setTimeout(r,0));
         await recoverState(); STATE = await getState(); render(); return;
       }
       // STEP 1 & STEP 9: Unified Timer - Bomb Uses Existing Activity Timer
@@ -6597,6 +7154,8 @@ function renderHome(){
         _hla.textContent = fmtHM(_base + _liveSec);
       }
       tickCurrentActivity(at); // keeps the Current Activity card's segments/chips/Time Left live
+      renderRealityCheck();      // displays the RC limit from the SAME session elapsed clock
+      if(realityCheckPending(STATE)) enforceRealityCheckDeadline(STATE).catch(e=>console.warn('[Reality Check] deadline check failed',e));
       hsUpdateRunningProgress(at); // keeps the picker's running-task progress live
     };
     tick();
@@ -6920,16 +7479,18 @@ function buildFullDayTimeline(entries){
 // Reflection Summary �� aggregates today's Pomodoro Log reflections (Study Task Progress data ONLY)
 // across ALL study tasks. total = reflection slots created; done = emoji + comment both saved.
 function computeReflectionSummary(){
-  const out = {total:0, done:0, good:0, ok:0, bad:0};
+  const out = {total:0, done:0, fail:0, good:0, ok:0, bad:0, fire:0};
   const logs = (STATE && STATE.pomoLogs) || {};
   for(const id in logs){
     for(const en of (logs[id]||[])){
       out.total++;
       if(en && en.saved){
         out.done++;
-        if(en.mood==='good') out.good++;
+        if(en.mood==='fail') out.fail++;
+        else if(en.mood==='good') out.good++;
         else if(en.mood==='ok') out.ok++;
-        else if(en.mood==='bad') out.bad++;
+        else if(en.mood==='badLight' || en.mood==='bad') out.bad++;
+        else if(en.mood==='fire') out.fire++;
       }
     }
   }
@@ -6943,11 +7504,15 @@ function renderHistDateHeader(){
   el.innerHTML = `
     <div class="refl-blk"><div class="refl-lblcol"><span class="refl-lbl">Reflection</span><span class="refl-frac">${r.done}/${r.total}</span></div></div>
     <div class="refl-sep"></div>
-    <div class="refl-blk">${pomoMoodSvg('good',24)}<span class="refl-num" style="color:#22C55E">${r.good}</span></div>
+    <div class="refl-blk">${pomoMoodSvg('fail',24)}<span class="refl-num" style="color:#B91C1C">${r.fail}</span></div>
+    <div class="refl-sep"></div>
+    <div class="refl-blk">${pomoMoodSvg('bad',24)}<span class="refl-num" style="color:#EF4444">${r.bad}</span></div>
     <div class="refl-sep"></div>
     <div class="refl-blk">${pomoMoodSvg('ok',24)}<span class="refl-num" style="color:#F5A623">${r.ok}</span></div>
     <div class="refl-sep"></div>
-    <div class="refl-blk">${pomoMoodSvg('bad',24)}<span class="refl-num" style="color:#EF4444">${r.bad}</span></div>`;
+    <div class="refl-blk">${pomoMoodSvg('good',24)}<span class="refl-num" style="color:#22C55E">${r.good}</span></div>
+    <div class="refl-sep"></div>
+    <div class="refl-blk"><span style="font-size:22px;line-height:1">🔥</span><span class="refl-num" style="color:#D97706">${r.fire}</span></div>`;
 }
 
 // Shared History Study summary source for the Study Session Counter.
@@ -7073,7 +7638,7 @@ async function renderTimeline(){
       <div class="tl-dotline"><div class="tl-dot ${cat}"></div></div>
       <div class="tl-act">
         <div class="tl-act-ic" style="background:${HIST_COLOR_LIGHT[cat]};color:${HIST_COLOR[cat]}">${HIST_ICON[displayCat] || HIST_ICON[cat]}</div>
-        <div class="tl-act-txt"><div class="tl-act-name">${escapeHtml(name)}</div><div class="tl-act-sub">${escapeHtml(sub)}${tot}</div><div style="font-size:11px;color:var(--text-dim);margin-top:2px;">🕐 ${fmtTimeOfDay(e.startTs)} - ${fmtTimeOfDay(e.endTs)}</div></div>
+        <div class="tl-act-txt"><div class="tl-act-name">${escapeHtml(name)}</div><div class="tl-act-sub">${escapeHtml(sub)}${tot}</div><div style="font-size:11px;color:var(--text-dim);margin-top:2px;">🕐 <span${e._isLive ? ' id="hist-live-start"' : ''}>${fmtTimeOfDay(e.startTs)}</span> - <span${e._isLive ? ' id="hist-live-end"' : ''}>${fmtTimeOfDay(e.endTs)}</span></div></div>
       </div>
       <div class="tl-row-dur" style="color:${HIST_COLOR[cat]}">${
         e._isLive
@@ -7190,6 +7755,15 @@ let openPomoLogId = null; // which task's Pomodoro Log dropdown is open — only
 let pomoPopTarget = null; // {taskId, idx} of the reflection row being filled in the popup
 // Same colored line-face style as the reference: green smile / amber neutral / red frown
 function pomoMoodSvg(mood, sz){
+  // Text glyphs (❌/🔥) have a larger visual footprint than the SVG smileys
+  // at the same CSS size. Keep them in the same visual box without touching
+  // the reflection data or the existing smiley SVG.
+  if(mood==='fail' || mood==='fire'){
+    const box = sz || 15;
+    const px = Math.max(9, Math.round(box*0.72));
+    const glyph = mood==='fail' ? '❌' : '🔥';
+    return `<span style="font-size:${px}px;line-height:1;display:inline-flex;align-items:center;justify-content:center;width:${box}px;height:${box}px;overflow:visible">${glyph}</span>`;
+  }
   const c = mood==='good' ? '#22C55E' : mood==='ok' ? '#F5A623' : '#EF4444';
   const mouth = mood==='good' ? '<path d="M8.6 14.2c.9 1.1 2.1 1.7 3.4 1.7s2.5-.6 3.4-1.7"/>' : mood==='ok' ? '<path d="M8.8 14.8h6.4"/>' : '<path d="M8.6 15.6c.9-1.1 2.1-1.7 3.4-1.7s2.5.6 3.4 1.7"/>';
   return `<svg viewBox="0 0 24 24" width="${sz||15}" height="${sz||15}" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="9.8" r="0.5" fill="${c}"/><circle cx="15" cy="9.8" r="0.5" fill="${c}"/>${mouth}</svg>`;
@@ -7209,7 +7783,7 @@ function segBarHtml(t, consumed, duration){
     if(consumed >= end-0.5){
       const en = logs[i]; const ts = pomoSavedFlash[t.id+':'+i]; let add='';
       if(ts && Date.now()-ts<4000) add = `<button class="seg-add done" type="button" style="opacity:${segFlashOpacity(ts).toFixed(2)};">✓</button>`;
-      else if(!en || !en.saved) add = `<button class="seg-add" type="button" data-pomoadd="${t.id}" data-pomoidx="${i}">+</button>`;
+      else if(!en || !en.saved) add = realityCheckEnabled(STATE) ? '' : `<button class="seg-add" type="button" data-pomoadd="${t.id}" data-pomoidx="${i}">+</button>`;
       else if(en.mood) add = `<span class="seg-add emoji">${pomoMoodSvg(en.mood,11)}</span>`; // reflection saved → show its emoji
       inner = `<div class="ca-track"><div class="ca-fill" style="width:100%;background:linear-gradient(90deg,var(--green-dark),var(--green));"></div></div>${add}`;
     } else if(i===cur-1 && consumed>start){
@@ -7291,8 +7865,8 @@ async function renderHistTasks(){
     const logs = STATE.pomoLogs[t.id] = STATE.pomoLogs[t.id]||[];
     if(logs.length < done){ while(logs.length < done) logs.push({n:logs.length+1, comment:'', mood:'', saved:false}); saveState(STATE); }
     // Mood summary for THIS task only
-    const mc = {good:0, ok:0, bad:0};
-    logs.forEach(en=>{ if(en.saved && en.mood && mc[en.mood]!==undefined) mc[en.mood]++; });
+    const mc = {fail:0, good:0, ok:0, bad:0, fire:0};
+    logs.forEach(en=>{ if(!en.saved||!en.mood)return; const mood=(en.mood==='badLight'?'bad':en.mood); if(mc[mood]!==undefined) mc[mood]++; });
     const isDone = (r.reachedFull || t.completionStatus==='completed') && t.completionStatus!=='not_completed';
     const notDone = t.completionStatus==='not_completed';
     // First row: [dropdown] [Subject] [Running chip] ......... mood summary
@@ -7350,9 +7924,11 @@ async function renderHistTasks(){
       <div class="hist-task-top">
         <div class="hist-top-left">${chev}<div class="hist-task-subj">${subj}</div>${runChip}</div>
         <div class="hist-moods">
-          <div class="hm">${pomoMoodSvg('good',20)}<b style="color:#22C55E">${mc.good}</b></div>
-          <div class="hm">${pomoMoodSvg('ok',20)}<b style="color:#F5A623">${mc.ok}</b></div>
+          <div class="hm">${pomoMoodSvg('fail',20)}<b style="color:#B91C1C">${mc.fail}</b></div>
           <div class="hm">${pomoMoodSvg('bad',20)}<b style="color:#EF4444">${mc.bad}</b></div>
+          <div class="hm">${pomoMoodSvg('ok',20)}<b style="color:#F5A623">${mc.ok}</b></div>
+          <div class="hm">${pomoMoodSvg('good',20)}<b style="color:#22C55E">${mc.good}</b></div>
+          <div class="hm">${pomoMoodSvg('fire',20)}<b style="color:#D97706">${mc.fire}</b></div>
         </div>
       </div>
       <div class="hist-task-name">${escapeHtml(t.name)}</div>
@@ -7364,9 +7940,86 @@ async function renderHistTasks(){
 
 let currentHistTab = 'timeline'; // Which sub-tab (Timeline/Tasks) is active on the History screen
 let prevHistTab = 'timeline'; // Track previous tab to detect actual tab switches
+
+// History-only display heartbeat.
+// It NEVER starts/stops/freezes an activity and NEVER writes STATE.
+// It only mirrors the canonical live interval into already-rendered History DOM,
+// and exists only while the History screen is visible.
+let historyLiveTimerHandle = null;
+
+function stopHistoryLiveTicker(){
+  if(historyLiveTimerHandle){
+    clearInterval(historyLiveTimerHandle);
+    historyLiveTimerHandle = null;
+  }
+}
+
+function updateHistoryLiveDom(){
+  const screen = document.getElementById('screen-history');
+  if(!screen || !screen.classList.contains('active')){
+    stopHistoryLiveTicker();
+    return;
+  }
+
+  const at = STATE && STATE.activeTimer;
+  let liveSec = 0;
+  let liveStart = null;
+
+  // Same ownership rules as buildFullDayTimeline().
+  const pausedBomb = !!(at && at.type !== 'bomb' && at.pausedAt && bombIsTicking(STATE));
+  const liveRunning = !!(at && (!at.pausedAt || pausedBomb));
+
+  if(liveRunning){
+    liveStart = pausedBomb
+      ? (at.wallPausedTs || Date.now())
+      : (at.wallSegmentStartTs || at.wallStartTs || at.startTs || Date.now());
+    liveSec = Math.max(0, (Date.now() - liveStart) / 1000);
+    if(!pausedBomb && at.duration) liveSec = Math.min(liveSec, at.duration);
+  }else{
+    // No activity = live Idle. Use the same anchor as the existing idle ticker.
+    liveStart = (STATE && STATE.bombLocked && STATE.bombLockedTs)
+      ? STATE.bombLockedTs
+      : ((STATE && STATE._idleStartTs) || Date.now());
+    liveSec = Math.max(0, (Date.now() - liveStart) / 1000);
+  }
+
+  const dur = document.getElementById('hist-live-dur');
+  if(dur) dur.textContent = fmtHMS(liveSec);
+
+  const logDur = document.getElementById('hist-live-log-dur');
+  if(logDur) logDur.textContent = fmtHMS(liveSec);
+
+  const actDur = document.getElementById('hist-live-act-dur');
+  if(actDur){
+    const base = parseFloat(actDur.dataset.committedSec || 0);
+    actDur.textContent = fmtHM(base + liveSec);
+  }
+
+  const startEl = document.getElementById('hist-live-start');
+  if(startEl && liveStart) startEl.textContent = fmtTimeOfDay(liveStart);
+
+  const endEl = document.getElementById('hist-live-end');
+  if(endEl) endEl.textContent = fmtTimeOfDay(Date.now());
+
+  // Preserve the existing Pomodoro-log countdown; only mirror its canonical value.
+  const runCountdown = document.getElementById('pomoRunCountdown');
+  if(runCountdown && at && at.type !== 'bomb' && !at.pausedAt){
+    const remain = msRemaining(at);
+    if(remain >= 0) runCountdown.textContent = fmtClock(remain/1000);
+  }
+}
+
+function startHistoryLiveTicker(){
+  stopHistoryLiveTicker();
+  const screen = document.getElementById('screen-history');
+  if(!screen || !screen.classList.contains('active')) return;
+  updateHistoryLiveDom();
+  historyLiveTimerHandle = setInterval(updateHistoryLiveDom, 500);
+}
 // Renders whichever History sub-tab is currently active, keeping Timeline + Tasks always in sync
 async function renderHistoryScreen(){
   const bt = document.getElementById('histResetTime'); if(bt) bt.textContent = hourLabel(getWakeHour());
+  renderHistoryThoughtReader();
   // Only collapse expanded groups when SWITCHING AWAY from timeline tab, not on every poll cycle
   if(currentHistTab==='timeline'){
     if(prevHistTab !== 'timeline'){ openPomoLogId = null; openActGroup = null; } // actual tab switch into timeline: collapse
@@ -7569,10 +8222,25 @@ function renderBudgets(){
   document.getElementById('bdHealth').innerHTML = fmtHMu(catUsedFrom(view,'health'));
   document.getElementById('bdOthers').innerHTML = fmtHMu(catUsedFrom(view,'others'));
 }
+// UI-only Revision tab visibility. This never changes Revision tasks, counts, durations, or stored data.
+function updateRevisionTabVisibility(){
+  const visible = STATE?.settings?.showRevisionTab !== false;
+  document.querySelectorAll('#taskTabsHome .task-tab[data-cat="revision"], #taskTabs .tab[data-cat="revision"]').forEach(el=>{
+    el.style.display = visible ? '' : 'none';
+  });
+  // If the user hides the currently selected tab, move only the visible UI selection to Study.
+  // No Revision data or task state is modified.
+  if(!visible && selectedCategory==='revision') selectedCategory='study';
+  if(!visible && currentTaskTab==='revision') currentTaskTab='study';
+  document.querySelectorAll('#taskTabsHome .task-tab').forEach(t=>t.classList.toggle('active',t.getAttribute('data-cat')===selectedCategory));
+  document.querySelectorAll('#taskTabs .tab').forEach(t=>t.classList.toggle('active',t.getAttribute('data-cat')===currentTaskTab));
+}
+
 // Renders the list of user-defined tasks for the currently selected Tasks-screen category tab,
 // plus the live budget planner above it
 let tasksSortMode = 'slot'; // Task Create list grouping: 'slot' (default) or 'subject' (Study only)
 function renderTasks(){
+  updateRevisionTabVisibility();
   updatePlanTabsUI();
   renderBudgets();
   // Tasks always sort by Time Slot (no UI control)
@@ -7710,11 +8378,24 @@ function renderSettings(){
   document.getElementById('setPomo').value = Math.round(STATE.settings.pomodoroDuration/60);
   document.getElementById('setManualTaskMode').checked = !!STATE.settings.manualTaskMode;
   document.getElementById('setStudySessionCounter').checked = !!STATE.settings.studySessionCounter;
+  const showRevisionEl = document.getElementById('setShowRevisionTab');
+  if(showRevisionEl) showRevisionEl.checked = STATE.settings.showRevisionTab !== false;
+  updateRevisionTabVisibility();
   const manualOn = !!STATE.settings.manualTaskMode;
   document.getElementById('manualBombNotice').style.display = manualOn ? '' : 'none';
   document.getElementById('setBombMode').disabled = manualOn;
   document.getElementById('setBombMode').closest('.plain-card').style.opacity = manualOn ? '.55' : '';
   document.getElementById('setToastsEnabled').checked = STATE.settings.toastsEnabled !== false;
+  const realityToggle = document.getElementById('setRealityCheckEnabled');
+  if(realityToggle) realityToggle.checked = STATE.settings.realityCheckEnabled !== false;
+  const realityDur = document.getElementById('setRealityCheckDuration');
+  if(realityDur){ const pomoMin=Math.max(1,Math.round((STATE.settings.pomodoroDuration||1800)/60)); const maxRc=Math.max(0,pomoMin-1); realityDur.max=String(Math.max(1,maxRc)); realityDur.value=String(Math.max(1,Math.min(Math.round((STATE.settings.realityCheckDuration||120)/60),Math.max(1,maxRc)))); }
+  updateRealityCheckDurationHint();
+  const thoughtToggle = document.getElementById('setThoughtsEnabled');
+  if(thoughtToggle) thoughtToggle.checked = STATE.settings.thoughtsEnabled !== false;
+  const thoughtLaunchSub = document.getElementById('thoughtLaunchSub');
+  if(thoughtLaunchSub) thoughtLaunchSub.textContent = (STATE.settings.thoughtsEnabled !== false ? 'On' : 'Off') + ' · ' + (STATE.settings.thoughtCategories||[]).length + ' categories';
+  if(typeof renderThoughtCategorySettings==='function' && document.getElementById('subThoughts')?.style.display==='none') renderThoughtCategorySettings();
 
   // BOMB CONFIGURATION: Reset working state to saved state, then initialize UI
   // This ensures we always load the last saved configuration, discarding any unsaved changes
@@ -8638,6 +9319,9 @@ async function renderGoalsScreen(){
   document.getElementById('goalExpectedTotal').textContent = Math.round(m.totalRequiredHours);
 
 
+  // Thought Reader — cumulative counts from the Goal Start Date through the current Goal day.
+  renderGoalThoughtReader();
+
   // Section 5 — Intelligent Status Engine (background/copy swap between behind/ontime/ahead)
   const card = document.getElementById('goalStatusCard');
   card.classList.remove('behind','ontime','ahead');
@@ -8773,6 +9457,8 @@ let renderQueued = false;
 // Serialize UI refreshes. Timers, navigation, storage callbacks and resume events can all request
 // a render; allowing them to overlap was the source of stale values briefly replacing fresh ones.
 function render(){
+  if(typeof renderRealityCheck==='function') renderRealityCheck();
+  if(typeof renderThoughtLogger==='function') renderThoughtLogger();
   if(renderInFlight){
     renderQueued = true;
     return renderInFlight;
@@ -8802,7 +9488,10 @@ async function renderNow(){
   await updateFinishByCache();
   renderHeader();
   renderHome();
-  if(document.getElementById('screen-history').classList.contains('active')) await renderHistoryScreen();
+  if(document.getElementById('screen-history').classList.contains('active')){
+    await renderHistoryScreen();
+    startHistoryLiveTicker();
+  }
   if(document.getElementById('screen-tasks').classList.contains('active')) renderTasks();
   // Settings inputs are rendered only on navigation (not on the 3s auto-render loop), so typed values are never clobbered before Save
   if(document.getElementById('screen-goals').classList.contains('active')) await renderGoalsScreen();
@@ -9703,7 +10392,10 @@ document.querySelectorAll('.nav-item').forEach(item=>{
     document.getElementById('reviewOverlay').classList.remove('show');
     const scr = item.getAttribute('data-screen');
     if(scr !== 'goals' && extraGoalTickHandle){ clearInterval(extraGoalTickHandle); extraGoalTickHandle = null; }
-    if(scr !== 'history' && !STATE.activeTimer && ringTimerHandle){ clearInterval(ringTimerHandle); ringTimerHandle = null; }
+    if(scr !== 'history'){
+      stopHistoryLiveTicker();
+      if(!STATE.activeTimer && ringTimerHandle){ clearInterval(ringTimerHandle); ringTimerHandle = null; }
+    }
     // Never leave the Goal delete bottom-sheet open when switching tabs
     document.getElementById('gsetMenuOverlay').classList.remove('show');
     // Prepare expensive pages while the current screen remains visible. Switching first created
@@ -9719,7 +10411,10 @@ document.querySelectorAll('.nav-item').forEach(item=>{
     if(scr==='goals'){ goalEntryConfettiPending = true; await renderGoalsScreen(); } // flag set only on tab entry — enables the one-shot confetti when goal is complete
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
     document.getElementById('screen-'+scr).classList.add('active');
-    if(scr==='history') renderHome(); // Start the live idle row only while History is actually visible.
+    if(scr==='history'){
+      renderHome(); // Existing timer engine remains unchanged.
+      startHistoryLiveTicker(); // History-only DOM heartbeat.
+    }
     if(scr==='home'){
       const scrollTo = item.getAttribute('data-scroll');
       requestAnimationFrame(()=>{
@@ -9920,6 +10615,26 @@ document.getElementById('earlyCompleteDialog').addEventListener('click',(e)=>{ i
 // Pomodoro Log popup wiring — mood pick, one-time save (no edit afterwards), tap-outside to dismiss.
 // Fills the mood buttons with the same colored line-face SVGs used in the log rows.
 document.querySelectorAll('#pomoMoods .pomo-mood-btn').forEach(b=>{ b.innerHTML = pomoMoodSvg(b.getAttribute('data-mood')); });
+
+// Reality Check is the direct UI for the SAME Pomodoro Log row. No separate popup/storage/timer.
+document.querySelectorAll('#realityCheckCard .rc-rating').forEach(b=>b.addEventListener('click',()=>setRealityCheckRating(Number(b.textContent))));
+document.getElementById('rcNote')?.addEventListener('input',e=>{
+  rcDraftNote=e.target.value;
+  const btn=document.getElementById('rcDone');
+  if(btn){
+    const ready=!!(realityCheckPending()&&rcDraftRating&&String(e.target.value||'').trim());
+    btn.disabled=false;
+    btn.setAttribute('aria-disabled',String(!ready));
+    btn.classList.toggle('rc-locked',!ready);
+  }
+});
+document.getElementById('rcDone')?.addEventListener('click',()=>{
+  if(!realityCheckPending()) return;
+  const comment=String(document.getElementById('rcNote')?.value||rcDraftNote||'').trim();
+  if(!comment){ showToast('Please enter a short session comment.'); return; }
+  if(!rcDraftRating){ showToast('Please select your focus mood.'); return; }
+  completeRealityCheck();
+});
 document.getElementById('pomoMoods').addEventListener('click', (e)=>{
   const b = e.target.closest('.pomo-mood-btn'); if(!b) return;
   const was = b.classList.contains('sel');
@@ -9936,18 +10651,10 @@ document.getElementById('pomoPopSave').addEventListener('click', async ()=>{
   if(!mood){ showToast('Please select your focus mood.'); return; }
   if(!comment){ showToast('Please enter a short session comment.'); return; }
   document.getElementById('pomoPop').classList.remove('show');
-  if(!STATE.pomoLogs) STATE.pomoLogs = {};
-  const lg = STATE.pomoLogs[pomoPopTarget.taskId] = STATE.pomoLogs[pomoPopTarget.taskId]||[];
-  while(lg.length <= pomoPopTarget.idx) lg.push({n:lg.length+1, comment:'', mood:'', saved:false}); // create the row if it doesn't exist yet
-  const en = lg[pomoPopTarget.idx];
-  if(en && !en.saved){
-    en.comment = comment; en.mood = mood; en.saved = true;
-    pomoSavedFlash[pomoPopTarget.taskId+':'+pomoPopTarget.idx] = Date.now(); // ✓ shows ~3.5s then fades
-    setTimeout(()=>{ if(currentHistTab==='tasks') renderHistTasks(); }, 4300); // clears the faded ✓ on the Tasks tab
-    await saveState(STATE);
-  }
-  await renderHistTasks();
-  pomoPopTarget = null;
+  const target={...pomoPopTarget};
+  const ok=await commitPomoReflection(target.taskId,target.idx,mood,comment);
+  if(ok){document.getElementById('pomoPop').classList.remove('show');setTimeout(()=>{if(currentHistTab==='tasks')renderHistTasks();},4300);render();}
+  pomoPopTarget=null;
 });
 // Home Current Activity bar — the tiny "+" on a completed Green segment opens the SAME reflection popup
 document.getElementById('caSegs').addEventListener('click', (e)=>{
@@ -9963,6 +10670,274 @@ document.getElementById('histTasksArea').addEventListener('input', (e)=>{
   const commentId = e.target.getAttribute && e.target.getAttribute('data-comment');
   if(commentId) histCommentDraft[commentId] = e.target.value;
 });
+
+/* ============ THOUGHT LOGGER — compact UI + persistent category settings ============ */
+/*
+   STEP 5.1 storage rule:
+   - Home edits are ONLY an in-memory draft.
+   - History + Goals read ONLY committed STATE.thoughtCountsByDay data.
+   - Nothing from + / − / manual input / No Thoughts reaches persistent storage until Done.
+   - thoughtDayKey() is the existing Study Day boundary, so History automatically follows the
+     same wake-up/day-reset behavior already used elsewhere in the app.
+*/
+let THOUGHT_DRAFTS = Object.create(null);      // transient per-Study-Day session preview
+let THOUGHT_NO_DRAFT = Object.create(null);    // transient "No Thoughts" selection state
+let THOUGHT_NO_BACKUP = Object.create(null);   // transient backup while No Thoughts is selected
+
+function thoughtCooldownUntil(dayKey){
+  const key=dayKey||thoughtDayKey();
+  const v=Number(STATE?.thoughtNextAvailableAtByDay?.[key]||0);
+  return Number.isFinite(v)?Math.max(0,v):0;
+}
+function thoughtCooldownRemainingMs(dayKey){ return Math.max(0,thoughtCooldownUntil(dayKey)-Date.now()); }
+function thoughtCooldownActive(dayKey){ return thoughtCooldownRemainingMs(dayKey)>0; }
+function fmtThoughtCooldown(ms){
+  const sec=Math.ceil(Math.max(0,ms)/1000), mm=Math.floor(sec/60), ss=sec%60;
+  return `${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+}
+
+function thoughtDayKey(){
+  try{return studyDayKey();}catch(e){return new Date().toISOString().slice(0,10);}
+}
+function nextThoughtWakeKey(now){
+  const t=now instanceof Date?now:new Date(now||Date.now());
+  const todayWake=todayWakeTs(t.getTime());
+  const nextWake=t.getTime()<todayWake?todayWake:(todayWake+24*3600*1000);
+  return studyDayKey(new Date(nextWake+1));
+}
+function finalizeExpiredThoughtDeletes(state){
+  const meta=Array.isArray(state?.settings?.thoughtCategoryMeta)?state.settings.thoughtCategoryMeta:[];
+  const today=studyDayKey(); let changed=false;
+  meta.forEach(c=>{
+    if(c&&c.pendingDelete&&c.deleteAfterWakeKey&&today>=c.deleteAfterWakeKey){
+      c.pendingDelete=false; c.active=false; c.deleteAfterWakeKey=null; changed=true;
+    }
+  });
+  if(changed) syncLegacyThoughtCategoryNames(state.settings);
+  return changed;
+}
+
+/* Persistent committed daily store — this is the ONLY source for History and Goal readers. */
+function thoughtCountsForDay(dayKey){
+  if(!STATE.thoughtCountsByDay || typeof STATE.thoughtCountsByDay!=='object') STATE.thoughtCountsByDay={};
+  const key=dayKey||thoughtDayKey();
+  if(!STATE.thoughtCountsByDay[key] || typeof STATE.thoughtCountsByDay[key]!=='object') STATE.thoughtCountsByDay[key]={};
+  return STATE.thoughtCountsByDay[key];
+}
+function thoughtHistoryCountsForDay(dayKey){
+  // Compatibility alias: History uses the same committed daily store as Goals.
+  return thoughtCountsForDay(dayKey);
+}
+
+/* Transient current-session draft — NEVER persisted by this subsystem. */
+function thoughtSessionCountsForToday(){
+  const key=thoughtDayKey();
+  if(!THOUGHT_DRAFTS[key] || typeof THOUGHT_DRAFTS[key]!=='object') THOUGHT_DRAFTS[key]={};
+  return THOUGHT_DRAFTS[key];
+}
+function thoughtNoBackupForToday(){
+  const key=thoughtDayKey();
+  if(!THOUGHT_NO_BACKUP[key] || typeof THOUGHT_NO_BACKUP[key]!=='object') THOUGHT_NO_BACKUP[key]={};
+  return THOUGHT_NO_BACKUP[key];
+}
+function noThoughtsForToday(){
+  return !!THOUGHT_NO_DRAFT[thoughtDayKey()];
+}
+function allThoughtCategoryDefs(){
+  const meta=Array.isArray(STATE?.settings?.thoughtCategoryMeta)?STATE.settings.thoughtCategoryMeta:[];
+  return meta.map((c,i)=>({id:String(c.id),name:String(c.name||('Category '+(i+1))),active:c.active!==false,order:Number.isFinite(Number(c.order))?Number(c.order):i}));
+}
+function activeThoughtCategoryDefs(){return allThoughtCategoryDefs().filter(c=>c.active).sort((a,b)=>a.order-b.order);}
+function thoughtCategoryDefById(id){return allThoughtCategoryDefs().find(c=>c.id===String(id))||null;}
+function thoughtCategoryTotal(counts,defs){return (defs||[]).reduce((sum,c)=>sum+(Number((counts||{})[c.id])||0),0);}
+function sortedThoughtRows(counts,defs){return (defs||[]).map((def,index)=>({id:def.id,label:def.name,count:Math.max(0,Math.min(99,Number((counts||{})[def.id])||0)),index}))
+  .sort((a,b)=>b.count-a.count||a.index-b.index);}
+
+let THOUGHT_SETTINGS_DRAFT=null;
+let THOUGHT_SETTINGS_ENABLED_DRAFT=null;
+function cloneThoughtMeta(meta){return (meta||[]).map((c,i)=>({id:String(c.id),name:String(c.name||('Category '+(i+1))),active:c.active!==false,order:Number.isFinite(Number(c.order))?Number(c.order):i,pendingDelete:c.pendingDelete===true,deleteAfterWakeKey:c.deleteAfterWakeKey?String(c.deleteAfterWakeKey):null}));}
+function beginThoughtSettingsDraft(){THOUGHT_SETTINGS_DRAFT=cloneThoughtMeta(STATE?.settings?.thoughtCategoryMeta||[]);THOUGHT_SETTINGS_ENABLED_DRAFT=STATE?.settings?.thoughtsEnabled!==false;const toggle=document.getElementById('setThoughtsEnabled');if(toggle)toggle.checked=THOUGHT_SETTINGS_ENABLED_DRAFT;}
+function getThoughtSettingsDraft(){if(!THOUGHT_SETTINGS_DRAFT)beginThoughtSettingsDraft();return THOUGHT_SETTINGS_DRAFT;}
+function syncLegacyThoughtCategoryNames(settings){settings.thoughtCategories=settings.thoughtCategoryMeta.filter(c=>c.active).sort((a,b)=>a.order-b.order).map(c=>c.name);}
+function newThoughtCategoryId(){let id;do{id='tc_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);}while(getThoughtSettingsDraft().some(c=>c.id===id));return id;}
+
+function renderThoughtLogger(){
+  // Reality Check visibility is owned exclusively by renderRealityCheck().
+  // Do NOT overwrite it here: doing so can resurrect a stale RC card after the
+  // existing Bomb Exploded lock has been acknowledged and cleared.
+  const card=document.getElementById('thoughtCard'), panel=document.getElementById('thoughtPanel');
+  if(!card||!panel||!STATE||!STATE.settings)return;
+  const enabled=STATE.settings.thoughtsEnabled!==false;
+  card.style.display=enabled?'':'none'; if(!enabled)return;
+  const defs=activeThoughtCategoryDefs();
+  const counts=thoughtSessionCountsForToday(), total=thoughtCategoryTotal(counts,defs), none=noThoughtsForToday();
+  const cooldownMs=thoughtCooldownRemainingMs(), locked=cooldownMs>0;
+  const totalEl=document.getElementById('thoughtTotal'); if(totalEl) totalEl.textContent=locked ? ('◷ '+fmtThoughtCooldown(cooldownMs)) : (total+' total');
+  const toggle=document.getElementById('thoughtToggle');
+  if(toggle){ toggle.disabled=locked; toggle.setAttribute('aria-disabled',String(locked)); toggle.style.opacity=locked?'.72':''; toggle.style.pointerEvents=locked?'none':''; }
+  if(locked) card.classList.remove('open');
+  const showThoughtDone=STATE.settings.realityCheckEnabled===false && !locked;
+  panel.innerHTML=`
+    <div class="thought-no-wrap">
+      <div class="thought-no-row ${none?'selected':''}" id="thoughtNoRow" role="button" aria-pressed="${none}">
+        <button type="button" class="thought-no-toggle" id="thoughtNoToggle" aria-label="No Thoughts">✓</button>
+        <span class="thought-no-label">No Thoughts</span>
+      </div>
+      <button type="button" class="thought-session-done" id="thoughtSessionDone" ${showThoughtDone?'':'hidden'}>Done</button>
+    </div>
+    <div class="thought-rows ${none?'disabled':''}" id="thoughtRows">
+      ${defs.length?defs.map(def=>{
+        const n=Math.max(0,Math.min(99,Number(counts[def.id])||0));
+        return `<div class="thought-row" data-thought-category-id="${escapeHtml(def.id)}"><span class="thought-label">${escapeHtml(def.name)}</span><div class="thought-counter"><button type="button" class="thought-count-btn" data-thought-minus="1" aria-label="Decrease ${escapeHtml(def.name)}">−</button><input class="thought-count-input" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${n}" data-thought-input="1" aria-label="${escapeHtml(def.name)} count"><button type="button" class="thought-count-btn" data-thought-plus="1" aria-label="Increase ${escapeHtml(def.name)}">+</button></div></div>`;
+      }).join(''):'<div class="thought-empty">No thought categories yet. Add one in Settings.</div>'}
+    </div>`;
+}
+
+function toggleThoughtLogger(){
+  const card=document.getElementById('thoughtCard'); if(!card)return;
+  if(thoughtCooldownActive()) return;
+  const open=card.classList.toggle('open'); const b=document.getElementById('thoughtToggle'); if(b)b.setAttribute('aria-expanded',String(open));
+}
+function refreshThoughtDraftUI(){renderThoughtLogger();}
+
+async function completeThoughtSession(){
+  const key=thoughtDayKey();
+  const defs=activeThoughtCategoryDefs();
+  const active=thoughtSessionCountsForToday();
+  const hist=thoughtCountsForDay(key);
+  if(!noThoughtsForToday()){
+    for(const def of defs){const n=Math.max(0,Math.min(99,Number(active[def.id])||0));if(n)hist[def.id]=(Number(hist[def.id])||0)+n;}
+  }
+  STATE.thoughtCountsByDay[key]=Object.assign({},hist);
+  if(STATE.goal&&STATE.goal.startDate&&STATE.goal.endDate){
+    const gd=normalizeThoughtDateKey(key),gs=normalizeThoughtDateKey(STATE.goal.startDate),ge=normalizeThoughtDateKey(STATE.goal.endDate);
+    if(gd>=gs&&gd<=ge){if(!STATE.goal.thoughtCountsByDay||typeof STATE.goal.thoughtCountsByDay!=='object')STATE.goal.thoughtCountsByDay={};STATE.goal.thoughtCountsByDay[gd]=Object.assign({},hist);}
+  }
+  const pomoSec=Math.max(60,Number(STATE.settings?.pomodoroDuration)||1800);
+  STATE.thoughtNextAvailableAtByDay[key]=Date.now()+(pomoSec*1000);
+  delete THOUGHT_DRAFTS[key];delete THOUGHT_NO_BACKUP[key];delete THOUGHT_NO_DRAFT[key];
+  await saveState(STATE);
+  const thoughtCardEl=document.getElementById('thoughtCard');if(thoughtCardEl)thoughtCardEl.classList.remove('open');
+  const thoughtToggleEl=document.getElementById('thoughtToggle');if(thoughtToggleEl)thoughtToggleEl.setAttribute('aria-expanded','false');
+  renderThoughtLogger();renderHistoryThoughtReader();renderGoalThoughtReader();
+  if(document.getElementById('screen-goals')?.classList.contains('active')&&typeof renderGoalsScreen==='function')await renderGoalsScreen();
+}
+
+document.getElementById('thoughtToggle')?.addEventListener('click',toggleThoughtLogger);
+document.getElementById('thoughtPanel')?.addEventListener('click',async e=>{
+  if(thoughtCooldownActive())return;
+  if(e.target.closest('#thoughtSessionDone')){e.preventDefault();await completeThoughtSession();return;}
+  if(e.target.closest('#thoughtNoRow')||e.target.closest('#thoughtNoToggle')){
+    e.preventDefault();const key=thoughtDayKey(),selected=!noThoughtsForToday(),counts=thoughtSessionCountsForToday(),backup=thoughtNoBackupForToday();
+    if(selected){Object.keys(backup).forEach(k=>delete backup[k]);Object.assign(backup,counts);Object.keys(counts).forEach(k=>delete counts[k]);THOUGHT_NO_DRAFT[key]=true;}
+    else{Object.keys(counts).forEach(k=>delete counts[k]);Object.assign(counts,backup);Object.keys(backup).forEach(k=>delete backup[k]);THOUGHT_NO_DRAFT[key]=false;}
+    refreshThoughtDraftUI();return;
+  }
+  if(noThoughtsForToday())return;
+  const row=e.target.closest('.thought-row');if(!row)return;
+  const id=row.getAttribute('data-thought-category-id');if(!id)return;
+  const counts=thoughtSessionCountsForToday(),liveInput=row.querySelector('[data-thought-input]');
+  const liveValue=liveInput?parseInt(String(liveInput.value).replace(/[^0-9]/g,''),10):NaN;
+  let n=Number.isFinite(liveValue)?Math.max(0,Math.min(99,liveValue)):Math.max(0,Number(counts[id])||0);
+  if(e.target.closest('[data-thought-plus]'))n=Math.min(99,n+1);else if(e.target.closest('[data-thought-minus]'))n=Math.max(0,n-1);else return;
+  counts[id]=n;refreshThoughtDraftUI();
+});
+document.getElementById('thoughtPanel')?.addEventListener('change',e=>{
+  if(thoughtCooldownActive()||noThoughtsForToday())return;const input=e.target.closest('[data-thought-input]');if(!input)return;
+  const row=input.closest('.thought-row'),id=row?.getAttribute('data-thought-category-id');if(!id)return;
+  let n=parseInt(String(input.value).replace(/[^0-9]/g,''),10);if(!Number.isFinite(n))n=0;n=Math.max(0,Math.min(99,n));input.value=n;thoughtSessionCountsForToday()[id]=n;refreshThoughtDraftUI();
+});
+document.getElementById('thoughtPanel')?.addEventListener('input',e=>{
+  if(thoughtCooldownActive()||noThoughtsForToday())return;const input=e.target.closest('[data-thought-input]');if(!input)return;input.value=input.value.replace(/[^0-9]/g,'').slice(0,2);
+});
+
+function renderThoughtReader(cardId,totalId,panelId,toggleId,counts,defs){
+  const card=document.getElementById(cardId),panel=document.getElementById(panelId);if(!card||!panel)return;
+  const enabled=STATE?.settings?.thoughtsEnabled!==false;card.style.display=enabled?'':'none';if(!enabled)return;
+  const list=sortedThoughtRows(counts,defs),total=thoughtCategoryTotal(counts,defs);
+  const totalEl=document.getElementById(totalId);if(totalEl)totalEl.textContent=total+' total';
+  panel.innerHTML=list.length?list.map(r=>`<div class="thought-reader-row"><span class="thought-reader-label">${escapeHtml(r.label)}</span><span class="thought-reader-value">${r.count}</span></div>`).join(''):'<div class="thought-reader-empty">No thought entries yet.</div>';
+  const btn=document.getElementById(toggleId);if(btn&&!btn.dataset.bound){btn.dataset.bound='1';btn.addEventListener('click',()=>{const open=card.classList.toggle('open');btn.setAttribute('aria-expanded',String(open));});}
+}
+function renderHistoryThoughtReader(){
+  const defs=allThoughtCategoryDefs();const counts=thoughtCountsForDay(thoughtDayKey());
+  renderThoughtReader('historyThoughtCard','historyThoughtTotal','historyThoughtPanel','historyThoughtToggle',counts,defs);
+}
+function normalizeThoughtDateKey(value){
+  if(value==null)return '';const raw=String(value).trim();if(!raw)return '';const iso=raw.match(/^(\d{4}-\d{2}-\d{2})/);if(iso)return iso[1];const dmy=raw.match(/^(\d{2})[\/.-](\d{2})[\/.-](\d{4})$/);if(dmy)return `${dmy[3]}-${dmy[2]}-${dmy[1]}`;return raw;
+}
+function goalThoughtDateRange(){
+  const g=STATE&&STATE.goal;if(!g||!g.startDate||!g.endDate)return null;const from=normalizeThoughtDateKey(g.startDate),end=normalizeThoughtDateKey(g.endDate),today=normalizeThoughtDateKey(goalTodayKey(new Date()));if(!from||!end||today<from)return null;const to=today<end?today:end;return to<from?null:{from,to};
+}
+function aggregateThoughtCountsInRange(fromKey,toKey){
+  const out={},from=normalizeThoughtDateKey(fromKey),to=normalizeThoughtDateKey(toKey);if(!from||!to||to<from)return out;
+  const globalStore=(STATE&&STATE.thoughtCountsByDay&&typeof STATE.thoughtCountsByDay==='object')?STATE.thoughtCountsByDay:{};
+  const goalStore=(STATE?.goal?.thoughtCountsByDay&&typeof STATE.goal.thoughtCountsByDay==='object')?STATE.goal.thoughtCountsByDay:{};
+  const days=new Set([...Object.keys(globalStore),...Object.keys(goalStore)]);
+  for(const storedDay of days){const day=normalizeThoughtDateKey(storedDay);if(!day||day<from||day>to)continue;const src=goalStore[storedDay]||globalStore[storedDay];if(!src||typeof src!=='object')continue;for(const id of Object.keys(src)){const n=Math.max(0,Number(src[id])||0);if(n)out[id]=(out[id]||0)+n;}}
+  return out;
+}
+function renderGoalThoughtReader(){
+  if(!STATE||!STATE.settings)return;const defs=allThoughtCategoryDefs();const range=goalThoughtDateRange();const counts=range?aggregateThoughtCountsInRange(range.from,range.to):{};
+  renderThoughtReader('goalThoughtCard','goalThoughtTotal','goalThoughtPanel','goalThoughtToggle',counts,defs);
+}
+
+function renderThoughtCategorySettings(){
+  const wrap=document.getElementById('thoughtCategoryList');if(!wrap||!STATE?.settings)return;
+  const draft=getThoughtSettingsDraft();
+  const active=draft.filter(c=>c.active&&!c.pendingDelete).sort((a,b)=>a.order-b.order);
+  const pending=draft.filter(c=>!c.active&&c.pendingDelete).sort((a,b)=>a.order-b.order);
+  const activeHtml=active.map(c=>`<div class="thought-settings-row" data-thought-setting-id="${escapeHtml(c.id)}" draggable="true">
+    <span class="thought-settings-order">${active.findIndex(x=>x.id===c.id)+1}</span>
+    <button type="button" class="thought-settings-handle" data-thought-drag-handle="1" aria-label="Hold to rearrange" title="Hold to rearrange"><svg viewBox="0 0 24 24"><circle cx="8" cy="6" r="1.5"/><circle cx="16" cy="6" r="1.5"/><circle cx="8" cy="12" r="1.5"/><circle cx="16" cy="12" r="1.5"/><circle cx="8" cy="18" r="1.5"/><circle cx="16" cy="18" r="1.5"/></svg></button>
+    <input class="thought-settings-input" type="text" value="${escapeHtml(c.name).replace(/&quot;/g,'&quot;')}" data-thought-cat-id="${escapeHtml(c.id)}" maxlength="32">
+    <button type="button" class="thought-settings-delete" data-thought-delete-id="${escapeHtml(c.id)}" aria-label="Delete ${escapeHtml(c.name)}">×</button>
+  </div>`).join('');
+  const pendingHtml=pending.length ? ('<div class=\"thought-settings-pending-divider\">Pending deletion</div><div class=\"thought-settings-pending-note\">These categories leave Home after Save, but remain recoverable until the next Wake-up Time.</div>' + pending.map(function(c){
+    return '<div class=\"thought-settings-row pending-delete\" data-thought-setting-id=\"'+escapeHtml(c.id)+'\">'
+      + '<span class=\"thought-settings-order\">—</span>'
+      + '<button type=\"button\" class=\"thought-settings-handle\" disabled aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\"><circle cx=\"8\" cy=\"6\" r=\"1.5\"/><circle cx=\"16\" cy=\"6\" r=\"1.5\"/><circle cx=\"8\" cy=\"12\" r=\"1.5\"/><circle cx=\"16\" cy=\"12\" r=\"1.5\"/><circle cx=\"8\" cy=\"18\" r=\"1.5\"/><circle cx=\"16\" cy=\"18\" r=\"1.5\"/></svg></button>'
+      + '<input class=\"thought-settings-input\" type=\"text\" value=\"'+escapeHtml(c.name).replace(/&quot;/g,'&quot;')+'\" disabled>'
+      + '<button type=\"button\" class=\"thought-settings-restore\" data-thought-restore-id=\"'+escapeHtml(c.id)+'\">Restore</button>'
+      + '</div>';
+  }).join('')) : '';
+  wrap.innerHTML=(activeHtml||'<div class="thought-settings-empty">No active categories. Add a category below.</div>')+pendingHtml;
+}
+function markThoughtCategoryDeleted(id){const d=getThoughtSettingsDraft().find(c=>c.id===String(id));if(!d)return;d.active=false;d.pendingDelete=true;d.deleteAfterWakeKey=nextThoughtWakeKey();renderThoughtCategorySettings();}
+function restoreThoughtCategory(id){const d=getThoughtSettingsDraft().find(c=>c.id===String(id));if(!d)return;const active=getThoughtSettingsDraft().filter(c=>c.active&&!c.pendingDelete);d.active=true;d.pendingDelete=false;d.deleteAfterWakeKey=null;d.order=active.length;renderThoughtCategorySettings();}
+function updateThoughtDraftName(id,value){const d=getThoughtSettingsDraft().find(c=>c.id===String(id));if(d)d.name=value.slice(0,32);}
+function reorderThoughtDraft(dragId,targetId){const draft=getThoughtSettingsDraft();const active=draft.filter(c=>c.active).sort((a,b)=>a.order-b.order);const from=active.findIndex(c=>c.id===dragId),to=active.findIndex(c=>c.id===targetId);if(from<0||to<0||from===to)return;const [item]=active.splice(from,1);active.splice(to,0,item);active.forEach((c,i)=>c.order=i);const inactive=draft.filter(c=>!c.active);inactive.forEach((c,i)=>c.order=10000+i);THOUGHT_SETTINGS_DRAFT=[...active,...inactive];renderThoughtCategorySettings();}
+async function saveThoughtCategorySettings(){
+  const state=await getState(),draft=getThoughtSettingsDraft().map(c=>({...c}));
+  const seen=new Set();for(const c of draft){c.name=String(c.name||'').trim();if(c.active&&!c.name){showToast('Category names cannot be empty.');return;}if(c.active){const k=c.name.toLowerCase();if(seen.has(k)){showToast('Thought category names must be unique.');return;}seen.add(k);}}
+  const oldMeta=Array.isArray(state.settings.thoughtCategoryMeta)?state.settings.thoughtCategoryMeta:[];const byId=new Map(oldMeta.map(c=>[String(c.id),{...c}]));
+  draft.forEach((c,i)=>{const old=byId.get(c.id)||{};byId.set(c.id,{id:c.id,name:c.name,active:c.active!==false,order:c.active?i:(old.order??10000+i),pendingDelete:c.pendingDelete===true,deleteAfterWakeKey:c.pendingDelete?(c.deleteAfterWakeKey||nextThoughtWakeKey()):null});});
+  const finalMeta=[...byId.values()];
+  // Deleted categories remain archived (active=false) so historical IDs and Goal counts survive.
+  state.settings.thoughtCategoryMeta=finalMeta;syncLegacyThoughtCategoryNames(state.settings);
+  state.settings.thoughtsEnabled = THOUGHT_SETTINGS_ENABLED_DRAFT!==false;
+  await saveState(state);THOUGHT_SETTINGS_DRAFT=null;THOUGHT_SETTINGS_ENABLED_DRAFT=null;
+  renderThoughtCategorySettings();renderThoughtLogger();renderHistoryThoughtReader();renderGoalThoughtReader();
+  const sub=document.getElementById('thoughtLaunchSub');if(sub)sub.textContent=(state.settings.thoughtsEnabled!==false?'On':'Off')+' · '+state.settings.thoughtCategories.length+' categories';
+  showToast('Thought settings saved.');
+}
+
+document.getElementById('thoughtCategoryList')?.addEventListener('input',e=>{const input=e.target.closest('[data-thought-cat-id]');if(input)updateThoughtDraftName(input.dataset.thoughtCatId,input.value);});
+document.getElementById('thoughtCategoryList')?.addEventListener('click',e=>{const del=e.target.closest('[data-thought-delete-id]');if(del){e.preventDefault();markThoughtCategoryDeleted(del.dataset.thoughtDeleteId);return;}const restore=e.target.closest('[data-thought-restore-id]');if(restore){e.preventDefault();restoreThoughtCategory(restore.dataset.thoughtRestoreId);}});
+let THOUGHT_DRAG_ID=null;
+document.getElementById('thoughtCategoryList')?.addEventListener('dragstart',e=>{const row=e.target.closest('.thought-settings-row');if(!row)return;THOUGHT_DRAG_ID=row.dataset.thoughtSettingId;e.dataTransfer.effectAllowed='move';});
+document.getElementById('thoughtCategoryList')?.addEventListener('dragover',e=>{const row=e.target.closest('.thought-settings-row');if(!row||!THOUGHT_DRAG_ID)return;e.preventDefault();});
+document.getElementById('thoughtCategoryList')?.addEventListener('drop',e=>{const row=e.target.closest('.thought-settings-row');if(!row||!THOUGHT_DRAG_ID)return;e.preventDefault();reorderThoughtDraft(THOUGHT_DRAG_ID,row.dataset.thoughtSettingId);THOUGHT_DRAG_ID=null;});
+document.getElementById('thoughtCategoryList')?.addEventListener('dragend',()=>{THOUGHT_DRAG_ID=null;});
+document.getElementById('addThoughtCategoryBtn')?.addEventListener('click',()=>{const input=document.getElementById('newThoughtCategory'),v=(input?.value||'').trim();if(!v)return;const draft=getThoughtSettingsDraft();if(draft.some(c=>c.active&&c.name.toLowerCase()===v.toLowerCase())){showToast('That thought category already exists.');return;}const active=draft.filter(c=>c.active);draft.push({id:newThoughtCategoryId(),name:v,active:true,pendingDelete:false,order:active.length});if(input)input.value='';renderThoughtCategorySettings();});
+let THOUGHT_POINTER_DRAG=null;
+const thoughtCategoryListEl=document.getElementById('thoughtCategoryList');
+thoughtCategoryListEl?.addEventListener('pointerdown',e=>{const handle=e.target.closest('[data-thought-drag-handle]');if(!handle)return;const row=handle.closest('.thought-settings-row');if(!row)return;clearTimeout(THOUGHT_POINTER_DRAG?.timer);THOUGHT_POINTER_DRAG={id:row.dataset.thoughtSettingId,active:false,timer:setTimeout(()=>{THOUGHT_POINTER_DRAG.active=true;row.classList.add('dragging');try{handle.setPointerCapture(e.pointerId);}catch(_){ }},320),pointerId:e.pointerId};});
+thoughtCategoryListEl?.addEventListener('pointermove',e=>{const d=THOUGHT_POINTER_DRAG;if(!d||d.pointerId!==e.pointerId||!d.active)return;e.preventDefault();const under=document.elementFromPoint(e.clientX,e.clientY)?.closest('.thought-settings-row');if(!under||under.dataset.thoughtSettingId===d.id)return;const from=thoughtCategoryListEl.querySelector(`[data-thought-setting-id="${CSS.escape(d.id)}"]`);if(!from)return;const rect=under.getBoundingClientRect();if(e.clientY < rect.top+rect.height/2)under.before(from);else under.after(from);const activeIds=[...thoughtCategoryListEl.querySelectorAll('.thought-settings-row:not(.pending-delete)')].map(r=>r.dataset.thoughtSettingId);const draft=getThoughtSettingsDraft();activeIds.forEach((id,i)=>{const c=draft.find(x=>x.id===id);if(c)c.order=i;});});
+function finishThoughtPointerDrag(e){const d=THOUGHT_POINTER_DRAG;if(!d||d.pointerId!==e.pointerId)return;clearTimeout(d.timer);const row=thoughtCategoryListEl?.querySelector(`[data-thought-setting-id="${CSS.escape(d.id)}"]`);if(row)row.classList.remove('dragging');if(d.active){const draft=getThoughtSettingsDraft();const activeIds=[...thoughtCategoryListEl.querySelectorAll('.thought-settings-row:not(.pending-delete)')].map(r=>r.dataset.thoughtSettingId);activeIds.forEach((id,i)=>{const c=draft.find(x=>x.id===id);if(c)c.order=i;});renderThoughtCategorySettings();}THOUGHT_POINTER_DRAG=null;}
+thoughtCategoryListEl?.addEventListener('pointerup',finishThoughtPointerDrag);thoughtCategoryListEl?.addEventListener('pointercancel',finishThoughtPointerDrag);
+document.getElementById('saveThoughtSettingsBtn')?.addEventListener('click',saveThoughtCategorySettings);
+document.getElementById('setThoughtsEnabled')?.addEventListener('change',e=>{if(THOUGHT_SETTINGS_DRAFT)THOUGHT_SETTINGS_ENABLED_DRAFT=e.target.checked;});
 
 /* ============ TIMER BUTTONS ============ */
 // Start button — begins a Study/Routine/Health session for the selected task.
@@ -10032,6 +11007,16 @@ document.getElementById('btnStop').onclick = async ()=>{
 };
 
 /* ============ SETTINGS ACTIONS ============ */
+function updateRealityCheckDurationHint(){
+  const pomoEl=document.getElementById('setPomo'),rcEl=document.getElementById('setRealityCheckDuration'),hint=document.getElementById('realityCheckDurationHint');
+  if(!pomoEl||!rcEl||!hint)return;
+  const pomo=Math.max(1,parseInt(pomoEl.value,10)||30),max=pomo-1;
+  rcEl.max=String(Math.max(1,max));
+  if(max<1){hint.textContent='No valid Reality Check duration while Pomodoro Duration is 1 minute. Use at least 2 minutes.';hint.style.color='var(--red)';}
+  else {hint.textContent='Maximum: '+max+' minutes — must be shorter than one Pomodoro session.';hint.style.color='';}
+}
+document.getElementById('setPomo')?.addEventListener('input',updateRealityCheckDurationHint);
+document.getElementById('setRealityCheckDuration')?.addEventListener('input',updateRealityCheckDurationHint);
 // Live-updates the "Other Activities" preview text under the Total/Study hours fields as the
 // user types, so they see the auto-calculated remainder before even hitting Save.
 function updateOtherHoursPreview(){
@@ -10056,6 +11041,13 @@ document.getElementById('setWakeHour').addEventListener('change', updateAvailabl
 document.getElementById('setStudyHours').addEventListener('input', updateOtherHoursPreview);
 // Live update: immediately persist the short-record filter and re-render History so the change
 // is visible at once — no Save button press required, and no recalculation of any totals.
+document.getElementById('setShowRevisionTab')?.addEventListener('change', ()=>{
+  if(!STATE?.settings) return;
+  STATE.settings.showRevisionTab = document.getElementById('setShowRevisionTab').checked;
+  updateRevisionTabVisibility();
+  if(document.getElementById('screen-home')?.classList.contains('active')) renderHome();
+  if(document.getElementById('screen-tasks')?.classList.contains('active')) renderTasks();
+});
 document.getElementById('setHistShortFilter').addEventListener('change', async ()=>{
   const state = await getState();
   state.settings.historyShortFilter = parseInt(document.getElementById('setHistShortFilter').value, 10) || 0;
@@ -10077,6 +11069,13 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
   const studyHrs = isNaN(studyHrsRaw) ? DEFAULT_SETTINGS.studyHours : studyHrsRaw;
   state.settings.studyHours = Math.max(0, Math.min(studyHrs, state.settings.totalAvailableHours));
   const pomo = parseInt(document.getElementById('setPomo').value,10);
+  const pomoMinutes = pomo>0 ? pomo : 30;
+  const rcDurationMinRaw = parseInt(document.getElementById('setRealityCheckDuration')?.value,10);
+  const rcEnabledNow = document.getElementById('setRealityCheckEnabled')?.checked !== false;
+  const rcMaxMinutes = Math.max(0,pomoMinutes-1);
+  if(rcEnabledNow && pomoMinutes < 2){ showToast('Pomodoro Duration must be at least 2 minutes when Reality Check is enabled.'); return; }
+  if(rcEnabledNow && (!Number.isFinite(rcDurationMinRaw) || rcDurationMinRaw < 1 || rcDurationMinRaw > rcMaxMinutes)){ showToast('Reality Check Duration must be between 1 and '+rcMaxMinutes+' minutes.'); return; }
+  const rcDurationMinutes = Math.max(1,Math.min(Number.isFinite(rcDurationMinRaw)?rcDurationMinRaw:2,Math.max(1,rcMaxMinutes)));
   const bomb = parseInt(document.getElementById('setBomb').value,10);
   
   // STEP 3: Bomb Configuration Validation - When Bomb Mode is ON, all fields must be filled
@@ -10094,9 +11093,21 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
     }
   }
   
-  state.settings.pomodoroDuration = (pomo>0?pomo:30)*60;
+  state.settings.pomodoroDuration = pomoMinutes*60;
+  state.settings.realityCheckDuration = rcDurationMinutes*60;
   state.settings.manualTaskMode = manualTaskMode;
   state.settings.studySessionCounter = document.getElementById('setStudySessionCounter').checked;
+  const showRevisionEl = document.getElementById('setShowRevisionTab');
+  if(showRevisionEl) state.settings.showRevisionTab = showRevisionEl.checked;
+  const realityToggleEl = document.getElementById('setRealityCheckEnabled');
+  if(realityToggleEl) {
+    state.settings.realityCheckEnabled = realityToggleEl.checked;
+    if(!realityToggleEl.checked) state.realityCheckPending = null;
+  }
+  const thoughtsToggleEl = document.getElementById('setThoughtsEnabled');
+  if(thoughtsToggleEl) state.settings.thoughtsEnabled = thoughtsToggleEl.checked;
+  state.settings.thoughtCategories = Array.isArray(state.settings.thoughtCategories) && state.settings.thoughtCategories.length
+    ? state.settings.thoughtCategories.slice() : [...DEFAULT_SETTINGS.thoughtCategories];
   state.settings.bombChallengeMode = bombModeEnabled;
   
   // When Bomb Mode is ON, use filled values. When OFF, clear to 0.
@@ -10214,7 +11225,7 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
   // open: Bomb owns its dirty/validation state, while every other editable section
   // starts with a usable Save button. This prevents Bomb's disabled state from
   // leaking into Task Create, Home, or Other Settings after navigation.
-  const SETTINGS_SAVE_READONLY_SUBS = new Set(['subAbout','subAndroid','subFormulaDebug','subMilestonesRevision']);
+  const SETTINGS_SAVE_READONLY_SUBS = new Set(['subAbout','subAndroid','subFormulaDebug','subMilestonesRevision','subThoughts']);
   function setSettingsSaveButtonForSection(sectionId){
     const btn = document.getElementById('saveSettingsBtn');
     if(!btn) return;
@@ -10227,6 +11238,7 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
     el.addEventListener('click', ()=>{
       document.getElementById('settingsMain').style.display = 'none';
       document.getElementById(el.dataset.sub).style.display = 'block';
+      if(el.dataset.sub === 'subThoughts'){ beginThoughtSettingsDraft(); renderThoughtCategorySettings(); }
       setSettingsSaveButtonForSection(el.dataset.sub);
       // Render Planner cards when opening Planner section
       if(el.dataset.sub === 'subMilestonesRevision'){
@@ -11451,7 +12463,9 @@ document.querySelectorAll('.set-sub-back').forEach(btn=>{
     document.querySelectorAll('#dbgHomeCard.expanded, #dbgGoalCard.expanded').forEach(card=>{
       card.classList.remove('expanded');
     });
-    
+    // Thought Settings uses its own transactional Save Changes button. Leaving the page
+    // without saving discards the draft exactly like the other folder-style settings pages.
+    if(btn.closest('#subThoughts')){ THOUGHT_SETTINGS_DRAFT=null; THOUGHT_SETTINGS_ENABLED_DRAFT=null; document.getElementById('newThoughtCategory').value=''; renderThoughtCategorySettings(); }
     document.querySelectorAll('.set-sub').forEach(d=>{ d.style.display = 'none'; });
     document.getElementById('settingsMain').style.display = 'block';
     document.getElementById('saveSettingsBtn').style.display = 'none';
@@ -11702,7 +12716,9 @@ document.getElementById('gsetDeleteConfirm').onclick = async ()=>{
   const pw = document.getElementById('gsetDeletePw').value.trim();
   if(pw !== '12345'){ showToast('Incorrect password.'); return; }
   const state = await getState();
-  state.goal = null; // permanently removes Goal Info, Campaign Progress, Streak, Extra Study progress & Motivation
+  // Deleting the Goal is the explicit lifecycle boundary that permanently clears that
+  // Goal's private thought bank. Global History remains untouched.
+  state.goal = null;
   state.studyDayTotals = {}; // explicit Goal deletion is one of the ONLY events allowed to clear the accumulated Study Hours bank
   await saveState(state);
   document.getElementById('gsetDeleteDialog').classList.remove('show');
@@ -11751,6 +12767,7 @@ document.getElementById('breachOkBtn').onclick = async ()=>{
   if(document.getElementById('breachConfirmInput').value.trim() !== '123') return; // must type exactly "123"
   document.getElementById('breachConfirmInput').value = '';
   document.getElementById('breachScreen').classList.remove('show');
+  const _rcExplosionFlow = !!(STATE && STATE.realityCheckFreezeActive);
   if(STATE){
     // RACE-CONDITION GUARD: hold _recovering while we mutate + persist the post-explosion reset.
     // Without this, the 3-second recoverState() interval can fire between applyExplosionReset()
@@ -11764,30 +12781,60 @@ document.getElementById('breachOkBtn').onclick = async ()=>{
     // STATE stays ours until saveState() durably commits the new bomb lifecycle to IDB.
     _recovering = true;
     try {
-      // Commit the currently-live post-explosion Idle interval before the reset
-      // clears bombLocked/bombLockedTs. This makes the old Bomb → Idle boundary
-      // durable and prevents the new Bomb from ever claiming that past time.
-      await finalizeExplosionIdle(STATE, Date.now());
-      // Mandatory order (step 6): the DEFERRED consequences of the explosion run HERE, only now that the
-      // password flow is complete — reset the Hour Streak, forfeit earned Lifelines, install a fresh Bomb clock.
-      BombEngine.applyExplosionReset(STATE);
-      STATE.bombLocked = false;            // clear persisted flag → leaves BOMB_LOCK
-      STATE.bombExplodedFromHours = null;  // drop the captured display value; card is done
-      FreezeManager.exit(FREEZE.BOMB_LOCK); // immediate in-memory exit so render() reflects it without waiting for the next poll
-      await saveState(STATE);               // persist reset + unlock together so a restart can't re-lock
-      // Password accepted, bomb re-armed — wake the recovery engine for exactly one cycle
-      // with the fresh bomb state, then it goes dormant again as normal.
-      _pendingRecovery = true;
+      if(STATE.realityCheckFreezeActive){
+        // Reality Check is only a central freeze of the existing active session. Do NOT run
+        // BombEngine.applyExplosionReset(), do NOT change the Bomb clock, and do NOT start a Bomb.
+        // Keep the existing explosion consequences that belong to the common lock UI: reset the
+        // current Hour Streak / earned-lifeline progress, then release the central freeze.
+        STATE.hourStreakSec = 0;
+        STATE.streakPomodoros = 0;
+        // Same reset baseline as the normal explosion path: do not let today's already-committed
+        // Study timeline repopulate the freshly-reset Hour Streak during reconciliation.
+        STATE.hourStreakSecAtDayStart = -(Math.max(0, Number(STATE.dailyStudySeconds)||0));
+        STATE.dailyLifelinesEarned = 0;
+        const at=STATE.activeTimer;
+        if(at && at.type!=='bomb' && at.pausedAt){
+          const resumeNow=Date.now();
+          const pausedSince=Number(at.wallPausedAt)||resumeNow;
+          const pauseMs=Math.max(0,resumeNow-pausedSince);
+          // The segment before the RC freeze was already committed at the expiry boundary.
+          // Exclude the frozen window from study time, then begin a new live segment now.
+          at.accumulatedPause=(at.accumulatedPause||0)+pauseMs;
+          at.wallAccumulatedPauseMs=(at.wallAccumulatedPauseMs||0)+pauseMs;
+          at.pausedAt=null;
+          at.wallPausedAt=null;
+          at.segmentStartTs=monotonicNow();
+          at.wallSegmentStartTs=resumeNow;
+        }
+        STATE.realityCheckFreezeActive=false;
+        STATE.realityCheckPending=null;
+        STATE.bombLocked=false;
+        STATE.bombLockedTs=null;
+        STATE.bombExplodedFromHours=null;
+        FreezeManager.exit(FREEZE.BOMB_LOCK);
+        await saveState(STATE);
+        _pendingRecovery=true;
+      } else {
+        // ORIGINAL BOMB PATH — untouched.
+        await finalizeExplosionIdle(STATE, Date.now());
+        BombEngine.applyExplosionReset(STATE);
+        STATE.bombLocked = false;
+        STATE.bombExplodedFromHours = null;
+        FreezeManager.exit(FREEZE.BOMB_LOCK);
+        await saveState(STATE);
+        _pendingRecovery = true;
+      }
     } finally {
       _recovering = false; // always release, even if saveState throws
     }
   }
   // Acknowledged → clear the persistent (ongoing) bomb-explosion notification if the shell posted one.
   try{ AND.call('cancelNotification', AND_NOTIF_BOMB_EXPLODE); }catch(e){}
+  const wasRealityCheckFreeze = _rcExplosionFlow;
   render(); // rebuild Home immediately: Explosion card gone, Current Activity card back, buttons live again
-  // Auto-start the bomb immediately after password reset — mirrors exactly what the Stop button does
-  // (Stop = starts bomb when bomb mode is on). No activity is running at this point so no stopSession needed.
-  if(STATE && bombModeOn(STATE) && BombEngine.isEnabled(STATE)){
+  // ORIGINAL BOMB PATH: auto-start the bomb exactly as before. RC freeze path deliberately does NOT,
+  // because the productive Pomodoro session was preserved and simply unfrozen by the password.
+  if(!wasRealityCheckFreeze && STATE && bombModeOn(STATE) && BombEngine.isEnabled(STATE)){
     await startSession('bomb', null, null);
   }
   // The freeze is over and a BRAND-NEW Bomb clock is armed. Force the notification engine off the old
@@ -12262,7 +13309,20 @@ function andSyncAlarms(){
   const masterAlarms = AND.call('getFlag', 'alarmsEnabled', true);
   const shouldAlarm = masterAlarms && alarmActive && (cfg.sessionAlarm || (cfg.taskCompletionAlarm && isFinalSession));
   if(shouldAlarm){
-    const remain = msRemaining(at);
+    // IMPORTANT: keep the real Study timer continuous. The session alarm follows the
+    // same Pomodoro segmentation that the UI displays instead of waiting for the
+    // whole Study task timer to end.
+    //
+    // Example: 60m Study task + 10m Pomodoro:
+    //   10m, 20m, 30m, 40m, 50m, 60m.
+    // Only the alarm deadline changes; the underlying activeTimer is untouched.
+    let remain = msRemaining(at);
+    if(cfg.sessionAlarm && at.type==='study'){
+      try{
+        const v = caComputeView(at);
+        if(v) remain = Math.max(0, v.segRemainSec*1000);
+      }catch(e){}
+    }
     if(remain > 3000){
       const icon = CAT_ICON[at.type]||'📖';
       andSetAlarm(AND_ALARM_SESSION, Date.now()+remain, icon+' Time is up!', (at.task||'Session')+' has finished.');
@@ -12324,50 +13384,44 @@ function andDetectEvents(){
   if(!p) return;
   const wasSession = p.type && p.type!=='bomb' && !p.review;
   const sessionGone = !now.type || now.type==='bomb' || now.review;
-  // 1) Session finished NATURALLY (remaining was nearly zero when it ended).
-  //    Manual stops (remaining still large) stay silent — the in-app toast covers those.
-  if(wasSession && sessionGone && p.remaining!==null && p.remaining < 2500){
+  // 1) Study Pomodoro finished naturally and entered REVIEW_PENDING.
+  //    The state transition itself is authoritative. We deliberately do NOT require
+  //    the previous snapshot to be within a small remaining-time window because the
+  //    observer runs once per second and can legitimately observe the transition later.
+  //    Manual Stop never enters REVIEW_PENDING, so it remains silent.
+  if(wasSession && (p.type==='pomodoro' || p.type==='study') && now.review){
     const icon = CAT_ICON[p.type]||'📖';
-    if(p.type==='study' && now.review){
-      // Pomodoro finished and is awaiting its review → offer a native ADD button that opens the
-      // exact Pomodoro-Log reflection "+" popup for the completed session (see "reviewAdd" below).
-      // Format (spec):   ✔️ 2/7 completed — Add Reflection 🥳
-      //                  Topic Name — Subject
-      const at = STATE && STATE.activeTimer;
-      const v = at ? caComputeView(at) : null;
-      const cfg = andCfg();
-      const isFinalPomo = v && (v.cur >= v.total); // final Pomodoro also completes the task
-      // Session End and Task Complete are independent. The session sound plays
-      // for every completed Pomodoro; the task sound is emitted once below when
-      // the task itself becomes complete, avoiding a double ring on the final one.
-      const playNow = cfg.sessionAlarm;
-      if(v){
-        andSaveReviewTarget({ taskId: at.taskId, idx: Math.max(0, v.cur - 1) });
-        const title = EMOJI.check+' ' + v.cur + '/' + v.total + ' completed — Add Reflection '+EMOJI.party_face;
-        const body  = v.activity + (v.subject ? ' — ' + v.subject : '');
-        // Native notification (Android bridge)
-        if(AND.on){
-          if(playNow){
-            andNotifyReview(AND_NOTIF_REVIEW, title, body, 'sessionend');
-          } else if(AND.has('showReviewNotification')){
-            AND.call('showReviewNotification', AND_NOTIF_REVIEW, title, body); // notification only, no sound
-          } else {
-            AND.call('showNotification', AND_NOTIF_REVIEW, title, body);
-          }
+    const at = STATE && STATE.activeTimer;
+    const v = at ? caComputeView(at) : null;
+    const cfg = andCfg();
+    const playNow = cfg.sessionAlarm;
+    if(v){
+      andSaveReviewTarget({ taskId: at.taskId, idx: Math.max(0, v.cur - 1) });
+      const title = EMOJI.check+' ' + v.cur + '/' + v.total + ' completed — Add Reflection '+EMOJI.party_face;
+      const body  = v.activity + (v.subject ? ' — ' + v.subject : '');
+      if(AND.on){
+        if(playNow){
+          andNotifyReview(AND_NOTIF_REVIEW, title, body, 'sessionend');
+        } else if(AND.has('showReviewNotification')){
+          AND.call('showReviewNotification', AND_NOTIF_REVIEW, title, body);
+        } else {
+          AND.call('showNotification', AND_NOTIF_REVIEW, title, body);
         }
-        // In-app banner (always shown, even without Android bridge)
-        showReviewBanner('✓ ' + v.cur + '/' + v.total + ' – ' + v.activity + ' session completed.',
-          { taskId: at.taskId, idx: Math.max(0, v.cur - 1) });
-      } else {
-        andSaveReviewTarget(null);
-        if(AND.on){ andNotifyReview(AND_NOTIF_REVIEW, EMOJI.check+' Session completed — Add Reflection '+EMOJI.party_face, (p.task||'Session'), playNow ? 'sessionend' : null); }
-        showReviewBanner('✓ Session completed.', null);
       }
-      // If neither flag is set, still play once as neutral feedback (original behavior)
-      if(playNow && !AND.on) SoundController.play('sessionend');
+      showReviewBanner('✓ ' + v.cur + '/' + v.total + ' – ' + v.activity + ' session completed.',
+        { taskId: at.taskId, idx: Math.max(0, v.cur - 1) });
     } else {
-      andNotifyCompletion(AND_NOTIF_REVIEW, icon+' Session complete', (p.task||'Session')+' finished.', cfg.sessionAlarm ? 'sessionend' : null);
+      andSaveReviewTarget(null);
+      if(AND.on){ andNotifyReview(AND_NOTIF_REVIEW, EMOJI.check+' Session completed — Add Reflection '+EMOJI.party_face, (p.task||'Session'), playNow ? 'sessionend' : null); }
+      showReviewBanner('✓ Session completed.', null);
     }
+    // In a browser (no native shell), play the configured session sound directly.
+    if(playNow && !AND.on) SoundController.play('sessionend');
+  } else if(wasSession && sessionGone){
+    // Existing non-study completion notification path remains unchanged.
+    const icon = CAT_ICON[p.type]||'📖';
+    const cfg = andCfg();
+    andNotifyCompletion(AND_NOTIF_REVIEW, icon+' Session complete', (p.task||'Session')+' finished.', cfg.sessionAlarm ? 'sessionend' : null);
   }
   // 2) Daily Study target reached (Home Day Streak awarded for today)
   if(now.homeAward !== p.homeAward && now.homeAward === appDayKey()){
