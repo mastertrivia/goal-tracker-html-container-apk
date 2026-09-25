@@ -48,6 +48,11 @@ class JsBridge(private val activity: MainActivity) {
     // Single reusable player for the optional completion sound.
     private var player: MediaPlayer? = null
 
+    // True while the in-app player is actively ringing. Volume-key silencing
+    // reads this from the UI thread; playback starts on the bridge thread.
+    @Volatile
+    private var ringing = false
+
     // v2.3: in-app sounds used to play the file ONCE (a ~3s clip rang for
     // ~3s). A real alarm should keep ringing. We now LOOP the sound and
     // auto-stop after RING_DURATION_MS so short clips ring for a full
@@ -598,6 +603,7 @@ class JsBridge(private val activity: MainActivity) {
             p.prepare()
             p.start()
             player = p
+            ringing = true
 
             if (loop) {
                 // End the ring after the full alarm window.
@@ -639,6 +645,7 @@ class JsBridge(private val activity: MainActivity) {
             p.prepare()
             p.start()
             player = p
+            ringing = true
             if (loop) {
                 stopSoundRunnable?.let { soundHandler.removeCallbacks(it) }
                 val stop = Runnable { releasePlayer() }
@@ -681,6 +688,7 @@ class JsBridge(private val activity: MainActivity) {
         p.prepare()
         p.start()
         player = p
+        ringing = true
         true
     }
 
@@ -732,6 +740,7 @@ class JsBridge(private val activity: MainActivity) {
     }
 
     private fun releasePlayer() {
+        ringing = false
         // Cancel any pending auto-stop so it can't fire against a new player.
         stopSoundRunnable?.let { soundHandler.removeCallbacks(it) }
         stopSoundRunnable = null
@@ -753,6 +762,24 @@ class JsBridge(private val activity: MainActivity) {
      */
     @JavascriptInterface
     fun stopSound(): Boolean = safe("stopSound", false) {
+        releasePlayer()
+        true
+    }
+
+    /** True while the in-app MediaPlayer is actually producing alarm audio. */
+    fun isRinging(): Boolean {
+        if (ringing) return true
+        return try { player?.isPlaying == true } catch (_: Exception) { false }
+    }
+
+    /**
+     * Hardware volume-button silence: stop the current ring if one is active.
+     * Returns true only when something was actually ringing, so the activity
+     * can swallow the key without changing system volume.
+     */
+    fun stopIfRinging(): Boolean = safe("stopIfRinging", false) {
+        val playing = ringing || try { player?.isPlaying == true } catch (_: Exception) { false }
+        if (!playing) return@safe false
         releasePlayer()
         true
     }

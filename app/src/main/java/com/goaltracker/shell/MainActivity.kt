@@ -9,6 +9,7 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.webkit.RenderProcessGoneDetail
@@ -1004,6 +1005,27 @@ class MainActivity : AppCompatActivity() {
     private fun toast(msg: String, force: Boolean = false) {
         if (!force && !Flags.get(this, "nativeToastsEnabled", true)) return
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    }
+
+    /**
+     * While any in-app alarm is ringing (session-end, task-complete, bomb,
+     * or a settings preview), a hardware volume key immediately stops it.
+     * The key is swallowed so it does not also change system volume.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        when (event.keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP,
+            KeyEvent.KEYCODE_VOLUME_DOWN,
+            KeyEvent.KEYCODE_VOLUME_MUTE -> {
+                if (::jsBridge.isInitialized && jsBridge.isRinging()) {
+                    if (event.action == KeyEvent.ACTION_DOWN) {
+                        jsBridge.stopIfRinging()
+                    }
+                    return true
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     @Deprecated("Deprecated in Java")
