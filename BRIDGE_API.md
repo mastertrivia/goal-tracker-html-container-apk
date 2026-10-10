@@ -136,7 +136,23 @@ These use exact alarms + a dedicated alarm notification channel
   A.scheduleAlarm(101, Date.now() + 25 * 60 * 1000, "Pomodoro", "Time is up!")
   ```
 - **Note:** persistence across reboot is handled natively (alarms are
-  re-scheduled on boot).
+  re-scheduled on boot). Legacy path uses slot `sessionend` and a 60s duration.
+
+### `AndroidBridge.scheduleAlarmWithSound(id, triggerAtMillis, title, text, soundSlot, durationMs)`
+- **Parameters:** same as `scheduleAlarm`, plus:
+  - `soundSlot` (String) — `sessionend`, `taskcomplete`, or `bombwarn`.
+  - `durationMs` (Number) — ring window, clamped natively to 5–60 seconds.
+- **Returns:** void
+- **Effect:** persists slot + duration with the alarm. At fire time a silent
+  notification is posted and `AlarmPlayer` plays the selected slot for the
+  configured duration, even if the WebView is frozen or the process was killed.
+- **Gated by flag:** `alarmsEnabled` (default true).
+
+### `AndroidBridge.stopAlarmPlayback()`
+- **Returns:** Boolean
+- **Effect:** stops currently playing scheduled/in-app alarm audio immediately.
+  Does **not** cancel future `AlarmManager` schedules and does **not** reset
+  the Bomb timer.
 
 ### `AndroidBridge.cancelAlarm(id)`
 - **Parameters:** `id` (Int)

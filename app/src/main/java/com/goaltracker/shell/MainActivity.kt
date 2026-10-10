@@ -520,17 +520,32 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    /** First run: copy the bundled fallback app from assets/ to filesDir/app. */
+    private val htmlPrefs get() = getSharedPreferences("shell_html", MODE_PRIVATE)
+
+    /** First run and APK upgrades: copy bundled HTML unless the user imported their own. */
     private fun copyBundledAppIfNeeded() {
-        if (File(appDir, "index.html").exists()) {
-            // index.html already exists — full copy is skipped to preserve any user-imported HTML.
-            // However, side-car assets bundled in the APK (e.g. manuals.js) may be missing if the
-            // user installed an update over an older version that didn't ship them yet.
-            // copyBundledAssetsIfMissing never overwrites existing files, so this is always safe.
-            copyBundledAssetsIfMissing(appDir)
+        val currentVersion = try {
+            packageManager.getPackageInfo(packageName, 0).versionName ?: "4.9"
+        } catch (_: Exception) {
+            "4.9"
+        }
+        val userImported = htmlPrefs.getBoolean("html_user_imported", false)
+        val lastBundled = htmlPrefs.getString("bundled_html_version", null)
+        val indexExists = File(appDir, "index.html").exists()
+        if (!indexExists) {
+            copyBundledApp()
+            htmlPrefs.edit()
+                .putString("bundled_html_version", currentVersion)
+                .putBoolean("html_user_imported", false)
+                .apply()
             return
         }
-        copyBundledApp()
+        if (!userImported && lastBundled != currentVersion) {
+            copyBundledApp()
+            htmlPrefs.edit().putString("bundled_html_version", currentVersion).apply()
+            return
+        }
+        copyBundledAssetsIfMissing(appDir)
     }
 
     private fun copyBundledApp() {
@@ -660,6 +675,10 @@ class MainActivity : AppCompatActivity() {
             ) {
                 appDir.deleteRecursively()
                 copyBundledApp()
+                htmlPrefs.edit()
+                    .putBoolean("html_user_imported", false)
+                    .putString("bundled_html_version", packageManager.getPackageInfo(packageName, 0).versionName)
+                    .apply()
                 loadApp()
                 toast("Restored default app (your data was kept)", force = true)
             }
@@ -830,6 +849,7 @@ class MainActivity : AppCompatActivity() {
             }
             // For ZIP imports that did not include manuals.js, fill the gap from assets.
             copyBundledAssetsIfMissing(appDir)
+            htmlPrefs.edit().putBoolean("html_user_imported", true).apply()
             toast("App updated")
             loadApp()
         } catch (e: Exception) {

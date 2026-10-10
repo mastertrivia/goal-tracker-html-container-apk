@@ -58,6 +58,7 @@ class TimerActionReceiver : BroadcastReceiver() {
                 }
                 ACTION_DISMISS_ALARM -> {
                     val id = intent.getIntExtra("id", 0)
+                    AlarmPlaybackService.stopPlayback(context)
                     val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                     nm.cancel(id)
                 }

@@ -138,12 +138,92 @@ body.bomb-danger{background-color:#EF4444;}
   .rc-rating.rc-locked{opacity:.45;pointer-events:none;}
   .rc-done.rc-locked{opacity:.45;pointer-events:auto;cursor:pointer;}
   .rc-input-row{display:grid;grid-template-columns:minmax(0,3fr) minmax(92px,.72fr);gap:8px;margin-top:8px;}
-  .rc-note{width:100%;height:40px;border:1.5px solid var(--border);border-radius:12px;background:var(--card);padding:0 12px;font:500 12.5px 'Inter',sans-serif;color:var(--text);min-width:0;}
+  .rc-note{width:100%;height:40px;border:1.5px solid var(--border);border-radius:12px;background:var(--card);padding:0 8px;font:500 12.5px 'Inter',sans-serif;color:var(--text);min-width:0;}
   .rc-note::placeholder{color:var(--text-dim);opacity:.85;}
   .rc-note:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,79,232,.10);}
+  .rc-recent-comments{display:flex;align-items:center;gap:5px;overflow:hidden;margin-top:5px;min-width:0;}
+  .rc-recent-chip{flex:0 1 auto;min-width:0;max-width:25%;height:22px;padding:0 7px;border:1px solid rgba(91,79,232,.16);border-radius:999px;background:rgba(91,79,232,.055);color:var(--text-dim);font:500 8.5px 'Inter',sans-serif;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none;}
+  .rc-recent-chip:active{transform:scale(.97);background:rgba(91,79,232,.10);}
+  .rc-recent-chip:focus-visible{outline:1.5px solid var(--primary);outline-offset:1px;}
   .rc-done{height:40px;border:none;border-radius:12px;background:linear-gradient(155deg,#6E63EF 0%,var(--primary) 100%);color:#fff;font:800 12.5px 'Inter',sans-serif;box-shadow:0 6px 14px rgba(91,79,232,.22);cursor:pointer;}
   .rc-done:active{transform:scale(.97);}
   @media (max-width:360px){.rc-input-row{grid-template-columns:minmax(0,1fr) 86px;gap:7px}.rc-ratings{gap:6px}.rc-rating{flex-basis:50px;width:50px;height:39px;font-size:18px;}}
+  /* CONTENT-PACE STUDY PLANNER — converts content quantity into an exact time target. */
+  .rc-progress-row{margin-top:9px;padding:9px 10px 8px;border-radius:12px;background:linear-gradient(155deg,#F7F5FF 0%,#F0EEFF 100%);border:1px solid rgba(91,79,232,.10);}
+  .rc-progress-label{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;font-size:9.5px;font-weight:800;letter-spacing:.06em;color:var(--primary);text-transform:uppercase;}
+  .rc-progress-input-wrap{display:flex;align-items:center;gap:8px;}
+  .rc-video-time-wrap{display:flex;align-items:center;gap:5px;flex:1 1 auto;min-width:0;}
+  .rc-video-time{width:64px;height:36px;border:1.5px solid var(--border);border-radius:10px;background:#fff;padding:0 8px;font:700 13px 'Inter',sans-serif;color:var(--text);min-width:0;text-align:center;}
+  .rc-video-time:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,79,232,.10);}
+  .rc-video-unit{font-size:8px;font-weight:800;color:var(--text-dim);letter-spacing:.05em;}
+  .rc-progress-input{width:100%;height:36px;border:1.5px solid var(--border);border-radius:10px;background:#fff;padding:0 10px;font:700 13px 'Inter',sans-serif;color:var(--text);min-width:0;}
+  .rc-progress-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,79,232,.10);}
+  .rc-progress-preview{font:800 11px 'Poppins',sans-serif;white-space:nowrap;color:var(--text-dim);min-width:82px;text-align:right;}
+  .study-derived-box{margin:6px 0 12px;padding:9px 11px;border-radius:11px;background:var(--primary-light);color:var(--primary);font-size:11px;font-weight:600;line-height:1.4;}
+  .study-derived-box b{font-family:'Poppins',sans-serif;font-size:13px;}
+  .study-derived-box span{display:block;margin-top:2px;color:var(--text-dim);font-size:10px;font-weight:500;}
+  #studyContentFields .field{margin-bottom:10px;}
+
+  #nonStudyTaskLayout{display:none;}
+  #nonStudyTaskLayout .nonstudy-task-row{display:flex;gap:10px;}
+  #nonStudyTaskLayout .nonstudy-task-row .field{flex:1;min-width:0;}
+  .task-subject-icon-row{display:grid !important;grid-template-columns:minmax(0,3fr) minmax(0,1fr);}
+  .study-method-row{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
+  .study-quantity-row{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
+  .study-unit-pair{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:7px;}
+  .study-unit-pair .task-select{margin-bottom:0;}
+  .study-derived-box{margin:2px 0 12px;padding:12px 13px;border-radius:14px;background:linear-gradient(145deg,#f5f2ff,#ece9ff);border:1px solid rgba(91,79,232,.12);color:var(--primary);text-align:left;}
+  .study-derived-title{font-size:9.5px;letter-spacing:.08em;font-weight:800;color:var(--text-dim);margin-bottom:3px;}
+  .study-derived-main{font-family:'Poppins',sans-serif;font-size:20px;line-height:1.15;font-weight:800;color:var(--primary);}
+  .study-derived-formula{margin-top:5px;font-size:11px;line-height:1.35;font-weight:600;color:var(--text-dim);}
+  .study-derived-formula b{color:var(--text);font-weight:800;}
+  /* Version 20.6: Duration stays beside Study Method when Duration mode is selected. */
+  /* Version 20.8 — premium task header + true inline Duration field. */
+  /* Version 20.9 — continuous Pomodoro-log chart separators + live running countdown. */
+  .task-modal-head{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-22px -18px 12px;padding:14px 18px 8px;min-height:58px;}
+  .task-modal-head h2{margin:0;min-width:0;}
+  .task-modal-head-actions{display:flex;align-items:center;gap:8px;margin-right:-18px;margin-top:-14px;}
+  .task-modal-head-actions #taskCloseBtn{flex:0 0 40px;}
+  #taskDurationField.study-duration-inline{width:auto;margin:0;position:static;z-index:auto;align-self:start;}
+  #taskDurationField.study-duration-inline .dur-split{gap:6px;}
+  #taskDurationField.study-duration-inline .dur-box{min-width:0;}
+  #taskDurationField.study-duration-inline .dur-split{gap:6px;}
+  #taskDurationField.study-duration-inline .dur-box{min-width:0;}
+  /* Thin, single-line live calculation preview. */
+  .study-derived-box{display:flex;align-items:center;gap:10px;min-height:42px;margin:2px 0 12px;padding:7px 11px;border-radius:12px;background:linear-gradient(145deg,#f7f5ff,#efedff);border:1px solid rgba(91,79,232,.12);box-shadow:0 2px 8px rgba(91,79,232,.05);color:var(--primary);overflow:hidden;}
+  .study-derived-main{flex:0 0 auto;font-family:'Poppins',sans-serif;font-size:19px;line-height:1;font-weight:800;color:var(--primary);white-space:nowrap;}
+  .study-derived-formula{min-width:0;margin:0;font-size:10.5px;line-height:1.2;font-weight:600;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .study-derived-formula b{color:var(--text);font-weight:800;}
+  #taskDurationField.content-calculated{display:none;}
+  #studyContentFields .task-select{margin-bottom:0;}
+  #taskDurationField.content-calculated .dur-box{background:#F4F2FF;border-color:rgba(91,79,232,.14);}
+  #taskDurationField.content-calculated input{color:var(--primary);font-weight:800;}
+  /* Version 20.6 — ultra-compact live Duration preview. */
+  .study-derived-box{display:flex;align-items:center;gap:10px;min-height:34px;height:34px;margin:2px 0 12px;padding:0 11px;border-radius:10px;background:linear-gradient(145deg,#f7f5ff,#efedff);border:1px solid rgba(91,79,232,.12);box-shadow:0 2px 7px rgba(91,79,232,.045);overflow:hidden;white-space:nowrap;}
+  .study-derived-main{flex:0 0 auto;font-family:'Poppins',sans-serif;font-size:9.5px;line-height:1;font-weight:800;letter-spacing:.07em;color:var(--text-dim);white-space:nowrap;}
+  .study-derived-formula{flex:1 1 auto;min-width:0;margin:0;font-size:10.5px;line-height:1;font-weight:600;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .study-derived-formula b{font-family:'Poppins',sans-serif;color:var(--primary);font-size:12.5px;font-weight:900;}
+  /* Version 20.8 — automatic content duration is a real full-width Duration field. */
+  .study-derived-field{display:block;}
+  .study-derived-field>label{display:block;margin-bottom:7px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);}
+  .study-derived-preview{height:42px;display:flex;align-items:center;width:100%;box-sizing:border-box;border:1.5px solid rgba(91,79,232,.18);border-radius:12px;background:linear-gradient(145deg,#F7F5FF,#F0EEFF);padding:0 12px;box-shadow:0 2px 9px rgba(91,79,232,.055);overflow:hidden;}
+  .study-derived-field .study-derived-formula{display:block;width:100%;font-size:10.5px;line-height:1.1;font-weight:650;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .study-derived-field .study-derived-formula b{font-family:'Poppins',sans-serif;color:var(--primary);font-size:14px;font-weight:900;}
+  .study-derived-field .study-derived-formula .formula-main{color:var(--text-dim);}
+
+  /* Explicitly preserve the original Current Activity segmented-bar appearance. */
+  #caSegs .ca-track{background:#E7E5F2;}
+  #caSegs .ca-fill{background:var(--primary);}
+  /* Version 20.8 — compact session progress feed. */
+  .rc-progress-row{margin-top:8px;padding:8px 10px;border-radius:11px;background:linear-gradient(145deg,#F7F5FF,#EFEDFF);border:1px solid rgba(91,79,232,.10);box-shadow:0 2px 8px rgba(91,79,232,.04);}
+  .rc-progress-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;}
+  .rc-progress-your{font-size:9.5px;font-weight:800;letter-spacing:.07em;color:var(--primary);text-transform:uppercase;white-space:nowrap;}
+  .rc-progress-topper{font-size:9.5px;font-weight:700;color:var(--text-dim);white-space:nowrap;}
+  .rc-progress-input-wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;}
+  .rc-progress-input{height:34px;border-radius:9px;font-size:12.5px;}
+  .rc-progress-preview{min-width:0;font-size:10px;font-weight:800;text-align:right;white-space:nowrap;}
+  .rc-progress-preview.ahead{color:var(--green-dark);}.rc-progress-preview.behind{color:var(--red);}.rc-progress-preview.on-time{color:var(--primary);}
+
   /* Generic card shell reused by most Home screen widgets */
   .card{background:var(--card);border:var(--card-border);border-radius:22px;box-shadow:var(--shadow);padding:18px;}
   .card-label{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:14px;}
@@ -303,6 +383,17 @@ body.bomb-danger{background-color:#EF4444;}
   .section-title-row .line{flex:1;height:1px;background:var(--border);}
   .section-title-row .t{font-size:12.5px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;white-space:nowrap;}
 
+  .pomo-row{grid-template-columns:22px minmax(0,1fr) auto auto !important;}
+  .pomo-p{min-width:62px;text-align:center;font-size:10px;font-weight:800;color:var(--primary);}
+  .pomo-progress{display:inline-flex;align-items:center;justify-content:center;min-width:52px;padding:3px 6px;border-radius:7px;background:var(--primary-light);color:var(--primary);font-size:10px;font-weight:800;}
+  .pomo-progress.ahead{background:var(--green-light);color:var(--green-dark);}
+  .pomo-progress.behind{background:var(--red-light);color:var(--red-dark);}
+  .pace-result{margin-top:8px;padding:9px 11px;border-radius:11px;background:#FAF9FF;border:1px solid var(--border);font-size:10.5px;color:var(--text-dim);line-height:1.55;}
+  .pace-result b{color:var(--primary);font-weight:800;}
+  .pace-final{margin-top:3px;font-weight:800;}
+  .pace-final.ahead{color:var(--green-dark);}
+  .pace-final.behind{color:var(--red);}
+
   /* Generic form fields + buttons reused by Tasks and Settings screens */
   .plain-card{background:var(--card);border:var(--card-border);border-radius:20px;box-shadow:var(--shadow);padding:4.2px 19px 4.2px;margin-bottom:14px;}
   .plain-card h3{margin:0 0 2px;font-size:20px;color:var(--text);font-weight:700;}
@@ -359,6 +450,8 @@ body.bomb-danger{background-color:#EF4444;}
   /* Helper text — matches .hdr-hearts .lbl typography: ultra-compact, bold, uppercase, tight spacing */
   .hdr-goal-helper{font-size:9.5px;font-weight:700;color:var(--text-dim);line-height:1.2;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;letter-spacing:0.05em;opacity:0.9;}
    .hdr-goal-delay{font-size:8.5px;font-weight:400;color:#DC2626;line-height:1.2;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0.01em;opacity:1;}
+  .hdr-goal-extra{font-family:'Inter',sans-serif;font-size:8.5px;font-weight:700;color:var(--text-dim);letter-spacing:0.01em;white-space:nowrap;margin-left:2px;opacity:0.9;}
+  .hdr-goal-delay-sep{display:inline-block;margin:0 5px;color:currentColor;font-weight:600;opacity:.65;}
   .hdr-session-sep{display:inline-block;margin:0 8px;color:currentColor;font-weight:600;opacity:.82;}
   /* Info button on the study widget — inline with label, 20% smaller, subtle grey */
   .hdr-goal-info{width:14px;height:14px;padding:0;border:none;background:transparent;color:var(--text-dim);cursor:pointer;opacity:0.5;display:flex;align-items:center;justify-content:center;transition:opacity .15s;flex-shrink:0;}
@@ -593,6 +686,12 @@ body.bomb-danger{background-color:#EF4444;}
   .hist-task-cat{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;}
   .hist-task-time{font-size:11.5px;color:var(--text-dim);font-weight:600;}
   .hist-task-name{font-weight:700;font-size:15px;color:var(--text);margin-bottom:10px;}
+/* Study quantity field — inline muted unit suffix that stays immediately after the number */
+.study-quantity-shell{position:relative;width:100%;height:50px;border:1.5px solid var(--border);border-radius:13px;background:#fff;overflow:hidden;box-sizing:border-box;}
+.study-quantity-shell:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,79,232,.10);}
+.study-quantity-shell input{width:100%;height:100%;border:0!important;outline:0!important;background:transparent!important;box-shadow:none!important;padding:0 78px 0 12px;font:600 14px 'Inter',sans-serif;color:var(--text);box-sizing:border-box;}
+.study-quantity-unit{position:absolute;top:50%;transform:translateY(-50%);right:12px;left:auto;pointer-events:none;color:var(--text-dim);font:600 12px 'Inter',sans-serif;white-space:nowrap;opacity:.72;}
+
 /* Pomodoro Log — ultra-compact reflections table inside Study Task Progress cards */
 .hist-name-row{display:flex;align-items:center;gap:7px;margin-bottom:10px;}
 .hist-name-row .hist-task-name{margin-bottom:0;}
@@ -602,7 +701,20 @@ body.bomb-danger{background-color:#EF4444;}
   .pomo-toggle{position:absolute;top:0;left:0;width:38px;height:46px;border:none;border-radius:19px 0 16px 0;background:var(--primary-light,#EEECFE);color:var(--primary);font-size:16.8px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;z-index:2;}
 .pomo-toggle:active{opacity:.75;}
 .hist-top-left{padding-left:28px;}
-.pomo-log{margin-top:8px;background:rgba(139,135,166,0.07);border-radius:10px;padding:6px 7px;}
+ .pomo-log{margin-top:8px;background:rgba(139,135,166,0.07);border-radius:10px;padding:6px 7px;}
+ .pomo-chart{position:relative;border-radius:8px;overflow:hidden;}
+ .pomo-chart::before{content:"";position:absolute;left:5px;right:5px;top:0;bottom:0;pointer-events:none;z-index:4;
+   background:linear-gradient(to right,
+     transparent 0,transparent 28px,rgba(139,135,166,.22) 28px,rgba(139,135,166,.22) 29px,
+     transparent 29px,transparent 76px,rgba(139,135,166,.22) 76px,rgba(139,135,166,.22) 77px,
+     transparent 77px,transparent 114px,rgba(139,135,166,.22) 114px,rgba(139,135,166,.22) 115px,
+     transparent 115px,transparent calc(100% - 40px),rgba(139,135,166,.22) calc(100% - 40px),rgba(139,135,166,.22) calc(100% - 39px),
+     transparent calc(100% - 39px),transparent 100%);}
+ .pomo-table-head{display:grid;grid-template-columns:28px 48px 38px minmax(0,1fr) 34px;align-items:center;gap:0;padding:1px 5px 4px;color:var(--text-dim);font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;}
+ .pomo-table-head>span:not(:first-child),.pomo-row>span:not(:first-child){border-left:none;padding-left:7px;}
+ .pomo-table-head .right{text-align:center;}.pomo-row{display:grid !important;grid-template-columns:28px 48px 38px minmax(0,1fr) 34px !important;align-items:center;gap:0;background:var(--card,#fff);border-radius:7px;padding:3px 6px;margin-bottom:3px;position:relative;z-index:1;}
+ .pomo-row .pomo-c{min-width:0;padding-left:7px;}.pomo-row .pomo-n,.pomo-row .pomo-topper,.pomo-row .pomo-you{padding-left:0 !important;}.pomo-row .pomo-m{justify-self:center;}.pomo-row .pomo-m{justify-self:center;}.pomo-row .pomo-m .pomo-add{width:18px;height:18px;}.pomo-topper,.pomo-you{font-size:9.5px;font-weight:800;white-space:nowrap;}
+.pomo-run-time{font-size:8.5px !important;font-weight:700 !important;color:var(--text-dim) !important;}.pomo-topper{color:var(--text-dim);}.pomo-you{color:var(--primary);}
 .pomo-log-head{display:flex;align-items:center;justify-content:space-between;gap:5px;font-size:10.5px;font-weight:700;color:var(--text-dim);padding:1px 2px 5px;}
 .pomo-count{font-size:10.5px;font-weight:800;color:var(--text);}
 /* Muted grey Running badge + countdown row inside the Pomodoro Log dropdown */
@@ -1392,7 +1504,7 @@ body.bomb-danger{background-color:#EF4444;}
     <!-- STEP 1 — Reality Check visual layer. Functional gating/countdown will be wired later. -->
     <div class="card rc-card" id="realityCheckCard">
       <div class="rc-head">
-        <div class="rc-title" id="rcTitle">REALITY CHECK</div>
+        <div class="rc-title" id="rcTitle">REALITY CHECK <span id="rcSessionId" style="font-size:9px;font-weight:700;color:var(--text-dim);letter-spacing:.02em;"></span></div>
         <div class="rc-deadline" id="rcDeadline" aria-label="Reality Check time remaining">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.7v4.8l3.1 1.8"></path></svg>
           <span>--:--</span>
@@ -1405,10 +1517,24 @@ body.bomb-danger{background-color:#EF4444;}
         <button type="button" class="rc-rating r4">4</button>
         <button type="button" class="rc-rating r5">5</button>
       </div>
+      <div class="rc-progress-row" id="rcProgressRow" style="display:none;">
+        <div class="rc-progress-top"><span class="rc-progress-your" id="rcProgressYour">YOUR PROGRESS</span><span class="rc-progress-topper" id="rcProgressTopper">Topper —</span></div>
+        <div class="rc-progress-input-wrap">
+          <input class="rc-progress-input" id="rcProgressInput" type="text" inputmode="decimal" placeholder="Enter your progress" aria-label="Session progress">
+          <div class="rc-video-time-wrap" id="rcVideoTimeWrap" style="display:none;">
+            <input class="rc-video-time" id="rcVideoHH" type="number" min="0" max="999" inputmode="numeric" placeholder="00" aria-label="Video hours">
+            <span class="rc-video-unit">HR</span>
+            <input class="rc-video-time" id="rcVideoMM" type="number" min="0" max="59" inputmode="numeric" placeholder="00" aria-label="Video minutes">
+            <span class="rc-video-unit">MIN</span>
+          </div>
+          <span class="rc-progress-preview" id="rcProgressPreview"></span>
+        </div>
+      </div>
       <div class="rc-input-row">
         <input class="rc-note" id="rcNote" type="text" maxlength="120" placeholder="Comment or note…" aria-label="Comment or note">
         <button type="button" class="rc-done" id="rcDone">Done</button>
       </div>
+      <div class="rc-recent-comments" id="rcRecentComments" aria-label="Recent comments" style="display:none;"></div>
     </div>
 
     <!-- THOUGHT LOGGER — compact persistent category dropdown. Counts are independent of the active task. -->
@@ -1698,7 +1824,7 @@ body.bomb-danger{background-color:#EF4444;}
       <div class="plain-card">
         <div class="goal-settings-launch" data-sub="subMilestonesRevision">
           <div class="gl-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="#fff" stroke="none"/></svg></div>
-          <div class="gl-txt"><div class="gl-t1">Planner &amp; Revision</div><div class="gl-t2">Study planning, milestones &amp; revision system</div></div>
+          <div class="gl-txt"><div class="gl-t1">Planner, Revision &amp; Pending</div><div class="gl-t2">Study planning, revision system &amp; pending tasks</div></div>
           <div class="gl-chev">›</div>
         </div>
       </div>
@@ -1900,6 +2026,16 @@ body.bomb-danger{background-color:#EF4444;}
             </div>
           </div>
 
+          <div style="height:1px;background:var(--border);margin:10px 0;opacity:0.55;"></div>
+
+          <!-- §10 Extra Info — DISPLAY ONLY. Reads existing §1/§8 values; never feeds back into the engine. -->
+          <div class="dbg-section">
+            <div class="dbg-label">§10 &nbsp; Extra Info</div>
+            <div class="dbg-eq dbg-formula">Status = <span id="dbgExtraStatus" class="dbg-dim">—</span></div>
+            <div class="dbg-eq dbg-intermediate">Plan difference = <span id="dbgExtraDifference" class="dbg-dim">—</span></div>
+            <div class="dbg-eq">Actual wasted = <span id="dbgActualWasted" class="dbg-val">—</span></div>
+          </div>
+
           <!-- Manual Refresh — the only way to update; no background polling -->
           <div style="margin-top:18px;text-align:right;">
             <button onclick="renderHomeWidgetDebugCard()" style="font-size:12px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;">Refresh</button>
@@ -2072,9 +2208,9 @@ body.bomb-danger{background-color:#EF4444;}
       <div class="gset-header" style="justify-content:flex-start;gap:12px;">
         <button class="gset-back set-sub-back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
         <div class="tabs" id="milestonesRevisionTabs" style="display:flex;flex:1;gap:0;background:var(--bg);border-radius:8px;padding:3px;overflow:hidden;">
-          <div class="tab active" data-mr-tab="planner" style="flex:1;text-align:center;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;transition:all 0.2s;background:var(--gp-primary);color:#fff;">Planner</div>
-          <div class="tab" data-mr-tab="revision" style="flex:1;text-align:center;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;transition:all 0.2s;color:var(--text);">Revision</div>
-          <div class="tab" data-mr-tab="pending" style="flex:1;text-align:center;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;transition:all 0.2s;color:var(--text);">Pending</div>
+          <div class="tab active" data-mr-tab="planner" style="flex:1;text-align:center;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;transition:all 0.2s;background:var(--gp-primary);color:#fff;"><span id="mrTabLabelPlanner">Planner</span></div>
+          <div class="tab" data-mr-tab="revision" style="flex:1;text-align:center;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;transition:all 0.2s;color:var(--text);"><span id="mrTabLabelRevision">Revision</span><span id="mrTabRevisionCount" style="font-size:10px;font-weight:700;margin-left:4px;opacity:.82;"></span></div>
+          <div class="tab" data-mr-tab="pending" style="flex:1;text-align:center;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;transition:all 0.2s;color:var(--text);"><span id="mrTabLabelPending">Pending</span><span id="mrTabPendingCount" style="font-size:10px;font-weight:700;margin-left:4px;opacity:.82;"></span></div>
         </div>
       </div>
       <!-- Planner Tab Content -->
@@ -2160,8 +2296,11 @@ body.bomb-danger{background-color:#EF4444;}
       <div class="plain-card">
         <h3>Reality Check</h3>
         <div class="subtext" style="margin-top:0;">Show the compact Reality Check layer on the Home screen after Current Activity.</div>
-        <div class="and-row"><div class="ar-txt"><div class="ar-t1">Enable Reality Check</div><div class="ar-t2">When enabled, the Reality Check is the same Pomodoro reflection entry shown by the old + button.</div></div><label class="tg-switch"><input type="checkbox" id="setRealityCheckEnabled"><span class="slider"></span></label></div>
+        <div class="and-row"><div class="ar-txt"><div class="ar-t1">Enable Reality Check</div><div class="ar-t2">When enabled, the Reality Check appears after each completed Pomodoro and stays visible for the configured window.</div></div><label class="tg-switch"><input type="checkbox" id="setRealityCheckEnabled"><span class="slider"></span></label></div>
         <div class="field" style="margin-top:12px;"><label>Reality Check Duration (minutes)</label><input type="number" id="setRealityCheckDuration" min="1" step="1"></div>
+        <div class="and-row" style="margin-top:12px;"><div class="ar-txt"><div class="ar-t1">Ask for Rating</div><div class="ar-t2">Show the 1–5 seriousness rating in every Reality Check.</div></div><label class="tg-switch"><input type="checkbox" id="setRealityCheckRating"><span class="slider"></span></label></div>
+        <div class="and-row"><div class="ar-txt"><div class="ar-t1">Require Comment</div><div class="ar-t2">When enabled, a comment must be entered before Done can be submitted.</div></div><label class="tg-switch"><input type="checkbox" id="setRealityCheckCommentRequired"><span class="slider"></span></label></div>
+        <div class="and-row"><div class="ar-txt"><div class="ar-t1">Ask for Topper Progress</div><div class="ar-t2">For content-based Study tasks, ask what you completed and compare it with the automatic Topper pace.</div></div><label class="tg-switch"><input type="checkbox" id="setRealityCheckProgress"><span class="slider"></span></label></div>
         <div class="subtext" id="realityCheckDurationHint" style="margin:-2px 0 0;font-size:10.5px;line-height:1.45;">Maximum: one minute less than the current Pomodoro Duration.</div>
       </div>
       <div class="plain-card">
@@ -3017,6 +3156,25 @@ body.bomb-danger{background-color:#EF4444;}
         </div>
       </div>
     </div>
+    <div class="plain-card" id="pendingControlsCard" style="display:none;padding:12px 14px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="min-width:0;flex:1;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);">Pending Expiry</div>
+          <div style="font-size:10.5px;color:var(--text-dim);margin-top:3px;line-height:1.4;">Pending tasks are automatically removed after the selected number of days.</div>
+        </div>
+        <select id="pendingExpirySelect" class="task-select" style="width:auto;min-width:112px;margin:0;padding:9px 12px;">
+          <option value="7">7 days</option>
+          <option value="14">14 days</option>
+          <option value="21">21 days</option>
+          <option value="28">28 days</option>
+          <option value="30">30 days</option>
+          <option value="50">50 days</option>
+          <option value="60">60 days</option>
+          <option value="90">90 days</option>
+        </select>
+      </div>
+      <button id="pendingDeleteAllBtn" class="btn-full danger" style="margin-top:12px;">Delete All Pending</button>
+    </div>
     <div id="planDetailTasksContainer" class="plain-card" style="display:flex;flex-direction:column;gap:0;margin-bottom:40px;padding:0;"></div>
   </div>
 
@@ -3201,7 +3359,7 @@ body.bomb-danger{background-color:#EF4444;}
 <!-- Add/Edit Task Modal - Create or update a reusable task (name, category, icon, color, duration) -->
 <div class="overlay" id="taskOverlay">
   <div class="sheet">
-    <div style="display:flex;align-items:center;justify-content:space-between;"><h2 id="taskModalTitle">Add Task</h2><div style="display:flex;align-items:center;gap:8px;"><button id="taskCloseBtn" aria-label="Close task editor" style="display:none;width:40px;height:40px;padding:0;background:var(--red-light);color:var(--red);border:1px solid rgba(239,68,68,.18);border-radius:50%;font-size:24px;line-height:1;align-items:center;justify-content:center;">×</button><button id="taskDeleteBtn" style="display:none;background:var(--red);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-weight:700;font-size:13px;">Delete</button></div></div>
+    <div class="task-modal-head"><h2 id="taskModalTitle">Add Task</h2><div class="task-modal-head-actions"><button id="taskCloseBtn" aria-label="Close task editor" style="display:none;width:40px;height:40px;padding:0;background:var(--red-light);color:var(--red);border:1px solid rgba(239,68,68,.18);border-radius:50%;font-size:24px;line-height:1;align-items:center;justify-content:center;">×</button><button id="taskDeleteBtn" style="display:none;background:var(--red);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-weight:700;font-size:13px;">Delete</button></div></div>
     <div class="field"><label>Name</label><input type="text" id="taskNameInput"></div>
     <div id="manualProgressInfo" style="display:none;">
       <div class="field" id="manualSubjectInfo"><label>Subject</label><div id="manualSubjectValue" style="padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-weight:600;color:var(--text-dim);"></div></div>
@@ -3218,20 +3376,50 @@ body.bomb-danger{background-color:#EF4444;}
         <!-- <div class="ca-radio" data-countas="health"><span class="ca-dot"></span><span class="ca-txt">Health</span></div> -->
       </div>
     </div>
-    <div class="field" id="taskSubjectField" style="display:none;"><label>Subject</label><select class="task-select" id="taskSubjectInput" style="margin-bottom:0;"></select></div>
-    <div class="field-row2" id="taskIconColorRow">
-      <div class="field"><label>Icon (emoji)</label><input type="text" id="taskIconInput" maxlength="4" placeholder="📖"></div>
-      <div class="field"><label id="colorFieldLabel">Difficulty Level</label><select class="task-select" id="taskColorInput" style="margin-bottom:0;"></select></div>
+    <div id="nonStudyTaskLayout" style="display:none;">
+      <div class="field-row2 nonstudy-task-row" id="nonStudyTopRow"></div>
+      <div class="field-row2 nonstudy-task-row" id="nonStudyBottomRow"></div>
     </div>
-    <div class="field-row2" id="taskDurationSlotRow">
-      <div class="field" id="taskDurationField"><label>Duration</label>
-        <div class="dur-split">
-          <div class="dur-box"><input type="text" id="taskDurHH" inputmode="numeric" maxlength="2" placeholder="00"><span class="dur-sub">HH</span></div>
-          <div class="dur-colon">:</div>
-          <div class="dur-box"><input type="text" id="taskDurMM" inputmode="numeric" maxlength="2" placeholder="30"><span class="dur-sub">MM</span></div>
+    <div class="field-row2 task-subject-icon-row" id="taskSubjectIconRow">
+      <div class="field" id="taskSubjectField" style="display:none;"><label>Subject</label><select class="task-select" id="taskSubjectInput" style="margin-bottom:0;"></select></div>
+      <div class="field" id="taskIconField"><label>Icon (emoji)</label><input type="text" id="taskIconInput" maxlength="4" placeholder="📖"></div>
+    </div>
+    <div id="studyContentFields" style="display:none;">
+      <div class="field-row2 study-method-row">
+        <div class="field"><label>Study Method</label><select class="task-select" id="studyMethodInput" style="margin-bottom:0;">
+          <option value="legacy">⏱ Duration</option>
+          <option value="reading">📖 Reading</option>
+          <option value="video">🎥 Video / Lecture</option>
+          <option value="writing">✍️ Writing / Questions</option>
+        </select></div>
+        <div class="field" id="studyMeasureField" style="display:none;"><label>Measure By</label><select class="task-select" id="studyUnitInput" style="margin-bottom:0;"></select></div>
+      </div>
+      <div id="studyUnitFields" style="display:none;">
+        <div class="field-row2 study-quantity-row">
+          <div class="field"><label>Quantity</label><div class="study-quantity-shell" id="studyQuantityShell"><input type="number" id="studyQuantityInput" min="0" step="any" value="0" placeholder="0" aria-label="Quantity"><span class="study-quantity-unit" id="studyQuantityUnit">questions</span></div></div>
+          <div class="field"><label id="studyAvgLabel">Average Time Per Unit</label><div class="study-unit-pair"><input type="number" id="studyAvgInput" min="0.01" step="any" placeholder="1"><select class="task-select" id="studyAvgUnitInput"><option value="s">Sec</option><option value="m" selected>Min</option><option value="h">Hr</option></select></div></div>
         </div>
       </div>
-      <div class="field"><label>Preferred Slot</label><select class="task-select" id="taskSlotInput" style="margin-bottom:0;"></select>
+      <div id="studyVideoFields" style="display:none;">
+        <div class="field"><label>Playback Speed</label><select class="task-select" id="studyVideoSpeed" style="margin-bottom:0;">
+          <option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="1.75">1.75×</option><option value="2">2×</option><option value="2.5">2.5×</option><option value="3">3×</option><option value="4">4×</option>
+        </select></div>
+      </div>
+      <div class="field study-derived-field" id="studyDerivedBox" aria-live="polite">
+        <label>Duration</label>
+        <div class="study-derived-preview"><span class="study-derived-formula" id="studyDerivedFormula">0 pages × 1 min = <b>0m</b></span></div>
+      </div>
+    </div>
+    <div class="field" id="taskDurationField"><label>Duration</label>
+      <div class="dur-split">
+        <div class="dur-box"><input type="text" id="taskDurHH" inputmode="numeric" maxlength="2" placeholder="00"><span class="dur-sub">HH</span></div>
+        <div class="dur-colon">:</div>
+        <div class="dur-box"><input type="text" id="taskDurMM" inputmode="numeric" maxlength="2" placeholder="30"><span class="dur-sub">MM</span></div>
+      </div>
+    </div>
+    <div class="field-row2" id="taskDifficultySlotRow">
+      <div class="field" id="taskColorField"><label id="colorFieldLabel">Difficulty Level</label><select class="task-select" id="taskColorInput" style="margin-bottom:0;"></select></div>
+      <div class="field" id="taskSlotField"><label>Preferred Slot</label><select class="task-select" id="taskSlotInput" style="margin-bottom:0;"></select>
         <div id="taskSlotRange" style="font-size:10.5px;color:var(--text-dim);font-weight:500;margin-top:4px;min-height:13px;"></div>
       </div>
     </div>
@@ -3575,6 +3763,7 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
   totalAvailableHours: 16,
   studyHours: 14,
   avgRevisionSec: 0, // Temporary: average daily revision duration in seconds used for Expected Finish estimation
+  pendingExpiryDays: 30, // Pending carry-over lifetime; records expire automatically after this many days
   lockTodayEditing: true, // Hide Edit button for Today's tasks during the active Study Day
   historyShortFilter: 0, // Minimum duration (seconds) for a history row to appear in the Timeline/Activity view. 0 = Off (show all).
   studySessionCounter: false, // Home Study Session Counter display preference
@@ -3582,6 +3771,9 @@ const CAT_LABEL = {study:'FOCUS TIME', routine:'ROUTINE TIME', health:'HEALTH TI
   thoughtsEnabled: true, // Compact Home Thought Logger visibility
   realityCheckEnabled: true, // Compact Home Reality Check visibility
   realityCheckDuration: 2*60, // seconds; must be strictly shorter than one Pomodoro session
+  realityCheckRating: true, // Ask for 1–5 rating
+  realityCheckCommentRequired: false, // Comment is optional by default
+  realityCheckProgress: true, // Ask for content progress on Reading/Video/Writing tasks
   thoughtCategories: ['Fear','Social Media','Study','Thought'], // Legacy active-name mirror; IDs live in thoughtCategoryMeta
   thoughtCategoryMeta: [
     {id:'tc_fear',name:'Fear',active:true,order:0},
@@ -3850,6 +4042,8 @@ async function getState(){
   if(!s.planners) s.planners = [];
   if(!Array.isArray(s.plannerChapters)) s.plannerChapters = [];
   if(!Array.isArray(s.plannerPending)) s.plannerPending = [];
+  if(!s.settings || typeof s.settings!=='object') s.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+  if(!Number.isFinite(Number(s.settings.pendingExpiryDays)) || ![7,14,21,28,30,50,60,90].includes(Number(s.settings.pendingExpiryDays))) s.settings.pendingExpiryDays = 30;
   if(s.wakePromotion===undefined) s.wakePromotion = null;
   if(s.missionText===undefined) s.missionText = '';
   if(s.extraStudy===undefined || s.extraStudy===null || typeof s.extraStudy!=='object') s.extraStudy = null;
@@ -3942,6 +4136,9 @@ async function getState(){
   if(s.settings.thoughtsEnabled===undefined) s.settings.thoughtsEnabled = DEFAULT_SETTINGS.thoughtsEnabled;
   if(s.settings.realityCheckEnabled===undefined) s.settings.realityCheckEnabled = DEFAULT_SETTINGS.realityCheckEnabled;
   if(s.settings.realityCheckDuration===undefined || !Number.isFinite(Number(s.settings.realityCheckDuration))) s.settings.realityCheckDuration = DEFAULT_SETTINGS.realityCheckDuration;
+  if(s.settings.realityCheckRating===undefined) s.settings.realityCheckRating = DEFAULT_SETTINGS.realityCheckRating;
+  if(s.settings.realityCheckCommentRequired===undefined) s.settings.realityCheckCommentRequired = DEFAULT_SETTINGS.realityCheckCommentRequired;
+  if(s.settings.realityCheckProgress===undefined) s.settings.realityCheckProgress = DEFAULT_SETTINGS.realityCheckProgress;
   if(!s.thoughtCountsByDay || typeof s.thoughtCountsByDay!=='object') s.thoughtCountsByDay = {};
   if(!s.noThoughtsByDay || typeof s.noThoughtsByDay!=='object') s.noThoughtsByDay = {};
   if(!s.thoughtSessionCountsByDay || typeof s.thoughtSessionCountsByDay!=='object') s.thoughtSessionCountsByDay = {};
@@ -4049,6 +4246,22 @@ function ensureTaskProgressFields(t){
   if(t.finishedEarly===undefined) t.finishedEarly = false;
   if(t.plannedDuration===undefined) t.plannedDuration = null;
   if(t.earlyConsumedSec===undefined) t.earlyConsumedSec = null;
+  // Content-based Study planning fields. Existing tasks remain time-based unless these fields exist.
+  if(t.studyMethod===undefined) t.studyMethod = 'legacy';
+  if(t.progressUnit===undefined) t.progressUnit = null;
+  // Content progress mode: absolute page/question number by default for all existing content tasks.
+  // This migration preserves the existing entered values while changing only their interpretation.
+  if(t.progressMode===undefined){
+    if(t.studyMethod==='video') t.progressMode='videoTime';
+    else if(t.progressUnit==='questions') t.progressMode='questionNumber';
+    else if(t.progressUnit==='pages') t.progressMode='pageNumber';
+    else t.progressMode=null;
+  }
+  if(t.plannedQuantity===undefined) t.plannedQuantity = null;
+  if(t.avgUnitSec===undefined) t.avgUnitSec = null;
+  if(t.videoDurationSec===undefined) t.videoDurationSec = null;
+  if(t.playbackSpeed===undefined) t.playbackSpeed = null;
+  if(t.contentProgress===undefined) t.contentProgress = 0;
   return t;
 }
 // Loads every task from IndexedDB, backfilling progress fields — use this instead of raw idbAll('tasks')
@@ -4299,7 +4512,7 @@ function getStudyProgressRows(){
         mood:    (en && en.saved && en.mood)    ? en.mood    : ''
       };
     });
-    return { id:t.id, name:t.name, subject:(t.category==='others' ? othersLabel(t) : (t.subject||'')), statusKey, pomodoros };
+    return { id:t.id, name:t.name, subject:(t.category==='others' ? othersLabel(t) : (t.subject||'')), statusKey, pomodoros, studyMethod:t.studyMethod||'legacy', progressUnit:t.progressUnit||null, plannedQuantity:t.plannedQuantity||null };
   });
 }
 // {studyTask} — completed Study Progress tasks + status ONLY (no Pomodoro logs, comments, or emoji).
@@ -5415,9 +5628,11 @@ async function recoverState(){
   try{ await syncSleepExtraStudyBoundary(state,false); }catch(e){ console.warn('[extra-study] recovery reconciliation failed',e); }
   state = await getState();
 
-  // Recovery owns the same timestamp/session reconstruction used by the rest of the app. If the
-  // existing RC threshold was crossed while the WebView was backgrounded/killed, immediately route
-  // ONLY to the existing Bomb Exploded card/lock. No BombEngine call is made here.
+  // Recovery also validates the Pomodoro number. If background execution advanced past the session
+  // that owns the pending RC, the old check is invalid and the existing Bomb Exploded flow wins.
+  if(await enforceRealityCheckSessionBinding(state)){ state=await getState(); }
+  // If the existing RC threshold was crossed while the WebView was backgrounded/killed, immediately
+  // route ONLY to the existing Bomb Exploded card/lock. No BombEngine call is made here.
   if(await enforceRealityCheckDeadline(state)){ state=await getState(); }
 
   // Bomb Mode is the master switch. A persisted lock from an older
@@ -6238,7 +6453,20 @@ let rcDraftRating = null;
 let rcDraftNote = '';
 let rcLastPendingKey = null;
 
-function realityCheckEnabled(state=STATE){ return !!(state?.settings?.realityCheckEnabled !== false); }
+function realityCheckEnabled(state=STATE){
+  if(state?.settings?.realityCheckEnabled===false) return false;
+  const s=state?.settings||{};
+  return s.realityCheckRating!==false || !!s.realityCheckCommentRequired || s.realityCheckProgress!==false;
+}
+function realityCheckEnabledForTask(state=STATE,task=null){
+  if(!realityCheckEnabled(state)) return false;
+  const s=state?.settings||{};
+  if(s.realityCheckRating!==false || !!s.realityCheckCommentRequired) return true;
+  return !!(s.realityCheckProgress!==false && task && task.studyMethod && task.studyMethod!=='legacy');
+}
+function realityCheckRatingEnabled(state=STATE){ return !!(state?.settings?.realityCheckRating!==false); }
+function realityCheckCommentRequired(state=STATE){ return !!state?.settings?.realityCheckCommentRequired; }
+function realityCheckProgressEnabled(state=STATE){ return !!(state?.settings?.realityCheckProgress!==false); }
 function realityCheckLimitSec(state=STATE){
   const pomo=Math.max(60,Number(state?.settings?.pomodoroDuration)||1800);
   const raw=Math.round(Number(state?.settings?.realityCheckDuration)||120);
@@ -6260,14 +6488,10 @@ function realityCheckClearPending(state=STATE){
 }
 function realityCheckElapsedSec(state=STATE){
   const p=state?.realityCheckPending;if(!p)return 0;
-  const at=state.activeTimer;
-  // Normal path: read the EXISTING Current Activity/Pomodoro elapsed value. No RC timer exists.
-  if(at && at.type==='study' && at.taskId===p.taskId && Number.isFinite(Number(p.startConsumedSec))){
-    try{const v=caComputeView(at);if(v)return Math.max(0,Number(v.consumed)-Number(p.startConsumedSec));}catch(_){ }
-  }
-  // Only a fallback for a final segment/legacy pending row after the productive timer disappeared.
-  return Number.isFinite(Number(p.deadlineTs)) && Number(p.createdAt)
-    ? Math.max(0,(Date.now()-Number(p.createdAt))/1000) : 0;
+  // Reality Check has its OWN fixed post-Pomodoro window. It must never borrow the
+  // active Pomodoro's elapsed clock, because the next Pomodoro is allowed to start immediately.
+  const start=Number(p.createdAt)||0;
+  return start>0 ? Math.max(0,(Date.now()-start)/1000) : 0;
 }
 function realityCheckRemainingSec(state=STATE){
   const p=state?.realityCheckPending;if(!p)return 0;
@@ -6278,12 +6502,19 @@ function realityCheckRemainingSec(state=STATE){
   return Math.max(0,((Number(p.deadlineTs)||0)-Date.now())/1000);
 }
 
+// Reality Check session binding is intentionally informational, not an immediate-expiry rule.
+// A check belongs to the Pomodoro that just finished, but the next Pomodoro may start immediately.
+// The previous check remains valid until its own fixed deadline. This is what gives the user the
+// configured grace window instead of exploding at the exact session boundary.
+function realityCheckSessionMismatch(state=STATE){ return false; }
+async function enforceRealityCheckSessionBinding(state=STATE){ return false; }
+
 // RC -> EXISTING Bomb Exploded card ONLY.
 // This is intentionally a UI/lock bridge, NOT a Bomb operation:
 // no BombEngine call, no lifeline consumption, no bombRemainingMs change, no Bomb re-arm/reset.
 // The existing Current Activity renderer already uses bombLocked to show the exact Bomb Exploded card.
 async function triggerRealityCheckExplosion(state=STATE, expiryTs=null){
-  if(!state||state.bombLocked)return;
+  if(!state||state.bombLocked||state.realityCheckFreezeActive)return;
   const p=state.realityCheckPending;
   const freezeWallTs = Number.isFinite(Number(expiryTs)) ? Number(expiryTs) : (Number(p?.deadlineTs)||Date.now());
 
@@ -6343,54 +6574,138 @@ function realityCheckPreviewHtml(rating){
   return map[r]||'REALITY CHECK';
 }
 function updateRealityCheckPreview(){
-  const title=document.getElementById('rcTitle');
-  if(!title)return;
+  const title=document.getElementById('rcTitle'); if(!title)return;
   const selected=Number(rcDraftRating)||0;
-  title.innerHTML=realityCheckPreviewHtml(selected);
-  title.classList.toggle('rc-preview',!!selected);
+  const pForTitle=STATE?.realityCheckPending;
+  const logsForTitle=pForTitle?.taskId!=null?(STATE.pomoLogs?.[pForTitle.taskId]||[]):[];
+  const suffix=(pForTitle&&realityCheckPending())?`<span id="rcSessionId" style="font-size:9px;font-weight:700;color:var(--text-dim);letter-spacing:.02em;">· Session ${Number(pForTitle.idx)+1} / ${Math.max(logsForTitle.length,Number(pForTitle.idx)+1)}</span>`:'';
+  title.innerHTML=(selected?realityCheckPreviewHtml(selected):'REALITY CHECK')+suffix; title.classList.toggle('rc-preview',!!selected);
+  const p=STATE?.realityCheckPending, task=p?CACHED_TASKS.find(t=>Number(t.id)===Number(p.taskId)):null;
+  const row=document.getElementById('rcProgressRow'), input=document.getElementById('rcProgressInput'), videoWrap=document.getElementById('rcVideoTimeWrap'), vh=document.getElementById('rcVideoHH'), vm=document.getElementById('rcVideoMM'), your=document.getElementById('rcProgressYour'), topper=document.getElementById('rcProgressTopper'), preview=document.getElementById('rcProgressPreview');
+  const contentMode=!!(task&&task.studyMethod&&task.studyMethod!=='legacy'&&realityCheckProgressEnabled(STATE));
+  if(!row||!input||!task||!contentMode||!realityCheckPending()){if(row)row.style.display='none';return;}
+  row.style.display='block';
+  const meta=getStudyProgressMeta(task,Number(p.idx));
+  const methodName=task.studyMethod==='video'?'VIDEO':task.studyMethod==='writing'?'WRITING':'READING';
+  if(your)your.textContent=`YOUR ${methodName}`;
+  const isVideo=meta?.kind==='video';
+  input.style.display=isVideo?'none':'';
+  if(videoWrap)videoWrap.style.display=isVideo?'flex':'none';
+  if(isVideo){
+    input.value='';
+    input.placeholder='Current video time';
+  }else{
+    if(videoWrap)videoWrap.style.display='none';
+    const mode=normalizeStudyProgressMode(task);
+    input.placeholder=mode==='pageNumber'?'Current page number':mode==='questionNumber'?'Current question number':mode==='pageCount'?'Pages completed this session':'Questions completed this session';
+  }
+  const target=Number(meta?.target)||0, unitName=isVideo?'video':(meta?.unit||'units');
+  const targetText=isVideo?fmtClock(target):fmtContentAmount(target,unitName);
+  if(topper)topper.textContent=`Topper ${targetText}${isVideo?'':' '+unitName}`;
+  let actual=NaN;
+  if(isVideo){
+    const h=Math.max(0,Number(vh?.value)||0),m=Math.max(0,Math.min(59,Number(vm?.value)||0));
+    const ts=(h*3600)+(m*60);
+    actual=(vh?.value!==''||vm?.value!=='')?Math.max(0,ts-(Number(task.contentProgress)||0)):NaN;
+  }else{ actual=Number(String(input.value||'').trim().replace(',','.')); }
+  if(preview){preview.classList.remove('ahead','behind','on-time');
+    if(!Number.isFinite(actual)){preview.textContent='';}
+    else{const d=actual-target;
+      if(Math.abs(d)<0.000001){preview.textContent='ON TIME';preview.classList.add('on-time');}
+      else if(d>0){const a=isVideo?fmtClock(d):fmtContentAmount(d,unitName);preview.textContent=`+${a} ${unitName} AHEAD`;preview.classList.add('ahead');}
+      else{const a=isVideo?fmtClock(Math.abs(d)):fmtContentAmount(Math.abs(d),unitName);preview.textContent=`${a} ${unitName} BEHIND`;preview.classList.add('behind');}
+    }
+  }
+}
+function getRecentRealityComments(limit=4){
+  const rows=[];
+  const taskId=STATE?.realityCheckPending?.taskId;
+  const logs=taskId!=null ? (STATE?.pomoLogs?.[taskId]||[]) : [];
+  logs.forEach((en,idx)=>{
+    const comment=String(en?.comment||'').trim();
+    if(!en?.saved||!comment)return;
+    rows.push({comment,ts:Number(en?.savedAt)||0,idx});
+  });
+  // Session-log order is the fallback for older comments that predate savedAt.
+  rows.sort((a,b)=>(b.ts-a.ts)||(b.idx-a.idx));
+  return rows.slice(0,limit);
+}
+function renderRecentRealityComments(){
+  const wrap=document.getElementById('rcRecentComments');
+  if(!wrap)return;
+  const rows=getRecentRealityComments(4);
+  if(!rows.length){wrap.innerHTML='';wrap.style.display='none';return;}
+  wrap.innerHTML=rows.map((r,i)=>`<button type="button" class="rc-recent-chip" data-rc-recent="${escapeHtml(r.comment)}" title="Tap to insert this comment" aria-label="Insert recent comment ${i+1}">${escapeHtml(r.comment)}</button>`).join('');
+  wrap.style.display='flex';
 }
 
 function renderRealityCheck(){
   const card=document.getElementById('realityCheckCard');if(!card||!STATE)return;
   const enabled=realityCheckEnabled(STATE),pending=realityCheckPending(STATE),p=STATE.realityCheckPending;
-  // Once the existing Bomb Exploded state is active, the RC draft is no longer a live prompt.
-  // Never leave a stale countdown visible on the page.
   card.style.display=(enabled&&pending&&!STATE.bombLocked)?'':'none';
+  renderRecentRealityComments();
+  const sessionIdEl=document.getElementById('rcSessionId');
+  const ratingWrap=document.querySelector('#realityCheckCard .rc-ratings');
+  const ratingEnabled=realityCheckRatingEnabled(STATE);
+  if(ratingWrap)ratingWrap.style.display=ratingEnabled?'flex':'none';
   if(!enabled||!pending||STATE.bombLocked){
+    if(sessionIdEl)sessionIdEl.textContent='';
     updateRealityCheckPreview();
     return;
+  }
+  if(sessionIdEl){
+    const totalLogs=STATE.pomoLogs?.[p.taskId]||[];
+    sessionIdEl.textContent=`· Session ${Number(p.idx)+1} / ${Math.max(totalLogs.length,Number(p.idx)+1)}`;
   }
   const key=`${p.taskId}:${p.idx}`;
   if(key!==rcLastPendingKey){
     rcLastPendingKey=key;rcDraftRating=null;rcDraftNote='';
     const n=document.getElementById('rcNote');if(n)n.value='';
+    const pr=document.getElementById('rcProgressInput');if(pr)pr.value='';
+    const vh=document.getElementById('rcVideoHH');if(vh)vh.value='';
+    const vm=document.getElementById('rcVideoMM');if(vm)vm.value='';
     document.querySelector('#realityCheckCard .rc-ratings')?.classList.remove('has-selection');
     updateRealityCheckPreview();
   }
   const remaining=Math.max(0,realityCheckRemainingSec(STATE));
   const deadline=document.getElementById('rcDeadline');
   if(deadline){deadline.style.visibility='visible';const span=deadline.querySelector('span');if(span)span.textContent=fmtClock(Math.ceil(remaining));}
-  const ratingWrap=document.querySelector('#realityCheckCard .rc-ratings');
-  ratingWrap?.classList.toggle('has-selection',!!rcDraftRating);
   document.querySelectorAll('#realityCheckCard .rc-rating').forEach(b=>{
-    b.disabled=false;b.classList.remove('rc-locked');b.classList.toggle('selected',Number(b.textContent)===Number(rcDraftRating));
+    b.disabled=!ratingEnabled;b.classList.remove('rc-locked');b.classList.toggle('selected',Number(b.textContent)===Number(rcDraftRating));
   });
   updateRealityCheckPreview();
-  const note=document.getElementById('rcNote');if(note){note.disabled=false;note.style.opacity='';}
+  const note=document.getElementById('rcNote');if(note){note.disabled=false;note.style.opacity='';note.placeholder=realityCheckCommentRequired(STATE)?'Comment required…':'Comment or note…';}
   const done=document.getElementById('rcDone');
   if(done){
-    const hasComment=String(note?.value||rcDraftNote||'').trim().length>0;
-    // Keep the same visual disabled state as the old Save/OK button, but do NOT use
-    // native disabled=true: the old popup still produced its validation toast when
-    // the user tried to submit without a comment. Reality Check is that same submit
-    // path, only rendered inline.
-    done.disabled=false;
-    done.setAttribute('aria-disabled',String(!(rcDraftRating&&hasComment)));
-    done.classList.toggle('rc-locked',!(rcDraftRating&&hasComment));
+    const taskNow=p?CACHED_TASKS.find(t=>Number(t.id)===Number(p.taskId)):null;
+    const contentMode=!!(taskNow&&taskNow.studyMethod&&taskNow.studyMethod!=='legacy'&&realityCheckProgressEnabled(STATE));
+    const rawProgress=String(document.getElementById('rcProgressInput')?.value||'').trim();
+    const videoHH=document.getElementById('rcVideoHH'),videoMM=document.getElementById('rcVideoMM');
+    const hasVideoTime=(videoHH?.value!==''||videoMM?.value!=='');
+    const progressReady=!contentMode || (taskNow?.studyMethod==='video'?hasVideoTime:Number.isFinite(parseProgressInput(taskNow,rawProgress)));
+    const ratingReady=!ratingEnabled || !!rcDraftRating;
+    const commentReady=!realityCheckCommentRequired(STATE) || !!String(note?.value||'').trim();
+    const ready=ratingReady&&progressReady&&commentReady;
+    done.disabled=false; done.setAttribute('aria-disabled',String(!ready)); done.classList.toggle('rc-locked',!ready);
+  }
+}
+function stopAlarmWhenRealityRatingSelected(){
+  // A rating tap is an explicit acknowledgement of the just-finished Pomodoro.
+  // Stop currently playing audio immediately. Do NOT cancelAlarm(): that would
+  // also drop a future session/bomb schedule that happens to reuse the same id.
+  try{ SoundController.stop(); }catch(e){}
+  try{ if(AND.on && AND.has('stopAlarmPlayback')) AND.call('stopAlarmPlayback'); }catch(e){}
+  try{ if(AND.on && AND.has('stopSound')) AND.call('stopSound'); }catch(e){}
+  if(AND.on){
+    try{ if(AND.has('cancelNotification')) AND.call('cancelNotification', AND_ALARM_SESSION); }catch(e){}
+    try{ if(AND.has('cancelNotification')) AND.call('cancelNotification', AND_NOTIF_REVIEW); }catch(e){}
   }
 }
 function setRealityCheckRating(v){
-  if(!realityCheckPending())return;
+  if(!realityCheckPending()||!realityCheckRatingEnabled(STATE))return;
+  // Tapping ANY enabled rating (1–5) immediately acknowledges and silences the
+  // Pomodoro alarm; saving the reflection with Done remains a separate action.
+  stopAlarmWhenRealityRatingSelected();
   // Selection is draft-only. Nothing is persisted and nothing can trigger the explosion until Done.
   rcDraftRating=Number(v);
   document.querySelector('#realityCheckCard .rc-ratings')?.classList.add('has-selection');
@@ -6398,22 +6713,45 @@ function setRealityCheckRating(v){
   updateRealityCheckPreview();
   const done=document.getElementById('rcDone'),note=document.getElementById('rcNote');
   if(done){
-    const ready=!!(rcDraftRating&&String(note?.value||rcDraftNote||'').trim());
-    done.disabled=false;
-    done.setAttribute('aria-disabled',String(!ready));
-    done.classList.toggle('rc-locked',!ready);
+    const p=STATE?.realityCheckPending, taskNow=p?CACHED_TASKS.find(t=>Number(t.id)===Number(p.taskId)):null;
+    const contentMode=!!(taskNow&&taskNow.studyMethod&&taskNow.studyMethod!=='legacy');
+    const rawProgress=String(document.getElementById('rcProgressInput')?.value||'').trim();
+    const progressReady=!contentMode || Number.isFinite(parseProgressInput(taskNow,rawProgress));
+    const ready=!!rcDraftRating&&progressReady;
+    done.disabled=false; done.setAttribute('aria-disabled',String(!ready)); done.classList.toggle('rc-locked',!ready);
   }
 }
 
 // ONE shared persistence function. Legacy + popup and Reality Check both call this function.
-async function commitPomoReflection(taskId,idx,mood,comment){
+async function commitPomoReflection(taskId,idx,mood,comment,progressValue=null){
   if(taskId==null||idx==null)return false;
   if(!STATE.pomoLogs)STATE.pomoLogs={};
   const lg=STATE.pomoLogs[taskId]=STATE.pomoLogs[taskId]||[];
   while(lg.length<=idx)lg.push({n:lg.length+1,comment:'',mood:'',saved:false});
   const en=lg[idx];if(!en)return false;
   if(!en.saved){
-    en.comment=String(comment||'').trim();en.mood=mood;en.saved=true;en.realityCheckExpired=false;
+    en.comment=String(comment||'').trim();en.mood=mood;en.savedAt=Date.now();
+    if(progressValue!==null && progressValue!==undefined && Number.isFinite(Number(progressValue))){
+      const task=CACHED_TASKS.find(t=>Number(t.id)===Number(taskId));
+      const meta=task&&getStudyProgressMeta(task,idx);
+      let actual=Number(progressValue);
+      if(meta?.kind==='video'){
+        const previous=Number(task.contentProgress)||0; actual=Math.max(0,actual-previous); task.contentProgress=Math.max(previous,Number(progressValue));
+      }else if(meta?.kind==='unit'){
+        const mode=normalizeStudyProgressMode(task);
+        if(mode==='pageNumber'||mode==='questionNumber'){
+          const previous=Number(task.contentProgress)||0;
+          actual=Math.max(0,Number(progressValue)-previous);
+          task.contentProgress=Math.max(previous,Number(progressValue));
+        }else{
+          actual=Math.max(0,Number(progressValue));
+          task.contentProgress=(Number(task.contentProgress)||0)+actual;
+        }
+      }
+      en.progress=Number(progressValue); en.progressDelta=actual; en.progressMode=meta?.mode||meta?.kind||null; en.progressTarget=meta?meta.target:null; en.progressUnit=meta?.unit||null; en.progressLabel=meta?.targetLabel||'';
+      if(task) await idbPut('tasks',task);
+    }
+    en.saved=true;en.realityCheckExpired=false;
     pomoSavedFlash[taskId+':'+idx]=Date.now();
   }
   const p=STATE.realityCheckPending;
@@ -6424,33 +6762,71 @@ async function commitPomoReflection(taskId,idx,mood,comment){
 async function completeRealityCheck(){
   if(!realityCheckPending())return;
   const p=STATE.realityCheckPending,rating=Number(rcDraftRating),comment=(document.getElementById('rcNote')?.value||'').trim();
-  if(!RC_MOOD_MAP[rating]){showToast('Select a Reality Check rating.');return;}
-  if(!comment){showToast('Please enter a short session comment.');return;}
-  const ok=await commitPomoReflection(p.taskId,Number(p.idx),RC_MOOD_MAP[rating],comment);
+  const ratingRequired=realityCheckRatingEnabled(STATE);
+  if(ratingRequired && !RC_MOOD_MAP[rating]){showToast('Select your Reality Check rating.');return;}
+  if(realityCheckCommentRequired(STATE) && !comment){showToast('Enter a comment before Done.');return;}
+  const task=CACHED_TASKS.find(t=>Number(t.id)===Number(p.taskId));
+  const progressEnabled=!!(task&&task.studyMethod&&task.studyMethod!=='legacy'&&realityCheckProgressEnabled(STATE));
+  let progressValue=null;
+  if(progressEnabled){
+    const meta=getStudyProgressMeta(task,Number(p.idx));
+    if(meta?.kind==='video'){
+      const h=Math.max(0,Number(document.getElementById('rcVideoHH')?.value)||0);
+      const m=Math.max(0,Math.min(59,Number(document.getElementById('rcVideoMM')?.value)||0));
+      const ts=h*3600+m*60;
+      const hasTime=document.getElementById('rcVideoHH')?.value!==''||document.getElementById('rcVideoMM')?.value!=='';
+      if(!hasTime){showToast('Enter the current video time.');return;}
+      progressValue=ts;
+      const previous=Number(task.contentProgress)||0;
+      if(progressValue<previous){showToast(`Video time must be at least ${fmtClock(previous)}.`);return;}
+      if(progressValue>Number(task.videoDurationSec)||0){showToast('Video time cannot be beyond the video length.');return;}
+    }else{
+      const raw=String(document.getElementById('rcProgressInput')?.value||'').trim();
+      progressValue=parseProgressInput(task,raw);
+      if(!Number.isFinite(progressValue)||progressValue<0){showToast('Enter your progress.');return;}
+      const mode=normalizeStudyProgressMode(task);
+      if(mode==='pageNumber'||mode==='questionNumber'){
+        const previous=Number(task.contentProgress)||0;
+        if(progressValue<previous){showToast(`Number must be at least ${fmtContentAmount(previous,meta?.unit||task.progressUnit)}.`);return;}
+        if(progressValue>Number(task.plannedQuantity)||0){showToast(`Number cannot be beyond ${fmtContentAmount(Number(task.plannedQuantity)||0,meta?.unit||task.progressUnit)}.`);return;}
+      }
+    }
+  }
+  const mood=ratingRequired?(RC_MOOD_MAP[rating]||''):'';
+  const ok=await commitPomoReflection(p.taskId,Number(p.idx),mood,comment,progressValue);
   if(!ok){showToast('The Pomodoro reflection row is missing.');return;}
-  // Reality Check Done is the single final-submit button while RC is enabled.
-  // Commit the transient Thoughts draft through its existing Done path as well.
   if(STATE.settings?.thoughtsEnabled!==false && !thoughtCooldownActive()) await completeThoughtSession();
-  if(rating===1){ await triggerRealityCheckExplosion(STATE); return; }
+  if(ratingRequired && rating===1){ await triggerRealityCheckExplosion(STATE); return; }
   render();
 }
-
 // Creates the pending pointer against an EXISTING completed Pomodoro log row. There is no new timer.
 function ensureRealityCheckPendingForStudy(state,at,consumed,parts,done,lg){
-  if(!realityCheckEnabled(state)||state.realityCheckPending||at?.taskId==null||done<=0)return false;
-  for(let i=0;i<done;i++){
-    if(lg[i]?.saved || lg[i]?.realityCheckExpired)continue;
-    let startConsumedSec=0;for(let j=0;j<=i;j++)startConsumedSec+=parts[j];
-    const limitSec=realityCheckLimitSec(state),now=Date.now();
-    state.realityCheckPending={taskId:at.taskId,idx:i,startConsumedSec,limitSec,createdAt:now,deadlineTs:now+limitSec*1000};
-    return true;
-  }
-  return false;
+  const task=CACHED_TASKS.find(t=>Number(t.id)===Number(at?.taskId));
+  if(!realityCheckEnabledForTask(state,task)||state.realityCheckPending||at?.taskId==null||done<=0)return false;
+  // Never replay the whole backlog. Only the immediately preceding completed Pomodoro
+  // owns the live Reality Check prompt. Older missed sessions stay empty forever.
+  const i=done-1;
+  if(lg[i]?.saved || lg[i]?.realityCheckExpired)return false;
+  let endConsumedSec=0;for(let j=0;j<=i;j++)endConsumedSec+=parts[j];
+  // IMPORTANT: the RC grace window starts at the ACTUAL end of this Pomodoro, not when
+  // the app happens to wake up. Therefore, if the WebView was frozen through sessions 1–4
+  // and returns during session 5, session 4's deadline is already in the past and exactly
+  // one explosion is raised for session 4 — never one explosion per old missed session.
+  const baseConsumed=Number(at.baseConsumedSec)||0;
+  const wallStart=Number(at.wallStartTs)||Date.now();
+  const wallPaused=Number(at.wallAccumulatedPauseMs)||0;
+  const actualEndTs=wallStart + Math.max(0,(endConsumedSec-baseConsumed))*1000 + Math.max(0,wallPaused);
+  const limitSec=realityCheckLimitSec(state);
+  state.realityCheckPending={
+    taskId:at.taskId,idx:i,startConsumedSec:Math.max(0,endConsumedSec-parts[i]),
+    limitSec,createdAt:actualEndTs,deadlineTs:actualEndTs+limitSec*1000
+  };
+  return true;
 }
 
 // Pomodoro Log row creator — same blank reflection row that the legacy '+' button uses.
 // With Reality Check enabled it additionally points the automatic RC UI to the FIRST unsaved row.
-function syncPomoLogRows(at){
+async function syncPomoLogRows(at){
   if(!at||at.type!=='study'||at.taskId==null||at.state==='REVIEW_PENDING')return;
   const totalSec=(at.baseConsumedSec||0)+at.duration;
   const consumed=Math.max(0,totalSec-Math.max(0,msRemaining(at)/1000));
@@ -6652,19 +7028,30 @@ function renderHeader(){
       goalLabelEl.className = 'hdr-goal-label green';
       goalLabelEl.textContent = 'Study Complete By';
       if(STATE?.settings?.studySessionCounter){
-        // Study Complete By means the existing widget has already established that
-        // today's available Study time is sufficient to finish all remaining Study.
-        // Therefore every planned Pomodoro session is achievable — show the full total.
+        // Display-only: use the EXISTING widget's already-computed maximum achievable Study
+        // time to show how many Pomodoro sessions can actually fit today. This does not
+        // change computeStudyCompletionWidget() or any of its formulas.
         const m = getStudySessionCounterMetrics();
-        const done = formatStudySessionCount(m.totalSessions);
-        const total = formatStudySessionCount(m.totalSessions);
-        goalValueEl.innerHTML = `${escapeHtml(timeStr)}<span class="hdr-session-sep">|</span><span>${escapeHtml(done)}</span>`;
-        if(goalHelperEl){ goalHelperEl.style.display = ''; goalHelperEl.innerHTML = `PLANNED: ${escapeHtml(cachedGoalLabels.planned)}<span class="hdr-session-sep">|</span><span>${escapeHtml(total)} ${sessionWord(total)}</span>`; }
+        const w = cachedWidgetData;
+        const achievableSec = Math.max(0, Number(w?.maxStudyTodaySeconds) || 0);
+        const done = formatStudySessionCount(achievableSec / m.pomoSec);
+        const extraSessions = formatStudySessionCount(Math.max(0, achievableSec - (Number(w?.plannedStudySeconds) || 0)) / m.pomoSec);
+        const extraMarkup = extraSessions !== '0'
+          ? ` <span class="hdr-goal-extra">(+${escapeHtml(extraSessions)})</span>`
+          : '';
+        goalValueEl.innerHTML = `${escapeHtml(timeStr)}<span class="hdr-session-sep">|</span><span>${escapeHtml(done)}${extraMarkup}</span>`;
+        if(goalHelperEl){ goalHelperEl.style.display = ''; goalHelperEl.innerHTML = `PLANNED: ${escapeHtml(cachedGoalLabels.planned)}<span class="hdr-session-sep">|</span><span>${escapeHtml(formatStudySessionCount(m.totalSessions))} ${sessionWord(m.totalSessions)}</span>`; }
       } else {
         goalValueEl.textContent = timeStr;
         if(goalHelperEl){ goalHelperEl.style.display = ''; goalHelperEl.textContent = 'Planned: ' + cachedGoalLabels.planned; }
       }
-      if(goalDelayEl){ goalDelayEl.textContent = 'no delay'; goalDelayEl.style.display = ''; }
+      if(goalDelayEl){
+        const plannedSec = Number(cachedWidgetData?.plannedStudySeconds) || 0;
+        const achievableSec = Number(cachedWidgetData?.maxStudyTodaySeconds) || 0;
+        const extraSec = Math.max(0, achievableSec - plannedSec);
+        goalDelayEl.innerHTML = 'on time<span class="hdr-goal-delay-sep">|</span>' + (extraSec > 0 ? 'extra ' + fmtHoursMinutes(extraSec / 3600) + '<span class="hdr-goal-delay-sep">|</span>' : '') + 'wasted ' + fmtHoursMinutes((Math.max(0, Number(cachedWidgetData?.lostTimeSeconds) || 0)) / 3600);
+        goalDelayEl.style.display = '';
+      }
       if(infoBtn) infoBtn.style.display = '';
     } 
     else if(state.startsWith('MAX_STUDY|')){
@@ -6693,15 +7080,8 @@ function renderHeader(){
         const plannedSec = Number(cachedWidgetData?.plannedStudySeconds) || 0;
         const maxSec = Number(cachedWidgetData?.maxStudyTodaySeconds) || 0;
         const delaySec = Math.max(0, plannedSec - maxSec);
-        const delayTotalMin = Math.max(0, Math.round(delaySec / 60));
-        const delayHours = Math.floor(delayTotalMin / 60);
-        const delayMinutes = delayTotalMin % 60;
-        const hourWord = delayHours === 1 ? 'hour' : 'hours';
-        const minuteWord = delayMinutes === 1 ? 'minute' : 'minutes';
-        const delayParts = [];
-        if(delayHours) delayParts.push(`${delayHours} ${hourWord}`);
-        if(delayMinutes || !delayHours) delayParts.push(`${delayMinutes} ${minuteWord}`);
-        goalDelayEl.textContent = 'delayed by : ' + delayParts.join(' ');
+        const actualWastedSec = Math.max(0, Number(cachedWidgetData?.lostTimeSeconds) || 0);
+        goalDelayEl.innerHTML = 'delayed by : ' + fmtHoursMinutes(delaySec / 3600) + '<span class="hdr-goal-delay-sep">|</span>wasted ' + fmtHoursMinutes(actualWastedSec / 3600);
         goalDelayEl.style.display = '';
       }
       if(infoBtn) infoBtn.style.display = '';
@@ -6726,6 +7106,7 @@ function renderHeader(){
           goalHelperEl.textContent = 'Completed: ' + cachedGoalLabels.completed + ' \u00a0/\u00a0 ' + cachedGoalLabels.planned;
         }
       }
+      if(goalDelayEl){ goalDelayEl.innerHTML = 'on time<span class="hdr-goal-delay-sep">|</span>wasted ' + fmtHoursMinutes((Math.max(0, Number(cachedWidgetData?.lostTimeSeconds) || 0)) / 3600); goalDelayEl.style.display = ''; }
       if(clockIcon) clockIcon.style.display = 'none';
       if(checkIcon) checkIcon.style.display = '';
     }
@@ -7450,6 +7831,10 @@ function renderHome(){
       const remain = msRemaining(at);
       if(remain <= 0){
         if(at.type==='study') await syncPomoLogRows(at);
+        if(realityCheckPending(STATE)){
+          if(await enforceRealityCheckSessionBinding(STATE)){clearInterval(ringTimerHandle);ringTimerHandle=null;render();return;}
+          if(await enforceRealityCheckDeadline(STATE)){clearInterval(ringTimerHandle);ringTimerHandle=null;render();return;}
+        }
         clearInterval(ringTimerHandle); ringTimerHandle = null;
         await new Promise(r=>setTimeout(r,0));
         await recoverState(); STATE = await getState(); render(); return;
@@ -7493,7 +7878,10 @@ function renderHome(){
       }
       tickCurrentActivity(at); // keeps the Current Activity card's segments/chips/Time Left live
       renderRealityCheck();      // displays the RC limit from the SAME session elapsed clock
-      if(realityCheckPending(STATE)) enforceRealityCheckDeadline(STATE).catch(e=>console.warn('[Reality Check] deadline check failed',e));
+      if(realityCheckPending(STATE)){
+        enforceRealityCheckSessionBinding(STATE).catch(e=>console.warn('[Reality Check] session binding failed',e));
+        enforceRealityCheckDeadline(STATE).catch(e=>console.warn('[Reality Check] deadline check failed',e));
+      }
       hsUpdateRunningProgress(at); // keeps the picker's running-task progress live
     };
     tick();
@@ -8232,32 +8620,25 @@ async function renderHistTasks(){
       <div class="hist-info-line">${fmtHMu(r.consumed)} <span class="dim">/</span> ${fmtHMu(r.duration)}<span class="dim">&nbsp;&nbsp;—&nbsp;&nbsp;</span>${fmtHMu(remaining)} remaining<span class="dim">&nbsp;&nbsp;—&nbsp;&nbsp;</span>${r.pct}%</div>
       ${!r.isRunning ? `<div class="hist-chip-row"><span class="hist-mini-chip inc">Incomplete</span><button class="hist-mini-chip btn" data-reset="${t.id}">↺ Restart</button></div>` : ''}`;
     }
-    // Pomodoro Log Comments — dropdown is ALWAYS available; rows mirror the Home session state:
-    // completed sessions (loggable), the live Running session (muted badge + countdown), future pending rows (disabled "+")
-    const isOpen = openPomoLogId===t.id;
-    const chev = `<button class="pomo-toggle" data-pomotoggle="${t.id}">${isOpen?'▾':'▸'}</button>`;
-    let logHtml = '';
+    // Pomodoro Log — compact table: S.No. / Topper / You / Comment / Action.
+    const isOpen=openPomoLogId===t.id;
+    const chev=`<button class="pomo-toggle" data-pomotoggle="${t.id}">${isOpen?'▾':'▸'}</button>`;
+    let logHtml='';
     if(isOpen){
-      let runRemain = 0;
-      if(r.isRunning && !isDone){ let s=0; for(let k=0;k<cur-1;k++) s+=parts[k]; runRemain = Math.max(0, (s+parts[cur-1]) - r.consumed); }
-      let rowsHtml = '';
-      for(let i=total-1;i>=0;i--){
-        const n=i+1;
+      let runRemain=0;if(r.isRunning&&!isDone){let ss=0;for(let k=0;k<cur-1;k++)ss+=parts[k];runRemain=Math.max(0,(ss+parts[cur-1])-r.consumed);}
+      let rowsHtml='';
+      for(let i=total-1;i>=0;i--){const n=i+1;
         if(i<done){
-          const en = logs[i]; const saved = en && en.saved;
-          const cCell = saved ? (en.comment ? escapeHtml(en.comment) : '<span class="empty">💬</span>') : `<button class="pomo-add" data-pomoadd="${t.id}" data-pomoidx="${i}">+</button>`;
-          const mCell = saved ? (en.mood ? pomoMoodSvg(en.mood) : '<span class="empty" style="color:var(--text-dim);font-size:10px;">—</span>') : `<button class="pomo-add" data-pomoadd="${t.id}" data-pomoidx="${i}">+</button>`;
-          rowsHtml += `<div class="pomo-row"><span class="pomo-n">${n}</span><span class="pomo-c ${saved&&en.comment?'':'empty'}">${cCell}</span><span class="pomo-m">${mCell}</span></div>`;
-        } else if(i===cur-1 && r.isRunning && !isDone){
-          rowsHtml += `<div class="pomo-row"><span class="pomo-n">${n}</span><span class="pomo-c"><span class="pomo-run-badge">Running</span></span><span class="pomo-run-time" id="pomoRunCountdown">${fmtClock(runRemain)}</span></div>`;
-        }
-        // Future sessions render nothing — their rows are revealed automatically once they start
+          const en=logs[i],saved=!!(en&&en.saved),pm=getStudyProgressMeta(t,i);
+          let topperText='—',youText='—';if(pm){topperText=pm.kind==='video'?fmtClock(pm.target):fmtContentAmount(pm.target,pm.unit);if(saved&&Number.isFinite(Number(en.progress)))youText=pm.kind==='video'?fmtClock(en.progress):fmtContentAmount(en.progress,pm.unit);}
+          const comment=saved&&en.comment?escapeHtml(en.comment):'<span class="empty">—</span>';
+          const action=saved?(en.mood?pomoMoodSvg(en.mood,15):'<span class="empty">✓</span>'):`<button class="pomo-add" data-pomoadd="${t.id}" data-pomoidx="${i}">+</button>`;
+          rowsHtml+=`<div class="pomo-row"><span class="pomo-n">${n}</span><span class="pomo-topper">${topperText}</span><span class="pomo-you">${youText}</span><span class="pomo-c ${saved&&en.comment?'':'empty'}">${comment}</span><span class="pomo-m">${action}</span></div>`;
+        }else if(i===cur-1&&r.isRunning&&!isDone){const pm=getStudyProgressMeta(t,i);const topperText=pm?(pm.kind==='video'?fmtClock(pm.target):fmtContentAmount(pm.target,pm.unit)):'—';rowsHtml+=`<div class="pomo-row"><span class="pomo-n">${n}</span><span class="pomo-topper">${topperText}</span><span class="pomo-you">—</span><span class="pomo-c"><span class="pomo-run-badge">Running</span></span><span class="pomo-m pomo-run-time" data-pomo-run-countdown="${t.id}">${fmtClock(runRemain)}</span></div>`;}
       }
-      logHtml = `<div class="pomo-log">
-        <div class="pomo-log-head"><span>☰ Pomodoro Log Comments</span><span class="pomo-count">${cur} / ${total}</span></div>
-        ${rowsHtml}
-      </div>`;
+      logHtml=`<div class="pomo-log"><div class="pomo-log-head"><span>☰ Pomodoro Log · Progress</span><span class="pomo-count">${cur} / ${total}</span></div><div class="pomo-chart"><div class="pomo-table-head"><span>No.</span><span>Top</span><span>You</span><span>Comment</span><span class="right">Mood</span></div>${rowsHtml}</div></div>`;
     }
+    let paceHtml='';
     return `<div class="plain-card hist-task-card ${isDone?'stat-done':'stat-live'}">
       <div class="hist-task-top">
         <div class="hist-top-left">${chev}<div class="hist-task-subj">${subj}</div>${runChip}</div>
@@ -8339,11 +8720,18 @@ function updateHistoryLiveDom(){
   const endEl = document.getElementById('hist-live-end');
   if(endEl) endEl.textContent = fmtTimeOfDay(Date.now());
 
-  // Preserve the existing Pomodoro-log countdown; only mirror its canonical value.
-  const runCountdown = document.getElementById('pomoRunCountdown');
-  if(runCountdown && at && at.type !== 'bomb' && !at.pausedAt){
-    const remain = msRemaining(at);
-    if(remain >= 0) runCountdown.textContent = fmtClock(remain/1000);
+  // Keep every visible Pomodoro-log running countdown live. The old implementation
+  // updated a single legacy element only after a full History re-render, so the value
+  // appeared frozen until the user changed tabs. This is display-only: STATE is untouched.
+  if(at && at.type !== 'bomb' && !at.pausedAt){
+    const v = caComputeView(at);
+    if(v){
+      const remain = Math.max(0, v.segRemainSec);
+      document.querySelectorAll('[data-pomo-run-countdown]').forEach(el=>{
+        if(String(el.getAttribute('data-pomo-run-countdown')) !== String(at.taskId)) return;
+        el.textContent = fmtClock(remain);
+      });
+    }
   }
 }
 
@@ -8421,6 +8809,7 @@ function budgetViewList(){ return planMode==='tomorrow' ? tomorrowConfirmed() : 
 // plan, pending reusable ones are discarded, and a brand new blank Tomorrow is seeded.
 async function carryUnfinishedStudyToPlanner(state){
   if(!Array.isArray(state.plannerPending)) state.plannerPending=[];
+  await purgeExpiredPlannerPending(state, studyDayKey());
   // Pending is a separate carry-forward bank.  It must work even before the
   // user has created/selected a Planner: manual Pending entries already allow
   // that state, so dropping wake-up carries here would silently lose work.
@@ -8727,6 +9116,12 @@ function renderSettings(){
   document.getElementById('setToastsEnabled').checked = STATE.settings.toastsEnabled !== false;
   const realityToggle = document.getElementById('setRealityCheckEnabled');
   if(realityToggle) realityToggle.checked = STATE.settings.realityCheckEnabled !== false;
+  const realityRating = document.getElementById('setRealityCheckRating');
+  if(realityRating) realityRating.checked = STATE.settings.realityCheckRating !== false;
+  const realityCommentReq = document.getElementById('setRealityCheckCommentRequired');
+  if(realityCommentReq) realityCommentReq.checked = !!STATE.settings.realityCheckCommentRequired;
+  const realityProgress = document.getElementById('setRealityCheckProgress');
+  if(realityProgress) realityProgress.checked = STATE.settings.realityCheckProgress !== false;
   const realityDur = document.getElementById('setRealityCheckDuration');
   if(realityDur){ const pomoMin=Math.max(1,Math.round((STATE.settings.pomodoroDuration||1800)/60)); const maxRc=Math.max(0,pomoMin-1); realityDur.max=String(Math.max(1,maxRc)); realityDur.value=String(Math.max(1,Math.min(Math.round((STATE.settings.realityCheckDuration||120)/60),Math.max(1,maxRc)))); }
   updateRealityCheckDurationHint();
@@ -8923,7 +9318,9 @@ async function renderHomeWidgetDebugCard(){
   const sessionCompleteBlock = document.getElementById('dbgSessionCompleteBlock');
 
   if(data.canFinishToday){
-    sessionDone = totalSessions;
+    // Display-only: use the existing Max Study Today value to show actual achievable sessions.
+    const achievableSec = Math.max(0, Number(data.maxStudyTodaySeconds) || 0);
+    sessionDone = formatStudySessionCount(achievableSec / sessionMetrics.pomoSec);
     if(sessionCompleteBlock) sessionCompleteBlock.style.display = '';
     if(sessionMaxBlock) sessionMaxBlock.style.display = 'none';
   } else {
@@ -8971,11 +9368,21 @@ async function renderHomeWidgetDebugCard(){
   set('dbgMaxStudyResult', maxStudy);
   set('dbgResult',     resultVal);
   set('dbgSessionStatus', statusLabel);
-  set('dbgSessionCompleteValue', `${totalSessions} ${sessionWord(totalSessions)} out of ${totalSessions}`);
+  const sessionExtra = formatStudySessionCount(Math.max(0, (Number(data.maxStudyTodaySeconds) || 0) - (Number(data.plannedStudySeconds) || 0)) / sessionMetrics.pomoSec);
+  set('dbgSessionCompleteValue', `${sessionDone} ${sessionWord(sessionDone)}${sessionExtra !== '0' ? ` (+${sessionExtra} extra; planned ${totalSessions})` : ` (planned ${totalSessions})`}`);
   set('dbgSessionMaxStudy', maxStudy);
   set('dbgSessionPomo', fmt(sessionMetrics.pomoSec));
   set('dbgSessionMaxValue', sessionDone);
   set('dbgSessionTotalValue', totalSessions);
+
+  // §10 Extra Info — presentation only. No predictor/formula values are changed.
+  const planDiffSec = (Number(data.plannedStudySeconds) || 0) - (Number(data.maxStudyTodaySeconds) || 0);
+  const actualWastedSec = Math.max(0, Number(data.lostTimeSeconds) || 0);
+  set('dbgExtraStatus', data.canFinishToday ? 'On Time' : 'Delayed by ' + fmtHoursMinutes(Math.max(0, planDiffSec) / 3600));
+  set('dbgExtraDifference', data.canFinishToday
+    ? (planDiffSec < 0 ? 'Extra ' + fmtHoursMinutes(Math.abs(planDiffSec) / 3600) : '0m')
+    : fmtHoursMinutes(Math.max(0, planDiffSec) / 3600));
+  set('dbgActualWasted', fmtHoursMinutes(actualWastedSec / 3600));
   setColor('dbgResult', resultColor);
 }
 
@@ -10039,6 +10446,7 @@ let editingPendingId = null; // Planner Pending item being edited in the shared 
 let creatingPending = false;
 let plannerDetailMode = 'subject';
 let planDetailSortMode = 'oldest';
+let pendingDeleteAllConfirm = false;
 
 function plannerChapters(){
   if(!STATE) return [];
@@ -10048,6 +10456,24 @@ function plannerChapters(){
 function plannerChaptersFor(plannerId){
   return (!STATE || !Array.isArray(STATE.plannerChapters)) ? [] : STATE.plannerChapters.filter(c=>c.plannerId===plannerId);
 }
+async function purgeExpiredPlannerPending(state=STATE, todayKey=studyDayKey()){
+  if(!state || !Array.isArray(state.plannerPending)) return 0;
+  const days=Math.max(1,Number(state.settings?.pendingExpiryDays)||30);
+  const today=new Date(todayKey+'T00:00:00');
+  if(Number.isNaN(today.getTime())) return 0;
+  const before=state.plannerPending.length;
+  state.plannerPending=state.plannerPending.filter(p=>{
+    if(!p?.createdOn) return true;
+    const created=new Date(String(p.createdOn)+'T00:00:00');
+    if(Number.isNaN(created.getTime())) return true;
+    const age=Math.floor((today-created)/86400000);
+    return age < days;
+  });
+  const removed=before-state.plannerPending.length;
+  if(removed) await saveState(state);
+  return removed;
+}
+
 function plannerPending(){
   if(!STATE || !Array.isArray(STATE.plannerPending)) return [];
   // Unassigned Pending records are valid when no Planner exists yet.  They
@@ -10152,6 +10578,235 @@ function secToHHMM(sec){ const m=Math.round(sec/60); return Math.floor(m/60)+':'
     if(mm) mm.value = String(totalMinutes%60).padStart(2,'0');
   }
   function getDurSec(){ const h=parseInt(document.getElementById('taskDurHH').value,10)||0; const mi=parseInt(document.getElementById('taskDurMM').value,10)||0; return (h*60+mi)*60; }
+
+  function parseFlexibleClock(v){
+    v=String(v||'').trim(); if(!v) return NaN;
+    const a=v.split(':').map(x=>parseInt(x,10)); if(a.some(Number.isNaN)) return NaN;
+    if(a.length===3) return a[0]*3600+a[1]*60+a[2];
+    if(a.length===2) return a[0]*60+a[1];
+    if(a.length===1) return a[0]*60;
+    return NaN;
+  }
+  function fmtContentAmount(v,unit){
+    const n=Number(v)||0; if(unit==='video') return fmtClock(n);
+    return Number.isInteger(n)?String(n):n.toFixed(1).replace(/\.0$/,'');
+  }
+  function avgUnitToSec(value,unit){
+    const n=Number(value); if(!Number.isFinite(n)||n<=0) return NaN;
+    return unit==='h'?n*3600:(unit==='m'?n*60:n);
+  }
+  function secToBestUnit(sec){
+    sec=Number(sec)||0;
+    if(sec>=3600 && Math.abs(sec/3600-Math.round(sec/3600))<0.001) return {value:sec/3600,unit:'h'};
+    if(sec>=60 && Math.abs(sec/60-Math.round(sec/60))<0.001) return {value:sec/60,unit:'m'};
+    return {value:sec,unit:'s'};
+  }
+  function unitLabel(unit){ return unit==='h'?'hr':unit==='m'?'min':'sec'; }
+  function normalizeStudyProgressMode(taskOrMode){
+    const mode=typeof taskOrMode==='string' ? taskOrMode : (taskOrMode?.progressMode||'');
+    if(mode==='pageNumber'||mode==='questionNumber'||mode==='pageCount'||mode==='questionCount'||mode==='videoTime') return mode;
+    const unit=typeof taskOrMode==='string' ? taskOrMode : (taskOrMode?.progressUnit||'');
+    if(unit==='questions') return 'questionNumber';
+    if(unit==='pages') return 'pageNumber';
+    if(unit==='video') return 'videoTime';
+    return 'pageNumber';
+  }
+  function studyProgressModeUnit(mode){
+    mode=normalizeStudyProgressMode(mode);
+    if(mode==='questionNumber'||mode==='questionCount') return 'questions';
+    if(mode==='videoTime') return 'video';
+    return 'pages';
+  }
+  function studyMeasureOptions(method,selected){
+    const u=document.getElementById('studyUnitInput'); if(!u)return;
+    const opts=method==='video'
+      ? [{v:'videoTime',t:'Video Length'}]
+      : [{v:'pageNumber',t:'Page Number'},{v:'questionNumber',t:'Question Number'},{v:'pageCount',t:'Page Count'},{v:'questionCount',t:'Question Count'}];
+    const normalized=normalizeStudyProgressMode(selected);
+    u.innerHTML=opts.map(o=>`<option value="${o.v}">${o.t}</option>`).join('');
+    u.value=opts.some(o=>o.v===normalized)?normalized:opts[0].v;
+  }
+  function studyContentConfigFromForm(){
+    const method=document.getElementById('studyMethodInput')?.value||'legacy';
+    if(method==='legacy') return {method,durationSec:getDurSec()};
+    const progressMode=normalizeStudyProgressMode(document.getElementById('studyUnitInput')?.value||(method==='video'?'videoTime':'pageNumber'));
+    const unit=studyProgressModeUnit(progressMode);
+    const qtyRaw=document.getElementById('studyQuantityInput')?.value;
+    const avgRaw=document.getElementById('studyAvgInput')?.value;
+    const qty=qtyRaw===''||qtyRaw==null?0:Number(qtyRaw);
+    const avg=avgRaw===''||avgRaw==null?1:Number(avgRaw);
+    const avgUnit=document.getElementById('studyAvgUnitInput')?.value||'m';
+    if(!Number.isFinite(qty)||qty<0||!Number.isFinite(avg)||avg<=0) return {method,error:'Enter a valid quantity and average time.'};
+    if(method==='video'){
+      const videoSec=avgUnitToSec(qty,avgUnit);
+      const speed=Number(document.getElementById('studyVideoSpeed')?.value)||1;
+      if(!Number.isFinite(videoSec)||videoSec<=0||speed<=0) return {method,error:'Enter a valid video length and playback speed.'};
+      return {method,durationSec:Math.max(1,Math.round(videoSec/speed)),progressMode:'videoTime',progressUnit:'video',plannedQuantity:videoSec,avgUnitSec:1/speed,videoDurationSec:videoSec,playbackSpeed:speed,quantity:qty,quantityUnit:avgUnit};
+    }
+    const avgSec=avgUnitToSec(avg,avgUnit);
+    return {method,durationSec:Math.max(1,Math.round(qty*avgSec)),progressMode,progressUnit:unit,plannedQuantity:qty,avgUnitSec:avgSec,videoDurationSec:null,playbackSpeed:null,quantity:qty,quantityUnit:avgUnit};
+  }
+  function setStudyContentFields(cfg){
+    const method=cfg?.studyMethod||'legacy';
+    const m=document.getElementById('studyMethodInput'); if(m)m.value=method;
+    const speed=document.getElementById('studyVideoSpeed'); if(speed)speed.value=String(cfg?.playbackSpeed||1);
+    studyMeasureOptions(method,cfg?.progressMode||cfg?.progressUnit||cfg?.measureBy);
+    const q=document.getElementById('studyQuantityInput');
+    const a=document.getElementById('studyAvgInput');
+    const au=document.getElementById('studyAvgUnitInput');
+    if(method==='video'){
+      const sec=Number(cfg?.videoDurationSec)||0, best=secToBestUnit(sec);
+      if(q)q.value=cfg?.plannedQuantity!=null ? (cfg?.quantity ?? 1) : 1;
+      if(au)au.value=sec?best.unit:'m';
+      if(a)a.value='';
+    }else{
+      if(q)q.value=cfg?.plannedQuantity??'';
+      const best=secToBestUnit(Number(cfg?.avgUnitSec)||0);
+      if(a)a.value=cfg?.avgUnitSec?best.value:'';
+      if(au)au.value=cfg?.avgUnitSec?best.unit:'m';
+    }
+    renderStudyContentFields();
+  }
+  function positionStudyQuantityUnit(){
+    const input=document.getElementById('studyQuantityInput'), unit=document.getElementById('studyQuantityUnit');
+    if(!input||!unit) return;
+    unit.style.left='auto';
+    unit.style.right='12px';
+    const method=document.getElementById('studyMethodInput')?.value||'legacy';
+    const measure=normalizeStudyProgressMode(document.getElementById('studyUnitInput')?.value||'');
+    unit.textContent=method==='video'?'video':(measure==='pageNumber'||measure==='pageCount'?'pages':'questions');
+  }
+
+  function renderStudyContentFields(){
+    const box=document.getElementById('studyContentFields'); if(!box)return;
+    const isStudy=modalCat==='study'; box.style.display=isStudy?'block':'none';
+
+    // IMPORTANT: taskDurationField is dynamically moved into the Study Method row
+    // for Study/Revision's legacy (plain Duration) method. When the modal is then
+    // reused for Routine/Health/Others, studyContentFields becomes hidden. If we
+    // return here without moving the duration field back out, Duration remains
+    // trapped inside the hidden Study container. That causes the non-study modal
+    // to lose Duration and makes the remaining Priority/Preferred Slot row shift.
+    // Always restore Duration to the normal non-study position when leaving Study.
+    if(!isStudy){
+      // Non-Study categories keep the original two-row layout:
+      // Row 1 = Icon + Priority, Row 2 = Duration + Preferred Slot.
+      // Move the existing fields into a dedicated layout instead of changing
+      // their data/IDs, so Study/Revision can safely restore their own layout.
+      const nonStudy=document.getElementById('nonStudyTaskLayout');
+      const top=document.getElementById('nonStudyTopRow');
+      const bottom=document.getElementById('nonStudyBottomRow');
+      const iconField=document.getElementById('taskIconField');
+      const durField=document.getElementById('taskDurationField');
+      const diffRow=document.getElementById('taskDifficultySlotRow');
+      // These fields are dynamically moved into the non-study rows. Do NOT
+      // look for them as diffRow.children because once moved, diffRow is empty.
+      // Stable IDs keep Study/Revision and Routine/Health/Others layouts isolated.
+      const colorField=document.getElementById('taskColorField');
+      const slotField=document.getElementById('taskSlotField');
+      const iconRow=document.getElementById('taskSubjectIconRow');
+      if(nonStudy && top && bottom && iconField && durField && colorField && slotField){
+        top.appendChild(iconField);
+        top.appendChild(colorField);
+        bottom.appendChild(durField);
+        bottom.appendChild(slotField);
+        iconRow.style.display='none';
+        diffRow.style.display='none';
+        nonStudy.style.display='block';
+        durField.classList.remove('content-calculated','study-duration-inline');
+        durField.style.display='';
+      }
+      return;
+    }
+    // Restore the shared fields to their original Study/Revision containers.
+    {
+      const nonStudy=document.getElementById('nonStudyTaskLayout');
+      const iconRow=document.getElementById('taskSubjectIconRow');
+      const diffRow=document.getElementById('taskDifficultySlotRow');
+      const iconField=document.getElementById('taskIconField');
+      const durField=document.getElementById('taskDurationField');
+      // Retrieve the fields by stable IDs because they may currently live in
+      // nonStudyTopRow/nonStudyBottomRow rather than inside diffRow.
+      const colorField=document.getElementById('taskColorField');
+      const slotField=document.getElementById('taskSlotField');
+      if(nonStudy && iconRow && diffRow && iconField && durField && colorField && slotField){
+        iconRow.appendChild(iconField);
+        diffRow.appendChild(colorField);
+        diffRow.appendChild(slotField);
+        iconRow.style.display='';
+        diffRow.style.display='';
+        nonStudy.style.display='none';
+      }
+    }
+    const method=document.getElementById('studyMethodInput')?.value||'legacy';
+    const qtyInput=document.getElementById('studyQuantityInput');
+    if(method==='video' && qtyInput && (qtyInput.value==='' || qtyInput.value==null)) qtyInput.value='1';
+    const measureField=document.getElementById('studyMeasureField'); if(measureField)measureField.style.display=method==='legacy'?'none':'block';
+    studyMeasureOptions(method,document.getElementById('studyUnitInput')?.value);
+    const uf=document.getElementById('studyUnitFields'); if(uf)uf.style.display=method==='legacy'?'none':'block';
+    const avgLabel=document.getElementById('studyAvgLabel'); if(avgLabel)avgLabel.textContent=method==='video'?'Video Length':'Average Time Per Unit';
+    const vf=document.getElementById('studyVideoFields'); if(vf)vf.style.display=method==='video'?'block':'none';
+    const db=document.getElementById('studyDerivedBox'); if(db)db.style.display=method==='legacy'?'none':'block';
+    const durField=document.getElementById('taskDurationField'), methodRow=document.querySelector('.study-method-row'), diffRow=document.getElementById('taskDifficultySlotRow');
+    if(durField){
+      durField.classList.toggle('content-calculated',method!=='legacy');
+      durField.classList.toggle('study-duration-inline',isStudy && method==='legacy');
+      if(isStudy && method==='legacy' && methodRow) methodRow.appendChild(durField);
+      else if(diffRow) diffRow.before(durField);
+    }
+    const derived=document.getElementById('studyDerivedDuration'),formula=document.getElementById('studyDerivedFormula');
+    if(method!=='legacy'){
+      const cfg=studyContentConfigFromForm();
+      if(cfg.error){
+        if(formula)formula.textContent=cfg.error;
+      }else{
+        if(formula){
+          const compactDur=(sec)=>{const n=Math.max(0,Math.round(Number(sec)||0)),h=Math.floor(n/3600),m=Math.floor((n%3600)/60),ss=n%60;return h>0?(h+'h'+(m?' '+m+'m':'')):(m>0?(m+'m'+(ss?' '+ss+'s':'')):(ss+'s'));};
+          if(method==='video'){
+            const qText=Number(cfg.quantity)||0, unitText=unitLabel(cfg.quantityUnit);
+            formula.innerHTML=`<span class="formula-main">${qText} video × ${qText} ${unitLabel(cfg.quantityUnit)} length ÷ ${Number(cfg.playbackSpeed)||1}× speed = </span><b>${compactDur(cfg.durationSec)}</b>`;
+          }else{
+            const av=cfg.quantityUnit==='h'?cfg.avgUnitSec/3600:cfg.quantityUnit==='m'?cfg.avgUnitSec/60:cfg.avgUnitSec;
+            const avText=Number.isInteger(av)?String(av):String(Number(av.toFixed(2)));
+            formula.innerHTML=`<span class="formula-main">${Number(cfg.plannedQuantity)||0} ${cfg.progressUnit} × ${avText} ${unitLabel(cfg.quantityUnit)} = </span><b>${compactDur(cfg.durationSec)}</b>`;
+          }
+        }
+        setDurInputs(cfg.durationSec);
+      }
+    }
+    positionStudyQuantityUnit();
+  }
+
+  function getStudyProgressMeta(task,idx){
+    if(!task || task.studyMethod==='legacy' || !task.plannedQuantity) return null;
+    const pomoSec=Math.max(60,STATE.settings.pomodoroDuration||1800);
+    const parts=activitySplit(task.duration||pomoSec,pomoSec);
+    const i=Math.min(Math.max(0,Number(idx)||0),parts.length-1);
+    const segSec=parts[i]||pomoSec;
+    if(task.studyMethod==='video'){
+      const target=segSec*(Number(task.playbackSpeed)||1);
+      return {kind:'video',mode:'videoTime',unit:'video',target,targetLabel:fmtClock(target),placeholder:'Current video timestamp (HH:MM:SS)',rate:Number(task.playbackSpeed)||1};
+    }
+    const mode=normalizeStudyProgressMode(task);
+    const unit=studyProgressModeUnit(mode);
+    const perSessionTarget=segSec/(Number(task.avgUnitSec)||60);
+    // Number modes are cumulative book/question positions: Session 1 -> 20, Session 2 -> 40,
+    // etc. Count modes remain independent per-session quantities.
+    let target=perSessionTarget;
+    if(mode==='pageNumber'||mode==='questionNumber'){
+      let elapsed=0;
+      for(let j=0;j<=i;j++) elapsed += parts[j]||0;
+      target=elapsed/(Number(task.avgUnitSec)||60);
+      target=Math.min(Number(task.plannedQuantity)||target,target);
+    }
+    return {kind:'unit',mode,unit,target,targetLabel:fmtContentAmount(target,unit),placeholder:`${mode==='pageNumber'?'Page number':mode==='questionNumber'?'Question number':mode==='pageCount'?'Pages completed':'Questions completed'}${mode.endsWith('Number')?'':' this session'}`,rate:1/(Number(task.avgUnitSec)||60),perSessionTarget};
+  }
+  function parseProgressInput(task,raw){
+    const meta=task?.studyMethod==='video'?getStudyProgressMeta(task,0):null;
+    if(task?.studyMethod==='video') return parseFlexibleClock(raw);
+    const n=Number(String(raw||'').trim().replace(',','.')); return Number.isFinite(n)&&n>=0?n:NaN;
+  }
+
   // Reject invalid values while typing. Daily tasks use HH 00–24; Planner
   // chapters switch to HH 00–999. Minutes are always 00–59.
   (function(){
@@ -10220,6 +10875,7 @@ function applyModalCat(cat, isEdit){
   document.getElementById('taskSubjectField').style.display = isStudy?'block':'none';
   document.getElementById('taskSubjectHint').style.display = isStudy?'block':'none';
   document.getElementById('taskCountAsField').style.display = (internalCat==='others')?'block':'none';
+  renderStudyContentFields();
 }
 // Opens the Add/Edit Task modal, pre-filled with an existing task's data if editing.
 // `focusField` optionally focuses one input after the sheet opens (used by the Edit Menu's
@@ -10240,6 +10896,7 @@ function openTomorrowModal(tid){
   populateColorSelect(t.color||CAT_COLOR_DEFAULT[t.category], t.category);
   populateSlotSelect(t.slotId);
   document.getElementById('taskIconInput').value = t.icon||CAT_ICON[t.category];
+  setStudyContentFields(t);
   setDurInputs(t.duration);
   document.getElementById('taskOverlay').classList.add('show');
 }
@@ -10254,6 +10911,7 @@ function setStartedTaskEditState(started){
   if(durationField) durationField.classList.toggle('started-locked', started);
   if(hh) hh.disabled=started;
   if(mm) mm.disabled=started;
+  ['studyMethodInput','studyVideoSpeed','studyUnitInput','studyQuantityInput','studyAvgInput','studyAvgUnitInput'].forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled=started; });
 }
 function openTaskModal(taskId, focusField){
   if(manualProgressTaskId !== null) closeManualProgressMode();
@@ -10279,8 +10937,14 @@ function openTaskModal(taskId, focusField){
   populateColorSelect(t ? (t.color||CAT_COLOR_DEFAULT[cat]) : '#5B4FE8', cat);
   populateSlotSelect(t ? t.slotId : '');
   document.getElementById('taskIconInput').value = t ? (t.icon||CAT_ICON[cat]||'') : (CAT_ICON[cat]||'');
+  setStudyContentFields(t ? t : {studyMethod:cat==='study'?'legacy':'legacy',progressMode:'pageNumber',progressUnit:'pages',plannedQuantity:'',avgUnitSec:null,playbackSpeed:1});
   setDurInputs(t ? t.duration : STATE.settings.defaultDurations[cat]);
+  if(!t && cat==='study') renderStudyContentFields();
   setStartedTaskEditState(startedEdit);
+  // Version 20.6: the Add Task sheet also gets the same rounded close button
+  // used by the started-task editor, so the sheet can be dismissed explicitly.
+  const addCloseBtn=document.getElementById('taskCloseBtn');
+  if(addCloseBtn && !t && cat==='study') addCloseBtn.style.display='flex';
   document.getElementById('taskOverlay').classList.add('show');
   if(focusField){
     const map = {rename:'taskNameInput', duration:'taskDurHH', icon:'taskIconInput'};
@@ -10340,6 +11004,7 @@ function openPendingTaskModal(pendingId){
   populateColorSelect(task.color||'#5B4FE8', 'study');
   populateSlotSelect('');
   document.getElementById('taskIconInput').value = task.icon||CAT_ICON.study;
+  setStudyContentFields(task);
   setDurInputs(task.duration);
   document.getElementById('taskOverlay').classList.add('show');
 }
@@ -10404,16 +11069,22 @@ document.getElementById('saveTaskBtn').onclick = async ()=>{
   const slotId = slotVal ? parseInt(slotVal,10) : null;
   const startedTaskBeingEdited = editingTaskId!=null && (()=>{ const _t=CACHED_TASKS.find(x=>x.id===editingTaskId); return !!_t && isTaskStarted(_t); })();
   const originalStartedDuration = startedTaskBeingEdited ? CACHED_TASKS.find(x=>x.id===editingTaskId).duration : null;
-  const durSec = startedTaskBeingEdited ? originalStartedDuration : getDurSec();
-  if(!name || isNaN(durSec) || durSec<=0){ showToast('Enter a valid name and duration (HH:MM).'); return; }
+  let contentCfg = null;
+  if(cat==='study' && !startedTaskBeingEdited){
+    contentCfg = studyContentConfigFromForm();
+    if(contentCfg.error){ showToast(contentCfg.error); return; }
+  }
+  const durSec = startedTaskBeingEdited ? originalStartedDuration : (contentCfg?.durationSec || getDurSec());
+  if(!name || isNaN(durSec) || durSec<=0){ showToast('Enter a valid name and study target.'); return; }
   if(editingPendingId !== null || creatingPending){
     const pending = plannerPending().find(p=>String(p.id)===String(editingPendingId));
     if(creatingPending){
-      STATE.plannerPending.push({id:'pending-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),plannerId:STATE.activePlannerId,category:'study',name,subject:subject||null,duration:durSec,icon:icon||CAT_ICON.study,color:color||'#5B4FE8',createdOn:plannerDateKey(),reuseDisabled:false});
+      STATE.plannerPending.push({id:'pending-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),plannerId:STATE.activePlannerId,category:'study',name,subject:subject||null,duration:durSec,icon:icon||CAT_ICON.study,color:color||'#5B4FE8',createdOn:plannerDateKey(),reuseDisabled:false,...(contentCfg&&contentCfg.method!=='legacy'?{studyMethod:contentCfg.method,progressMode:contentCfg.progressMode,progressUnit:contentCfg.progressUnit,plannedQuantity:contentCfg.plannedQuantity,avgUnitSec:contentCfg.avgUnitSec,videoDurationSec:contentCfg.videoDurationSec,playbackSpeed:contentCfg.playbackSpeed}:{} )});
     } else {
       if(!pending){ showToast('Pending task no longer exists.'); return; }
       pending.name=name; pending.subject=subject||null; pending.duration=durSec;
       pending.icon=icon||CAT_ICON.study; pending.color=color||'#5B4FE8'; pending.reuseDisabled=true;
+      if(contentCfg&&contentCfg.method!=='legacy') Object.assign(pending,{studyMethod:contentCfg.method,progressMode:contentCfg.progressMode,progressUnit:contentCfg.progressUnit,plannedQuantity:contentCfg.plannedQuantity,avgUnitSec:contentCfg.avgUnitSec,videoDurationSec:contentCfg.videoDurationSec,playbackSpeed:contentCfg.playbackSpeed});
     }
     await saveState(STATE);
     editingPendingId=null; creatingPending=false;
@@ -10463,6 +11134,7 @@ document.getElementById('saveTaskBtn').onclick = async ()=>{
     task.subject=subject||null; task.slotId=slotId;
     task.countAs = (cat==='others') ? modalCountAs : 'others';
     task.icon=icon||CAT_ICON[cat]; task.color=color||CAT_COLOR_DEFAULT[cat]; task.pending=false;
+    if(contentCfg&&contentCfg.method!=='legacy') Object.assign(task,{studyMethod:contentCfg.method,progressMode:contentCfg.progressMode,progressUnit:contentCfg.progressUnit,plannedQuantity:contentCfg.plannedQuantity,avgUnitSec:contentCfg.avgUnitSec,videoDurationSec:contentCfg.videoDurationSec,playbackSpeed:contentCfg.playbackSpeed,contentProgress:Number(task.contentProgress)||0});
     await saveState(STATE);
     document.getElementById('taskOverlay').classList.remove('show');
     currentTaskTab = taskTabAtOpen==='revision' ? 'revision' : cat;
@@ -10490,6 +11162,8 @@ document.getElementById('saveTaskBtn').onclick = async ()=>{
   obj.subject = subject||null; obj.slotId = slotId;
   obj.countAs = (modalCat==='others') ? modalCountAs : 'others';
   obj.icon = icon || CAT_ICON[modalCat]; obj.color = color || CAT_COLOR_DEFAULT[modalCat];
+  if(cat==='study' && contentCfg && contentCfg.method!=='legacy') Object.assign(obj,{studyMethod:contentCfg.method,progressMode:contentCfg.progressMode,progressUnit:contentCfg.progressUnit,plannedQuantity:contentCfg.plannedQuantity,avgUnitSec:contentCfg.avgUnitSec,videoDurationSec:contentCfg.videoDurationSec,playbackSpeed:contentCfg.playbackSpeed,contentProgress:Number(obj.contentProgress)||0});
+  else if(cat==='study' && !editingTaskId){ obj.studyMethod='legacy'; obj.progressMode=null; obj.progressUnit=null; obj.plannedQuantity=null; obj.avgUnitSec=null; obj.videoDurationSec=null; obj.playbackSpeed=null; obj.contentProgress=0; }
   await idbPut('tasks', obj);
   CACHED_TASKS = await loadTasks();
   // LIVE TOMORROW MIRROR — Study & Others ONLY (never Routine/Health, whose logic is untouched):
@@ -10521,6 +11195,13 @@ document.getElementById('taskListArea').addEventListener('click', async (e)=>{
   [...document.getElementById('taskTabs').children].forEach(c=>c.classList.remove('active'));
   tab.classList.add('active'); currentTaskTab = tab.getAttribute('data-cat'); renderTasks();
   });
+
+['studyMethodInput','studyVideoSpeed','studyUnitInput','studyQuantityInput','studyAvgInput','studyAvgUnitInput'].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener('input',renderStudyContentFields); el.addEventListener('change',renderStudyContentFields); }});
+document.getElementById('studyQuantityInput')?.addEventListener('input',positionStudyQuantityUnit);
+document.getElementById('studyQuantityInput')?.addEventListener('change',positionStudyQuantityUnit);
+document.getElementById('studyVideoSpeed')?.addEventListener('change',renderStudyContentFields);
+document.getElementById('studyUnitInput')?.addEventListener('change',renderStudyContentFields);
+document.getElementById('studyQuantityInput')?.addEventListener('input',renderStudyContentFields);
 
 document.getElementById('taskOverlay').addEventListener('click',(e)=>{ if(e.target.id==='taskOverlay'){ closeManualProgressMode(); e.target.classList.remove('show'); } });
 document.getElementById('manualAddHH').addEventListener('input', renderManualProgressPreview);
@@ -11035,21 +11716,25 @@ document.querySelectorAll('#pomoMoods .pomo-mood-btn').forEach(b=>{ b.innerHTML 
 
 // Reality Check is the direct UI for the SAME Pomodoro Log row. No separate popup/storage/timer.
 document.querySelectorAll('#realityCheckCard .rc-rating').forEach(b=>b.addEventListener('click',()=>setRealityCheckRating(Number(b.textContent))));
-document.getElementById('rcNote')?.addEventListener('input',e=>{
-  rcDraftNote=e.target.value;
-  const btn=document.getElementById('rcDone');
-  if(btn){
-    const ready=!!(realityCheckPending()&&rcDraftRating&&String(e.target.value||'').trim());
-    btn.disabled=false;
-    btn.setAttribute('aria-disabled',String(!ready));
-    btn.classList.toggle('rc-locked',!ready);
-  }
+function refreshRealityCheckDoneState(){ renderRealityCheck(); }
+document.getElementById('rcNote')?.addEventListener('input',e=>{ rcDraftNote=e.target.value; refreshRealityCheckDoneState(); });
+document.getElementById('rcProgressInput')?.addEventListener('input',()=>{updateRealityCheckPreview();refreshRealityCheckDoneState();});
+document.getElementById('rcVideoHH')?.addEventListener('input',()=>{updateRealityCheckPreview();refreshRealityCheckDoneState();});
+document.getElementById('rcVideoMM')?.addEventListener('input',()=>{updateRealityCheckPreview();refreshRealityCheckDoneState();});
+
+document.getElementById('rcRecentComments')?.addEventListener('click',e=>{
+  const chip=e.target.closest('[data-rc-recent]');
+  if(!chip)return;
+  const note=document.getElementById('rcNote');
+  if(!note)return;
+  note.value=chip.getAttribute('data-rc-recent')||'';
+  note.dispatchEvent(new Event('input',{bubbles:true}));
+  note.focus();
 });
 document.getElementById('rcDone')?.addEventListener('click',()=>{
   if(!realityCheckPending()) return;
-  const comment=String(document.getElementById('rcNote')?.value||rcDraftNote||'').trim();
-  if(!comment){ showToast('Please enter a short session comment.'); return; }
-  if(!rcDraftRating){ showToast('Please select your focus mood.'); return; }
+  const ratingRequired=realityCheckRatingEnabled(STATE);
+  if(ratingRequired&&!rcDraftRating){showToast('Please select your focus rating.');return;}
   completeRealityCheck();
 });
 document.getElementById('pomoMoods').addEventListener('click', (e)=>{
@@ -11550,10 +12235,18 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
   const showRevisionEl = document.getElementById('setShowRevisionTab');
   if(showRevisionEl) state.settings.showRevisionTab = showRevisionEl.checked;
   const realityToggleEl = document.getElementById('setRealityCheckEnabled');
-  if(realityToggleEl) {
-    state.settings.realityCheckEnabled = realityToggleEl.checked;
-    if(!realityToggleEl.checked) state.realityCheckPending = null;
+  const realityRatingEl = document.getElementById('setRealityCheckRating');
+  const realityCommentReqEl = document.getElementById('setRealityCheckCommentRequired');
+  const realityProgressEl = document.getElementById('setRealityCheckProgress');
+  if(realityToggleEl) state.settings.realityCheckEnabled = realityToggleEl.checked;
+  if(realityRatingEl) state.settings.realityCheckRating = realityRatingEl.checked;
+  if(realityCommentReqEl) state.settings.realityCheckCommentRequired = realityCommentReqEl.checked;
+  if(realityProgressEl) state.settings.realityCheckProgress = realityProgressEl.checked;
+  // If the user has disabled every question the RC can ask, automatically disable the feature.
+  if(!state.settings.realityCheckRating && !state.settings.realityCheckCommentRequired && !state.settings.realityCheckProgress){
+    state.settings.realityCheckEnabled = false;
   }
+  if(!state.settings.realityCheckEnabled) state.realityCheckPending = null;
   const thoughtsToggleEl = document.getElementById('setThoughtsEnabled');
   if(thoughtsToggleEl) state.settings.thoughtsEnabled = thoughtsToggleEl.checked;
   state.settings.thoughtCategories = Array.isArray(state.settings.thoughtCategories) && state.settings.thoughtCategories.length
@@ -11692,6 +12385,7 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
       setSettingsSaveButtonForSection(el.dataset.sub);
       // Render Planner cards when opening Planner section
       if(el.dataset.sub === 'subMilestonesRevision'){
+        updateMilestonesRevisionTabLabels();
         renderPlanners();
       }
       // Save button must start disabled when entering bomb sub-page (no change made yet)
@@ -11708,9 +12402,38 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
   }); // close click listener
 }); // close forEach
 
+// Live counts for the Planner / Revision / Pending settings tabs.
+// Planner remains the default tab; Revision hides its suffix when no duration is configured,
+// while Pending always exposes the current active-planner count (including zero).
+function updateMilestonesRevisionTabLabels(){
+  const revisionLabel=document.getElementById('mrTabLabelRevision');
+  const revisionCount=document.getElementById('mrTabRevisionCount');
+  const pendingLabel=document.getElementById('mrTabLabelPending');
+  const pendingCount=document.getElementById('mrTabPendingCount');
+  if(revisionCount){
+    const sec=Math.max(0,Number(STATE?.settings?.avgRevisionSec)||0);
+    let display='';
+    if(sec>0){
+      const hours=Math.floor(sec/3600);
+      const minutes=Math.round((sec%3600)/60);
+      if(hours>0) display=hours+'H';
+      else if(minutes>0) display=minutes+'M';
+    }
+    revisionCount.textContent=display;
+  }
+  if(pendingCount){
+    const count=Array.isArray(STATE?.plannerPending) ? plannerPending().length : 0;
+    pendingCount.textContent=String(count);
+  }
+  // Keep the base labels explicit even after re-render/navigation.
+  if(revisionLabel) revisionLabel.textContent='Revision';
+  if(pendingLabel) pendingLabel.textContent='Pending';
+}
+
 // Lock Today's Task Editing toggle — save immediately without waiting for Save button
 // Milestones & Revision uses the standard app tab component; this shell intentionally has no feature logic.
 document.getElementById('milestonesRevisionTabs').addEventListener('click', (e)=>{
+  updateMilestonesRevisionTabLabels();
   const tab = e.target.closest('.tab[data-mr-tab]');
   if(!tab) return;
   document.querySelectorAll('#milestonesRevisionTabs .tab').forEach(item=>{
@@ -11757,6 +12480,8 @@ document.getElementById('saveRevisionDurBtn').addEventListener('click', async ()
   const state = await getState();
   state.settings.avgRevisionSec = sec;
   await saveState(state);
+  STATE=state;
+  updateMilestonesRevisionTabLabels();
   renderPlanners();
   // Re-lock inputs after saving
   document.getElementById('revisionDurHH').disabled = true;
@@ -11838,6 +12563,7 @@ document.getElementById('plannerOverlay').addEventListener('click', (e)=>{
 
 // Delete Planner Button
 document.getElementById('plannerDeleteBtn').addEventListener('click', ()=>{
+  pendingDeleteAllConfirm=false;
   if(editingPlannerIndex === null) return;
   const planner = STATE.planners[editingPlannerIndex];
   if(!planner) return;
@@ -11847,7 +12573,11 @@ document.getElementById('plannerDeleteBtn').addEventListener('click', ()=>{
 
 // Cancel Planner Delete
 document.getElementById('plannerDeleteCancel').addEventListener('click', ()=>{
+  pendingDeleteAllConfirm=false;
   document.getElementById('plannerDeleteDialog').classList.remove('show');
+  document.querySelector('#plannerDeleteDialog h3').textContent='Are you sure?';
+  document.querySelector('#plannerDeleteDialog p').textContent='Deleting this Planner permanently removes all its subject progress and task history. This action cannot be undone.';
+  document.getElementById('plannerDeleteConfirm').textContent='Delete Permanently';
 });
 
 // Confirm Planner Delete - requires typing "12345"
@@ -11855,6 +12585,21 @@ document.getElementById('plannerDeleteConfirm').addEventListener('click', async 
   const code = document.getElementById('plannerDeleteConfirmCode').value.trim();
   if(code !== '12345') {
     showToast('Incorrect code. Please try again.');
+    return;
+  }
+  if(pendingDeleteAllConfirm){
+    const activeId=STATE.activePlannerId || null;
+    const before=(STATE.plannerPending||[]).length;
+    STATE.plannerPending=(STATE.plannerPending||[]).filter(p=>activeId ? p.plannerId!==activeId : !!p.plannerId);
+    pendingDeleteAllConfirm=false;
+    await saveState(STATE);
+    document.getElementById('plannerDeleteDialog').classList.remove('show');
+    document.getElementById('plannerDeleteConfirmCode').value='';
+    document.querySelector('#plannerDeleteDialog h3').textContent='Are you sure?';
+    document.querySelector('#plannerDeleteDialog p').textContent='Deleting this Planner permanently removes all its subject progress and task history. This action cannot be undone.';
+    document.getElementById('plannerDeleteConfirm').textContent='Delete Permanently';
+    if(document.getElementById('screen-planDetail').classList.contains('active')) await showPlannerPendingScreen();
+    showToast(before ? 'All pending tasks deleted.' : 'No pending tasks to delete.');
     return;
   }
   
@@ -11924,6 +12669,32 @@ document.getElementById('savePlannerBtn').addEventListener('click', async ()=>{
     console.error('Error saving planner:', e);
   }
 });
+
+// Pending settings — expiry is persisted immediately; Delete All reuses the existing Planner confirmation dialog.
+const pendingExpirySelectEl=document.getElementById('pendingExpirySelect');
+if(pendingExpirySelectEl){
+  pendingExpirySelectEl.addEventListener('change', async ()=>{
+    const value=Number(pendingExpirySelectEl.value);
+    if(![7,14,21,28,30,50,60,90].includes(value)) return;
+    const state=await getState();
+    state.settings.pendingExpiryDays=value;
+    await purgeExpiredPlannerPending(state, studyDayKey());
+    STATE=state;
+    await showPlannerPendingScreen();
+    showToast('Pending expiry set to '+value+' days.');
+  });
+}
+const pendingDeleteAllBtnEl=document.getElementById('pendingDeleteAllBtn');
+if(pendingDeleteAllBtnEl){
+  pendingDeleteAllBtnEl.addEventListener('click', ()=>{
+    pendingDeleteAllConfirm=true;
+    document.getElementById('plannerDeleteConfirmCode').value='';
+    document.querySelector('#plannerDeleteDialog h3').textContent='Delete All Pending?';
+    document.querySelector('#plannerDeleteDialog p').textContent='This will permanently delete every Pending task for the current Planner. This action cannot be undone.';
+    document.getElementById('plannerDeleteConfirm').textContent='Delete All';
+    document.getElementById('plannerDeleteDialog').classList.add('show');
+  });
+}
 
 // Render all Planners
 async function renderPlanners(){
@@ -12182,14 +12953,16 @@ function showPlanDetailScreen(subject){
   currentPlanDetailSubject = subject;
   document.getElementById('planDetailAddTaskBtn').style.display = '';
   document.getElementById('planDetailAddTaskBtn').innerHTML = '<span style="font-size:18px;">+</span> Add New Chapter';
-  // Opening a subject always starts with the requested default: Oldest.
-  planDetailSortMode = 'oldest';
+  // Chapter detail opens newest-first so the latest created chapter is immediately visible.
+  planDetailSortMode = 'newest';
   const sortLabel = document.getElementById('planDetailSortVal');
-  if(sortLabel) sortLabel.textContent = 'Oldest';
+  if(sortLabel) sortLabel.textContent = 'Newest';
   planDetailTasks = plannerChapters().filter(t => (t.subject || '') === subject);
   
   // Update header
   document.getElementById('planDetailSubjectName').textContent = subject;
+  const pendingControls=document.getElementById('pendingControlsCard');
+  if(pendingControls) pendingControls.style.display='none';
   const taskCount = planDetailTasks.length;
   document.getElementById('planDetailTaskCount').textContent = taskCount + (taskCount === 1 ? ' Chapter' : ' Chapters');
   
@@ -12213,14 +12986,21 @@ function showPlanDetailScreen(subject){
   document.getElementById('screen-planDetail').classList.add('active');
 }
 
-function showPlannerPendingScreen(){
+async function showPlannerPendingScreen(){
+  updateMilestonesRevisionTabLabels();
   plannerDetailMode = 'pending';
   currentPlanDetailSubject = null;
-  const tasks = plannerPending();
+  await purgeExpiredPlannerPending(STATE, studyDayKey());
+  // Pending queue is always newest-first so the most recently created carry-over is immediately visible.
+  const tasks = plannerPending().slice().sort((a,b)=>(b.createdOn||'').localeCompare(a.createdOn||''));
   document.getElementById('planDetailSubjectName').textContent = 'Pending';
   document.getElementById('planDetailTaskCount').textContent = tasks.length + (tasks.length===1 ? ' Task' : ' Tasks');
   document.getElementById('planDetailDuration').innerHTML = `0m / ${fmtHMu(tasks.reduce((s,t)=>s+(t.duration||0),0))}`;
   const addBtn=document.getElementById('planDetailAddTaskBtn'); addBtn.style.display = ''; addBtn.innerHTML='<span style="font-size:18px;">+</span> Add Pending Chapter';
+  const pendingControls=document.getElementById('pendingControlsCard');
+  if(pendingControls) pendingControls.style.display='block';
+  const expirySelect=document.getElementById('pendingExpirySelect');
+  if(expirySelect) expirySelect.value=String(STATE.settings?.pendingExpiryDays||30);
   renderPlanDetailTasks();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-planDetail').classList.add('active');
@@ -12229,7 +13009,7 @@ function showPlannerPendingScreen(){
 async function reusePendingTask(pendingId){
   const task = plannerPending().find(p=>String(p.id)===String(pendingId));
   if(!task || task.reuseDisabled) return;
-  await idbPut('tasks',{category:'study',name:task.name,duration:task.duration,subject:task.subject||null,slotId:null,countAs:'others',icon:task.icon||CAT_ICON.study,color:task.color||'#5B4FE8',createdOn:plannerDateKey(),consumedSec:0,completedAt:null,completionStatus:null,comment:'',cycleStartTs:null});
+  await idbPut('tasks',{category:'study',name:task.name,duration:task.duration,subject:task.subject||null,slotId:null,countAs:'others',icon:task.icon||CAT_ICON.study,color:task.color||'#5B4FE8',createdOn:plannerDateKey(),consumedSec:0,completedAt:null,completionStatus:null,comment:'',cycleStartTs:null,studyMethod:task.studyMethod||'legacy',progressMode:task.progressMode||null,progressUnit:task.progressUnit||null,plannedQuantity:task.plannedQuantity||null,avgUnitSec:task.avgUnitSec||null,videoDurationSec:task.videoDurationSec||null,playbackSpeed:task.playbackSpeed||null,contentProgress:Number(task.contentProgress)||0});
   STATE.plannerPending = STATE.plannerPending.filter(p=>String(p.id)!==String(pendingId));
   await saveState(STATE);
   CACHED_TASKS = await loadTasks();
@@ -12238,20 +13018,14 @@ async function reusePendingTask(pendingId){
 }
 
 function renderPlannerPendingTasks(container){
-  const tasks = plannerPending();
+  // Pending is intentionally newest-first: the latest carry-over should appear at the top.
+  const tasks = plannerPending().slice().sort((a,b)=>(b.createdOn||'').localeCompare(a.createdOn||''));
   if(!tasks.length){ container.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:20px;">No pending tasks</div>'; return; }
   container.innerHTML = tasks.map((t,index)=>{
     const reuse = '';
-    return `<div class="task-row-plan-detail" style="display:flex;align-items:center;gap:12px;padding:8px;justify-content:space-between;${index<tasks.length-1?'border-bottom:1px solid var(--border);':''}"><div style="display:flex;align-items:center;gap:8px;flex:1;"><div style="width:8px;height:8px;border-radius:50%;background:${t.color||'#5B4FE8'};flex-shrink:0;"></div><div><span style="font-weight:700;color:var(--text);font-size:14px;">${escapeHtml(t.name)}</span>${t.subject?`<div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">${escapeHtml(t.subject)}</div>`:''}</div></div><div style="display:flex;align-items:center;gap:8px;"><div style="color:var(--text-dim);font-size:12px;">${fmtHMu(t.duration)}</div>${reuse}<button class="plan-pending-edit-btn" data-id="${t.id}" aria-label="Edit pending task" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--gp-primary);cursor:pointer;">✎</button></div></div>`;
+    const created = t.createdOn ? formatPlannerDate(t.createdOn) : '';
+    return `<div class="task-row-plan-detail" style="display:flex;align-items:center;gap:12px;padding:8px;justify-content:space-between;${index<tasks.length-1?'border-bottom:1px solid var(--border);':''}"><div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;"><div style="width:8px;height:8px;border-radius:50%;background:${t.color||'#5B4FE8'};flex-shrink:0;"></div><div style="min-width:0;"><span style="font-weight:700;color:var(--text);font-size:14px;">${escapeHtml(t.name)}</span>${t.subject?`<div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">${escapeHtml(t.subject)}</div>`:''}</div></div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0;"><div style="color:var(--text-dim);font-size:10.5px;white-space:nowrap;">${escapeHtml(created)}</div><div style="color:var(--text-dim);font-size:12px;white-space:nowrap;">${fmtHMu(t.duration)}</div>${reuse}<button class="plan-pending-edit-btn" data-id="${t.id}" aria-label="Edit pending task" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--gp-primary);cursor:pointer;">✎</button></div></div>`;
   }).join('');
-  container.querySelectorAll('.plan-pending-edit-btn').forEach(btn=>{
-    const task=plannerPending().find(t=>String(t.id)===String(btn.dataset.id));
-    if(!task || !task.createdOn) return;
-    const date=document.createElement('span');
-    date.textContent=formatPlannerDate(task.createdOn);
-    date.style.cssText='font-size:10.5px;color:var(--text-dim);white-space:nowrap;';
-    btn.parentElement.insertBefore(date, btn);
-  });
   container.querySelectorAll('.plan-pending-reuse-btn').forEach(btn=>btn.addEventListener('click',e=>reusePendingTask(e.currentTarget.dataset.id)));
   container.querySelectorAll('.plan-pending-edit-btn').forEach(btn=>btn.addEventListener('click',e=>openPendingTaskModal(e.currentTarget.dataset.id)));
 }
@@ -12276,15 +13050,16 @@ function renderPlanDetailTasks(){
     const difficultyColor = t.color || '#5B4FE8';
     const usedDur = fmtHMu(t.allocatedSec || 0);
     const totalDur = fmtHMu(t.duration || 0);
+    const created = t.createdOn ? formatPlannerDate(t.createdOn) : '';
     
     row.innerHTML = `
-      <div style="display:flex;align-items:center;gap:8px;flex:1;">
+      <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
         <div style="width:8px;height:8px;border-radius:50%;background:${difficultyColor};flex-shrink:0;"></div>
-        <span style="font-weight:700;color:var(--text);font-size:14px;">${escapeHtml(t.name)}</span>
+        <div style="min-width:0;"><span style="font-weight:700;color:var(--text);font-size:14px;">${escapeHtml(t.name)}</span><div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;white-space:nowrap;">${escapeHtml(created)}</div></div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        <div style="color:var(--text-dim);font-size:12px;text-align:right;">${usedDur} / ${totalDur}</div>
-        <button class="plan-detail-edit-btn" data-id="${t.id}" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gp-primary);flex-shrink:0;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <div style="color:var(--text-dim);font-size:12px;text-align:right;white-space:nowrap;">${usedDur} / ${totalDur}</div>
+        <button class="plan-detail-edit-btn" data-id="${t.id}" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gp-primary);flex-shrink:0;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;"><path d="M11 4H4a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
       </div>
     `;
     
@@ -12370,6 +13145,14 @@ document.getElementById('planDetailAddTaskBtn').addEventListener('click', () => 
 
   function shopSelectedChapterCount(){
     return plannerChapters().filter(t => (shopSelections.get(String(t.id))||0) > 0).length + shopPendingSelections.size;
+  }
+
+  function updateShopCartBadge(){
+    const badge = document.getElementById('shopCartBadge');
+    if(!badge) return;
+    const count = shopSelectedChapterCount();
+    badge.textContent = count;
+    badge.style.display = count ? 'flex' : 'none';
   }
 
   // Parse multiple formats into total seconds:
@@ -12458,10 +13241,7 @@ document.getElementById('planDetailAddTaskBtn').addEventListener('click', () => 
     if(subjectName==='Pending'){ renderShopPending(); return; }
     const tasks = filterPlannerChapterList(plannerChapters().filter(t => t.subject === subjectName), shopSortMode);
     const list = document.getElementById('shopChapterList');
-    const badge = document.getElementById('shopCartBadge');
-    const selectedCount = shopSelectedChapterCount();
-    badge.textContent = selectedCount;
-    badge.style.display = selectedCount ? 'flex' : 'none';
+    updateShopCartBadge();
     shopEditingId = null;
 
     if(!tasks.length){
@@ -12516,9 +13296,17 @@ document.getElementById('planDetailAddTaskBtn').addEventListener('click', () => 
   function renderShopPending(){
     const list=document.getElementById('shopChapterList');
     const tasks=plannerPending().filter(t=>!t.reuseDisabled);
-    if(!tasks.length){ list.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">No reusable pending tasks</div>'; return; }
-    list.innerHTML=tasks.map(t=>{const on=shopPendingSelections.has(String(t.id)); return `<div class="shop-row"><div style="width:8px;height:8px;border-radius:50%;background:${t.color||'#5B4FE8'};"></div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">${escapeHtml(t.name)}</div>${t.subject?`<div style="font-size:10.5px;color:var(--text-dim);">${escapeHtml(t.subject)}</div>`:''}</div><span class="shop-total">${fmtHMu(t.duration)}</span><button class="shop-pending-btn" data-id="${t.id}" style="border:none;border-radius:7px;padding:7px 11px;background:${on?'var(--primary-light)':'var(--green-light)'};color:${on?'var(--gp-primary)':'var(--green-dark)'};font-weight:700;">${on?'Undo':'Reuse'}</button></div>`;}).join('');
-    list.querySelectorAll('.shop-pending-btn').forEach(b=>b.addEventListener('click',e=>{const id=String(e.currentTarget.dataset.id); shopPendingSelections.has(id)?shopPendingSelections.delete(id):shopPendingSelections.add(id); renderShopChips([...plannerSubjects(),'Pending']); renderShopPending();}));
+    updateShopCartBadge();
+    if(!tasks.length){ list.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">No reusable pending tasks</div>'; updateShopDurationDisplay(); return; }
+    list.innerHTML=tasks.map(t=>{const on=shopPendingSelections.has(String(t.id)); const created=t.createdOn?formatPlannerDate(t.createdOn):''; return `<div class="shop-row"><div style="width:8px;height:8px;border-radius:50%;background:${t.color||'#5B4FE8'};"></div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">${escapeHtml(t.name)}</div>${t.subject?`<div style="font-size:10.5px;color:var(--text-dim);">${escapeHtml(t.subject)}</div>`:''}${created?`<div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">${escapeHtml(created)}</div>`:''}</div><span class="shop-total">${fmtHMu(t.duration)}</span><button class="shop-pending-btn" data-id="${t.id}" style="border:none;border-radius:7px;padding:7px 11px;background:${on?'var(--primary-light)':'var(--green-light)'};color:${on?'var(--gp-primary)':'var(--green-dark)'};font-weight:700;">${on?'Undo':'Reuse'}</button></div>`;}).join('');
+    list.querySelectorAll('.shop-pending-btn').forEach(b=>b.addEventListener('click',e=>{
+      const id=String(e.currentTarget.dataset.id);
+      shopPendingSelections.has(id) ? shopPendingSelections.delete(id) : shopPendingSelections.add(id);
+      renderShopChips([...plannerSubjects(),'Pending']);
+      renderShopPending();
+      updateShopCartBadge();
+      updateShopDurationDisplay();
+    }));
   }
   function shopHandleActionBtn(btn){
     const taskId = btn.dataset.taskId;
@@ -12683,7 +13471,7 @@ document.getElementById('planDetailAddTaskBtn').addEventListener('click', () => 
       }
     }
     for(const task of pendingSelected){
-      const copy={category:'study',uiCategory:'study',name:task.name,duration:task.duration,subject:task.subject||null,slotId:null,countAs:'others',icon:task.icon||CAT_ICON.study,color:task.color||'#5B4FE8',createdOn:plannerDateKey(),consumedSec:0,completedAt:null,completionStatus:null,comment:'',cycleStartTs:null};
+      const copy={category:'study',uiCategory:'study',name:task.name,duration:task.duration,subject:task.subject||null,slotId:null,countAs:'others',icon:task.icon||CAT_ICON.study,color:task.color||'#5B4FE8',createdOn:plannerDateKey(),consumedSec:0,completedAt:null,completionStatus:null,comment:'',cycleStartTs:null,studyMethod:task.studyMethod||'legacy',progressMode:task.progressMode||null,progressUnit:task.progressUnit||null,plannedQuantity:task.plannedQuantity||null,avgUnitSec:task.avgUnitSec||null,videoDurationSec:task.videoDurationSec||null,playbackSpeed:task.playbackSpeed||null,contentProgress:Number(task.contentProgress)||0};
       if(planMode==='tomorrow') STATE.tomorrow.tasks.push({...copy,tid:nextTid(),pending:false});
       else taskCopies.push(copy);
     }
@@ -13455,7 +14243,10 @@ const SoundController = {
 
   // Stop whatever is playing on either engine. Always safe to call.
   _stopEngine(){
-    if(AND.on) AND.call('stopCompletionSound');
+    if(AND.on){
+      if(AND.has('stopAlarmPlayback')) AND.call('stopAlarmPlayback');
+      AND.call('stopCompletionSound');
+    }
     this._stopFallback();
   },
 
@@ -13551,6 +14342,7 @@ function andLoadReviewTarget(){
 let andPrev = null;             // previous observer snapshot (event diffing)
 let andManualStopPending = false; // suppress the generic completion notification caused by a manual STOP
 let andAlarms = {};             // {id: triggerMs} last scheduled, to avoid re-scheduling every tick
+let andAlarmMeta = {};          // {id: {soundSlot, durationMs}} associated native playback settings
 let andPermission = null;       // last known notification permission result
 
 // ---- Live notification content (mirrors the Current Activity card) ----
@@ -13734,15 +14526,27 @@ function andSyncNotificationLegacy(){
 }
 
 // ---- Alarm sync (session end + bomb explosion survive app death) ----
-function andSetAlarm(id, triggerMs, title, text){
-  if(Math.abs((andAlarms[id]||0) - triggerMs) < 1500) return; // already scheduled close enough
-  AND.call('scheduleAlarm', id, triggerMs, title, text);
+function andSetAlarm(id, triggerMs, title, text, soundSlot='sessionend'){
+  const durationMs = SoundController.durationMs(soundSlot);
+  const previous = andAlarmMeta[id];
+  const sameSound = previous && previous.soundSlot===soundSlot && previous.durationMs===durationMs;
+  if(Math.abs((andAlarms[id]||0) - triggerMs) < 1500 && sameSound) return; // same deadline + sound settings
+  // v2.4+ wrapper contract: the native scheduled alarm must use the same
+  // per-slot sound and duration as the in-app SoundController.
+  if(AND.has('scheduleAlarmWithSound')){
+    AND.call('scheduleAlarmWithSound', id, triggerMs, title, text, soundSlot, durationMs);
+  }else{
+    // Older wrapper compatibility. Its scheduled notification still uses the
+    // legacy fixed sound until the Android wrapper is upgraded.
+    AND.call('scheduleAlarm', id, triggerMs, title, text);
+  }
   andAlarms[id] = triggerMs;
+  andAlarmMeta[id] = {soundSlot, durationMs};
 }
 function andClearAlarm(id){
   // Always ask native to cancel: a WebView reload loses andAlarms, while the
   // OS may still hold the persisted alarm from before that reload.
-  AND.call('cancelAlarm', id); delete andAlarms[id];
+  AND.call('cancelAlarm', id); delete andAlarms[id]; delete andAlarmMeta[id];
 }
 function andSyncAlarms(){
   if(!AND.on || !STATE || !AND.has('scheduleAlarm')) return;
@@ -13783,10 +14587,22 @@ function andSyncAlarms(){
     }
     if(remain > 3000){
       if(extraAlarmActive){
-        andSetAlarm(AND_ALARM_SESSION, Date.now()+remain, '⏱️ Extra Study time is up!', 'Extra Study session finished.');
+        andSetAlarm(AND_ALARM_SESSION, Date.now()+remain, '⏱️ Extra Study time is up!', 'Extra Study session finished.', 'sessionend');
       }else{
         const icon = CAT_ICON[at.type]||'📖';
-        andSetAlarm(AND_ALARM_SESSION, Date.now()+remain, icon+' Time is up!', (at.task||'Session')+' has finished.');
+        let title = icon+' Time is up!';
+        let body = (at.task||'Session')+' has finished.';
+        if(at.type==='study'){
+          try{
+            const v = caComputeView(at);
+            if(v){
+              title = 'Session '+v.cur+' out of '+v.total+' Done';
+              body = v.activity+' '+v.cur+' out of '+v.total+' Completed.';
+            }
+          }catch(e){}
+        }
+        const alarmSlot = cfg.sessionAlarm ? 'sessionend' : 'taskcomplete';
+        andSetAlarm(AND_ALARM_SESSION, Date.now()+remain, title, body, alarmSlot);
       }
     }
   } else andClearAlarm(AND_ALARM_SESSION);
@@ -13794,7 +14610,7 @@ function andSyncAlarms(){
   // in Bomb Mode), so an explosion still fires if the app is killed while paused.
   if(masterAlarms && cfg.bombAlarm && bombIsTicking(STATE)){
     const remain = bombLiveRemainingMs(STATE);
-    if(remain > 3000) andSetAlarm(AND_ALARM_BOMB, Date.now()+remain, EMOJI.bomb+EMOJI.explosion+EMOJI.red_circle+' Bomb reached 00:00!', 'Open Goal Tracker now — your streak is at stake.');
+    if(remain > 3000) andSetAlarm(AND_ALARM_BOMB, Date.now()+remain, EMOJI.bomb+EMOJI.explosion+EMOJI.red_circle+' Bomb reached 00:00!', 'Open Goal Tracker now — your streak is at stake.', 'bombwarn');
     else andClearAlarm(AND_ALARM_BOMB);
   } else andClearAlarm(AND_ALARM_BOMB);
 }
@@ -13856,11 +14672,11 @@ function andDetectEvents(){
     const at = STATE && STATE.activeTimer;
     const v = at ? caComputeView(at) : null;
     const cfg = andCfg();
-    const playNow = cfg.sessionAlarm;
+    const playNow = cfg.sessionAlarm && !AND.has('scheduleAlarm');
     if(v){
       andSaveReviewTarget({ taskId: at.taskId, idx: Math.max(0, v.cur - 1) });
-      const title = EMOJI.check+' ' + v.cur + '/' + v.total + ' completed — Add Reflection '+EMOJI.party_face;
-      const body  = v.activity + (v.subject ? ' — ' + v.subject : '');
+      const title = 'Session '+v.cur+' out of '+v.total+' Done';
+      const body  = v.activity+' '+v.cur+' out of '+v.total+' Completed.';
       if(AND.on){
         if(playNow){
           andNotifyReview(AND_NOTIF_REVIEW, title, body, 'sessionend');
@@ -13889,7 +14705,16 @@ function andDetectEvents(){
       // Existing non-study completion notification path remains unchanged.
       const icon = CAT_ICON[p.type]||'📖';
       const cfg = andCfg();
-      andNotifyCompletion(AND_NOTIF_REVIEW, icon+' Session complete', (p.task||'Session')+' finished.', cfg.sessionAlarm ? 'sessionend' : null);
+      let title = icon+' Session complete';
+      let body = (p.task||'Session')+' finished.';
+      if(p.type==='study'){
+        try{
+          const atNow = STATE && STATE.activeTimer;
+          const vNow = atNow ? caComputeView(atNow) : null;
+          if(vNow){ title='Session '+vNow.cur+' out of '+vNow.total+' Done'; body=vNow.activity+' '+vNow.cur+' out of '+vNow.total+' Completed.'; }
+        }catch(e){}
+      }
+      andNotifyCompletion(AND_NOTIF_REVIEW, title, body, (cfg.sessionAlarm && !AND.has('scheduleAlarm')) ? 'sessionend' : null);
     }
   }
   // 2) Daily Study target reached (Home Day Streak awarded for today)
@@ -14358,6 +15183,38 @@ function andInit(){
   andMirrorToNative(); // first mirror right away
 }
 
+/* ============ CONTENT PROGRESS MODE MIGRATION ============ */
+// Version 20.11 migration: existing Pages/Questions content tasks are interpreted as
+// absolute page/question numbers. Existing saved Reality Check values are retained exactly;
+// the only change is that the next session now compares the new number against the last one.
+async function migrateStudyProgressModes(){
+  const tasks=await loadTasks();
+  let changed=false;
+  for(const t of tasks){
+    if(!t || t.studyMethod==='legacy') continue;
+    const oldMode=t.progressMode;
+    if(!oldMode){
+      t.progressMode=t.studyMethod==='video'?'videoTime':(t.progressUnit==='questions'?'questionNumber':'pageNumber');
+      changed=true;
+    }
+    if(t.studyMethod!=='video' && (t.progressMode==='pageNumber'||t.progressMode==='questionNumber')){
+      const logs=STATE?.pomoLogs?.[t.id]||[];
+      let latest=Number(t.contentProgress)||0;
+      for(const en of logs){
+        if(en?.saved && Number.isFinite(Number(en.progress))) latest=Math.max(latest,Number(en.progress));
+      }
+      if(latest!==Number(t.contentProgress||0)){ t.contentProgress=latest; changed=true; }
+    }
+    if(t.progressUnit!=='video'){
+      const expected=studyProgressModeUnit(t.progressMode);
+      if(expected!==t.progressUnit){ t.progressUnit=expected; changed=true; }
+    }
+    if(changed) await idbPut('tasks',t);
+    changed=false;
+  }
+  CACHED_TASKS=tasks;
+}
+
 /* ============ BOOT ============ */
 // App entry point: opens the DB, seeds default tasks, recovers/reconciles state, then renders.
 // Two background intervals keep the UI live: header/clock every 1s, and a full state
@@ -14367,6 +15224,7 @@ async function boot(){
   await openDB();
   await ensureDefaultTasks();
   STATE = await recoverState();
+  await migrateStudyProgressModes();
   // First paint is based on the recovered in-memory snapshot. Network work and maintenance must
   // never delay the first interactive screen or expose its default placeholder values.
   await render();
@@ -14391,6 +15249,18 @@ async function boot(){
     window.addEventListener('pageshow', ()=> gtResumeResync());
   }catch(e){ console.warn('[resume] could not attach visibility listeners', e); }
   setInterval(()=>{
+    // Reality Check heartbeat also runs when the productive timer has just ended. This is
+    // important for the final Pomodoro: its one-minute RC window must continue counting even
+    // after recoverState() has removed the completed activeTimer.
+    if(STATE && realityCheckPending(STATE)){
+      void (async()=>{
+        try{
+          if(await enforceRealityCheckSessionBinding(STATE)) return;
+          if(await enforceRealityCheckDeadline(STATE)) return;
+          if(!STATE.activeTimer) renderRealityCheck();
+        }catch(e){ console.warn('[Reality Check] heartbeat failed',e); }
+      })();
+    }
     maybeAwardLiveLifeline(); // business rule: must remain live while a study timer is running
     void checkSleepFreeze(); // freeze active Bomb/Pomodoro state at the exact Sleep boundary
     void checkWakeRollover(); // keeps Tomorrow → Today reliable while the app stays open overnight

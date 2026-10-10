@@ -17,8 +17,8 @@ android {
         applicationId "com.goaltracker.shell"
         minSdk 26          // Android 8.0
         targetSdk 34
-        versionCode 18
-        versionName "4.8"
+        versionCode 19
+        versionName "4.9"
     }
 
     signingConfigs {
@@ -60,4 +60,5 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     // WebViewAssetLoader lives here - serves filesDir over a stable https:// origin
     implementation 'androidx.webkit:webkit:1.8.0'
+    testImplementation 'junit:junit:4.13.2'
 }

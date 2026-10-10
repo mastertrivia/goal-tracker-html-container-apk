@@ -6,10 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.os.SystemClock
 import android.util.Base64
 import android.webkit.JavascriptInterface
@@ -45,20 +42,9 @@ class JsBridge(private val activity: MainActivity) {
     private fun namedSoundFile(name: String): File =
         File(File(activity.filesDir, "sound").apply { mkdirs() }, safeKey(name))
 
-    // Single reusable player for the optional completion sound.
-    private var player: MediaPlayer? = null
-
-    // True while the in-app player is actively ringing. Volume-key silencing
-    // reads this from the UI thread; playback starts on the bridge thread.
-    @Volatile
-    private var ringing = false
-
-    // v2.3: in-app sounds used to play the file ONCE (a ~3s clip rang for
-    // ~3s). A real alarm should keep ringing. We now LOOP the sound and
-    // auto-stop after RING_DURATION_MS so short clips ring for a full
-    // "alarm length" (up to a minute) instead of a single short blip.
-    private val soundHandler = Handler(Looper.getMainLooper())
-    private var stopSoundRunnable: Runnable? = null
+    // Short one-shot preview player used by the native sound chooser.
+    // Named/completion/scheduled playback goes through AlarmPlayer.
+    private var previewPlayer: MediaPlayer? = null
 
     private companion object {
         // How long an in-app alarm/completion sound keeps ringing before it
@@ -283,6 +269,45 @@ class JsBridge(private val activity: MainActivity) {
         }
     }
 
+    /**
+     * Schedule a notification at an absolute time and persist the sound slot
+     * plus ring duration so a killed process still plays the correct clip
+     * for the configured window. Duration is clamped to 5–60 seconds.
+     */
+    @JavascriptInterface
+    fun scheduleAlarmWithSound(
+        id: Int,
+        triggerAtMillis: Double,
+        title: String,
+        text: String,
+        soundSlot: String,
+        durationMs: Double
+    ) {
+        safe("scheduleAlarmWithSound", Unit) {
+            if (!Flags.get(activity, "alarmsEnabled")) return@safe
+            AlarmScheduler.schedule(
+                activity,
+                id,
+                triggerAtMillis.toLong(),
+                title,
+                text,
+                soundSlot,
+                durationMs.toLong()
+            )
+        }
+    }
+
+    /**
+     * Stop currently playing scheduled/in-app alarm audio immediately.
+     * Does not cancel future AlarmManager schedules.
+     */
+    @JavascriptInterface
+    fun stopAlarmPlayback(): Boolean = safe("stopAlarmPlayback", false) {
+        AlarmPlaybackService.stopPlayback(activity)
+        releasePreviewPlayer()
+        true
+    }
+
     @JavascriptInterface
     fun cancelAlarm(id: Int) {
         safe("cancelAlarm", Unit) {
@@ -493,7 +518,10 @@ class JsBridge(private val activity: MainActivity) {
 
     @JavascriptInterface
     fun stopCompletionSound() {
-        safe("stopCompletionSound", Unit) { releasePlayer() }
+        safe("stopCompletionSound", Unit) {
+            AlarmPlaybackService.stopPlayback(activity)
+            releasePreviewPlayer()
+        }
     }
 
     // ---- v2.2: named sounds (separate Pomodoro-completion / Bomb-warning) ----
@@ -560,103 +588,8 @@ class JsBridge(private val activity: MainActivity) {
      * duration means the same thing for short and long sounds alike.
      */
     private fun playNamedSoundInternal(name: String, ringDurationMs: Long = RING_DURATION_MS): Boolean {
-        releasePlayer()
-
-        val slot = name  // "completion" / "bombwarn" map 1:1 to SoundLibrary slots
-        val file = if (slot == "completion") soundFile else namedSoundFile(slot)
-        var loop = true
-
-        val p = MediaPlayer()
-        try {
-            // Play on the ALARM stream so it uses alarm volume and still rings
-            // when the phone is on silent/vibrate - real alarm behavior.
-            p.setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build()
-            )
-
-            if (file.exists()) {
-                // Legacy: a custom file was uploaded from the HTML settings.
-                p.setDataSource(file.absolutePath)
-                loop = true
-            } else {
-                val sel = SoundLibrary.getSelection(activity, slot)
-                if (sel.type == SoundLibrary.TYPE_DEVICE) {
-                    p.setDataSource(activity, Uri.parse(sel.value))
-                } else {
-                    val b = SoundLibrary.builtinByKey(sel.value)
-                        ?: SoundLibrary.BUILTINS.first()
-                    activity.resources.openRawResourceFd(b.resId).use { afd ->
-                        p.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-                    }
-                }
-            }
-
-            p.isLooping = loop
-            p.setOnErrorListener { _, _, _ -> releasePlayer(); true }
-            if (!loop) {
-                // One-shot notification tone: release as soon as it finishes.
-                p.setOnCompletionListener { releasePlayer() }
-            }
-            p.prepare()
-            p.start()
-            player = p
-            ringing = true
-
-            if (loop) {
-                // End the ring after the full alarm window.
-                stopSoundRunnable?.let { soundHandler.removeCallbacks(it) }
-                val stop = Runnable { releasePlayer() }
-                stopSoundRunnable = stop
-                soundHandler.postDelayed(stop, ringDurationMs)
-            }
-            return true
-        } catch (e: Exception) {
-            try { p.release() } catch (_: Exception) {}
-            ErrorLog.log(activity, "playNamedSound", e.message ?: e.javaClass.simpleName)
-            // Last resort: never leave the alarm silent - try the built-in default.
-            return playBuiltinFallback(slot, ringDurationMs)
-        }
-    }
-
-    /** Absolute last-resort playback of a guaranteed-present bundled sound. */
-    private fun playBuiltinFallback(slot: String, ringDurationMs: Long = RING_DURATION_MS): Boolean {
-        return try {
-            releasePlayer()
-            val b = SoundLibrary.builtinByKey(
-                if (slot == SoundLibrary.SLOT_BOMB) "classic" else "chime"
-            ) ?: SoundLibrary.BUILTINS.first()
-            val p = MediaPlayer()
-            p.setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build()
-            )
-            activity.resources.openRawResourceFd(b.resId).use { afd ->
-                p.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-            }
-            val loop = true
-            p.isLooping = loop
-            p.setOnErrorListener { _, _, _ -> releasePlayer(); true }
-            if (!loop) p.setOnCompletionListener { releasePlayer() }
-            p.prepare()
-            p.start()
-            player = p
-            ringing = true
-            if (loop) {
-                stopSoundRunnable?.let { soundHandler.removeCallbacks(it) }
-                val stop = Runnable { releasePlayer() }
-                stopSoundRunnable = stop
-                soundHandler.postDelayed(stop, ringDurationMs)
-            }
-            true
-        } catch (e: Exception) {
-            ErrorLog.log(activity, "playBuiltinFallback", e.message ?: "failed")
-            false
-        }
+        releasePreviewPlayer()
+        return AlarmPlayer.play(activity, AlarmContract.normalizeSlot(name), ringDurationMs)
     }
 
     // ---- v2.3: built-in sound library + selection (native-authoritative) ----
@@ -671,7 +604,8 @@ class JsBridge(private val activity: MainActivity) {
     @JavascriptInterface
     fun previewBuiltinSound(key: String): Boolean = safe("previewBuiltinSound", false) {
         val b = SoundLibrary.builtinByKey(key) ?: return@safe false
-        releasePlayer()
+        AlarmPlayer.stop()
+        releasePreviewPlayer()
         val p = MediaPlayer()
         p.setAudioAttributes(
             AudioAttributes.Builder()
@@ -683,12 +617,11 @@ class JsBridge(private val activity: MainActivity) {
             p.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
         }
         p.isLooping = false
-        p.setOnErrorListener { _, _, _ -> releasePlayer(); true }
-        p.setOnCompletionListener { releasePlayer() }
+        p.setOnErrorListener { _, _, _ -> releasePreviewPlayer(); true }
+        p.setOnCompletionListener { releasePreviewPlayer() }
         p.prepare()
         p.start()
-        player = p
-        ringing = true
+        previewPlayer = p
         true
     }
 
@@ -739,20 +672,21 @@ class JsBridge(private val activity: MainActivity) {
         if (f.exists()) try { f.delete() } catch (_: Exception) {}
     }
 
+    private fun releasePreviewPlayer() {
+        try {
+            previewPlayer?.stop()
+        } catch (_: Exception) {
+        }
+        try {
+            previewPlayer?.release()
+        } catch (_: Exception) {
+        }
+        previewPlayer = null
+    }
+
     private fun releasePlayer() {
-        ringing = false
-        // Cancel any pending auto-stop so it can't fire against a new player.
-        stopSoundRunnable?.let { soundHandler.removeCallbacks(it) }
-        stopSoundRunnable = null
-        try {
-            player?.stop()
-        } catch (_: Exception) {
-        }
-        try {
-            player?.release()
-        } catch (_: Exception) {
-        }
-        player = null
+        AlarmPlayer.stop()
+        releasePreviewPlayer()
     }
 
     /**
@@ -762,14 +696,15 @@ class JsBridge(private val activity: MainActivity) {
      */
     @JavascriptInterface
     fun stopSound(): Boolean = safe("stopSound", false) {
-        releasePlayer()
+        AlarmPlaybackService.stopPlayback(activity)
+        releasePreviewPlayer()
         true
     }
 
-    /** True while the in-app MediaPlayer is actually producing alarm audio. */
+    /** True while native alarm or preview audio is producing sound. */
     fun isRinging(): Boolean {
-        if (ringing) return true
-        return try { player?.isPlaying == true } catch (_: Exception) { false }
+        if (AlarmPlayer.isRinging()) return true
+        return try { previewPlayer?.isPlaying == true } catch (_: Exception) { false }
     }
 
     /**
@@ -778,16 +713,17 @@ class JsBridge(private val activity: MainActivity) {
      * can swallow the key without changing system volume.
      */
     fun stopIfRinging(): Boolean = safe("stopIfRinging", false) {
-        val playing = ringing || try { player?.isPlaying == true } catch (_: Exception) { false }
+        val playing = isRinging()
         if (!playing) return@safe false
-        releasePlayer()
+        AlarmPlaybackService.stopPlayback(activity)
+        releasePreviewPlayer()
         true
     }
 
     // ---------------- Misc ----------------
 
     @JavascriptInterface
-    fun getShellVersion(): String = "4.0"
+    fun getShellVersion(): String = "4.9"
 
     // ---------------- Manual fallback ----------------
 

@@ -4,6 +4,19 @@
 
 ---
 
+## v4.9 — 2026-10-10
+
+**Native alarm sound, duration, and Reality Check silence**
+
+- **Per-slot scheduled alarms:** `scheduleAlarmWithSound(id, triggerMs, title, text, soundSlot, durationMs)` persists `sessionend`, `taskcomplete`, and `bombwarn` independently. Playback uses the selected built-in or device sound, not the old looping Classic Alarm notification.
+- **Native duration:** the configured 5–60s window is enforced by `AlarmPlayer` / `AlarmPlaybackService`. It no longer depends on WebView timers, so a 5-second alarm stops after 5 seconds even when the app is backgrounded.
+- **Silent alarm notifications:** scheduled alarms post on a new silent channel (`alarm_silent_v1`) without `FLAG_INSISTENT`. Native playback is the only audio source.
+- **Stop without cancelling the future:** `stopAlarmPlayback()` silences current audio. Tapping a Reality Check rating (1–5) calls this immediately and does not `cancelAlarm()`, so future Pomodoro/Bomb schedules stay intact.
+- **HTML:** bundled `index-v21-html-fixed.html` as `assets/app/index.html`. Non-imported installs pick up the new HTML on upgrade.
+- **Native/version:** `versionName "4.9"`, `versionCode 19`, `JsBridge.getShellVersion()` → `"4.9"`.
+
+---
+
 ## v4.8 — 2026-07-16
 
 **Bomb Challenge Mode — Wake-up Trigger Behaviour Fix**

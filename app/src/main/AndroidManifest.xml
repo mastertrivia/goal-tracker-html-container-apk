@@ -15,6 +15,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <!-- Vibration for the alarm notification channel -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- MediaPlayer.setWakeMode keeps scheduled alarm audio alive for its duration -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".ShellApp"
@@ -58,6 +60,15 @@
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="Visible countdown timer controlled by the user" />
+        </service>
+
+        <service
+            android:name=".AlarmPlaybackService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Plays a user-scheduled alarm for its configured duration" />
         </service>
 
     </application>

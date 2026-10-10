@@ -10,17 +10,35 @@ import org.json.JSONObject
 /**
  * Schedules exact alarms and remembers them in SharedPreferences so
  * BootReceiver can re-schedule everything after the phone reboots.
+ *
+ * Sound slot and duration are persisted with each alarm so a killed
+ * process still rings the correct clip for the configured window.
  */
 object AlarmScheduler {
 
     private const val PREFS = "scheduled_alarms"
 
     fun schedule(context: Context, id: Int, triggerAtMillis: Long, title: String, text: String) {
-        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val pi = buildPendingIntent(context, id, title, text)
+        schedule(
+            context, id, triggerAtMillis, title, text,
+            AlarmContract.DEFAULT_SLOT, AlarmContract.DEFAULT_DURATION_MS
+        )
+    }
 
-        // On Android 12+ the user can revoke exact-alarm permission.
-        // Fall back to an inexact alarm instead of crashing.
+    fun schedule(
+        context: Context,
+        id: Int,
+        triggerAtMillis: Long,
+        title: String,
+        text: String,
+        soundSlot: String,
+        durationMs: Long
+    ) {
+        val slot = AlarmContract.normalizeSlot(soundSlot)
+        val duration = AlarmContract.clampDuration(durationMs)
+        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val pi = buildPendingIntent(context, id, title, text, slot, duration)
+
         val canExact = Build.VERSION.SDK_INT < 31 || am.canScheduleExactAlarms()
         if (canExact) {
             am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pi)
@@ -28,18 +46,19 @@ object AlarmScheduler {
             am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pi)
         }
 
-        // Persist for reboot rescheduling
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val entry = JSONObject()
             .put("at", triggerAtMillis)
             .put("title", title)
             .put("text", text)
+            .put("soundSlot", slot)
+            .put("durationMs", duration)
         prefs.edit().putString(id.toString(), entry.toString()).apply()
     }
 
     fun cancel(context: Context, id: Int) {
         val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        am.cancel(buildPendingIntent(context, id, "", ""))
+        am.cancel(buildPendingIntent(context, id, "", "", AlarmContract.DEFAULT_SLOT, AlarmContract.DEFAULT_DURATION_MS))
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .edit().remove(id.toString()).apply()
     }
@@ -60,7 +79,15 @@ object AlarmScheduler {
                 val obj = JSONObject(value as String)
                 val at = obj.getLong("at")
                 if (at > now) {
-                    schedule(context, key.toInt(), at, obj.getString("title"), obj.getString("text"))
+                    schedule(
+                        context,
+                        key.toInt(),
+                        at,
+                        obj.getString("title"),
+                        obj.getString("text"),
+                        obj.optString("soundSlot", AlarmContract.DEFAULT_SLOT),
+                        obj.optLong("durationMs", AlarmContract.DEFAULT_DURATION_MS)
+                    )
                 } else {
                     editor.remove(key)
                 }
@@ -77,11 +104,20 @@ object AlarmScheduler {
             .edit().remove(id.toString()).apply()
     }
 
-    private fun buildPendingIntent(context: Context, id: Int, title: String, text: String): PendingIntent {
+    private fun buildPendingIntent(
+        context: Context,
+        id: Int,
+        title: String,
+        text: String,
+        soundSlot: String,
+        durationMs: Long
+    ): PendingIntent {
         val intent = Intent(context, AlarmReceiver::class.java).apply {
-            putExtra("id", id)
-            putExtra("title", title)
-            putExtra("text", text)
+            putExtra(AlarmContract.EXTRA_ID, id)
+            putExtra(AlarmContract.EXTRA_TITLE, title)
+            putExtra(AlarmContract.EXTRA_TEXT, text)
+            putExtra(AlarmContract.EXTRA_SOUND_SLOT, soundSlot)
+            putExtra(AlarmContract.EXTRA_DURATION_MS, durationMs)
         }
         return PendingIntent.getBroadcast(
             context, id, intent,
