@@ -141,7 +141,7 @@ These use exact alarms + a dedicated alarm notification channel
 ### `AndroidBridge.scheduleAlarmWithSound(id, triggerAtMillis, title, text, soundSlot, durationMs)`
 - **Parameters:** same as `scheduleAlarm`, plus:
   - `soundSlot` (String) — `sessionend`, `taskcomplete`, or `bombwarn`.
-  - `durationMs` (Number) — ring window, clamped natively to 5–60 seconds.
+  - `durationMs` (Number) — ring window, clamped natively to 1–60 seconds.
 - **Returns:** void
 - **Effect:** persists slot + duration with the alarm. At fire time a silent
   notification is posted and `AlarmPlayer` plays the selected slot for the

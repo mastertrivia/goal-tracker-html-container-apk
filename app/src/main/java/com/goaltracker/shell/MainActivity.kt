@@ -525,9 +525,9 @@ class MainActivity : AppCompatActivity() {
     /** First run and APK upgrades: copy bundled HTML unless the user imported their own. */
     private fun copyBundledAppIfNeeded() {
         val currentVersion = try {
-            packageManager.getPackageInfo(packageName, 0).versionName ?: "4.9"
+            packageManager.getPackageInfo(packageName, 0).versionName ?: "4.10"
         } catch (_: Exception) {
-            "4.9"
+            "4.10"
         }
         val userImported = htmlPrefs.getBoolean("html_user_imported", false)
         val lastBundled = htmlPrefs.getString("bundled_html_version", null)

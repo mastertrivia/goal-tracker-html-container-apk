@@ -272,7 +272,7 @@ class JsBridge(private val activity: MainActivity) {
     /**
      * Schedule a notification at an absolute time and persist the sound slot
      * plus ring duration so a killed process still plays the correct clip
-     * for the configured window. Duration is clamped to 5–60 seconds.
+     * for the configured window. Duration is clamped to 1–60 seconds.
      */
     @JavascriptInterface
     fun scheduleAlarmWithSound(
@@ -556,13 +556,13 @@ class JsBridge(private val activity: MainActivity) {
     }
 
     /**
-     * Plays a named alarm for its caller-selected window (5–60 seconds).
+     * Plays a named alarm for its caller-selected window (1–60 seconds).
      * Keeping this stop timer native makes the chosen duration survive a
      * paused/throttled WebView after playback has started.
      */
     @JavascriptInterface
     fun playNamedSoundForDuration(name: String, durationMs: Long): Boolean = safe("playNamedSoundForDuration", false) {
-        playNamedSoundInternal(name, durationMs.coerceIn(5_000L, 60_000L))
+        playNamedSoundInternal(name, durationMs.coerceIn(1_000L, 60_000L))
     }
 
     private fun saveNamedSoundInternal(name: String, base64: String): Boolean {
@@ -723,7 +723,7 @@ class JsBridge(private val activity: MainActivity) {
     // ---------------- Misc ----------------
 
     @JavascriptInterface
-    fun getShellVersion(): String = "4.9"
+    fun getShellVersion(): String = "4.10"
 
     // ---------------- Manual fallback ----------------
 

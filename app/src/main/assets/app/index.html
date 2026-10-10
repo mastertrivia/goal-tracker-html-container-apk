@@ -2652,6 +2652,9 @@ body.bomb-danger{background-color:#EF4444;}
           <div class="and-row">
             <div class="ar-txt"><div class="ar-t1">Sound Duration</div><div class="ar-t2">How long this alarm keeps playing.</div></div>
             <select id="andSessionSoundDuration" class="task-select" style="width:auto;min-width:120px;margin-bottom:0;padding:10px 12px;">
+              <option value="1">1 second</option>
+              <option value="2">2 seconds</option>
+              <option value="3">3 seconds</option>
               <option value="5">5 seconds</option>
               <option value="10">10 seconds</option>
               <option value="15">15 seconds</option>
@@ -2672,7 +2675,7 @@ body.bomb-danger{background-color:#EF4444;}
         <div class="plain-card" id="cardTaskCompletionAlarm">
           <h3>Task Complete Alarm</h3>
           <div class="and-row"><div class="ar-txt"><div class="ar-t1">Enabled</div><div class="ar-t2">Ring once when the entire task reaches 100%.</div></div><label class="tg-switch"><input type="checkbox" id="andSetTaskCompletionAlarm"><span class="slider"></span></label></div>
-          <div class="and-row"><div class="ar-txt"><div class="ar-t1">Sound Duration</div><div class="ar-t2">How long this alarm keeps playing.</div></div><select id="andTaskSoundDuration" class="task-select" style="width:auto;min-width:120px;margin-bottom:0;padding:10px 12px;"><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="15">15 seconds</option><option value="30">30 seconds</option><option value="60">60 seconds</option></select></div>
+          <div class="and-row"><div class="ar-txt"><div class="ar-t1">Sound Duration</div><div class="ar-t2">How long this alarm keeps playing.</div></div><select id="andTaskSoundDuration" class="task-select" style="width:auto;min-width:120px;margin-bottom:0;padding:10px 12px;"><option value="1">1 second</option><option value="2">2 seconds</option><option value="3">3 seconds</option><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="15">15 seconds</option><option value="30">30 seconds</option><option value="60">60 seconds</option></select></div>
           <div class="subtext" id="andTaskSoundStatus" style="margin-top:10px;">No custom sound set.</div>
           <input type="file" id="andTaskSoundFile" accept="audio/*" style="display:none;">
           <div class="and-btn-row" style="margin-top:4px;"><button class="btn-full ghost" id="andTaskSoundPick">Choose Sound</button><button class="btn-full ghost" id="andTaskSoundTest">Test</button><button class="btn-full danger" id="andTaskSoundClear">Remove</button></div>
@@ -2682,7 +2685,7 @@ body.bomb-danger{background-color:#EF4444;}
         <div class="plain-card" id="cardBombSound">
           <h3>Bomb Explosion Alarm</h3>
           <div class="and-row"><div class="ar-txt"><div class="ar-t1">Enabled</div><div class="ar-t2">Ring when the Bomb reaches 00:00.</div></div><label class="tg-switch"><input type="checkbox" id="andSetBombAlarm"><span class="slider"></span></label></div>
-          <div class="and-row"><div class="ar-txt"><div class="ar-t1">Sound Duration</div><div class="ar-t2">How long this alarm keeps playing.</div></div><select id="andBombSoundDuration" class="task-select" style="width:auto;min-width:120px;margin-bottom:0;padding:10px 12px;"><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="15">15 seconds</option><option value="30">30 seconds</option><option value="60">60 seconds</option></select></div>
+          <div class="and-row"><div class="ar-txt"><div class="ar-t1">Sound Duration</div><div class="ar-t2">How long this alarm keeps playing.</div></div><select id="andBombSoundDuration" class="task-select" style="width:auto;min-width:120px;margin-bottom:0;padding:10px 12px;"><option value="1">1 second</option><option value="2">2 seconds</option><option value="3">3 seconds</option><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="15">15 seconds</option><option value="30">30 seconds</option><option value="60">60 seconds</option></select></div>
           <div class="subtext" id="andBombSoundStatus" style="margin-top:10px;">No custom bomb sound set.</div>
           <input type="file" id="andBombSoundFile" accept="audio/*" style="display:none;">
           <div class="and-btn-row" style="margin-top:4px;">
@@ -14183,7 +14186,7 @@ function monotonicNow(){
 // HTML-side Android preferences (native flags cover the rest). Stored inside
 // STATE.settings.android so they ride along with normal state persistence + backup.
 const AND_CFG_DEFAULTS = { bombNotif:true, sessionAlarm:true, taskCompletionAlarm:false, bombAlarm:true, vibrate:false, sessionSoundDurationSec:60, taskSoundDurationSec:60, bombSoundDurationSec:60 };
-const SOUND_DURATION_CHOICES = [5, 10, 15, 30, 60];
+const SOUND_DURATION_CHOICES = [1, 2, 3, 5, 10, 15, 30, 60];
 function andCfg(){
   if(!STATE) return {...AND_CFG_DEFAULTS};
   if(!STATE.settings.android) STATE.settings.android = {...AND_CFG_DEFAULTS};

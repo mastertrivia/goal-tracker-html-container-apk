@@ -10,7 +10,7 @@ import org.json.JSONObject
  * current sound selection.
  *
  * Design goals (v2.3):
- *  - 10 sounds are bundled in res/raw, so they are ALWAYS available: after a
+ *  - 14 sounds are bundled in res/raw, so they are ALWAYS available: after a
  *    fresh install, after a factory reset, with no storage permission, and
  *    without depending on any external/user file.
  *  - The user's choice is stored as lightweight metadata in SharedPreferences
@@ -37,6 +37,10 @@ object SoundLibrary {
         BuiltinSound("marimba", "Marimba", R.raw.snd_short_marimba, false),
         BuiltinSound("pop", "Pop", R.raw.snd_short_pop, false),
         BuiltinSound("glass", "Glass", R.raw.snd_short_glass, false),
+        BuiltinSound("harp", "Soft Harp", R.raw.snd_short_harp, false),
+        BuiltinSound("wood", "Wood Tap", R.raw.snd_short_wood, false),
+        BuiltinSound("piano", "Soft Piano", R.raw.snd_short_piano, false),
+        BuiltinSound("drop", "Water Drop", R.raw.snd_short_drop, false),
         // Long alarm/warning tones (looped to a full ring by the shell).
         BuiltinSound("classic", "Classic Alarm", R.raw.snd_long_classic, true),
         BuiltinSound("siren", "Siren", R.raw.snd_long_siren, true),

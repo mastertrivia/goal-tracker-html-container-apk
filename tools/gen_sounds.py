@@ -7,9 +7,9 @@ Outputs 16-bit mono PCM WAV files into app/src/main/res/raw so they are:
   - readable with no storage permission
   - independent of any external/user file
 
-5 SHORT notification sounds  (brief, pleasant, played once)
+9 SHORT notification sounds  (brief, pleasant, played once)
 5 LONG  alarm/warning sounds (looping patterns; the shell loops them to
-                              30-60s so they ring like a real alarm)
+                              1-60s so they ring like a real alarm)
 
 All tones are generated from simple math (sine partials + envelopes) so they
 are 100% original and royalty-free.
@@ -125,6 +125,30 @@ def build_short():
                   tone(G6, 0.13, BELL, 0.42, decay=8),
                   tone(C7, 0.5, BELL, 0.42, decay=5)))
 
+    # 6) Soft harp - gentle rising pentatonic
+    write_wav(os.path.join(out_dir, "snd_short_harp.wav"),
+              seq(tone(C5, 0.18, BELL, 0.38, decay=7),
+                  tone(E5, 0.18, BELL, 0.38, decay=7),
+                  tone(G5, 0.18, BELL, 0.38, decay=7),
+                  tone(B5, 0.18, BELL, 0.38, decay=7),
+                  tone(E6, 0.55, BELL, 0.40, decay=4)))
+
+    # 7) Woodblock - warm two-tap
+    write_wav(os.path.join(out_dir, "snd_short_wood.wav"),
+              seq(tone(E5, 0.09, SOFT, 0.48, decay=16),
+                  silence(0.07),
+                  tone(G5, 0.18, SOFT, 0.46, decay=12)))
+
+    # 8) Piano - soft major third
+    write_wav(os.path.join(out_dir, "snd_short_piano.wav"),
+              mix(tone(C5, 0.85, (1.0, 0.45, 0.18, 0.08), 0.42, decay=3.2),
+                  tone(E5, 0.85, (1.0, 0.40, 0.14), 0.32, decay=3.4)))
+
+    # 9) Drop - descending water-drop ping
+    write_wav(os.path.join(out_dir, "snd_short_drop.wav"),
+              seq(tone(A6, 0.16, BELL, 0.42, decay=10),
+                  tone(E6, 0.55, BELL, 0.38, decay=5)))
+
 
 def build_long():
     out_dir = os.path.join(RES_RAW)
@@ -177,7 +201,7 @@ def build_long():
 if __name__ == "__main__":
     here = os.path.dirname(os.path.abspath(__file__))
     RES_RAW = os.path.abspath(os.path.join(
-        here, "..", "goal-tracker-android", "app", "src", "main", "res", "raw"))
+        here, "..", "app", "src", "main", "res", "raw"))
     os.makedirs(RES_RAW, exist_ok=True)
     print("Generating SHORT notification sounds...")
     build_short()

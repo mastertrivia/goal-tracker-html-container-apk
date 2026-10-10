@@ -7,7 +7,7 @@ package com.goaltracker.shell
  */
 object AlarmContract {
 
-    const val MIN_DURATION_MS = 5_000L
+    const val MIN_DURATION_MS = 1_000L
     const val MAX_DURATION_MS = 60_000L
     const val DEFAULT_DURATION_MS = 60_000L
     const val SLOT_SESSION_END = "sessionend"

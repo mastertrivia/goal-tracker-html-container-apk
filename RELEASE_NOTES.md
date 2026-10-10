@@ -4,6 +4,16 @@
 
 ---
 
+## v4.10 — 2026-10-10
+
+**Short alarm durations and extra notification tones**
+
+- **1 / 2 / 3 second options** added to Pomodoro, Task Complete, and Bomb sound-duration dropdowns. Native clamp is now 1–60 seconds so a 1-second Test and a 1-second real event both stop on time.
+- **New pleasant notification tones:** Soft Harp, Wood Tap, Soft Piano, Water Drop.
+- **Native/version:** `versionName "4.10"`, `versionCode 20`, `JsBridge.getShellVersion()` → `"4.10"`.
+
+---
+
 ## v4.9 — 2026-10-10
 
 **Native alarm sound, duration, and Reality Check silence**

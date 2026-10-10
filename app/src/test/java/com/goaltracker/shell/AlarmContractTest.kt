@@ -6,9 +6,12 @@ import org.junit.Test
 class AlarmContractTest {
 
     @Test
-    fun clampDuration_enforcesFiveToSixtySeconds() {
-        assertEquals(5_000L, AlarmContract.clampDuration(0))
-        assertEquals(5_000L, AlarmContract.clampDuration(4_999))
+    fun clampDuration_enforcesOneToSixtySeconds() {
+        assertEquals(1_000L, AlarmContract.clampDuration(0))
+        assertEquals(1_000L, AlarmContract.clampDuration(999))
+        assertEquals(1_000L, AlarmContract.clampDuration(1_000))
+        assertEquals(2_000L, AlarmContract.clampDuration(2_000))
+        assertEquals(3_000L, AlarmContract.clampDuration(3_000))
         assertEquals(5_000L, AlarmContract.clampDuration(5_000))
         assertEquals(15_000L, AlarmContract.clampDuration(15_000))
         assertEquals(60_000L, AlarmContract.clampDuration(60_000))
