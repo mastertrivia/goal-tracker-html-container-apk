@@ -3558,8 +3558,17 @@ function todayStr(d){ d=d||new Date(); return d.getFullYear()+'-'+String(d.getMo
    resets, the Study Timeline's day grouping, and the entire Goals engine 🔵 must go
    through appDayKey()/appDayStart() below instead of raw calendar dates, so changing
    this one setting instantly and consistently affects the whole app. */
-function getDayResetHour(){ return (STATE && STATE.settings && STATE.settings.dayResetHour!=null) ? STATE.settings.dayResetHour : DEFAULT_SETTINGS.dayResetHour; }
-function getWakeHour(){ return (STATE && STATE.settings && STATE.settings.wakeHour!=null) ? STATE.settings.wakeHour : DEFAULT_SETTINGS.wakeHour; }
+// COLD-BOOT BRIDGE (GT-01 fix): recoverState() reads the persisted state BEFORE the STATE
+// cache has been assigned (boot does `STATE = await recoverState()`), and warm reloads start
+// with STATE = null too. During that window the boundary helpers below used to fall back to
+// DEFAULT_SETTINGS, so sleep/wake/study-day boundaries were computed with the DEFAULT hours
+// instead of the user's configured ones - arming the bomb at the wrong wake time (spurious
+// explosion), mis-keying studyDayKey(), and evaluating the Sleep freeze against the wrong
+// window on every cold boot. Recovery publishes the settings of the state it is reconciling
+// so boundary math always sees the persisted configuration. STATE takes precedence once set.
+let RECOVERY_SETTINGS = null;
+function getDayResetHour(){ const s = (STATE && STATE.settings) || RECOVERY_SETTINGS; return (s && s.dayResetHour!=null) ? s.dayResetHour : DEFAULT_SETTINGS.dayResetHour; }
+function getWakeHour(){ const s = (STATE && STATE.settings) || RECOVERY_SETTINGS; return (s && s.wakeHour!=null) ? s.wakeHour : DEFAULT_SETTINGS.wakeHour; }
 // True while the configured Sleep Duration (Sleep Start → Wake-up) is active. During this window
 // the HOME screen & HISTORY are frozen: Pomodoro/Bomb/Tasks can't run and the daily reset in
 // recoverState() is deferred until the Wake-up moment. (Goals section is NOT affected by this.)
@@ -5431,7 +5440,16 @@ function bombTimelineSnapshot(state, remainingMs){
 // overflowMs (optional): when the immediately-preceding session overran its end time (app was backgrounded),
 // the bomb's wallStartTs is pre-offset backward by this many ms so msRemaining() is correct on first read.
 // (Thin delegate �� BombEngine.arm is the single owner of arming.)
-function armBomb(state, overflowMs, wallStartOverride){ BombEngine.arm(state, overflowMs, wallStartOverride); }
+// GT-06: arming is a Bomb-Mode-ONLY operation. Previously this delegate installed a bomb timer
+// unconditionally (unlike armForNewDay, which checks isEnabled), so with Bomb Mode OFF every
+// stop/completion installed an EXPIRED (duration 0) bomb; the next recovery pass then replayed it
+// — consuming a real Lifeline and rewriting the bomb clock, or recording a phantom explosion.
+// With the mode off the app must simply go IDLE, exactly as saveSettings does on toggle-off.
+function armBomb(state, overflowMs, wallStartOverride){
+  const st = state || STATE;
+  if(!BombEngine.isEnabled(st)){ st.activeTimer = null; return; }
+  BombEngine.arm(st, overflowMs, wallStartOverride);
+}
 
 // Called when a Routine/Health timer finishes naturally — logs it to the Timeline, then re-arms the Bomb.
 // Rule: the Bomb must be on immediately whenever no productive timer is running.
@@ -5463,6 +5481,7 @@ async function completeNonStudySession(state){
   // foreground time minus a clamped offset. This allows recovery to replay
   // every missed Bomb/lifeline boundary at its real timestamp.
   armBomb(state, overflowMs, endTs);
+  if(!state.activeTimer) state._idleStartTs = Date.now(); // GT-06: Bomb OFF → app is idle now; anchor it
   await saveState(state);
   // (item 2) Per-session Telegram auto-logging removed — Telegram now only sends the automatic Daily Study Report.
 }
@@ -5625,6 +5644,10 @@ async function recoverState(){
 
   try{
   let state = await getState();
+  // Publish the persisted settings immediately so getDayResetHour()/getWakeHour()/isSleepActive()
+  // (and everything built on them: studyDayKey, todayWakeTs, nextSleepTs, freeze evaluation) use
+  // the user's configured boundary hours during this whole recovery pass - not DEFAULT_SETTINGS (GT-01).
+  RECOVERY_SETTINGS = state.settings || null;
 
   // Reconcile the isolated Sleep Extra Study session across app reload/backgrounding. This never
   // touches activeTimer, Timeline, History, Bomb, or the Home Study widget.
@@ -5970,6 +5993,15 @@ async function recoverState(){
   // Once a row has BOTH startTime and endTime it is immutable — read-only, never reclassified,
   // never merged into another type. The loop below only processes the ACTIVE (no endTime) timer.
   // A completed Idle row can NEVER become Bomb time, even after a Password Reset.
+  // GT-06: with Bomb Mode OFF a bomb activeTimer is an invalid state by the app's own rule
+  // (saveSettings clears it when the mode is switched off). Clear any leftover created by older
+  // builds instead of letting the catch-up loop replay bomb deadlines for an inert subsystem
+  // (that replay consumed real Lifelines / recorded phantom explosions while the mode was off).
+  if(state.activeTimer && state.activeTimer.type === 'bomb' && !bombModeOn(state)){
+    state.activeTimer = null;
+    state._idleStartTs = Date.now();
+    await saveState(state);
+  }
   let guard = 0; // Safety cap so a very long-idle app can't loop forever catching up
   while(state.activeTimer && guard < 25){
     guard++;
@@ -6011,9 +6043,19 @@ async function recoverState(){
       await saveState(state);
       break;
     } else {
+      const _completedType = state.activeTimer.type;
       if(state.activeTimer.type==='study') await syncPomoLogRows(state.activeTimer);
       if(state.activeTimer.type==='study') await saveState(state);
       await completeNonStudySession(state);
+      // GT-03: this synthetic completion just committed the session's IDB entry, but the
+      // pass-level reconcile above already ran BEFORE the catch-up loop - without a second
+      // reconcile here, hourStreakSec/dailyStudySeconds (and everything derived: Hour Streak
+      // card, Today widget, heart progress, Day Streak) would keep showing pre-completion
+      // values, and with _pendingRecovery consumed no later pass was guaranteed to heal it.
+      // reconcile is idempotent (IDB is ground truth; Fix 2 only corrects upward), so running
+      // it mid-loop is safe and also lets a bomb expiry later in this same pass capture the
+      // correct pre-explosion streak.
+      if(_completedType === 'study' && await reconcileDailyStudySeconds(state)) await saveState(state);
     }
     state = await getState();
   }
@@ -6390,9 +6432,14 @@ async function stopSessionForEarlyComplete(taskId){
   if(!at || at.type==='bomb' || at.taskId!==taskId) return;
   const endTs = Date.now();
   const actualDurationSec = commitStudySeconds(effectiveElapsedMs(at)/1000, at, 'earlyComplete');
-  if(actualDurationSec > 0){
+  // GT-04: same rule as stopSession — bank whole-session elapsed, but write only the current
+  // segment's row (no row at all if the pause already committed this segment).
+  if(!at.pausedAt && actualDurationSec > 0){
     const wallStart = at.wallSegmentStartTs || at.wallStartTs || endTs - actualDurationSec * 1000;
-    await addTimelineEntry({ category: at.type, task: at.task, topic: at.topic||null, startTs: wallStart, endTs, duration: actualDurationSec, segmentKey: activeSegmentKey(at, wallStart) });
+    const segDurSec = Math.max(0, Math.min(actualDurationSec, (endTs - wallStart) / 1000));
+    if(segDurSec > 0){
+      await addTimelineEntry({ category: at.type, task: at.task, topic: at.topic||null, startTs: wallStart, endTs, duration: segDurSec, segmentKey: activeSegmentKey(at, wallStart) });
+    }
   }
   await syncActiveTaskProgress(state);
   if(at.type==='study' && actualDurationSec > 0){
@@ -6418,13 +6465,24 @@ async function stopSession(){
   if(!at || at.type==='bomb') return;
   const endTs = Date.now();
   const actualDurationSec = commitStudySeconds(effectiveElapsedMs(at)/1000, at, 'stopSession'); // Pillar 3: strict gate before banking to Timeline/Hour Streak/Daily Study
-  if(actualDurationSec > 0){
+  // GT-04: actualDurationSec is the WHOLE session's elapsed time and remains the value banked to
+  // Hour Streak / Daily Study below (unchanged business rule). The Timeline row, however, must
+  // cover only the CURRENT segment: pauseResumeSession already committed every prior segment the
+  // moment it was paused, so (a) a stop-while-paused writes NO row at all, and (b) after a
+  // pause+resume the row's duration is clamped to its own start→end span. Previously the row got
+  // the whole-session duration with a current-segment span, double-counting pre-pause time in
+  // every Timeline sum (and reconcile then banked that inflated total). Mirrors the guard
+  // startSession already applies when committing a previous activity.
+  if(!at.pausedAt && actualDurationSec > 0){
     // Use wallSegmentStartTs — the wall-clock start of the CURRENT segment (reset on every resume).
     // pauseResumeSession already committed all prior segments, each with their own wallSegmentStartTs.
     // Using wallStartTs here would create an entry spanning the entire session (original start → now),
     // which overlaps every already-committed segment and makes bomb entries between them disappear.
     const wallStart = at.wallSegmentStartTs || at.wallStartTs || endTs - actualDurationSec * 1000;
-    await addTimelineEntry({ category: at.type, task: at.task, topic: at.topic||null, startTs: wallStart, endTs, duration: actualDurationSec, segmentKey: activeSegmentKey(at, wallStart) });
+    const segDurSec = Math.max(0, Math.min(actualDurationSec, (endTs - wallStart) / 1000));
+    if(segDurSec > 0){
+      await addTimelineEntry({ category: at.type, task: at.task, topic: at.topic||null, startTs: wallStart, endTs, duration: segDurSec, segmentKey: activeSegmentKey(at, wallStart) });
+    }
   }
   await syncActiveTaskProgress(state); // save exactly how much of the task was consumed so it resumes correctly next time
   // Bank the partial Study time BEFORE the bomb re-arms, so the Hour Streak progress, the Lifeline
@@ -6440,7 +6498,11 @@ async function stopSession(){
   // CENTRALIZED: Use BombEngine method — guarantees consistent bomb state before re-arming
   BombEngine.bankBombClockFromPause(state);
   armBomb(state);
-  STATE._idleStartTs = Date.now(); // mark idle start so the history idle tick counts up correctly
+  // GT-07: write the anchor on `state` (the object saveState persists) — the previous
+  // `STATE._idleStartTs = ...` mutated the pre-saveState cache object, which saveState(state)
+  // immediately replaced with the fresh getState() clone, silently discarding the stop moment
+  // (History's live Idle row then anchored to a stale/null value instead of the stop time).
+  state._idleStartTs = Date.now(); // mark idle start so the history idle tick counts up correctly
   andManualStopPending = true; // the observer will see the session disappear on the next tick
   await saveState(state);
   showToast('Session stopped — progress saved.');
@@ -6899,6 +6961,7 @@ async function submitReview(focus, energy, mood, notes){
   await syncActiveTaskProgress(state); // task just hit 100% — persist the checkpoint before the Bomb re-arms
   if(at.isExtraGoal && state.goal){ state.goal.extraActive = false; } // Extra Study session finished naturally — Goals page stops showing the mini countdown
   armBomb(state); // completing a Pomodoro ends the productive timer, so the bomb must resume immediately
+  if(!state.activeTimer) state._idleStartTs = Date.now(); // GT-06: Bomb OFF → app is idle now; anchor it
   await saveState(state);
   // (item 2) Per-Pomodoro Telegram auto-send removed — Telegram now only sends the automatic Daily Study Report at End of Day.
   render();
@@ -13078,8 +13141,10 @@ function renderPlanDetailTasks(){
   });
 }
 
-// Initialize Planners on load
-renderPlanners();
+// Initialize Planners on load - deferred to boot(): this module-level call used to run BEFORE
+// boot() assigned STATE, so renderPlanners() dereferenced a null STATE and threw (unhandled
+// rejection) on EVERY page load, leaving the Planner list unrendered until an action handler
+// happened to call it (GT-02). boot() now invokes it once STATE is ready.
 
 // Plan Detail Screen event handlers
 document.getElementById('planDetailBackBtn').addEventListener('click', () => {
@@ -14345,6 +14410,9 @@ function andLoadReviewTarget(){
 let andPrev = null;             // previous observer snapshot (event diffing)
 let andManualStopPending = false; // suppress the generic completion notification caused by a manual STOP
 let andAlarms = {};             // {id: triggerMs} last scheduled, to avoid re-scheduling every tick
+let andAlarmsCleared = {};      // GT-05: {id:true} once a native cancel has been sent for an idle id — the 1s
+                                // observer otherwise calls cancelAlarm (bridge + AlarmManager + PendingIntent)
+                                // EVERY idle second for each of the two alarm ids, forever
 let andAlarmMeta = {};          // {id: {soundSlot, durationMs}} associated native playback settings
 let andPermission = null;       // last known notification permission result
 
@@ -14545,11 +14613,17 @@ function andSetAlarm(id, triggerMs, title, text, soundSlot='sessionend'){
   }
   andAlarms[id] = triggerMs;
   andAlarmMeta[id] = {soundSlot, durationMs};
+  andAlarmsCleared[id] = false; // a real alarm now exists — an idle cancel must reach native again
 }
 function andClearAlarm(id){
-  // Always ask native to cancel: a WebView reload loses andAlarms, while the
-  // OS may still hold the persisted alarm from before that reload.
-  AND.call('cancelAlarm', id); delete andAlarms[id]; delete andAlarmMeta[id];
+  // Always ask native to cancel when something might still be scheduled: a WebView reload loses
+  // andAlarms, while the OS may still hold the persisted alarm from before that reload.
+  // GT-05: once that post-load reconcile (or a real cancel of a scheduled alarm) has been sent
+  // for an id, repeat idle-tick cancels are skipped — an idle app no longer performs two
+  // cancelAlarm bridge + AlarmManager round-trips every second. Any later schedule clears the
+  // marker so the next idle transition cancels natively again.
+  if(andAlarms[id] === undefined && andAlarmsCleared[id]) return;
+  AND.call('cancelAlarm', id); delete andAlarms[id]; delete andAlarmMeta[id]; andAlarmsCleared[id] = true;
 }
 function andSyncAlarms(){
   if(!AND.on || !STATE || !AND.has('scheduleAlarm')) return;
@@ -15231,6 +15305,8 @@ async function boot(){
   // First paint is based on the recovered in-memory snapshot. Network work and maintenance must
   // never delay the first interactive screen or expose its default placeholder values.
   await render();
+  // Initialize the Planner list now that STATE exists (was a crashing module-level call - GT-02)
+  try{ await renderPlanners(); }catch(e){ console.warn('[boot] renderPlanners failed', e); }
   document.body.classList.remove('app-booting');
   void (async ()=>{
     try{

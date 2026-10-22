@@ -6,6 +6,11 @@ app/build/
 # Local machine config (never commit)
 local.properties
 
+# Test dependencies and local run artifacts
+node_modules/
+artifacts/
+nohup.out
+
 # IDE noise
 .idea/
 *.iml
