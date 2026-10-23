@@ -1,11 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Goal Tracker</string>
-    <string name="menu_reload">🔄  Refresh App</string>
-    <string name="menu_import_html">📥  Import App (HTML / ZIP)</string>
-    <string name="menu_export_backup">💾  Export Data (Save to Device)</string>
-    <string name="menu_import_backup">📂  Import Data (Restore Backup)</string>
-    <string name="menu_reset">🏠  Restore Default App</string>
-    <string name="menu_factory_reset">🗑️  Factory Reset</string>
-    <string name="menu_system_check">🔍  System Check</string>
 </resources>

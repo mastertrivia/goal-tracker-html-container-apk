@@ -196,8 +196,18 @@ source of truth; keep IndexedDB only as a working cache.
 - **Example:** `const keys = JSON.parse(A.listDataKeys())`
 
 ### Backup (whole-dataset, via system file picker)
-- `AndroidBridge.exportBackup()` — void; opens a "save file" dialog, writes ALL keys into one JSON file.
-- `AndroidBridge.importBackup()` — void; opens a picker, restores keys, then fires the `backupRestored` event.
+- `AndroidBridge.exportBackup()` — void; v4.11: shows the native typed-confirmation dialog ("Export User Data"), then opens a "save file" dialog and writes ALL keys into one JSON file (FNV-1a checksum attached).
+- `AndroidBridge.importBackup()` — void; v4.11: shows the native typed-confirmation dialog ("Import User Data"), then opens a picker. The file is fully validated (app id, JSON shape, state structure, checksum) BEFORE any stored file is written — a bad file shows "Import failed: …" and changes nothing. On success the `backupRestored` event fires.
+
+### App & Data menu (v4.11 — replaced the top-bar three-dot menu)
+Each method opens the SAME native confirmation dialog the old menu used, then
+performs its action. Triggered from Settings → Android Shell Settings → App & Data.
+
+- `AndroidBridge.refreshApp()` — void; confirm ("Refresh App") → reloads the HTML. No user data is touched.
+- `AndroidBridge.importHtmlFile()` — void; typed confirm ("INSTALL") → file picker; the HTML/ZIP is staged and validated before it replaces the current app. User data preserved.
+- `AndroidBridge.exportCurrentHtml()` — void; confirm ("Save Current HTML File") → saves the CURRENTLY running `index.html` (bundled or custom-installed) as `goal-tracker-app.html`.
+- `AndroidBridge.factoryResetUserData()` — void; typed confirm ("FACTORY RESET") → deletes user data only (storage, alarms, flags, sounds); the current HTML file is preserved. Keeps `auto-backup-before-reset.json`.
+- `AndroidBridge.systemCheck()` — void; opens the native System Check dialog (full diagnostics + "Export as file").
 
 ---
 
@@ -249,6 +259,25 @@ these before acting; your HTML settings screen reads/writes them.
 - **Returns:** `String` — JSON object of all stored flags.
 - **Example:** `const flags = JSON.parse(A.getAllFlags())`
 
+### Display scale — v4.11 (stored in the same shell prefs, as a **string** value)
+The app-owned "Display Size" setting: a 1–10 level picker where level `6` is the
+app's normal size (as if the setting never existed), each level is ~8% apart,
+and the default is `2`. The wrapper only persists the level; the HTML applies
+it before first paint by rewriting its viewport meta (see the "Display Size
+engine" script in `index.html`). Nothing here changes Android's system Display
+size / Font size settings.
+
+### `AndroidBridge.getDisplayScale()`
+- **Returns:** `String` — one of `"1"`..`"10"` (default `"2"`). Unknown stored
+  values are reported as `"2"`. Values from the earlier 4-size test build are
+  migrated at read time: `xsmall`→`"4"`, `small`→`"6"`, `medium`→`"7"`,
+  `large`→`"8"`.
+
+### `AndroidBridge.setDisplayScale(level)`
+- **Parameters:** `level` (String — whitelisted: `"1"`..`"10"`)
+- **Returns:** void; unknown values are rejected and logged to the error log.
+- **Effect:** persists the level so it survives HTML reloads and app restarts.
+
 ---
 
 ## 9. Optional completion sound
@@ -279,7 +308,14 @@ failure always falls back silently.
 - **Returns:** `String` — JSON with verified keys:
   `shellVersion`, `androidRelease`, `androidSdk`, `device`,
   `notificationsAllowed`, `exactAlarmsAllowed`, `dataKeyCount`,
-  `errorLogCount`, `customSoundSet`, `bootId`, `flags` (object).
+  `errorLogCount`, `customSoundSet`, `displayScale`, `useWideViewPort`,
+  `loadWithOverviewMode`, `textZoom`, `fontScale`, `bootId`, `flags` (object).
+  (`displayScale` is the app's Display Size level 1–10; `useWideViewPort` /
+  `loadWithOverviewMode` are the WebView viewport settings that must be `true`
+  for the viewport-meta scaling to apply — Android WebView defaults them to
+  `false`, which silently discards every sub-1.0 scale; `textZoom` is pinned to
+  100 so the system font size never restyles the app; `fontScale` is the system
+  font scale — informational only.)
 - **Example:** `const d = JSON.parse(A.getDiagnostics())`
 
 ### `AndroidBridge.getErrorLog()`
@@ -334,8 +370,10 @@ Timer: `startTimer`, `updateTimer`, `pauseTimer`, `stopTimer`
 Notifications: `requestNotificationPermission`, `showNotification`
 Alarms: `scheduleAlarm`, `cancelAlarm`
 Storage: `saveData`, `loadData`, `deleteData`, `listDataKeys`, `exportBackup`, `importBackup`
+App & Data: `refreshApp`, `importHtmlFile`, `exportCurrentHtml`, `factoryResetUserData`, `systemCheck`
 Time safety: `elapsedRealtime`, `currentTimeInfo`
 Flags: `getFlag`, `setFlag`, `getAllFlags`
+Display scale: `getDisplayScale`, `setDisplayScale`
 Sound: `saveSoundFile`, `playCompletionSound`, `stopCompletionSound`, `clearSoundFile`
 Diagnostics: `getDiagnostics`, `getErrorLog`, `clearErrorLog`, `getShellVersion`
 Events: `getPendingEvents` (+ `window.onAndroidEvent` callback)

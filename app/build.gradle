@@ -17,8 +17,8 @@ android {
         applicationId "com.goaltracker.shell"
         minSdk 26          // Android 8.0
         targetSdk 34
-        versionCode 20
-        versionName "4.10"
+        versionCode 21
+        versionName "4.11"
     }
 
     signingConfigs {
@@ -61,4 +61,7 @@ dependencies {
     // WebViewAssetLoader lives here - serves filesDir over a stable https:// origin
     implementation 'androidx.webkit:webkit:1.8.0'
     testImplementation 'junit:junit:4.13.2'
+    // Local unit tests need the REAL org.json — android.jar only ships stubs
+    // whose methods throw "not mocked" (BackupValidatorTest parses JSON).
+    testImplementation 'org.json:json:20240303'
 }

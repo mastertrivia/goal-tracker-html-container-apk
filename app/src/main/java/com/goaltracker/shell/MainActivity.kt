@@ -40,6 +40,14 @@ import java.util.zip.ZipInputStream
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
+    // v4.11 Display Size debug readout: viewport settings cached here when they
+    // are (re)configured on the MAIN thread. getDiagnostics() runs on the
+    // WebView JS bridge thread, and reading WebView state from there failed on
+    // device — the readout silently fell back to placeholder values
+    // (wideVP=false / textZoom=-1) while the fix itself was active.
+    @Volatile private var cachedUseWideViewPort: Boolean? = null
+    @Volatile private var cachedLoadWithOverviewMode: Boolean? = null
+    @Volatile private var cachedTextZoom: Int? = null
     // v2.3: kept so the shell can drive the reliable sound player (preview /
     // selection) directly from the native sound chooser.
     private lateinit var jsBridge: JsBridge
@@ -159,6 +167,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    // v4.11: "Save Current HTML File" - exports the RUNNING index.html (bundled or
+    // custom-installed) as a .html file the user can keep or re-install later.
+    private val exportHtmlLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("text/html")) { uri ->
+            if (uri != null) writeCurrentHtmlTo(uri)
+        }
+
     /** Guards against showing the load-failure dialog repeatedly. */
     private var recoveryDialogShowing = false
 
@@ -186,6 +201,29 @@ class MainActivity : AppCompatActivity() {
             allowFileAccess = false           // we serve via https://, not file://
             allowContentAccess = false
             mediaPlaybackRequiresUserGesture = false
+            // v4.11: Android WebView seeds textZoom from the system FONT SIZE
+            // setting (Chromium AwSettings reads Configuration.fontScale), so a
+            // user changing Android's font size silently restyled this app.
+            // The app owns its UI scale instead: textZoom is pinned to 100 and
+            // the Display Size setting (HTML viewport engine + getDisplayScale /
+            // setDisplayScale) is the only thing that scales the interface.
+            textZoom = 100
+            // v4.11 ROOT CAUSE FIX (Display Size levels below 6): Android WebView
+            // defaults to NARROW viewport mode (useWideViewPort=false) with overview
+            // mode off (loadWithOverviewMode=false). In that mode the page's viewport
+            // meta `width` is ignored and any initial scale BELOW 1.0 is discarded —
+            // so every "smaller" Display Size level was silently thrown away while
+            // zoom-in (>1) still worked. This is also why the old Extra-Small/Small
+            // options did nothing. Chromium's WebView layout doc calls this pair the
+            // "configure WebView like a browser" setup; with it the meta behaves
+            // exactly like Chrome, verified in tests/viewport-render.test.js.
+            // Level 6 emits width=device-width + initial-scale=1.0, so the baseline
+            // renders identically to before this change.
+            useWideViewPort = true
+            loadWithOverviewMode = true
+            cachedUseWideViewPort = useWideViewPort
+            cachedLoadWithOverviewMode = loadWithOverviewMode
+            cachedTextZoom = textZoom
         }
 
         webView.webViewClient = object : WebViewClientCompat() {
@@ -396,6 +434,36 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
     }
 
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // v4.11: WebView seeds textZoom from Configuration.fontScale at creation
+        // and may re-read the configuration on a config change. Re-pin it here so
+        // changing Android's system Font size NEVER restyles the app — not even
+        // while it is open. (Screen-size configChanges are handled by this
+        // activity; fontScale changes arrive through the same path only when
+        // fontScale is in the manifest's configChanges, otherwise on recreation.)
+        if (::webView.isInitialized) {
+            try {
+                webView.settings.textZoom = 100
+                cachedTextZoom = 100
+            } catch (e: Exception) {
+                ErrorLog.log(this, "MainActivity.onConfigurationChanged", e.message ?: "textZoom failed")
+            }
+        }
+    }
+
+    /**
+     * v4.11 debug readout for the Display Size card: the viewport-related
+     * WebView settings, so an on-device screenshot can prove the whole scale
+     * chain (level -> meta -> actual viewport -> native settings).
+     * Reads the main-thread-cached copies only — never touches the WebView
+     * itself, because this is invoked from the JS bridge thread.
+     */
+    fun viewportSettingsJson(): JSONObject = JSONObject()
+        .put("useWideViewPort", cachedUseWideViewPort ?: false)
+        .put("loadWithOverviewMode", cachedLoadWithOverviewMode ?: false)
+        .put("textZoom", cachedTextZoom ?: -1)
+
     private fun loadApp() {
         recoveryDialogShowing = false
         webView.loadUrl("https://appassets.androidplatform.net/app/index.html")
@@ -579,133 +647,142 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ---------- Menu ----------
+    // ---------- Shell actions (the three-dot top-bar menu was removed in v4.11) ----------
+    // Everything the old overflow menu did is now triggered from the HTML
+    // (Settings -> Android Shell Settings -> App & Data) through the bridge,
+    // keeping the SAME native typed-confirmation dialogs and file pickers.
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_reload -> ConfirmDialog.show(
-                activity = this,
-                accent = ConfirmDialog.BLUE,
-                icon = "\uD83D\uDD04",
-                heading = "Refresh App",
-                english = "Reload the current app without changing anything.",
-                hinglish = "Current HTML ko sirf refresh karega. Bilkul browser " +
-                    "refresh ki tarah. Kuch bhi delete nahi hoga.",
-                summary = listOf(
-                    ConfirmDialog.SummaryLine("HTML", "Preserved"),
-                    ConfirmDialog.SummaryLine("User Data", "Preserved"),
-                ),
-                confirmLabel = "Refresh Now",
-            ) {
-                loadApp()
-            }
-            R.id.action_import_html -> ConfirmDialog.show(
-                activity = this,
-                accent = ConfirmDialog.BLUE,
-                icon = "\uD83D\uDCE5",
-                heading = "Import App (HTML / ZIP)",
-                english = "Import a new HTML or ZIP package. Your current app will be " +
-                    "replaced while keeping all your existing data.",
-                hinglish = "Nayi HTML ya ZIP file import karega. App update ho jayegi, " +
-                    "lekin Tasks, History, Goals aur baaki Data bilkul safe rahega.",
-                summary = listOf(
-                    ConfirmDialog.SummaryLine("HTML", "Replaced"),
-                    ConfirmDialog.SummaryLine("User Data", "Preserved"),
-                ),
-                confirmLabel = "Import",
-                requiredWord = "IMPORT",
-            ) {
-                val ok = safeLaunch("launchImportHtml") {
-                    importHtmlLauncher.launch(arrayOf("text/html", "application/zip"))
-                }
-                if (!ok) toast("Import failed: no file picker available on this device", force = true)
-            }
-            R.id.action_export_backup -> ConfirmDialog.show(
-                activity = this,
-                accent = ConfirmDialog.GREEN,
-                icon = "\uD83D\uDCBE",
-                heading = "Export Data (Save to Device)",
-                english = "Create a backup of your data and save it to your device.",
-                hinglish = "Aapka poora data phone me Backup File ke roop me save hoga. " +
-                    "Isme HTML include nahi hoti.",
-                summary = listOf(
-                    ConfirmDialog.SummaryLine("HTML", "Not Included"),
-                    ConfirmDialog.SummaryLine("User Data", "Saved"),
-                ),
-                confirmLabel = "Export Now",
-            ) {
-                launchExportBackup()
-            }
-            R.id.action_import_backup -> ConfirmDialog.show(
-                activity = this,
-                accent = ConfirmDialog.GREEN,
-                icon = "\uD83D\uDCC2",
-                heading = "Import Data (Restore Backup)",
-                english = "Restore your previously saved backup file.",
-                hinglish = "Pehle save ki hui Backup File se poora data wapas aa jayega. " +
-                    "HTML bilkul change nahi hogi.",
-                summary = listOf(
-                    ConfirmDialog.SummaryLine("HTML", "Preserved"),
-                    ConfirmDialog.SummaryLine("User Data", "Restored"),
-                ),
-                confirmLabel = "Restore",
-                requiredWord = "RESTORE",
-            ) {
-                launchImportBackup()
-            }
-            R.id.action_reset -> ConfirmDialog.show(
-                activity = this,
-                accent = ConfirmDialog.ORANGE,
-                icon = "\uD83C\uDFE0",
-                heading = "Restore Default App",
-                english = "Restore the default Goal Tracker app bundled inside the APK.",
-                hinglish = "Current HTML hata kar APK wali original Goal Tracker App " +
-                    "wapas aa jayegi. Aapka data safe rahega.",
-                summary = listOf(
-                    ConfirmDialog.SummaryLine("HTML", "Restored"),
-                    ConfirmDialog.SummaryLine("User Data", "Preserved"),
-                ),
-                confirmLabel = "Restore Default",
-                requiredWord = "RESTORE DEFAULT",
-            ) {
-                appDir.deleteRecursively()
-                copyBundledApp()
-                htmlPrefs.edit()
-                    .putBoolean("html_user_imported", false)
-                    .putString("bundled_html_version", packageManager.getPackageInfo(packageName, 0).versionName)
-                    .apply()
-                loadApp()
-                toast("Restored default app (your data was kept)", force = true)
-            }
-            R.id.action_factory_reset -> ConfirmDialog.show(
-                activity = this,
-                accent = ConfirmDialog.RED,
-                icon = "\uD83D\uDDD1\uFE0F",
-                heading = "Factory Reset",
-                english = "Delete all user data while keeping the current app. " +
-                    "Tip: export a backup first. A last-chance internal copy is kept " +
-                    "at auto-backup-before-reset.json.",
-                hinglish = "Sirf Data delete hoga (Tasks, History, Goals, Timers, " +
-                    "Settings, Streaks, etc.). Current HTML bilkul remove nahi hogi.",
-                summary = listOf(
-                    ConfirmDialog.SummaryLine("HTML", "Preserved"),
-                    ConfirmDialog.SummaryLine("User Data", "Deleted"),
-                ),
-                confirmLabel = "Factory Reset",
-                requiredWord = "FACTORY RESET",
-            ) {
-                factoryReset()
-            }
-            R.id.action_system_check -> showSystemCheck()
-            else -> return super.onOptionsItemSelected(item)
+    fun showRefreshAppFlow() {
+        ConfirmDialog.show(
+            activity = this,
+            accent = ConfirmDialog.BLUE,
+            icon = "\uD83D\uDD04",
+            heading = "Refresh App",
+            english = "Reload the application without deleting user data.",
+            hinglish = "Current HTML ko sirf refresh karega. Bilkul browser " +
+                "refresh ki tarah. Kuch bhi delete nahi hoga.",
+            summary = listOf(
+                ConfirmDialog.SummaryLine("HTML", "Preserved"),
+                ConfirmDialog.SummaryLine("User Data", "Preserved"),
+            ),
+            confirmLabel = "Refresh Now",
+        ) {
+            loadApp()
         }
-        return true
     }
+
+    fun showImportHtmlFlow() {
+        ConfirmDialog.show(
+            activity = this,
+            accent = ConfirmDialog.BLUE,
+            icon = "\uD83D\uDCE5",
+            heading = "Install NEW HTML File",
+            english = "Select a new HTML app file from your file manager and install it " +
+                "as the app's interface. The file is validated in staging before it " +
+                "replaces the current app, and all of your user data is kept.",
+            hinglish = "File manager se nayi HTML file chun kar app ki nayi interface " +
+                "banayega. File validate hone ke baad hi replace hogi, aapka data safe rahega.",
+            summary = listOf(
+                ConfirmDialog.SummaryLine("HTML", "Replaced (after validation)"),
+                ConfirmDialog.SummaryLine("User Data", "Preserved"),
+            ),
+            confirmLabel = "Install",
+            requiredWord = "INSTALL",
+        ) {
+            val ok = safeLaunch("launchImportHtml") {
+                importHtmlLauncher.launch(arrayOf("text/html", "application/zip"))
+            }
+            if (!ok) toast("Install failed: no file picker available on this device", force = true)
+        }
+    }
+
+    fun showExportBackupFlow() {
+        ConfirmDialog.show(
+            activity = this,
+            accent = ConfirmDialog.GREEN,
+            icon = "\uD83D\uDCBE",
+            heading = "Export User Data",
+            english = "Create a backup of the user's data and save it to your device. " +
+                "The app's HTML interface is not included.",
+            hinglish = "Aapka poora data phone me Backup File ke roop me save hoga. " +
+                "Isme HTML include nahi hoti.",
+            summary = listOf(
+                ConfirmDialog.SummaryLine("HTML", "Not Included"),
+                ConfirmDialog.SummaryLine("User Data", "Saved"),
+            ),
+            confirmLabel = "Export Now",
+        ) {
+            launchExportBackup()
+        }
+    }
+
+    fun showImportBackupFlow() {
+        ConfirmDialog.show(
+            activity = this,
+            accent = ConfirmDialog.GREEN,
+            icon = "\uD83D\uDCC2",
+            heading = "Import User Data",
+            english = "Restore previously exported user data from a backup file. The " +
+                "file is fully verified first - a wrong or damaged file is rejected " +
+                "without changing anything.",
+            hinglish = "Pehle save ki hui Backup File se poora data wapas aa jayega. " +
+                "File pehle verify hoti hai - galat ya damaged file accept nahi hogi.",
+            summary = listOf(
+                ConfirmDialog.SummaryLine("HTML", "Preserved"),
+                ConfirmDialog.SummaryLine("User Data", "Restored"),
+            ),
+            confirmLabel = "Restore",
+            requiredWord = "RESTORE",
+        ) {
+            launchImportBackup()
+        }
+    }
+
+    fun showSaveCurrentHtmlFlow() {
+        ConfirmDialog.show(
+            activity = this,
+            accent = ConfirmDialog.BLUE,
+            icon = "\uD83D\uDCC4",
+            heading = "Save Current HTML File",
+            english = "Export the currently installed/running HTML app file to your file " +
+                "manager - exactly what is running now, even if you installed a custom " +
+                "HTML file earlier.",
+            hinglish = "Jo HTML abhi chal rahi hai (custom ho ya original), uska copy " +
+                "file manager me save ho jayega.",
+            summary = listOf(
+                ConfirmDialog.SummaryLine("HTML", "Saved as file"),
+                ConfirmDialog.SummaryLine("User Data", "Not Included"),
+            ),
+            confirmLabel = "Save File",
+        ) {
+            launchExportCurrentHtml()
+        }
+    }
+
+    fun showFactoryResetFlow() {
+        ConfirmDialog.show(
+            activity = this,
+            accent = ConfirmDialog.RED,
+            icon = "\uD83D\uDDD1\uFE0F",
+            heading = "Factory Reset User Data",
+            english = "Delete the application's user data and restore the initial data " +
+                "state. The current HTML app file is NOT deleted or replaced. Tip: " +
+                "export a backup first. A last-chance internal copy is kept at " +
+                "auto-backup-before-reset.json.",
+            hinglish = "Sirf Data delete hoga (Tasks, History, Goals, Timers, " +
+                "Settings, Streaks, etc.). Current HTML bilkul remove nahi hogi.",
+            summary = listOf(
+                ConfirmDialog.SummaryLine("HTML", "Preserved"),
+                ConfirmDialog.SummaryLine("User Data", "Deleted"),
+            ),
+            confirmLabel = "Factory Reset",
+            requiredWord = "FACTORY RESET",
+        ) {
+            factoryReset()
+        }
+    }
+
+    fun showSystemCheckFlow() = showSystemCheck()
 
     private fun showSystemCheck() {
         try {
@@ -938,15 +1015,79 @@ class MainActivity : AppCompatActivity() {
         if (!ok) toast("Import failed: no file picker available on this device", force = true)
     }
 
+    // ---------- Save current HTML (v4.11) ----------
+
+    fun launchExportCurrentHtml() {
+        if (safeLaunch("launchExportCurrentHtml") {
+                exportHtmlLauncher.launch("goal-tracker-app.html")
+            }
+        ) return
+        exportCurrentHtmlToDownloads()
+    }
+
+    /** Picker-free export path: writes the running HTML into public Downloads. */
+    private fun exportCurrentHtmlToDownloads() {
+        try {
+            val name = "goal-tracker-app-${System.currentTimeMillis()}.html"
+            val uri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val values = android.content.ContentValues().apply {
+                    put(android.provider.MediaStore.Downloads.DISPLAY_NAME, name)
+                    put(android.provider.MediaStore.Downloads.MIME_TYPE, "text/html")
+                }
+                contentResolver.insert(
+                    android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, values
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                val dir = android.os.Environment.getExternalStoragePublicDirectory(
+                    android.os.Environment.DIRECTORY_DOWNLOADS
+                ).apply { mkdirs() }
+                Uri.fromFile(File(dir, name))
+            }
+            if (uri == null) {
+                toast("Save failed: no file picker and Downloads unavailable", force = true)
+                return
+            }
+            writeCurrentHtmlTo(uri)
+        } catch (e: Exception) {
+            ErrorLog.log(this, "exportCurrentHtmlToDownloads", e.message ?: e.javaClass.simpleName)
+            toast("Save failed: ${e.message}", force = true)
+        }
+    }
+
+    private fun writeCurrentHtmlTo(uri: Uri) {
+        try {
+            val src = File(appDir, "index.html")
+            if (!src.exists() || src.length() == 0L) {
+                throw IllegalStateException("current HTML file is missing")
+            }
+            contentResolver.openOutputStream(uri)!!.use { out ->
+                src.inputStream().use { input -> input.copyTo(out) }
+            }
+            toast("Current app HTML saved", force = true)
+        } catch (e: Exception) {
+            ErrorLog.log(this, "writeCurrentHtmlTo", e.message ?: e.javaClass.simpleName)
+            toast("Save failed: ${e.message}", force = true)
+        }
+    }
+
     /** Collects every stored data key into the single backup JSON document. */
     private fun buildBackupJson(): JSONObject {
-        val data = JSONObject()
+        val map = linkedMapOf<String, String>()
         appDataDir.listFiles()?.filter { it.extension == "json" }?.forEach { f ->
-            data.put(f.nameWithoutExtension, f.readText())
+            map[f.nameWithoutExtension] = f.readText()
         }
+        if (!map.containsKey("gt_backup")) {
+            throw IllegalStateException("no Goal Tracker data to export yet - open the app once and try again")
+        }
+        val data = JSONObject()
+        map.forEach { (key, value) -> data.put(key, value) }
+        // v4.11: checksum lets import detect damaged/truncated files, and the
+        // app id lets import reject files that belong to a different app.
         return JSONObject()
-            .put("app", "goal-tracker-shell")
+            .put("app", BackupValidator.APP_ID)
             .put("exportedAt", System.currentTimeMillis())
+            .put("checksum", BackupValidator.fnv1a32(BackupValidator.checksumPayload(map)))
             .put("data", data)
     }
 
@@ -966,23 +1107,31 @@ class MainActivity : AppCompatActivity() {
         try {
             val text = contentResolver.openInputStream(uri)!!
                 .bufferedReader().use { it.readText() }
-            val backup = JSONObject(text)
-            if (backup.optString("app") != "goal-tracker-shell") {
-                throw IllegalArgumentException("This is not a Goal Tracker backup")
+            // v4.11: validate the ENTIRE payload BEFORE touching a single stored
+            // file. A corrupt, truncated or foreign JSON file is rejected with a
+            // clear message and can never overwrite existing user data.
+            val entries = BackupValidator.validate(text)
+            // Stage every file first, then swap them in - a write failure halfway
+            // can never leave a half-restored mixture behind.
+            val staging = File(filesDir, "data_import_tmp")
+            staging.deleteRecursively()
+            staging.mkdirs()
+            entries.forEach { (key, value) -> File(staging, "$key.json").writeText(value) }
+            for (key in entries.keys) {
+                val src = File(staging, "$key.json")
+                val dest = File(appDataDir, "$key.json")
+                if (!src.renameTo(dest)) {
+                    dest.writeText(src.readText())
+                    src.delete()
+                }
             }
-            val data = backup.getJSONObject("data")
-            if (!data.has("gt_backup") || data.opt("gt_backup") !is String) {
-                throw IllegalArgumentException("Backup has no Goal Tracker data")
-            }
-            for (key in data.keys()) {
-                File(appDataDir, "$key.json").writeText(data.getString(key))
-            }
-            toast("Backup restored")
+            staging.deleteRecursively()
+            toast("Backup restored", force = true)
             // Tell the HTML app so it can re-read its data
             notifyJs("backupRestored", "null")
         } catch (e: Exception) {
             ErrorLog.log(this, "restoreBackupFrom", e.message ?: e.javaClass.simpleName)
-            toast("Restore failed: ${e.message}", force = true)
+            toast("Import failed: ${e.message}", force = true)
         }
     }
 

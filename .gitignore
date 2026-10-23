@@ -19,3 +19,6 @@ nohup.out
 # IMPORTANT - these must stay COMMITTED, never ignore them:
 #   gradlew, gradlew.bat, gradle/wrapper/gradle-wrapper.jar
 #   signing/release.keystore
+
+# Local build artifacts (CI builds the signed release APK)
+*.apk

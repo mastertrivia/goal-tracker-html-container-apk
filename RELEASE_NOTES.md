@@ -4,6 +4,46 @@
 
 ---
 
+## v4.11 — 2026-10-23
+
+**Display Size (1–10), top-bar removal, App & Data menu, fail-safe backups**
+
+- **Display Size setting (levels 1–10, level 6 = exactly the old look):** Settings →
+  Android Shell Settings → Display Size. Default level **2**, ~8% per level. The app owns
+  its scale through the viewport-meta engine; the wrapper pins `textZoom = 100`, so
+  Android's system Font size / Display size no longer restyle the app. Legacy
+  xsmall/small/medium/large values migrate automatically.
+- **ROOT-CAUSE FIX — levels below 6 now genuinely shrink.** Android WebView defaults to
+  narrow viewport mode (`useWideViewPort=false`, `loadWithOverviewMode=false`), which
+  silently discarded every requested scale **below 1.0** while allowing zoom-in above 1.0 —
+  the same defect that made the earlier Extra-Small/Small options do nothing. The shell now
+  configures WebView browser-style (`useWideViewPort=true`, `loadWithOverviewMode=true`),
+  the setup Chromium documents for WebView/Chrome parity. Level 6 still emits
+  `width=device-width, initial-scale=1.0` — byte-identical baseline.
+- **On-device debug readout** in the Display Size card (kept by request): level → computed
+  scale → viewport meta → rendered viewport (`vv.scale` + applied ✓/✗ marker) → native
+  WebView settings.
+- **Green top bar removed (NoActionBar):** the HTML starts at the top of the screen; the
+  three-dot menu is gone with it.
+- **All menu actions moved into Settings → Android Shell Settings → App & Data**, in order:
+  🔄 Refresh App · 📂 Import User Data · 💾 Export User Data · 📥 Install NEW HTML File ·
+  📄 Save Current HTML File (NEW) · 🗑️ Factory Reset User Data · 🔍 System Check. Native
+  typed confirmations, staged HTML/ZIP validation and file pickers are unchanged. "Restore
+  Default App" was removed as requested; installing HTML never touches user data, and
+  Factory Reset never touches the HTML file.
+- **Android Shell Settings launcher moved to the top of the Settings list.**
+- **Backup import is now fail-safe:** the native side validates the ENTIRE file (app id,
+  JSON shape, state structure, FNV-1a checksum) before any stored file is written — a
+  corrupt or foreign JSON shows "Import failed: …" and changes nothing. The HTML side
+  re-validates before clearing the database and rolls back automatically if a restore fails
+  midway (the old path cleared first, which could corrupt data).
+- **Backup export hardened:** fresh state mirror first (aborts if it cannot be read),
+  checksum attached, atomic temp-then-rename writes, refuses to export when no data exists.
+- **Native/version:** `versionName "4.11"`, `versionCode 21`,
+  `JsBridge.getShellVersion()` → `"4.11"`.
+
+---
+
 ## v4.10 — 2026-10-10
 
 **Short alarm durations and extra notification tones**

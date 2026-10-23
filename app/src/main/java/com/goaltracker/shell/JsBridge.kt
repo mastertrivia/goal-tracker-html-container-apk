@@ -50,6 +50,19 @@ class JsBridge(private val activity: MainActivity) {
         // How long an in-app alarm/completion sound keeps ringing before it
         // auto-stops. Short source clips are looped to fill this window.
         const val RING_DURATION_MS = 60_000L
+
+        // v4.11: app-owned Display Size. The wrapper only persists the level;
+        // the HTML applies it before first paint via the viewport meta (see the
+        // "Display Size engine" script in index.html). Levels are "1".."10"
+        // (6 = the app's normal size, default = "2", ~8% per step). Values are
+        // whitelisted because the bridge input is untrusted JavaScript.
+        const val DISPLAY_SCALE_KEY = "displayScale"
+        const val DISPLAY_SCALE_DEFAULT = "2"
+        val DISPLAY_SCALE_LEVELS = (1..10).map { it.toString() }.toSet()
+        // Values written by the earlier 4-size test build — migrated, never lost.
+        val DISPLAY_SCALE_LEGACY = mapOf(
+            "xsmall" to "4", "small" to "6", "medium" to "7", "large" to "8"
+        )
     }
 
     /** Keys become filenames, so strip anything unsafe. */
@@ -109,7 +122,15 @@ class JsBridge(private val activity: MainActivity) {
 
     @JavascriptInterface
     fun saveData(key: String, json: String): Boolean = safe("saveData", false) {
-        File(dataDir, safeKey(key) + ".json").writeText(json)
+        // v4.11: temp-then-rename so a concurrent reader (backup export) can
+        // never observe a half-written file.
+        val dest = File(dataDir, safeKey(key) + ".json")
+        val tmp = File(dataDir, safeKey(key) + ".json.tmp")
+        tmp.writeText(json)
+        if (!tmp.renameTo(dest)) {
+            dest.writeText(json)
+            tmp.delete()
+        }
         true
     }
 
@@ -137,16 +158,52 @@ class JsBridge(private val activity: MainActivity) {
 
     // ---------------- Backup ----------------
 
-    /** Opens a "save file" dialog; writes ALL data keys into one JSON file. */
+    /**
+     * Opens the native typed-confirmation dialog, then the "save file" picker;
+     * writes ALL data keys into one JSON file (v4.11: shows the confirmation
+     * first — the old top-bar menu behavior, now triggered from the HTML).
+     */
     @JavascriptInterface
     fun exportBackup() {
-        safeUi("exportBackup") { activity.launchExportBackup() }
+        safeUi("exportBackup") { activity.showExportBackupFlow() }
     }
 
-    /** Opens a file picker; restores data keys from a backup JSON file. */
+    /** Native typed-confirmation dialog first, then the file picker (v4.11). */
     @JavascriptInterface
     fun importBackup() {
-        safeUi("importBackup") { activity.launchImportBackup() }
+        safeUi("importBackup") { activity.showImportBackupFlow() }
+    }
+
+    // ---------------- App & Data menu (v4.11: replaced the top-bar menu) ----------------
+
+    /** Reload the app HTML without deleting user data (native confirm first). */
+    @JavascriptInterface
+    fun refreshApp() {
+        safeUi("refreshApp") { activity.showRefreshAppFlow() }
+    }
+
+    /** Install a new HTML/ZIP interface file (native typed confirm + staged import). */
+    @JavascriptInterface
+    fun importHtmlFile() {
+        safeUi("importHtmlFile") { activity.showImportHtmlFlow() }
+    }
+
+    /** Export the CURRENTLY running index.html to a user-chosen file. */
+    @JavascriptInterface
+    fun exportCurrentHtml() {
+        safeUi("exportCurrentHtml") { activity.showSaveCurrentHtmlFlow() }
+    }
+
+    /** Factory reset: deletes user data only; the current HTML file is preserved. */
+    @JavascriptInterface
+    fun factoryResetUserData() {
+        safeUi("factoryResetUserData") { activity.showFactoryResetFlow() }
+    }
+
+    /** Native System Check dialog (full diagnostics + export as file). */
+    @JavascriptInterface
+    fun systemCheck() {
+        safeUi("systemCheck") { activity.showSystemCheckFlow() }
     }
 
     // ---------------- Notifications ----------------
@@ -450,6 +507,32 @@ class JsBridge(private val activity: MainActivity) {
     @JavascriptInterface
     fun getAllFlags(): String = safe("getAllFlags", "{}") { Flags.all(activity) }
 
+    // ---------------- Display scale (v4.11: app-owned UI size) ----------------
+    // The HTML renders itself at this scale (viewport rewrite in its head); the
+    // wrapper owns persistence only, so the choice survives HTML reloads and
+    // app restarts even though the setting is managed from the HTML settings UI.
+    // Known values: "xsmall", "small" (default), "medium", "large".
+
+    @JavascriptInterface
+    fun getDisplayScale(): String = safe("getDisplayScale", DISPLAY_SCALE_DEFAULT) {
+        val raw = Flags.getString(activity, DISPLAY_SCALE_KEY, DISPLAY_SCALE_DEFAULT)
+            .trim().lowercase()
+        val migrated = DISPLAY_SCALE_LEGACY[raw] ?: raw
+        if (migrated in DISPLAY_SCALE_LEVELS) migrated else DISPLAY_SCALE_DEFAULT
+    }
+
+    @JavascriptInterface
+    fun setDisplayScale(size: String) {
+        safe("setDisplayScale", Unit) {
+            val v = size.trim().lowercase()
+            if (v in DISPLAY_SCALE_LEVELS) {
+                Flags.setString(activity, DISPLAY_SCALE_KEY, v)
+            } else {
+                ErrorLog.log(activity, "setDisplayScale", "rejected unknown value: $size")
+            }
+        }
+    }
+
     // ---------------- Pending events ----------------
     // Call on page load AND on document visibilitychange. Reading drains
     // the queue, so each event is delivered exactly once.
@@ -474,6 +557,7 @@ class JsBridge(private val activity: MainActivity) {
         val alarmManager = activity.getSystemService(Context.ALARM_SERVICE)
                 as android.app.AlarmManager
         val canExact = Build.VERSION.SDK_INT < 31 || alarmManager.canScheduleExactAlarms()
+        val vp = activity.viewportSettingsJson()
         JSONObject()
             .put("shellVersion", getShellVersion())
             .put("androidRelease", Build.VERSION.RELEASE ?: "unknown")
@@ -484,6 +568,11 @@ class JsBridge(private val activity: MainActivity) {
             .put("dataKeyCount", JSONArray(listDataKeys()).length())
             .put("errorLogCount", ErrorLog.count(activity))
             .put("customSoundSet", soundFile.exists())
+            .put("displayScale", getDisplayScale())
+            .put("useWideViewPort", vp.optBoolean("useWideViewPort", false))
+            .put("loadWithOverviewMode", vp.optBoolean("loadWithOverviewMode", false))
+            .put("textZoom", vp.optInt("textZoom", -1))
+            .put("fontScale", activity.resources.configuration.fontScale)
             .put("bootId", TimeSafety.bootId(activity))
             .put("flags", JSONObject(Flags.all(activity)))
             .toString()
@@ -723,7 +812,7 @@ class JsBridge(private val activity: MainActivity) {
     // ---------------- Misc ----------------
 
     @JavascriptInterface
-    fun getShellVersion(): String = "4.10"
+    fun getShellVersion(): String = "4.11"
 
     // ---------------- Manual fallback ----------------
 

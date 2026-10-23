@@ -21,6 +21,7 @@
 | Alarm sound + vibration + Dismiss | Available | Dedicated alarm channel in `AlarmReceiver` |
 | Persistent storage (JSON, internal) | Available | `saveData`, `loadData`, `deleteData`, `listDataKeys` |
 | Full backup export / import | Available | `exportBackup`, `importBackup` (+ `backupRestored` event) |
+| App & Data menu (top-bar replacement) | Available (v4.11) | `refreshApp`, `importHtmlFile`, `exportCurrentHtml`, `factoryResetUserData`, `systemCheck` |
 | Time safety (monotonic clock, reboot detect) | Available | `elapsedRealtime`, `currentTimeInfo` |
 | Feature flags (HTML settings) | Available | `getFlag`, `setFlag`, `getAllFlags` |
 | Optional custom completion sound (≤ 1 MB) | Available | `saveSoundFile`, `playCompletionSound`, `stopCompletionSound`, `clearSoundFile` |

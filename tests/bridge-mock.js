@@ -15,15 +15,37 @@ function makeBridge(win, opts = {}) {
   const rec = (name, args) => calls.push([name, ...args]);
   const now = () => Date.now();
 
+  // Display scale (v4.11): string-persisted like the native Flags store.
+  // Shared across page reloads by the caller (opts.displayScale) so a
+  // "WebView reload" test behaves like the real device. Mirrors native:
+  // levels "1".."10", default "2", legacy 4-size values migrated at read.
+  const DISPLAY_SCALE_LEVELS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+  const DISPLAY_SCALE_DEFAULT = '2';
+  const DISPLAY_SCALE_LEGACY = { xsmall: '4', small: '6', medium: '7', large: '8' };
+  const displayScale = opts.displayScale || { value: opts.initialDisplayScale || DISPLAY_SCALE_DEFAULT };
+  const normalizeLevel = (v) => {
+    let s = String(v == null ? '' : v).trim().toLowerCase();
+    if (DISPLAY_SCALE_LEGACY[s]) s = DISPLAY_SCALE_LEGACY[s];
+    return DISPLAY_SCALE_LEVELS.includes(s) ? s : null;
+  };
+
   const bridge = {
     __calls: calls,
     __flags: flags,
     __storage: storage,
 
-    getShellVersion: () => '4.10',
+    getShellVersion: () => '4.11',
     getFlag: (k, d) => (Object.prototype.hasOwnProperty.call(flags, k) ? flags[k] : d),
     setFlag: (k, v) => { flags[k] = v; rec('setFlag', [k, v]); return true; },
     getAllFlags: () => JSON.stringify(flags),
+
+    // Mirrors native JsBridge: level whitelist in, "2" out, unknown rejected.
+    getDisplayScale: () => normalizeLevel(displayScale.value) || DISPLAY_SCALE_DEFAULT,
+    setDisplayScale: (v) => {
+      const s = normalizeLevel(v);
+      if (s) { displayScale.value = s; rec('setDisplayScale', [s]); }
+      else rec('setDisplayScale.rejected', [String(v)]);
+    },
 
     requestNotificationPermission: () => rec('requestNotificationPermission', []),
 
@@ -66,10 +88,16 @@ function makeBridge(win, opts = {}) {
 
     getErrorLog: () => '[]',
     clearErrorLog: () => true,
-    getDiagnostics: () => JSON.stringify({ shellVersion: '4.10', notificationsAllowed: true, exactAlarmsAllowed: true }),
+    getDiagnostics: () => JSON.stringify({ shellVersion: '4.11', notificationsAllowed: true, exactAlarmsAllowed: true, displayScale: (normalizeLevel(displayScale.value) || DISPLAY_SCALE_DEFAULT), useWideViewPort: true, loadWithOverviewMode: true, textZoom: 100, fontScale: 1 }),
 
     exportBackup: () => rec('exportBackup', []),
     importBackup: () => rec('importBackup', []),
+    // v4.11 App & Data menu (moved out of the removed top-bar menu)
+    refreshApp: () => rec('refreshApp', []),
+    importHtmlFile: () => rec('importHtmlFile', []),
+    exportCurrentHtml: () => rec('exportCurrentHtml', []),
+    factoryResetUserData: () => rec('factoryResetUserData', []),
+    systemCheck: () => rec('systemCheck', []),
   };
   return bridge;
 }

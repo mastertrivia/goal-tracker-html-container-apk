@@ -3,6 +3,102 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<script>
+/* ===== Display Size engine (v4.11) — app-owned visual scale ================
+   A 1–10 level picker: level 6 renders EXACTLY like the app before this setting
+   existed (the stock viewport meta, byte-for-byte), each level is ~8% apart
+   (level 10 ≈ +36%, level 1 ≈ −32%), and the shipped default is level 2.
+
+   Root cause background: Android WebView seeds its textZoom from the system
+   Font size setting (Chromium AwSettings) and renders CSS px through the
+   system Display size density, so before v4.11 the app's appearance was
+   controlled by Android's settings. The wrapper now pins textZoom=100, and the
+   user's own Display Size level is applied HERE, before first paint: the
+   viewport meta is rewritten so the layout viewport becomes
+   round(deviceWidth / scale) CSS px with initial-scale = scale. The whole UI
+   then renders `scale` times larger while the responsive layout reflows to the
+   narrower logical width — exactly like browser zoom — so nothing overflows
+   horizontally and media queries keep adapting.
+
+   The level itself is persisted by the Android wrapper (getDisplayScale /
+   setDisplayScale bridge methods; UI in Settings → Android Shell Settings →
+   Display Size). A plain browser (no bridge) remembers the last choice in
+   localStorage so development previews behave the same. */
+(function(){
+  var GT_DEFAULT_LEVEL = '2';
+  var GT_LEVEL_STEP = 1.08; // visual distance between two neighbouring levels
+  var META_DEFAULT = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+  // Values stored by the earlier 4-size build — migrated instead of lost.
+  var LEGACY_SIZES = { xsmall:'4', small:'6', medium:'7', large:'8' };
+  var current = GT_DEFAULT_LEVEL;
+
+  function normalizeLevel(v){
+    v = String(v == null ? '' : v).trim().toLowerCase();
+    if(LEGACY_SIZES.hasOwnProperty(v)) v = LEGACY_SIZES[v];
+    var n = parseInt(v, 10);
+    return (String(n) === v && n >= 1 && n <= 10) ? String(n) : null;
+  }
+  function scaleOf(level){ return Math.pow(GT_LEVEL_STEP, parseInt(level, 10) - 6); }
+
+  function bridgeLevel(){
+    try{
+      var a = window.AndroidBridge;
+      if(a && typeof a.getDisplayScale === 'function') return normalizeLevel(a.getDisplayScale());
+    }catch(e){}
+    return null;
+  }
+  function localLevel(){
+    try{ return normalizeLevel(localStorage.getItem('gt_displaySize')); }catch(e){ return null; }
+  }
+  function readLevel(){ return bridgeLevel() || localLevel() || GT_DEFAULT_LEVEL; }
+
+  // Real screen width in CSS px at the CURRENT orientation + system density.
+  function deviceCssWidth(){
+    try{ if(window.screen && window.screen.width) return window.screen.width; }catch(e){}
+    try{ if(window.visualViewport && window.visualViewport.width){ return window.visualViewport.width * (window.visualViewport.scale || 1); } }catch(e){}
+    return window.innerWidth || 360;
+  }
+
+  function apply(level){
+    level = normalizeLevel(level) || GT_DEFAULT_LEVEL;
+    current = level;
+    var meta = document.querySelector('meta[name="viewport"]');
+    if(!meta) return;
+    var s = scaleOf(level);
+    var content = s === 1 ? META_DEFAULT :
+      'width=' + Math.max(280, Math.round(deviceCssWidth() / s)) +
+      ', initial-scale=' + s + ', maximum-scale=' + s +
+      ', user-scalable=no, viewport-fit=cover';
+    if(meta.getAttribute('content') !== content) meta.setAttribute('content', content);
+  }
+
+  window.gtDisplaySize = {
+    get: function(){ return current; },
+    scaleOf: scaleOf,
+    isNative: function(){
+      try{ var a = window.AndroidBridge; return !!(a && typeof a.getDisplayScale === 'function'); }catch(e){ return false; }
+    },
+    set: function(level){
+      level = normalizeLevel(level) || GT_DEFAULT_LEVEL;
+      try{ localStorage.setItem('gt_displaySize', level); }catch(e){}
+      try{
+        var a = window.AndroidBridge;
+        if(a && typeof a.setDisplayScale === 'function') a.setDisplayScale(level);
+      }catch(e){}
+      apply(level);
+    }
+  };
+
+  apply(readLevel());
+  // Rotation changes the real device width; recompute the layout width for the
+  // current level so the biggest sizes never overflow in landscape either.
+  var rzT = null;
+  window.addEventListener('resize', function(){
+    clearTimeout(rzT);
+    rzT = setTimeout(function(){ apply(current); }, 150);
+  });
+})();
+</script>
 <title>Never Break The Chain</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -319,6 +415,10 @@ body.bomb-danger{background-color:#EF4444;}
   .task-tabs{display:flex;gap:8px;margin-bottom:14px;}
   .task-tab{flex:1;border:1.5px solid var(--border);border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;font-weight:700;font-size:12.5px;color:var(--text-dim);background:var(--card);transition:all .15s cubic-bezier(.4,0,.2,1);text-transform:uppercase;letter-spacing:0.03em;}
   .task-tab .ic{font-size:18px;display:block;margin-bottom:4px;}
+  /* Display Size levels above 6 shrink the layout viewport (browser-zoom style);
+     keep the 5-tab bar overflow-free down to the 280px layout floor. Same
+     defensive pattern as the <=360px Reality-Check compaction below. */
+  @media (max-width:310px){.task-tab{padding:10px 2px;font-size:11px;letter-spacing:0.01em;}.task-tab .ic{font-size:16px;margin-bottom:3px;}}
   .task-tab.active{border-color:var(--primary);color:var(--primary);background:var(--primary-light);box-shadow:0 4px 12px rgba(91,79,232,0.14);}
   .task-tab-count{font-size:9.5px;font-weight:700;color:var(--text-dim);text-transform:none;letter-spacing:0;margin-top:4px;}
   .task-tab.active .task-tab-count{color:var(--primary);opacity:0.85;}
@@ -1820,6 +1920,14 @@ body.bomb-danger{background-color:#EF4444;}
   <div class="screen" id="screen-settings">
     <!-- Main folder list -->
     <div id="settingsMain">
+      <!-- 0. Android Shell Settings — moved to the top in v4.11 (hosts the App & Data menu) -->
+      <div class="plain-card">
+        <div class="goal-settings-launch" data-sub="subAndroid">
+          <div class="gl-ic" style="background:linear-gradient(155deg,#5B4FE8 0%,#4A3FD1 100%);box-shadow:0 6px 14px rgba(91,79,232,0.28);"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2.5"/><path d="M10.5 18.5h3"/></svg></div>
+          <div class="gl-txt"><div class="gl-t1">Android Shell Settings</div><div class="gl-t2" id="andLaunchSub">App &amp; Data menu, notifications, alarms, sound &amp; backup</div></div>
+          <div class="gl-chev">›</div>
+        </div>
+      </div>
       <!-- 1. Planner & Revision -->
       <div class="plain-card">
         <div class="goal-settings-launch" data-sub="subMilestonesRevision">
@@ -1873,14 +1981,6 @@ body.bomb-danger{background-color:#EF4444;}
         <div class="goal-settings-launch" data-sub="subOther">
           <div class="gl-ic" style="background:linear-gradient(155deg,#8E8E93 0%,#636366 100%);box-shadow:0 6px 14px rgba(99,99,102,0.28);"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.2"/><circle cx="9.8" cy="17" r="2.2"/></svg></div>
           <div class="gl-txt"><div class="gl-t1">All Other Settings</div><div class="gl-t2">Labels, sleep duration, hours budget &amp; timers</div></div>
-          <div class="gl-chev">›</div>
-        </div>
-      </div>
-      <!-- 7. Application Settings — Android shell integration (notifications, alarms, sound, backup, diagnostics) -->
-      <div class="plain-card">
-        <div class="goal-settings-launch" data-sub="subAndroid">
-          <div class="gl-ic" style="background:linear-gradient(155deg,#5B4FE8 0%,#4A3FD1 100%);box-shadow:0 6px 14px rgba(91,79,232,0.28);"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2.5"/><path d="M10.5 18.5h3"/></svg></div>
-          <div class="gl-txt"><div class="gl-t1">Android Shell Settings</div><div class="gl-t2" id="andLaunchSub">Notifications, alarms, sound, backup &amp; diagnostics</div></div>
           <div class="gl-chev">›</div>
         </div>
       </div>
@@ -2589,11 +2689,76 @@ body.bomb-danger{background-color:#EF4444;}
       </div>
 
       <div id="andBridgeUI" style="display:none;">
+        <!-- App & Data — the old three-dot top-bar menu, moved into the shell (v4.11).
+             The native side owns every confirmation dialog + file picker behind these
+             rows, so a broken HTML import can still never lock you out. -->
+        <div class="plain-card" id="cardAppData">
+          <h3>App &amp; Data</h3>
+          <div class="subtext" style="margin-top:0;">Everything the old top-bar menu (⋮) did now lives here. The user's data and the HTML interface are always handled separately: installing a new HTML never erases data, and a factory reset never touches your HTML file.</div>
+          <div class="and-row" id="andMnuRefresh" role="button" tabindex="0">
+            <div class="ar-txt"><div class="ar-t1">🔄 Refresh App</div><div class="ar-t2">Reload the application without deleting user data.</div></div>
+            <div class="gl-chev">›</div>
+          </div>
+          <div class="and-row" id="andMnuImportData" role="button" tabindex="0">
+            <div class="ar-txt"><div class="ar-t1">📂 Import User Data</div><div class="ar-t2">Restore previously exported user data from a backup file.</div></div>
+            <div class="gl-chev">›</div>
+          </div>
+          <div class="and-row" id="andMnuExportData" role="button" tabindex="0">
+            <div class="ar-txt"><div class="ar-t1">💾 Export User Data</div><div class="ar-t2">Export the user's data and save it to the device, allowing the user to back it up.</div></div>
+            <div class="gl-chev">›</div>
+          </div>
+          <div class="and-row" id="andMnuInstallHtml" role="button" tabindex="0">
+            <div class="ar-txt"><div class="ar-t1">📥 Install NEW HTML File</div><div class="ar-t2">Select a new HTML app file and install it as the app's interface. User data is preserved.</div></div>
+            <div class="gl-chev">›</div>
+          </div>
+          <div class="and-row" id="andMnuSaveHtml" role="button" tabindex="0">
+            <div class="ar-txt"><div class="ar-t1">📄 Save Current HTML File</div><div class="ar-t2">Export the HTML file running right now to your file manager — even a custom-installed one.</div></div>
+            <div class="gl-chev">›</div>
+          </div>
+          <div class="and-row" id="andMnuFactoryReset" role="button" tabindex="0">
+            <div class="ar-txt"><div class="ar-t1">🗑️ Factory Reset User Data</div><div class="ar-t2">Delete the application's user data and restore the initial data state. The current HTML file is kept.</div></div>
+            <div class="gl-chev">›</div>
+          </div>
+          <div class="and-row" id="andMnuSysCheck" role="button" tabindex="0">
+            <div class="ar-txt"><div class="ar-t1">🔍 System Check</div><div class="ar-t2">Full device &amp; shell diagnostics — exportable as a file.</div></div>
+            <div class="gl-chev">›</div>
+          </div>
+          <div class="subtext" id="andBackupInfo" style="margin-bottom:0;margin-top:10px;"></div>
+        </div>
+
         <!-- Bridge status -->
         <div class="plain-card">
           <h3>Bridge Status</h3>
           <div id="andStatusRows"></div>
           <button class="btn-full ghost" id="andRefreshStatus" style="margin:12px 0 0;">Refresh Status</button>
+        </div>
+
+        <!-- Display Size — native-persisted wrapper setting, managed from HTML exactly like
+             the alarm settings. The head viewport engine (gtDisplaySize) applies it instantly. -->
+        <div class="plain-card" id="cardDisplaySize">
+          <h3>Display Size</h3>
+          <div class="subtext" style="margin-top:0;">Pick how large the app looks, from 1 to 10. Level <b>6 is exactly the app's normal size</b> — as if this setting never existed. Each level is about 8% apart. The app's default is level <b>2</b>. This is the app's own scale; it does not change Android's system Display size or Font size, and it is saved inside the Android shell so it survives app restarts.</div>
+          <div class="and-row">
+            <div class="ar-txt"><div class="ar-t1">App Display Size</div><div class="ar-t2" id="andDisplaySizeDesc">—</div></div>
+            <select id="andDisplaySize" class="task-select" style="width:auto;min-width:120px;margin-bottom:0;padding:10px 12px;">
+              <option value="1">Level 1 (smallest)</option>
+              <option value="2">Level 2 (default)</option>
+              <option value="3">Level 3</option>
+              <option value="4">Level 4</option>
+              <option value="5">Level 5</option>
+              <option value="6">Level 6 (normal)</option>
+              <option value="7">Level 7</option>
+              <option value="8">Level 8</option>
+              <option value="9">Level 9</option>
+              <option value="10">Level 10 (largest)</option>
+            </select>
+          </div>
+          <!-- v4.11 debug readout (kept permanently by request): proves the whole
+               scale chain on-device (level -> viewport meta -> rendered viewport ->
+               native WebView settings). A screenshot of this block pinpoints exactly
+               where scaling applies. -->
+          <div id="dsDebug" style="display:none;margin-top:10px;padding:8px 10px;background:#0F0B2E;color:#8CF0C0;border-radius:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.55;word-break:break-all;white-space:pre-wrap;"></div>
+          <div class="subtext" style="margin-bottom:0;margin-top:10px;">Level 6 renders exactly like the app looked before this setting existed. Going down makes everything more compact; going up makes everything easier to read. The layout always reflows so nothing is cut off, even at the biggest level.</div>
         </div>
 
         <!-- Notifications -->
@@ -2696,22 +2861,10 @@ body.bomb-danger{background-color:#EF4444;}
           <div class="subtext" style="margin-bottom:0;margin-top:10px;">Max 1 MB. This sound belongs only to Bomb explosions.</div>
         </div>
 
-        <!-- Backup -->
-        <div class="plain-card" id="cardBackup">
-          <h3>Backup</h3>
-          <div class="subtext" style="margin-top:0;">Your full app data (state, tasks, history) is mirrored to Android storage automatically. Export writes it to a file you choose; Import restores from a previously exported file.</div>
-          <div class="and-btn-row">
-            <button class="btn-full primary" id="andExportBackup">Export Backup</button>
-            <button class="btn-full ghost" id="andImportBackup">Import Backup</button>
-          </div>
-          <div class="subtext" id="andBackupInfo" style="margin-bottom:0;margin-top:10px;"></div>
-        </div>
-
-        <!-- Diagnostics -->
+        <!-- Diagnostics (Error Log; System Check lives in the App & Data menu) -->
         <div class="plain-card" id="cardDiag">
           <h3>Diagnostics</h3>
           <div class="and-btn-row" style="margin-bottom:8px;">
-            <button class="btn-full ghost" id="andSysCheck">System Check</button>
             <button class="btn-full ghost" id="andShowErrors">Error Log</button>
           </div>
           <div id="andDiagOut" style="display:none;" class="and-log"></div>
@@ -2721,11 +2874,6 @@ body.bomb-danger{background-color:#EF4444;}
           </div>
         </div>
 
-        <!-- HTML management (native-owned actions) -->
-        <div class="plain-card">
-          <h3>HTML App Management</h3>
-          <div class="subtext" style="margin-top:0;"><b>Import HTML</b> and <b>Restore Bundled App</b> are owned by the Android shell itself (with their own typed confirmations) and are available from the Android app menu (&#8942;) in the top bar. They intentionally cannot be triggered from inside the HTML, so a broken import can never lock you out.</div>
-        </div>
       </div>
     </div>
 
@@ -14845,31 +14993,69 @@ function andSyncToastFlag(){
   AND.call('setFlag', 'nativeToastsEnabled', STATE.settings.toastsEnabled !== false);
 }
 async function andMirrorToNative(){
-  if(!AND.on || !STATE || andMirrorBusy || !AND.has('saveData')) return;
+  if(!AND.on || !STATE || !AND.has('saveData')) return false;
+  if(andMirrorBusy) return true; // a fresh mirror is already in flight
   andMirrorBusy = true;
   try{
     const [tasks, sessions, timeline] = await Promise.all([idbAll('tasks'), idbAll('sessions'), idbAll('timeline')]);
     AND.call('saveData', 'gt_backup', JSON.stringify({ v:1, savedAt:Date.now(), state:STATE, tasks, sessions, timeline }));
-  }catch(e){ console.warn('[android] mirror failed', e); }
+    return true;
+  }catch(e){ console.warn('[android] mirror failed', e); return false; }
   finally{ andMirrorBusy = false; }
 }
+// v4.11: pure validation gate for a mirror snapshot (exposed for the test suite).
+// Returns null when the snapshot is safe to apply, otherwise a user-facing reason.
+function gtValidateSnap(snap){
+  if(!snap || typeof snap!=='object') return 'file contains no Goal Tracker data';
+  if(!snap.state || typeof snap.state!=='object') return 'backup has no valid app state';
+  if(!snap.state.settings || typeof snap.state.settings!=='object') return 'backup state has no settings';
+  for(const k of ['tasks','sessions','timeline']){
+    if(snap[k]!==undefined && (!Array.isArray(snap[k]) || snap[k].some(x=>!x || typeof x!=='object'))) return 'backup field "'+k+'" is corrupt';
+  }
+  return null;
+}
+window.gtValidateSnap = gtValidateSnap;
 async function andRestoreFromNative(){
   const snap = AND.json('loadData', null, 'gt_backup');
-  if(!snap || !snap.state){ showToast('Backup restored, but no Goal Tracker data was found inside it.'); return; }
+  // v4.11: verify BEFORE touching anything — a bad file must say so, never
+  // overwrite working data (the old code cleared the database first).
+  const invalid = gtValidateSnap(snap);
+  if(invalid){ showToast('Import failed: '+invalid); return false; }
+  // Keep an in-memory copy of the current data as an automatic rollback point.
+  let old = null;
+  try{ old = { tasks: await idbAll('tasks'), sessions: await idbAll('sessions'), timeline: await idbAll('timeline'), meta: await idbAll('meta') }; }catch(e){}
   try{
     RESETTING = true; // freeze the background recovery loop during the swap
-    await idbClear('tasks'); await idbClear('sessions'); await idbClear('timeline'); invalidateTimelineCache();
+    await idbClear('tasks'); await idbClear('sessions'); await idbClear('timeline');
+    invalidateTimelineCache();
     for(const t of (snap.tasks||[])) await idbPut('tasks', t);
     for(const s of (snap.sessions||[])) await idbPut('sessions', s);
     for(const e of (snap.timeline||[])) await idbPut('timeline', e);
     await idbPut('meta', snap.state);
     showToast('Backup restored — reloading…');
     setTimeout(()=>location.reload(), 600);
+    return true;
   }catch(e){
+    // Roll back to the pre-import data so a mid-restore failure can never
+    // leave the app half-broken.
+    try{
+      if(old){
+        await idbClear('tasks'); await idbClear('sessions'); await idbClear('timeline');
+        for(const t of old.tasks||[]) await idbPut('tasks', t);
+        for(const s of old.sessions||[]) await idbPut('sessions', s);
+        for(const tl of old.timeline||[]) await idbPut('timeline', tl);
+        for(const m of old.meta||[]) await idbPut('meta', m);
+      }
+      invalidateTimelineCache();
+    }catch(e2){ console.warn('[android] restore rollback failed', e2); }
     RESETTING = false;
-    showToast('Restore failed: '+(e && e.message ? e.message : 'unknown error'));
+    showToast('Import failed: '+(e && e.message ? e.message : 'unknown error'));
+    return false;
   }
 }
+// Exposed explicitly for the test suite (and robust against scoping changes).
+window.andRestoreFromNative = andRestoreFromNative;
+window.andMirrorToNative = andMirrorToNative;
 
 // Opens the Pomodoro-Log reflection popup exactly as if the user tapped the "+" for the
 // completed session: navigate to History → Study Task Progress, expand that task's log,
@@ -15027,6 +15213,54 @@ window.onAndroidEvent = function(name, payload){
 
 /* ---- Application Settings page ---- */
 function andStatusPill(ok, yes, no){ return '<span class="and-pill '+(ok?'ok':'bad')+'">'+(ok?yes:no)+'</span>'; }
+// Display Size (v4.11): a 1–10 level picker. Level 6 = the app's normal size
+// (byte-identical to the pre-setting layout); each level is ~8% apart.
+function andDisplaySizeLabel(level){
+  const n = parseInt(level, 10);
+  if(n === 6) return 'Level 6 — Normal: exactly the size the app has always been (as if this setting never existed).';
+  const scale = window.gtDisplaySize ? gtDisplaySize.scaleOf(String(n)) : Math.pow(1.08, n - 6);
+  const pct = Math.round(Math.abs(1 - scale) * 100);
+  const dir = scale < 1 ? 'smaller' : 'larger';
+  return 'Level ' + n + ' — ' + pct + '% ' + dir + ' than normal.' + (n === 2 ? ' (This is the app\u2019s default.)' : '');
+}
+function andSyncDisplaySizeDesc(){
+  const d = document.getElementById('andDisplaySizeDesc');
+  const s = document.getElementById('andDisplaySize');
+  if(d && s) d.textContent = andDisplaySizeLabel(s.value);
+}
+// v4.11 on-device debug readout for the Display Size scale chain (kept
+// permanently by request): level -> computed scale -> viewport meta -> actual
+// rendered viewport -> native WebView settings (useWideViewPort /
+// loadWithOverviewMode / textZoom). The 'applied' marker compares the computed
+// scale with visualViewport.scale so a screenshot shows at a glance whether
+// the WebView honored the requested scale.
+function andRenderDsDebug(){
+  const box = document.getElementById('dsDebug');
+  if(!box) return;
+  const g = window.gtDisplaySize;
+  if(!g){ box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  const level = String(g.get());
+  const s = g.scaleOf(level);
+  const metaEl = document.querySelector('meta[name="viewport"]');
+  const vv = window.visualViewport;
+  const sR = Math.round(s * 1000) / 1000;
+  const vvR = vv ? Math.round(vv.scale * 1000) / 1000 : null;
+  const marker = vvR === null ? '' : (Math.abs(vvR - sR) <= 0.01 ? '  applied \u2713' : '  NOT APPLIED \u2717');
+  const lines = [
+    'level=' + level + '  scale=' + sR + (level === '6' ? ' (baseline)' : ''),
+    'meta: ' + (metaEl ? metaEl.getAttribute('content') : '-'),
+    'innerWidth=' + Math.round(window.innerWidth) + '  vv.scale=' + (vvR === null ? 'n/a' : vvR) + marker,
+    'screen=' + (window.screen ? window.screen.width + 'x' + window.screen.height : '?') + '  dpr=' + window.devicePixelRatio,
+  ];
+  const d = AND.json('getDiagnostics', null);
+  if(d){
+    lines.push('native: level=' + (d.displayScale || '?') + '  wideVP=' + d.useWideViewPort + '  overview=' + d.loadWithOverviewMode + '  textZoom=' + d.textZoom + '  fontScale=' + d.fontScale);
+  } else {
+    lines.push('native: (no bridge)');
+  }
+  box.textContent = lines.join('\n');
+}
 function andRenderSettings(){
   const noBridge = document.getElementById('andNoBridge');
   const ui = document.getElementById('andBridgeUI');
@@ -15073,6 +15307,15 @@ function andRenderSettings(){
   if(sessionDur) sessionDur.value = String(SOUND_DURATION_CHOICES.includes(cfg.sessionSoundDurationSec) ? cfg.sessionSoundDurationSec : 60);
   if(taskDur) taskDur.value = String(SOUND_DURATION_CHOICES.includes(cfg.taskSoundDurationSec) ? cfg.taskSoundDurationSec : 60);
   if(bombDur) bombDur.value = String(SOUND_DURATION_CHOICES.includes(cfg.bombSoundDurationSec) ? cfg.bombSoundDurationSec : 60);
+  // Display Size — the head viewport engine is the authority; this only reports it.
+  const dsSel = document.getElementById('andDisplaySize');
+  if(dsSel){
+    dsSel.value = window.gtDisplaySize ? gtDisplaySize.get() : '2';
+    andSyncDisplaySizeDesc();
+    andRenderDsDebug();
+    const dsCard = document.getElementById('cardDisplaySize');
+    if(dsCard) dsCard.style.opacity = (window.gtDisplaySize && gtDisplaySize.isNative()) ? '' : '.45';
+  }
   // Capability-gated cards
   document.getElementById('cardAlarms').style.opacity = AND.has('scheduleAlarm') ? '' : '.45';
   document.getElementById('rowVibrate').classList.toggle('disabled', !navigator.vibrate);
@@ -15140,6 +15383,17 @@ function andBindSettings(){
       AND.call('showToast', 'Native toast test.');
     };
   }
+  // Display Size — applied instantly by the head viewport engine (gtDisplaySize);
+  // the native wrapper only persists the choice (setDisplayScale).
+  if(el('andDisplaySize')){
+    el('andDisplaySize').onchange = ()=>{
+      if(window.gtDisplaySize) gtDisplaySize.set(el('andDisplaySize').value);
+      andSyncDisplaySizeDesc();
+      andRenderDsDebug();
+      setTimeout(andRenderDsDebug, 450); // re-read after the resize reflow settles
+      showToast('Display size updated.');
+    };
+  }
   // Two independent completion alarm sound slots. Bomb keeps its dedicated slot below.
   const bindSoundSlot = (slot, prefix, cfgKey, label)=>{
     el(prefix+'Pick').onclick = ()=> el(prefix+'File').click();
@@ -15185,18 +15439,22 @@ function andBindSettings(){
     };
     el('andBombSoundClear').onclick = ()=>{ SoundController.stop(); AND.call('clearNamedSound', 'bombwarn'); showToast('Custom bomb sound removed.'); andRenderSettings(); };
   }
-  // Backup — mirror the freshest data right before opening the native picker
-  el('andExportBackup').onclick = async ()=>{ await andMirrorToNative(); AND.call('exportBackup'); };
-  el('andImportBackup').onclick = ()=> AND.call('importBackup'); // native owns the picker + confirmation; backupRestored event completes the flow
-  // Diagnostics
+  // App & Data menu (v4.11 — replaces the removed three-dot top-bar menu).
+  // The native side owns every confirmation dialog + file picker behind these rows.
+  if(el('andMnuRefresh')) el('andMnuRefresh').onclick = ()=> AND.call('refreshApp');
+  if(el('andMnuImportData')) el('andMnuImportData').onclick = ()=> AND.call('importBackup'); // native confirm + picker; backupRestored event completes the flow
+  if(el('andMnuExportData')) el('andMnuExportData').onclick = async ()=>{
+    const ok = await andMirrorToNative(); // freshest state into the mirror first
+    if(ok === false){ showToast('Export failed: current data could not be read.'); return; }
+    AND.call('exportBackup');
+  };
+  if(el('andMnuInstallHtml')) el('andMnuInstallHtml').onclick = ()=> AND.call('importHtmlFile');
+  if(el('andMnuSaveHtml')) el('andMnuSaveHtml').onclick = ()=> AND.call('exportCurrentHtml');
+  if(el('andMnuFactoryReset')) el('andMnuFactoryReset').onclick = ()=> AND.call('factoryResetUserData');
+  if(el('andMnuSysCheck')) el('andMnuSysCheck').onclick = ()=> AND.call('systemCheck');
+  // Diagnostics — Error Log only (System Check moved into the App & Data menu)
   const out = el('andDiagOut'), acts = el('andDiagActions');
   let diagMode = null;
-  el('andSysCheck').onclick = ()=>{
-    const d = AND.json('getDiagnostics', {});
-    out.innerHTML = Object.keys(d).map(k=>'<div class="le"><span class="lw">'+escapeHtml(k)+'</span>: '+escapeHtml(typeof d[k]==='object'? JSON.stringify(d[k]) : String(d[k]))+'</div>').join('') || 'No diagnostics available.';
-    out.style.display='block'; acts.style.display='flex'; diagMode='diag';
-    el('andClearErrors').style.display='none';
-  };
   // Format a native error-log timestamp (epoch ms from System.currentTimeMillis) into a
   // readable local date + time. Falls back to the raw value if it isn't a usable number.
   const fmtLogTime = (at)=>{
