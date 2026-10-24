@@ -51,15 +51,22 @@ class JsBridge(private val activity: MainActivity) {
         // auto-stops. Short source clips are looped to fill this window.
         const val RING_DURATION_MS = 60_000L
 
-        // v4.11: app-owned Display Size. The wrapper only persists the level;
+        // v4.12: app-owned Display Size. The wrapper only persists the level;
         // the HTML applies it before first paint via the viewport meta (see the
-        // "Display Size engine" script in index.html). Levels are "1".."10"
-        // (6 = the app's normal size, default = "2", ~8% per step). Values are
+        // "Display Size engine" script in index.html). Levels are "1".."9"
+        // (8 = the app's normal size, default = "5", ~8% per step). Values are
         // whitelisted because the bridge input is untrusted JavaScript.
         const val DISPLAY_SCALE_KEY = "displayScale"
-        const val DISPLAY_SCALE_DEFAULT = "2"
-        val DISPLAY_SCALE_LEVELS = (1..10).map { it.toString() }.toSet()
-        // Values written by the earlier 4-size test build — migrated, never lost.
+        const val DISPLAY_SCALE_DEFAULT = "5"
+        val DISPLAY_SCALE_LEVELS = (1..9).map { it.toString() }.toSet()
+        // v4.12 scheme marker: a stored level WITHOUT this marker was written by
+        // v4.11's 1–10 numbering (6 = normal) and is migrated once at read time
+        // (shift +2, old 8/9/10 clamp to "9") so every stored choice keeps its
+        // exact visual size. With the marker present the value is used as-is.
+        const val DISPLAY_SCALE_SCHEME_KEY = "displayScaleScheme"
+        const val DISPLAY_SCALE_SCHEME = "2"
+        // Values written by the earlier 4-size test build — old-scheme numbers,
+        // migrated through the same +2 shift at read time.
         val DISPLAY_SCALE_LEGACY = mapOf(
             "xsmall" to "4", "small" to "6", "medium" to "7", "large" to "8"
         )
@@ -507,18 +514,33 @@ class JsBridge(private val activity: MainActivity) {
     @JavascriptInterface
     fun getAllFlags(): String = safe("getAllFlags", "{}") { Flags.all(activity) }
 
-    // ---------------- Display scale (v4.11: app-owned UI size) ----------------
+    // ---------------- Display scale (v4.12: app-owned UI size) ----------------
     // The HTML renders itself at this scale (viewport rewrite in its head); the
     // wrapper owns persistence only, so the choice survives HTML reloads and
     // app restarts even though the setting is managed from the HTML settings UI.
-    // Known values: "xsmall", "small" (default), "medium", "large".
+    // Known values: "1".."9" ("8" = normal, default "5"). Values stored by the
+    // v4.11 1–10 scheme are migrated once, guarded by the scheme marker.
 
     @JavascriptInterface
     fun getDisplayScale(): String = safe("getDisplayScale", DISPLAY_SCALE_DEFAULT) {
-        val raw = Flags.getString(activity, DISPLAY_SCALE_KEY, DISPLAY_SCALE_DEFAULT)
-            .trim().lowercase()
-        val migrated = DISPLAY_SCALE_LEGACY[raw] ?: raw
-        if (migrated in DISPLAY_SCALE_LEVELS) migrated else DISPLAY_SCALE_DEFAULT
+        val raw = Flags.getString(activity, DISPLAY_SCALE_KEY, "").trim().lowercase()
+        val scheme = Flags.getString(activity, DISPLAY_SCALE_SCHEME_KEY, "")
+        if (scheme == DISPLAY_SCALE_SCHEME) {
+            if (raw in DISPLAY_SCALE_LEVELS) raw else DISPLAY_SCALE_DEFAULT
+        } else {
+            // One-time migration from v4.11's 1–10 numbering (or the 4-size
+            // build): +2 preserves the rendered size; old 8/9/10 clamp to "9".
+            val oldLevel = DISPLAY_SCALE_LEGACY[raw] ?: raw
+            val n = oldLevel.toIntOrNull()
+            val migrated = if (n != null && n in 1..10) {
+                minOf(9, n + 2).toString()
+            } else {
+                DISPLAY_SCALE_DEFAULT
+            }
+            if (raw.isNotEmpty()) Flags.setString(activity, DISPLAY_SCALE_KEY, migrated)
+            Flags.setString(activity, DISPLAY_SCALE_SCHEME_KEY, DISPLAY_SCALE_SCHEME)
+            migrated
+        }
     }
 
     @JavascriptInterface
@@ -527,6 +549,7 @@ class JsBridge(private val activity: MainActivity) {
             val v = size.trim().lowercase()
             if (v in DISPLAY_SCALE_LEVELS) {
                 Flags.setString(activity, DISPLAY_SCALE_KEY, v)
+                Flags.setString(activity, DISPLAY_SCALE_SCHEME_KEY, DISPLAY_SCALE_SCHEME)
             } else {
                 ErrorLog.log(activity, "setDisplayScale", "rejected unknown value: $size")
             }
@@ -812,7 +835,7 @@ class JsBridge(private val activity: MainActivity) {
     // ---------------- Misc ----------------
 
     @JavascriptInterface
-    fun getShellVersion(): String = "4.11"
+    fun getShellVersion(): String = "4.12"
 
     // ---------------- Manual fallback ----------------
 

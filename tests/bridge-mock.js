@@ -15,18 +15,29 @@ function makeBridge(win, opts = {}) {
   const rec = (name, args) => calls.push([name, ...args]);
   const now = () => Date.now();
 
-  // Display scale (v4.11): string-persisted like the native Flags store.
-  // Shared across page reloads by the caller (opts.displayScale) so a
-  // "WebView reload" test behaves like the real device. Mirrors native:
-  // levels "1".."10", default "2", legacy 4-size values migrated at read.
-  const DISPLAY_SCALE_LEVELS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
-  const DISPLAY_SCALE_DEFAULT = '2';
+  // Display scale (v4.12): mirrors native JsBridge exactly. The store is
+  // { value, scheme }, shared across page reloads by the caller
+  // (opts.displayScale), so a "WebView reload" test behaves like the device.
+  // A store WITHOUT scheme === '2' holds a v4.11 1–10 level (or a 4-size
+  // name) and is migrated once at read (+2, clamp 9) — same as native.
+  const DISPLAY_SCALE_LEVELS = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const DISPLAY_SCALE_DEFAULT = '5';
+  const DISPLAY_SCALE_SCHEME = '2';
   const DISPLAY_SCALE_LEGACY = { xsmall: '4', small: '6', medium: '7', large: '8' };
-  const displayScale = opts.displayScale || { value: opts.initialDisplayScale || DISPLAY_SCALE_DEFAULT };
+  const displayScale = opts.displayScale || { value: opts.initialDisplayScale || DISPLAY_SCALE_DEFAULT, scheme: DISPLAY_SCALE_SCHEME };
   const normalizeLevel = (v) => {
-    let s = String(v == null ? '' : v).trim().toLowerCase();
-    if (DISPLAY_SCALE_LEGACY[s]) s = DISPLAY_SCALE_LEGACY[s];
+    const s = String(v == null ? '' : v).trim();
     return DISPLAY_SCALE_LEVELS.includes(s) ? s : null;
+  };
+  const migrateDisplayScale = () => {
+    if (displayScale.scheme === DISPLAY_SCALE_SCHEME) return;
+    const stored = String(displayScale.value == null ? '' : displayScale.value).trim();
+    let raw = stored.toLowerCase();
+    if (DISPLAY_SCALE_LEGACY[raw]) raw = DISPLAY_SCALE_LEGACY[raw];
+    const n = parseInt(raw, 10);
+    const ok = String(n) === raw && n >= 1 && n <= 10;
+    if (stored !== '') displayScale.value = ok ? String(Math.min(9, n + 2)) : DISPLAY_SCALE_DEFAULT;
+    displayScale.scheme = DISPLAY_SCALE_SCHEME;
   };
 
   const bridge = {
@@ -34,16 +45,16 @@ function makeBridge(win, opts = {}) {
     __flags: flags,
     __storage: storage,
 
-    getShellVersion: () => '4.11',
+    getShellVersion: () => '4.12',
     getFlag: (k, d) => (Object.prototype.hasOwnProperty.call(flags, k) ? flags[k] : d),
     setFlag: (k, v) => { flags[k] = v; rec('setFlag', [k, v]); return true; },
     getAllFlags: () => JSON.stringify(flags),
 
-    // Mirrors native JsBridge: level whitelist in, "2" out, unknown rejected.
-    getDisplayScale: () => normalizeLevel(displayScale.value) || DISPLAY_SCALE_DEFAULT,
+    // Mirrors native JsBridge: level whitelist in, default out, unknown rejected.
+    getDisplayScale: () => { migrateDisplayScale(); return normalizeLevel(displayScale.value) || DISPLAY_SCALE_DEFAULT; },
     setDisplayScale: (v) => {
       const s = normalizeLevel(v);
-      if (s) { displayScale.value = s; rec('setDisplayScale', [s]); }
+      if (s) { displayScale.value = s; displayScale.scheme = DISPLAY_SCALE_SCHEME; rec('setDisplayScale', [s]); }
       else rec('setDisplayScale.rejected', [String(v)]);
     },
 
@@ -88,7 +99,7 @@ function makeBridge(win, opts = {}) {
 
     getErrorLog: () => '[]',
     clearErrorLog: () => true,
-    getDiagnostics: () => JSON.stringify({ shellVersion: '4.11', notificationsAllowed: true, exactAlarmsAllowed: true, displayScale: (normalizeLevel(displayScale.value) || DISPLAY_SCALE_DEFAULT), useWideViewPort: true, loadWithOverviewMode: true, textZoom: 100, fontScale: 1 }),
+    getDiagnostics: () => JSON.stringify({ shellVersion: '4.12', notificationsAllowed: true, exactAlarmsAllowed: true, displayScale: (migrateDisplayScale(), normalizeLevel(displayScale.value) || DISPLAY_SCALE_DEFAULT), useWideViewPort: true, loadWithOverviewMode: true, textZoom: 100, fontScale: 1 }),
 
     exportBackup: () => rec('exportBackup', []),
     importBackup: () => rec('importBackup', []),

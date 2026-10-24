@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <script>
-/* ===== Display Size engine (v4.11) — app-owned visual scale ================
-   A 1–10 level picker: level 6 renders EXACTLY like the app before this setting
+/* ===== Display Size engine (v4.12) — app-owned visual scale ================
+   A 1–9 level picker: level 8 renders EXACTLY like the app before this setting
    existed (the stock viewport meta, byte-for-byte), each level is ~8% apart
-   (level 10 ≈ +36%, level 1 ≈ −32%), and the shipped default is level 2.
+   (level 9 ≈ +8%, level 1 ≈ −42%), and the shipped default is level 5.
 
    Root cause background: Android WebView seeds its textZoom from the system
    Font size setting (Chromium AwSettings) and renders CSS px through the
@@ -25,20 +25,35 @@
    Display Size). A plain browser (no bridge) remembers the last choice in
    localStorage so development previews behave the same. */
 (function(){
-  var GT_DEFAULT_LEVEL = '2';
+  var GT_DEFAULT_LEVEL = '5';
   var GT_LEVEL_STEP = 1.08; // visual distance between two neighbouring levels
   var META_DEFAULT = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
-  // Values stored by the earlier 4-size build — migrated instead of lost.
+  // v4.12 remap: the picker went from 1–10 (6 = normal) to 1–9 (8 = normal).
+  // Every stored choice is shifted +2 ONCE so its visual size never changes
+  // (old 3 → new 5, old 1 → new 3, old 8/9/10 → new 9); the scheme marker
+  // guards that migration against running a second time.
+  var GT_LEVEL_SCHEME = '2';
+  var GT_SCHEME_LS_KEY = 'gt_displaySizeScheme';
+  // Values stored by the earlier 4-size build — old-scheme numbers, migrated below.
   var LEGACY_SIZES = { xsmall:'4', small:'6', medium:'7', large:'8' };
   var current = GT_DEFAULT_LEVEL;
 
+  // Validates a NEW-scheme (v4.12) level: an integer string in 1..9.
   function normalizeLevel(v){
+    v = String(v == null ? '' : v).trim();
+    var n = parseInt(v, 10);
+    return (String(n) === v && n >= 1 && n <= 9) ? String(n) : null;
+  }
+  // One-time OLD→NEW migration (v4.11's 1–10 numbering or the 4-size names):
+  // shift +2 and clamp at 9 so the rendered size is preserved.
+  function migrateOldLevel(v){
     v = String(v == null ? '' : v).trim().toLowerCase();
     if(LEGACY_SIZES.hasOwnProperty(v)) v = LEGACY_SIZES[v];
     var n = parseInt(v, 10);
-    return (String(n) === v && n >= 1 && n <= 10) ? String(n) : null;
+    if(String(n) !== v || n < 1 || n > 10) return null;
+    return String(Math.min(9, n + 2));
   }
-  function scaleOf(level){ return Math.pow(GT_LEVEL_STEP, parseInt(level, 10) - 6); }
+  function scaleOf(level){ return Math.pow(GT_LEVEL_STEP, parseInt(level, 10) - 8); }
 
   function bridgeLevel(){
     try{
@@ -48,7 +63,17 @@
     return null;
   }
   function localLevel(){
-    try{ return normalizeLevel(localStorage.getItem('gt_displaySize')); }catch(e){ return null; }
+    try{
+      var raw = localStorage.getItem('gt_displaySize');
+      if(raw == null) return null;
+      if(localStorage.getItem(GT_SCHEME_LS_KEY) !== GT_LEVEL_SCHEME){
+        var migrated = migrateOldLevel(raw) || GT_DEFAULT_LEVEL;
+        try{ localStorage.setItem('gt_displaySize', migrated); }catch(e){}
+        try{ localStorage.setItem(GT_SCHEME_LS_KEY, GT_LEVEL_SCHEME); }catch(e){}
+        raw = migrated;
+      }
+      return normalizeLevel(raw);
+    }catch(e){ return null; }
   }
   function readLevel(){ return bridgeLevel() || localLevel() || GT_DEFAULT_LEVEL; }
 
@@ -80,7 +105,10 @@
     },
     set: function(level){
       level = normalizeLevel(level) || GT_DEFAULT_LEVEL;
-      try{ localStorage.setItem('gt_displaySize', level); }catch(e){}
+      try{
+        localStorage.setItem('gt_displaySize', level);
+        localStorage.setItem(GT_SCHEME_LS_KEY, GT_LEVEL_SCHEME);
+      }catch(e){}
       try{
         var a = window.AndroidBridge;
         if(a && typeof a.setDisplayScale === 'function') a.setDisplayScale(level);
@@ -2737,20 +2765,19 @@ body.bomb-danger{background-color:#EF4444;}
              the alarm settings. The head viewport engine (gtDisplaySize) applies it instantly. -->
         <div class="plain-card" id="cardDisplaySize">
           <h3>Display Size</h3>
-          <div class="subtext" style="margin-top:0;">Pick how large the app looks, from 1 to 10. Level <b>6 is exactly the app's normal size</b> — as if this setting never existed. Each level is about 8% apart. The app's default is level <b>2</b>. This is the app's own scale; it does not change Android's system Display size or Font size, and it is saved inside the Android shell so it survives app restarts.</div>
+          <div class="subtext" style="margin-top:0;">Pick how large the app looks, from 1 to 9. Level <b>8 is exactly the app's normal size</b> — as if this setting never existed. Each level is about 8% apart. The app's default is level <b>5</b>. This is the app's own scale; it does not change Android's system Display size or Font size, and it is saved inside the Android shell so it survives app restarts.</div>
           <div class="and-row">
             <div class="ar-txt"><div class="ar-t1">App Display Size</div><div class="ar-t2" id="andDisplaySizeDesc">—</div></div>
             <select id="andDisplaySize" class="task-select" style="width:auto;min-width:120px;margin-bottom:0;padding:10px 12px;">
               <option value="1">Level 1 (smallest)</option>
-              <option value="2">Level 2 (default)</option>
+              <option value="2">Level 2</option>
               <option value="3">Level 3</option>
               <option value="4">Level 4</option>
-              <option value="5">Level 5</option>
-              <option value="6">Level 6 (normal)</option>
+              <option value="5">Level 5 (default)</option>
+              <option value="6">Level 6</option>
               <option value="7">Level 7</option>
-              <option value="8">Level 8</option>
-              <option value="9">Level 9</option>
-              <option value="10">Level 10 (largest)</option>
+              <option value="8">Level 8 (normal)</option>
+              <option value="9">Level 9 (largest)</option>
             </select>
           </div>
           <!-- v4.11 debug readout (kept permanently by request): proves the whole
@@ -2758,7 +2785,7 @@ body.bomb-danger{background-color:#EF4444;}
                native WebView settings). A screenshot of this block pinpoints exactly
                where scaling applies. -->
           <div id="dsDebug" style="display:none;margin-top:10px;padding:8px 10px;background:#0F0B2E;color:#8CF0C0;border-radius:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.55;word-break:break-all;white-space:pre-wrap;"></div>
-          <div class="subtext" style="margin-bottom:0;margin-top:10px;">Level 6 renders exactly like the app looked before this setting existed. Going down makes everything more compact; going up makes everything easier to read. The layout always reflows so nothing is cut off, even at the biggest level.</div>
+          <div class="subtext" style="margin-bottom:0;margin-top:10px;">Level 8 renders exactly like the app looked before this setting existed. Going down makes everything more compact; going up makes everything easier to read. The layout always reflows so nothing is cut off, even at the biggest level.</div>
         </div>
 
         <!-- Notifications -->
@@ -3343,62 +3370,26 @@ body.bomb-danger{background-color:#EF4444;}
   </div>
 </div>
 
-<!-- Delete Goal confirmation dialog — requires typing the password (default 12345) -->
-<div class="overlay center-modal" id="gsetDeleteDialog">
+<!-- ═══ SHARED typed-confirmation dialog (v4.12) ═══ ONE instance drives every
+     "type a code/word to confirm" flow: Goal delete (12345), Planner delete +
+     Delete-all-pending (12345), Reset All Data (123456789), Task restart (123)
+     and Turn off Thought Logging (THOUGHT). openSharedConfirm({...}) fills these
+     same elements with different text/input/password per flow; custom-layout
+     dialogs (Early-complete, Task delete, Bomb lock) keep their own markup. -->
+<div class="overlay center-modal" id="sharedConfirmDialog">
   <div class="dialog">
-    <div class="d-icon warn">⚠️</div>
-    <h3>Are you sure?</h3>
-    <p>Deleting this Goal permanently removes its Goal Information, Campaign Progress, Goal Streak, Status History, Extra Study Progress, and Motivation Message. This action cannot be undone.</p>
-    <input type="password" class="gdel-input" id="gsetDeletePw" placeholder="12345" maxlength="10">
+    <div class="d-icon warn" id="sharedConfirmIcon">⚠️</div>
+    <h3 id="sharedConfirmTitle">Are you sure?</h3>
+    <p id="sharedConfirmMsg"></p>
+    <input type="text" class="gdel-input" id="sharedConfirmInput" placeholder="" maxlength="10" autocomplete="off">
     <div class="d-btn-row">
-      <button class="d-btn cancel" id="gsetDeleteCancel">Cancel</button>
-      <button class="d-btn danger" id="gsetDeleteConfirm">Delete Permanently</button>
+      <button class="d-btn cancel" id="sharedConfirmCancel">Cancel</button>
+      <button class="d-btn danger" id="sharedConfirmConfirm">Confirm</button>
     </div>
   </div>
 </div>
 
-<!-- Delete Planner confirmation dialog -->
-<div class="overlay center-modal" id="plannerDeleteDialog">
-  <div class="dialog">
-    <div class="d-icon warn">⚠️</div>
-    <h3>Are you sure?</h3>
-    <p>Deleting this Planner permanently removes all its subject progress and task history. This action cannot be undone.</p>
-    <input type="text" inputmode="numeric" class="gdel-input" id="plannerDeleteConfirmCode" placeholder="12345" maxlength="5" autocomplete="off">
-    <div class="d-btn-row">
-      <button class="d-btn cancel" id="plannerDeleteCancel">Cancel</button>
-      <button class="d-btn danger" id="plannerDeleteConfirm">Delete Permanently</button>
-    </div>
-  </div>
-</div>
-
-<!-- Reset All Data confirmation ����� reuses the Goal-delete dialog shell; requires typing 123456789 -->
-<div class="overlay center-modal" id="resetConfirmDialog">
-  <div class="dialog">
-    <div class="d-icon warn">⚠️🔵</div>
-    <h3>Reset All Data</h3>
-    <p>This action will permanently delete all tasks, history, goals, settings, streaks, statistics, and every saved value.<br><br>This action cannot be undone.</p>
-    <input type="text" inputmode="numeric" class="gdel-input" id="resetConfirmCode" placeholder="123456789" maxlength="9" autocomplete="off">
-    <div class="d-btn-row">
-      <button class="d-btn cancel" id="resetConfirmCancel">Cancel</button>
-      <button class="d-btn danger" id="resetConfirmDelete">Reset</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- Restart Task Progress confirmation — same compact shell as Reset All Data; requires typing 123 -->
-<div class="overlay center-modal" id="taskRestartDialog">
-  <div class="dialog">
-    <div class="d-icon warn">⚠️</div>
-    <h3>Restart Task Progress?</h3>
-    <p>This will reset all progress for this task and start it from the beginning.<br><br>To confirm, type:<br><b>123</b></p>
-    <input type="text" inputmode="numeric" class="gdel-input" id="taskRestartCode" placeholder="123" maxlength="3" autocomplete="off">
-    <div class="d-btn-row">
-      <button class="d-btn cancel" id="taskRestartCancel">Cancel</button>
-      <button class="d-btn danger" id="taskRestartConfirm">Restart</button>
-    </div>
-  </div>
-</div>
+<!-- Reset All Data confirmation - now handled by the shared typed-confirm dialog (type 123456789). -->
 
 <!-- Mark-as-Completed-Early confirmation — reuses the shared typed-confirm dialog shell (same as
      Reset / Restart / Time Inconsistency). Opened from the View/Info icon on a started activity.
@@ -10660,7 +10651,6 @@ let editingPendingId = null; // Planner Pending item being edited in the shared 
 let creatingPending = false;
 let plannerDetailMode = 'subject';
 let planDetailSortMode = 'oldest';
-let pendingDeleteAllConfirm = false;
 
 function plannerChapters(){
   if(!STATE) return [];
@@ -11779,16 +11769,86 @@ document.getElementById('histTasksArea').addEventListener('click', async (e)=>{
     const at2 = STATE.activeTimer;
     if(at2 && at2.type!=='bomb' && at2.taskId===id){ showToast('Stop this task first, then restart it.'); return; }
     pendingRestartId = id;
-    document.getElementById('taskRestartCode').value = '';
-    document.getElementById('taskRestartDialog').classList.add('show');
+    openSharedConfirm({
+      icon:'⚠️',
+      title:'Restart Task Progress?',
+      message:'This will reset all progress for this task and start it from the beginning.<br><br>To confirm, type:<br><b>123</b>',
+      inputMode:'numeric', placeholder:'123', maxlength:3,
+      confirmText:'Restart', confirmStyle:'danger',
+      validate: v => v.trim() === '123',
+      onCancel: ()=>{ pendingRestartId = null; },
+      onConfirm: async ()=>{ await restartTaskAfterConfirm(); }
+    });
   }
 });
-// Restart Task Progress — same compact typed-confirmation flow as Goal Reset / Reset All Settings ("123")
+/* ============ SHARED TYPED-CONFIRM DIALOG (v4.12) ============
+   ONE instance drives every "type a code/word to confirm" flow:
+   Goal delete (12345), Planner delete + Delete-all-pending (12345),
+   Reset All Data (123456789), Task restart (123) and Turn off Thought
+   Logging (THOUGHT). openSharedConfirm() fills the same
+   #sharedConfirmDialog elements with different text/input/password;
+   custom-layout dialogs (Early-complete, Task delete, Bomb lock) keep
+   their own markup. */
+const SHARED_CONFIRM = { validate:null, mismatchToast:null, onConfirm:null, onCancel:null, filter:null, liveEnable:false };
+function openSharedConfirm(opts){
+  const dlg = document.getElementById('sharedConfirmDialog');
+  if(!dlg) return;
+  opts = opts || {};
+  SHARED_CONFIRM.validate = typeof opts.validate === 'function' ? opts.validate : (v => !!String(v).trim());
+  SHARED_CONFIRM.mismatchToast = opts.mismatchToast || null;
+  SHARED_CONFIRM.onConfirm = typeof opts.onConfirm === 'function' ? opts.onConfirm : null;
+  SHARED_CONFIRM.onCancel = typeof opts.onCancel === 'function' ? opts.onCancel : null;
+  SHARED_CONFIRM.filter = typeof opts.filter === 'function' ? opts.filter : null;
+  SHARED_CONFIRM.liveEnable = opts.liveEnable === true;
+  document.getElementById('sharedConfirmIcon').textContent = opts.icon || '⚠️';
+  document.getElementById('sharedConfirmTitle').textContent = opts.title || 'Are you sure?';
+  document.getElementById('sharedConfirmMsg').innerHTML = opts.message || '';
+  const input = document.getElementById('sharedConfirmInput');
+  input.type = opts.inputType || 'text';
+  if(opts.inputMode) input.setAttribute('inputmode', opts.inputMode); else input.removeAttribute('inputmode');
+  if(opts.autocapitalize) input.setAttribute('autocapitalize', opts.autocapitalize); else input.removeAttribute('autocapitalize');
+  input.placeholder = opts.placeholder || '';
+  input.maxLength = Number.isFinite(Number(opts.maxlength)) ? Number(opts.maxlength) : 10;
+  input.value = '';
+  const confirmBtn = document.getElementById('sharedConfirmConfirm');
+  confirmBtn.textContent = opts.confirmText || 'Confirm';
+  confirmBtn.className = 'd-btn ' + (opts.confirmStyle || 'danger');
+  confirmBtn.disabled = SHARED_CONFIRM.liveEnable;
+  confirmBtn.style.opacity = SHARED_CONFIRM.liveEnable ? '.45' : '1';
+  dlg.classList.add('show');
+  try{ input.focus(); }catch(e){}
+}
+function closeSharedConfirm(runCancel){
+  const dlg = document.getElementById('sharedConfirmDialog');
+  if(dlg) dlg.classList.remove('show');
+  const onCancel = SHARED_CONFIRM.onCancel;
+  SHARED_CONFIRM.validate = null; SHARED_CONFIRM.mismatchToast = null;
+  SHARED_CONFIRM.onConfirm = null; SHARED_CONFIRM.onCancel = null;
+  SHARED_CONFIRM.filter = null; SHARED_CONFIRM.liveEnable = false;
+  if(runCancel && onCancel){ try{ onCancel(); }catch(e){ console.error('sharedConfirm cancel failed', e); } }
+}
+document.getElementById('sharedConfirmInput')?.addEventListener('input', function(){
+  if(!SHARED_CONFIRM.liveEnable) return;
+  if(SHARED_CONFIRM.filter) this.value = SHARED_CONFIRM.filter(this.value);
+  const ok = SHARED_CONFIRM.validate ? SHARED_CONFIRM.validate(this.value) : !!this.value;
+  const btn = document.getElementById('sharedConfirmConfirm');
+  btn.disabled = !ok; btn.style.opacity = ok ? '1' : '.45';
+});
+document.getElementById('sharedConfirmCancel')?.addEventListener('click', ()=> closeSharedConfirm(true));
+document.getElementById('sharedConfirmConfirm')?.addEventListener('click', async ()=>{
+  const input = document.getElementById('sharedConfirmInput');
+  let v = String(input.value);
+  if(SHARED_CONFIRM.filter){ v = SHARED_CONFIRM.filter(v); input.value = v; }
+  if(!SHARED_CONFIRM.validate || !SHARED_CONFIRM.validate(v)){
+    if(SHARED_CONFIRM.mismatchToast) showToast(SHARED_CONFIRM.mismatchToast);
+    return;
+  }
+  const onConfirm = SHARED_CONFIRM.onConfirm;
+  if(onConfirm){ try{ await onConfirm(v); }catch(e){ console.error('sharedConfirm action failed', e); } }
+  closeSharedConfirm(false);
+});
 let pendingRestartId = null;
-document.getElementById('taskRestartCancel').onclick = ()=>{ document.getElementById('taskRestartDialog').classList.remove('show'); pendingRestartId=null; };
-document.getElementById('taskRestartConfirm').onclick = async ()=>{
-  if(document.getElementById('taskRestartCode').value.trim()!=='123') return; // must type exactly "123"
-  document.getElementById('taskRestartDialog').classList.remove('show');
+async function restartTaskAfterConfirm(){
   const task = pendingRestartId!=null ? CACHED_TASKS.find(t=>t.id===pendingRestartId) : null;
   const id = pendingRestartId; pendingRestartId = null;
   if(!task) return;
@@ -11804,7 +11864,7 @@ document.getElementById('taskRestartConfirm').onclick = async ()=>{
   showToast('Task restarted from the beginning.');
   await renderHistTasks();
   render();
-};
+}
 /* ============ MARK ACTIVITY AS COMPLETED EARLY ============ */
 // Opened from the View/Info icon on a started Today activity. Reuses the shared typed-confirm dialog
 // shell; requires typing DONE. On confirm it finalizes the activity as Completed and trims its
@@ -12246,20 +12306,44 @@ function renderThoughtCategorySettings(){
 function markThoughtCategoryDeleted(id){const d=getThoughtSettingsDraft().find(c=>c.id===String(id));if(!d)return;d.active=false;d.pendingDelete=true;d.deleteAfterWakeKey=nextThoughtWakeKey();renderThoughtCategorySettings();}
 function restoreThoughtCategory(id){const d=getThoughtSettingsDraft().find(c=>c.id===String(id));if(!d)return;const active=getThoughtSettingsDraft().filter(c=>c.active&&!c.pendingDelete);d.active=true;d.pendingDelete=false;d.deleteAfterWakeKey=null;d.order=active.length;renderThoughtCategorySettings();}
 function updateThoughtDraftName(id,value){const d=getThoughtSettingsDraft().find(c=>c.id===String(id));if(d)d.name=value.slice(0,32);}
-function reorderThoughtDraft(dragId,targetId){const draft=getThoughtSettingsDraft();const active=draft.filter(c=>c.active).sort((a,b)=>a.order-b.order);const from=active.findIndex(c=>c.id===dragId),to=active.findIndex(c=>c.id===targetId);if(from<0||to<0||from===to)return;const [item]=active.splice(from,1);active.splice(to,0,item);active.forEach((c,i)=>c.order=i);const inactive=draft.filter(c=>!c.active);inactive.forEach((c,i)=>c.order=10000+i);THOUGHT_SETTINGS_DRAFT=[...active,...inactive];renderThoughtCategorySettings();}
-async function saveThoughtCategorySettings(){
+function reorderThoughtDraft(dragId,targetId){const draft=getThoughtSettingsDraft();const active=draft.filter(c=>c.active).sort((a,b)=>a.order-b.order);const from=active.findIndex(c=>c.id===dragId),to=active.findIndex(c=>c.id===targetId);if(from<0||to<0||from===to)return;const [item]=active.splice(from,1);active.splice(to,0,item);active.forEach((c,i)=>c.order=i);const inactive=draft.filter(c=>!c.active);inactive.forEach((c,i)=>c.order=10000+i);THOUGHT_SETTINGS_DRAFT=[...active,...inactive];renderThoughtCategorySettings();}async function saveThoughtCategorySettings(){
   const state=await getState(),draft=getThoughtSettingsDraft().map(c=>({...c}));
   const seen=new Set();for(const c of draft){c.name=String(c.name||'').trim();if(c.active&&!c.name){showToast('Category names cannot be empty.');return;}if(c.active){const k=c.name.toLowerCase();if(seen.has(k)){showToast('Thought category names must be unique.');return;}seen.add(k);}}
-  const oldMeta=Array.isArray(state.settings.thoughtCategoryMeta)?state.settings.thoughtCategoryMeta:[];const byId=new Map(oldMeta.map(c=>[String(c.id),{...c}]));
+  const oldMeta=Array.isArray(state.settings.thoughtCategoryMeta)?state.settings.thoughtCategoryMeta:[];
+  const byId=new Map(oldMeta.map(c=>[String(c.id),{...c}]));
   draft.forEach((c,i)=>{const old=byId.get(c.id)||{};byId.set(c.id,{id:c.id,name:c.name,active:c.active!==false,order:c.active?i:(old.order??10000+i),pendingDelete:c.pendingDelete===true,deleteAfterWakeKey:c.pendingDelete?(c.deleteAfterWakeKey||nextThoughtWakeKey()):null});});
   const finalMeta=[...byId.values()];
   // Deleted categories remain archived (active=false) so historical IDs and Goal counts survive.
-  state.settings.thoughtCategoryMeta=finalMeta;syncLegacyThoughtCategoryNames(state.settings);
-  state.settings.thoughtsEnabled = THOUGHT_SETTINGS_ENABLED_DRAFT!==false;
-  await saveState(state);THOUGHT_SETTINGS_DRAFT=null;THOUGHT_SETTINGS_ENABLED_DRAFT=null;
-  renderThoughtCategorySettings();renderThoughtLogger();renderHistoryThoughtReader();renderGoalThoughtReader();
-  const sub=document.getElementById('thoughtLaunchSub');if(sub)sub.textContent=(state.settings.thoughtsEnabled!==false?'On':'Off')+' · '+state.settings.thoughtCategories.length+' categories';
-  showToast('Thought settings saved.');
+  const wantEnabled = THOUGHT_SETTINGS_ENABLED_DRAFT!==false;
+  // v4.12: turning the feature OFF is gated — the shared typed-confirm dialog
+  // must see the word THOUGHT before anything is committed (popup appears on
+  // Save, not on the toggle itself). Saved records are NEVER deleted here: the
+  // feature is only hidden everywhere + new logging paused.
+  const turningOff = state.settings.thoughtsEnabled!==false && !wantEnabled;
+  const commitThoughtSettings = async (enabled, toastMsg)=>{
+    // Re-fetch inside the commit so the confirmation dialog's open time cannot
+    // clobber background state changes that happened while it was shown.
+    const fresh = await getState();
+    fresh.settings.thoughtCategoryMeta=finalMeta;syncLegacyThoughtCategoryNames(fresh.settings);
+    fresh.settings.thoughtsEnabled = enabled;
+    await saveState(fresh);THOUGHT_SETTINGS_DRAFT=null;THOUGHT_SETTINGS_ENABLED_DRAFT=null;
+    const tg=document.getElementById('setThoughtsEnabled');if(tg)tg.checked=enabled;
+    renderThoughtCategorySettings();renderThoughtLogger();renderHistoryThoughtReader();renderGoalThoughtReader();updateThoughtCooldownUI();
+    const sub=document.getElementById('thoughtLaunchSub');if(sub)sub.textContent=(enabled!==false?'On':'Off')+' · '+fresh.settings.thoughtCategories.length+' categories';
+    showToast(toastMsg||'Thought settings saved.');
+  };
+  if(!turningOff){ await commitThoughtSettings(wantEnabled); return; }
+  openSharedConfirm({
+    icon:'⚠️',
+    title:'Turn off Thought Logging?',
+    message:'Thought Logging disappears from Home, History and Goals, and no new thoughts will be logged. <b>Your saved thought records are kept</b> — turn the feature back on any time to see them again. To confirm, type:<br><br><b>THOUGHT</b>',
+    inputType:'text', autocapitalize:'characters', placeholder:'THOUGHT', maxlength:10,
+    confirmText:'Turn Off', confirmStyle:'danger',
+    validate: v => String(v).trim().toUpperCase()==='THOUGHT',
+    mismatchToast:'Type THOUGHT to confirm.',
+    onConfirm: async ()=>{ await commitThoughtSettings(false); },
+    onCancel: ()=>{ commitThoughtSettings(true, 'Thought Logging stays ON — your other changes were saved.'); }
+  });
 }
 
 document.getElementById('thoughtCategoryList')?.addEventListener('input',e=>{const input=e.target.closest('[data-thought-cat-id]');if(input)updateThoughtDraftName(input.dataset.thoughtCatId,input.value);});
@@ -12277,7 +12361,15 @@ thoughtCategoryListEl?.addEventListener('pointermove',e=>{const d=THOUGHT_POINTE
 function finishThoughtPointerDrag(e){const d=THOUGHT_POINTER_DRAG;if(!d||d.pointerId!==e.pointerId)return;clearTimeout(d.timer);const row=thoughtCategoryListEl?.querySelector(`[data-thought-setting-id="${CSS.escape(d.id)}"]`);if(row)row.classList.remove('dragging');if(d.active){const draft=getThoughtSettingsDraft();const activeIds=[...thoughtCategoryListEl.querySelectorAll('.thought-settings-row:not(.pending-delete)')].map(r=>r.dataset.thoughtSettingId);activeIds.forEach((id,i)=>{const c=draft.find(x=>x.id===id);if(c)c.order=i;});renderThoughtCategorySettings();}THOUGHT_POINTER_DRAG=null;}
 thoughtCategoryListEl?.addEventListener('pointerup',finishThoughtPointerDrag);thoughtCategoryListEl?.addEventListener('pointercancel',finishThoughtPointerDrag);
 document.getElementById('saveThoughtSettingsBtn')?.addEventListener('click',saveThoughtCategorySettings);
-document.getElementById('setThoughtsEnabled')?.addEventListener('change',e=>{if(THOUGHT_SETTINGS_DRAFT)THOUGHT_SETTINGS_ENABLED_DRAFT=e.target.checked;});
+document.getElementById('setThoughtsEnabled')?.addEventListener('change',e=>{
+  const want=!!e.target.checked;
+  // The draft may have been cleared by an earlier Save; (re)begin it so the
+  // choice is never dropped — begin() re-syncs the checkbox from STATE, so
+  // restore the user's fresh choice right after.
+  if(!THOUGHT_SETTINGS_DRAFT) beginThoughtSettingsDraft();
+  THOUGHT_SETTINGS_ENABLED_DRAFT=want;
+  const t=document.getElementById('setThoughtsEnabled');if(t)t.checked=want;
+});
 
 /* ============ TIMER BUTTONS ============ */
 // Start button — begins a Study/Routine/Health session for the selected task.
@@ -12461,8 +12553,10 @@ document.getElementById('saveSettingsBtn').onclick = async ()=>{
     state.settings.realityCheckEnabled = false;
   }
   if(!state.settings.realityCheckEnabled) state.realityCheckPending = null;
-  const thoughtsToggleEl = document.getElementById('setThoughtsEnabled');
-  if(thoughtsToggleEl) state.settings.thoughtsEnabled = thoughtsToggleEl.checked;
+  // thoughtsEnabled is owned EXCLUSIVELY by the Thought Logger page's Save flow
+  // (gated by the typed THOUGHT confirmation in the shared dialog). This general
+  // settings save deliberately does NOT write it — otherwise an unconfirmed
+  // toggle could leak through this path.
   state.settings.thoughtCategories = Array.isArray(state.settings.thoughtCategories) && state.settings.thoughtCategories.length
     ? state.settings.thoughtCategories.slice() : [...DEFAULT_SETTINGS.thoughtCategories];
   state.settings.bombChallengeMode = bombModeEnabled;
@@ -12775,48 +12869,33 @@ document.getElementById('plannerOverlay').addEventListener('click', (e)=>{
   if(e.target.id === 'plannerOverlay') e.target.classList.remove('show');
 });
 
-// Delete Planner Button
+// Delete Planner Button — confirmation via the shared typed-confirm dialog
 document.getElementById('plannerDeleteBtn').addEventListener('click', ()=>{
-  pendingDeleteAllConfirm=false;
   if(editingPlannerIndex === null) return;
   const planner = STATE.planners[editingPlannerIndex];
   if(!planner) return;
-  document.getElementById('plannerDeleteConfirmCode').value = '';
-  document.getElementById('plannerDeleteDialog').classList.add('show');
+  openSharedConfirm({
+    icon:'⚠️',
+    title:'Are you sure?',
+    message:'Deleting this Planner permanently removes all its subject progress and task history. This action cannot be undone.',
+    inputMode:'numeric', placeholder:'12345', maxlength:5,
+    confirmText:'Delete Permanently', confirmStyle:'danger',
+    validate: v => v.trim() === '12345',
+    mismatchToast:'Incorrect code. Please try again.',
+    onConfirm: async ()=>{ await deletePlannerAfterConfirm(); }
+  });
 });
 
-// Cancel Planner Delete
-document.getElementById('plannerDeleteCancel').addEventListener('click', ()=>{
-  pendingDeleteAllConfirm=false;
-  document.getElementById('plannerDeleteDialog').classList.remove('show');
-  document.querySelector('#plannerDeleteDialog h3').textContent='Are you sure?';
-  document.querySelector('#plannerDeleteDialog p').textContent='Deleting this Planner permanently removes all its subject progress and task history. This action cannot be undone.';
-  document.getElementById('plannerDeleteConfirm').textContent='Delete Permanently';
-});
-
-// Confirm Planner Delete - requires typing "12345"
-document.getElementById('plannerDeleteConfirm').addEventListener('click', async ()=>{
-  const code = document.getElementById('plannerDeleteConfirmCode').value.trim();
-  if(code !== '12345') {
-    showToast('Incorrect code. Please try again.');
-    return;
-  }
-  if(pendingDeleteAllConfirm){
-    const activeId=STATE.activePlannerId || null;
-    const before=(STATE.plannerPending||[]).length;
-    STATE.plannerPending=(STATE.plannerPending||[]).filter(p=>activeId ? p.plannerId!==activeId : !!p.plannerId);
-    pendingDeleteAllConfirm=false;
-    await saveState(STATE);
-    document.getElementById('plannerDeleteDialog').classList.remove('show');
-    document.getElementById('plannerDeleteConfirmCode').value='';
-    document.querySelector('#plannerDeleteDialog h3').textContent='Are you sure?';
-    document.querySelector('#plannerDeleteDialog p').textContent='Deleting this Planner permanently removes all its subject progress and task history. This action cannot be undone.';
-    document.getElementById('plannerDeleteConfirm').textContent='Delete Permanently';
-    if(document.getElementById('screen-planDetail').classList.contains('active')) await showPlannerPendingScreen();
-    showToast(before ? 'All pending tasks deleted.' : 'No pending tasks to delete.');
-    return;
-  }
-  
+// Planner delete actions — invoked by the shared typed-confirm dialog (v4.12).
+async function deleteAllPlannerPendingAfterConfirm(){
+  const activeId=STATE.activePlannerId || null;
+  const before=(STATE.plannerPending||[]).length;
+  STATE.plannerPending=(STATE.plannerPending||[]).filter(p=>activeId ? p.plannerId!==activeId : !!p.plannerId);
+  await saveState(STATE);
+  if(document.getElementById('screen-planDetail').classList.contains('active')) await showPlannerPendingScreen();
+  showToast(before ? 'All pending tasks deleted.' : 'No pending tasks to delete.');
+}
+async function deletePlannerAfterConfirm(){
   if(editingPlannerIndex === null || editingPlannerIndex < 0 || editingPlannerIndex >= STATE.planners.length) return;
   
   const removedPlanner = STATE.planners[editingPlannerIndex];
@@ -12831,7 +12910,6 @@ document.getElementById('plannerDeleteConfirm').addEventListener('click', async 
   
   try {
     await saveState(STATE);
-    document.getElementById('plannerDeleteDialog').classList.remove('show');
     document.getElementById('plannerOverlay').classList.remove('show');
     renderPlanners();
     showToast('Planner deleted.');
@@ -12839,7 +12917,7 @@ document.getElementById('plannerDeleteConfirm').addEventListener('click', async 
     console.error('Error deleting planner:', e);
     showToast('Error deleting planner.');
   }
-});
+}
 
 // Save Planner
 document.getElementById('savePlannerBtn').addEventListener('click', async ()=>{
@@ -12901,12 +12979,16 @@ if(pendingExpirySelectEl){
 const pendingDeleteAllBtnEl=document.getElementById('pendingDeleteAllBtn');
 if(pendingDeleteAllBtnEl){
   pendingDeleteAllBtnEl.addEventListener('click', ()=>{
-    pendingDeleteAllConfirm=true;
-    document.getElementById('plannerDeleteConfirmCode').value='';
-    document.querySelector('#plannerDeleteDialog h3').textContent='Delete All Pending?';
-    document.querySelector('#plannerDeleteDialog p').textContent='This will permanently delete every Pending task for the current Planner. This action cannot be undone.';
-    document.getElementById('plannerDeleteConfirm').textContent='Delete All';
-    document.getElementById('plannerDeleteDialog').classList.add('show');
+    openSharedConfirm({
+      icon:'⚠️',
+      title:'Delete All Pending?',
+      message:'This will permanently delete every Pending task for the current Planner. This action cannot be undone.',
+      inputMode:'numeric', placeholder:'12345', maxlength:5,
+      confirmText:'Delete All', confirmStyle:'danger',
+      validate: v => v.trim() === '12345',
+      mismatchToast:'Incorrect code. Please try again.',
+      onConfirm: async ()=>{ await deleteAllPlannerPendingAfterConfirm(); }
+    });
   });
 }
 
@@ -14162,26 +14244,29 @@ document.getElementById('gsetMenuOverlay').addEventListener('click', (e)=>{
 });
 document.getElementById('gsetDeleteMenuItem').onclick = ()=>{
   document.getElementById('gsetMenuOverlay').classList.remove('show');
-  document.getElementById('gsetDeletePw').value='';
-  document.getElementById('gsetDeleteDialog').classList.add('show');
-};
-document.getElementById('gsetDeleteCancel').onclick = ()=> document.getElementById('gsetDeleteDialog').classList.remove('show');
-// Deleting requires typing the password (default 12345, shown dimly as the input's placeholder)
-document.getElementById('gsetDeleteConfirm').onclick = async ()=>{
-  const pw = document.getElementById('gsetDeletePw').value.trim();
-  if(pw !== '12345'){ showToast('Incorrect password.'); return; }
-  const state = await getState();
-  // Deleting the Goal is the explicit lifecycle boundary that permanently clears that
-  // Goal's private thought bank. Global History remains untouched.
-  state.goal = null;
-  state.extraStudy = null; // Extra Study progress belongs exclusively to this Goal.
-  state.studyDayTotals = {}; // explicit Goal deletion is one of the ONLY events allowed to clear the accumulated Study Hours bank
-  await saveState(state);
-  document.getElementById('gsetDeleteDialog').classList.remove('show');
-  showToast('Goal deleted.');
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-settings').classList.add('active');
-  renderSettings();
+  // Deleting requires typing the password (default 12345) — shared dialog.
+  openSharedConfirm({
+    icon:'⚠️',
+    title:'Are you sure?',
+    message:'Deleting this Goal permanently removes its Goal Information, Campaign Progress, Goal Streak, Status History, Extra Study Progress, and Motivation Message. This action cannot be undone.',
+    inputType:'password', placeholder:'12345', maxlength:10,
+    confirmText:'Delete Permanently', confirmStyle:'danger',
+    validate: v => v.trim() === '12345',
+    mismatchToast:'Incorrect password.',
+    onConfirm: async ()=>{
+      const state = await getState();
+      // Deleting the Goal is the explicit lifecycle boundary that permanently clears that
+      // Goal's private thought bank. Global History remains untouched.
+      state.goal = null;
+      state.extraStudy = null; // Extra Study progress belongs exclusively to this Goal.
+      state.studyDayTotals = {}; // explicit Goal deletion is one of the ONLY events allowed to clear the accumulated Study Hours bank
+      await saveState(state);
+      showToast('Goal deleted.');
+      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+      document.getElementById('screen-settings').classList.add('active');
+      renderSettings();
+    }
+  });
 };
 
 /* ============ GOALS: DASHBOARD INTERACTIONS ============ */
@@ -14198,24 +14283,19 @@ document.getElementById('goalExtraStartBtn').onclick = async ()=>{
 document.getElementById('goalExtraStopBtn').onclick = stopSleepExtraStudy;
 
 // Wipes the entire IndexedDB database (all history, streak, hearts, tasks) and reloads fresh
+// Reset requires typing 123456789 — the shared dialog keeps its button disabled until it matches.
 document.getElementById('resetDataBtn').onclick = ()=>{
-  const inp=document.getElementById('resetConfirmCode');
-  inp.value='';
-  const btn=document.getElementById('resetConfirmDelete');
-  btn.disabled=true; btn.style.opacity='.45';
-  document.getElementById('resetConfirmDialog').classList.add('show');
-};
-document.getElementById('resetConfirmCancel').onclick = ()=> document.getElementById('resetConfirmDialog').classList.remove('show');
-// Reset stays disabled until the exact confirmation code is typed (digits only)
-document.getElementById('resetConfirmCode').addEventListener('input', function(){
-  this.value=this.value.replace(/\D/g,'').slice(0,9);
-  const ok=this.value==='123456789';
-  const btn=document.getElementById('resetConfirmDelete');
-  btn.disabled=!ok; btn.style.opacity=ok?'1':'.45';
-});
-document.getElementById('resetConfirmDelete').onclick = ()=>{
-  if(document.getElementById('resetConfirmCode').value!=='123456789') return;
-  factoryReset(); // restore built-in defaults instead of deleting the DB (prevents corrupt/empty settings)
+  openSharedConfirm({
+    icon:'⚠️🔵',
+    title:'Reset All Data',
+    message:'This action will permanently delete all tasks, history, goals, settings, streaks, statistics, and every saved value.<br><br>This action cannot be undone.',
+    inputMode:'numeric', placeholder:'123456789', maxlength:9,
+    confirmText:'Reset', confirmStyle:'danger',
+    liveEnable:true,
+    filter: v => String(v).replace(/\D/g,'').slice(0,9),
+    validate: v => v === '123456789',
+    onConfirm: async ()=>{ factoryReset(); } // restore built-in defaults instead of deleting the DB (prevents corrupt/empty settings)
+  });
 };
 document.getElementById('breachOkBtn').onclick = async ()=>{
   if(document.getElementById('breachConfirmInput').value.trim() !== '123') return; // must type exactly "123"
@@ -15213,15 +15293,15 @@ window.onAndroidEvent = function(name, payload){
 
 /* ---- Application Settings page ---- */
 function andStatusPill(ok, yes, no){ return '<span class="and-pill '+(ok?'ok':'bad')+'">'+(ok?yes:no)+'</span>'; }
-// Display Size (v4.11): a 1–10 level picker. Level 6 = the app's normal size
+// Display Size (v4.12): a 1–9 level picker. Level 8 = the app's normal size
 // (byte-identical to the pre-setting layout); each level is ~8% apart.
 function andDisplaySizeLabel(level){
   const n = parseInt(level, 10);
-  if(n === 6) return 'Level 6 — Normal: exactly the size the app has always been (as if this setting never existed).';
-  const scale = window.gtDisplaySize ? gtDisplaySize.scaleOf(String(n)) : Math.pow(1.08, n - 6);
+  if(n === 8) return 'Level 8 — Normal: exactly the size the app has always been (as if this setting never existed).';
+  const scale = window.gtDisplaySize ? gtDisplaySize.scaleOf(String(n)) : Math.pow(1.08, n - 8);
   const pct = Math.round(Math.abs(1 - scale) * 100);
   const dir = scale < 1 ? 'smaller' : 'larger';
-  return 'Level ' + n + ' — ' + pct + '% ' + dir + ' than normal.' + (n === 2 ? ' (This is the app\u2019s default.)' : '');
+  return 'Level ' + n + ' — ' + pct + '% ' + dir + ' than normal.' + (n === 5 ? ' (This is the app\u2019s default.)' : '');
 }
 function andSyncDisplaySizeDesc(){
   const d = document.getElementById('andDisplaySizeDesc');
@@ -15248,7 +15328,7 @@ function andRenderDsDebug(){
   const vvR = vv ? Math.round(vv.scale * 1000) / 1000 : null;
   const marker = vvR === null ? '' : (Math.abs(vvR - sR) <= 0.01 ? '  applied \u2713' : '  NOT APPLIED \u2717');
   const lines = [
-    'level=' + level + '  scale=' + sR + (level === '6' ? ' (baseline)' : ''),
+    'level=' + level + '  scale=' + sR + (level === '8' ? ' (baseline)' : ''),
     'meta: ' + (metaEl ? metaEl.getAttribute('content') : '-'),
     'innerWidth=' + Math.round(window.innerWidth) + '  vv.scale=' + (vvR === null ? 'n/a' : vvR) + marker,
     'screen=' + (window.screen ? window.screen.width + 'x' + window.screen.height : '?') + '  dpr=' + window.devicePixelRatio,
@@ -15310,7 +15390,7 @@ function andRenderSettings(){
   // Display Size — the head viewport engine is the authority; this only reports it.
   const dsSel = document.getElementById('andDisplaySize');
   if(dsSel){
-    dsSel.value = window.gtDisplaySize ? gtDisplaySize.get() : '2';
+    dsSel.value = window.gtDisplaySize ? gtDisplaySize.get() : '5';
     andSyncDisplaySizeDesc();
     andRenderDsDebug();
     const dsCard = document.getElementById('cardDisplaySize');

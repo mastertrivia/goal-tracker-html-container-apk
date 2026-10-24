@@ -4,6 +4,47 @@
 
 ---
 
+## v4.12 — 2026-10-24
+
+**Thought Logging off-switch fixed · shared typed-confirm dialog · Display Size remapped to 1–9**
+
+- **Thought Logging toggle bug fixed:** the OFF choice was silently reverted to
+  ON whenever the settings draft had been cleared by an earlier Save (the
+  change handler dropped the value when no draft existed). The listener now
+  (re)begins the draft and pins the checkbox, so the choice is never lost.
+- **Turning OFF is confirmed at Save Changes:** pressing Save Changes with the
+  switch OFF opens the typed confirmation — **type THOUGHT** (case-insensitive).
+  A wrong word keeps everything unchanged; **Cancel keeps the feature ON** and
+  still saves the category edits. After confirmation the feature hides
+  **everywhere at once** (Home card, History reader, Goals reader, session-end
+  logging; Settings subtitle shows "Off"). **Saved records are never deleted** —
+  turning the feature back on brings them all back (verified by test).
+- **`thoughtsEnabled` now has a single writer** (the Thought Logger Save flow);
+  the general settings save no longer writes it, so an unconfirmed toggle can
+  not leak through another path.
+- **ONE shared typed-confirmation dialog** (`#sharedConfirmDialog` +
+  `openSharedConfirm()`) now drives every typed-confirm flow — same elements,
+  only text/input/password differ: Goal delete (`12345`), Planner delete
+  (`12345`), Delete-all-pending (`12345`), Reset All Data (`123456789`), Task
+  restart (`123`), Turn off Thought Logging (`THOUGHT`). Custom-layout dialogs
+  (Early-complete, task-delete preview, Bomb lock screen) keep their own markup.
+- **Display Size remapped to 9 levels (1–9, uniform 8% steps):** old→new —
+  1→3, 2→4, **3→5**, 4→6, 5→7, 6(normal)→8, 7→9; old 8/9/10 are removed
+  (clamped to 9). New levels **1 and 2** are the two extra-small sizes
+  (−42% / −37% of normal). **Default = Level 5** (= the old level 3, 21%
+  smaller), **Level 8 = exactly normal**, and Level 5→6 is the standard subtle
+  8% step you asked for.
+- **One-time migration everywhere:** native prefs (`displayScaleScheme`=`"2"`)
+  and browser localStorage (`gt_displaySizeScheme`) both guard the old→new
+  +2 shift, so every stored choice keeps its exact visual size and is never
+  shifted twice. Ancient xsmall/small/medium/large values migrate through the
+  same shift.
+- **On-device debug readout kept** (baseline marker now at Level 8).
+- **Native/version:** `versionName "4.12"`, `versionCode 22`,
+  `JsBridge.getShellVersion()` → `"4.12"`.
+
+---
+
 ## v4.11 — 2026-10-23
 
 **Display Size (1–10), top-bar removal, App & Data menu, fail-safe backups**

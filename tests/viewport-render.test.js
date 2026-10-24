@@ -72,9 +72,9 @@ function row(label, p) {
   });
 
   console.log('=== PHASE 1: BOOT path (localStorage level set pre-paint, reload) ===');
-  for (const lvl of ['6', '5', '4', '1', '7', '10']) {
+  for (const lvl of ['8', '5', '4', '1', '7', '9']) {
     const page = await ctx.newPage();
-    await page.addInitScript((l) => { try { localStorage.setItem('gt_displaySize', l); } catch (e) {} }, lvl);
+    await page.addInitScript((l) => { try { localStorage.setItem('gt_displaySize', l); localStorage.setItem('gt_displaySizeScheme', '2'); } catch (e) {} }, lvl);
     await page.goto(APP, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForFunction(() => !!window.gtDisplaySize, null, { timeout: 10000 }).catch(() => {});
     await page.waitForTimeout(600); // fonts / boot
@@ -84,16 +84,27 @@ function row(label, p) {
 
   console.log('\n=== PHASE 2: LIVE path (dropdown flow: set() without reload) ===');
   const live = await ctx.newPage();
-  await live.addInitScript(() => { try { localStorage.setItem('gt_displaySize', '6'); } catch (e) {} });
+  await live.addInitScript(() => { try { localStorage.setItem('gt_displaySize', '6'); localStorage.setItem('gt_displaySizeScheme', '2'); } catch (e) {} });
   await live.goto(APP, { waitUntil: 'domcontentloaded', timeout: 20000 });
   await live.waitForFunction(() => !!window.gtDisplaySize, null, { timeout: 10000 }).catch(() => {});
   await live.waitForTimeout(600);
   row('live start', await probe(live));
-  for (const lvl of ['6', '5', '4', '3', '2', '1', '7', '10']) {
+  for (const lvl of ['6', '5', '4', '3', '2', '1', '7', '9']) {
     await live.evaluate((l) => window.gtDisplaySize.set(l), lvl);
     row(`live set -> ${lvl}`, await probe(live));
   }
   await live.close();
+
+  console.log('\n=== PHASE 1b: v4.12 migration probe (raw v4.11 value, NO scheme marker) ===');
+  {
+    const page = await ctx.newPage();
+    await page.addInitScript(() => { try { localStorage.setItem('gt_displaySize', '3'); localStorage.removeItem('gt_displaySizeScheme'); } catch (e) {} });
+    await page.goto(APP, { waitUntil: 'domcontentloaded', timeout: 20000 });
+    await page.waitForFunction(() => !!window.gtDisplaySize, null, { timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(600);
+    row('boot old "3" -> lvl (expect 5)', await probe(page));
+    await page.close();
+  }
 
   console.log('\n=== PHASE 3: INGREDIENT probe (raw documents, no app logic) ===');
   const ing = await ctx.newPage();

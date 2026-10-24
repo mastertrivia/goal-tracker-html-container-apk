@@ -17,8 +17,8 @@ android {
         applicationId "com.goaltracker.shell"
         minSdk 26          // Android 8.0
         targetSdk 34
-        versionCode 21
-        versionName "4.11"
+        versionCode 22
+        versionName "4.12"
     }
 
     signingConfigs {

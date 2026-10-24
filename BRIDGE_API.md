@@ -259,24 +259,28 @@ these before acting; your HTML settings screen reads/writes them.
 - **Returns:** `String` — JSON object of all stored flags.
 - **Example:** `const flags = JSON.parse(A.getAllFlags())`
 
-### Display scale — v4.11 (stored in the same shell prefs, as a **string** value)
-The app-owned "Display Size" setting: a 1–10 level picker where level `6` is the
+### Display scale — v4.12 (stored in the same shell prefs, as a **string** value)
+The app-owned "Display Size" setting: a 1–9 level picker where level `8` is the
 app's normal size (as if the setting never existed), each level is ~8% apart,
-and the default is `2`. The wrapper only persists the level; the HTML applies
+and the default is `5`. The wrapper only persists the level; the HTML applies
 it before first paint by rewriting its viewport meta (see the "Display Size
 engine" script in `index.html`). Nothing here changes Android's system Display
 size / Font size settings.
 
 ### `AndroidBridge.getDisplayScale()`
-- **Returns:** `String` — one of `"1"`..`"10"` (default `"2"`). Unknown stored
-  values are reported as `"2"`. Values from the earlier 4-size test build are
-  migrated at read time: `xsmall`→`"4"`, `small`→`"6"`, `medium`→`"7"`,
-  `large`→`"8"`.
+- **Returns:** `String` — one of `"1"`..`"9"` (default `"5"`, `"8"` = normal).
+  Unknown stored values are reported as `"5"`. One-time migration: a value
+  stored by the v4.11 1–10 scheme (no `displayScaleScheme` marker) is shifted
+  +2 at first read so its visual size is preserved (old `8`/`9`/`10` clamp to
+  `"9"`) and the marker `displayScaleScheme`=`"2"` is written. The 4-size
+  names migrate through the same shift: `xsmall`→`"6"`, `small`→`"8"`,
+  `medium`→`"9"`, `large`→`"9"`.
 
 ### `AndroidBridge.setDisplayScale(level)`
-- **Parameters:** `level` (String — whitelisted: `"1"`..`"10"`)
+- **Parameters:** `level` (String — whitelisted: `"1"`..`"9"`, v4.12 numbering)
 - **Returns:** void; unknown values are rejected and logged to the error log.
-- **Effect:** persists the level so it survives HTML reloads and app restarts.
+- **Effect:** persists the level (plus the scheme marker) so it survives HTML
+  reloads and app restarts.
 
 ---
 
@@ -310,7 +314,7 @@ failure always falls back silently.
   `notificationsAllowed`, `exactAlarmsAllowed`, `dataKeyCount`,
   `errorLogCount`, `customSoundSet`, `displayScale`, `useWideViewPort`,
   `loadWithOverviewMode`, `textZoom`, `fontScale`, `bootId`, `flags` (object).
-  (`displayScale` is the app's Display Size level 1–10; `useWideViewPort` /
+  (`displayScale` is the app's Display Size level 1–9, v4.12 numbering; `useWideViewPort` /
   `loadWithOverviewMode` are the WebView viewport settings that must be `true`
   for the viewport-meta scaling to apply — Android WebView defaults them to
   `false`, which silently discards every sub-1.0 scale; `textZoom` is pinned to

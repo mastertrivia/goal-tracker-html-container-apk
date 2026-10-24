@@ -208,7 +208,8 @@ class MainActivity : AppCompatActivity() {
             // the Display Size setting (HTML viewport engine + getDisplayScale /
             // setDisplayScale) is the only thing that scales the interface.
             textZoom = 100
-            // v4.11 ROOT CAUSE FIX (Display Size levels below 6): Android WebView
+            // v4.11 ROOT CAUSE FIX (Display Size levels below the normal level,
+            // i.e. any requested scale < 1): Android WebView
             // defaults to NARROW viewport mode (useWideViewPort=false) with overview
             // mode off (loadWithOverviewMode=false). In that mode the page's viewport
             // meta `width` is ignored and any initial scale BELOW 1.0 is discarded —
@@ -217,7 +218,8 @@ class MainActivity : AppCompatActivity() {
             // options did nothing. Chromium's WebView layout doc calls this pair the
             // "configure WebView like a browser" setup; with it the meta behaves
             // exactly like Chrome, verified in tests/viewport-render.test.js.
-            // Level 6 emits width=device-width + initial-scale=1.0, so the baseline
+            // Level 8 (v4.12; formerly 6) emits width=device-width + initial-scale=1.0,
+            // so the baseline
             // renders identically to before this change.
             useWideViewPort = true
             loadWithOverviewMode = true
