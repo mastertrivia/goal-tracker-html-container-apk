@@ -25,11 +25,11 @@ function check(name, cond, expected, actual) {
 
 const MENU_IDS = [
   'andMnuRefresh', 'andMnuImportData', 'andMnuExportData', 'andMnuInstallHtml',
-  'andMnuSaveHtml', 'andMnuFactoryReset', 'andMnuSysCheck',
+  'andMnuRevertHtml', 'andMnuSaveHtml', 'andMnuFactoryReset', 'andMnuSysCheck',
 ];
 const MENU_TITLES = [
   'Refresh App', 'Import User Data', 'Export User Data', 'Install NEW HTML File',
-  'Save Current HTML File', 'Factory Reset User Data', 'System Check',
+  'Revert to original HTML', 'Save Current HTML File', 'Factory Reset User Data', 'System Check',
 ];
 
 function validSnap(extra = {}) {
@@ -179,13 +179,14 @@ async function b7_menuRowsDispatchToBridge() {
   await app.click('#andMnuExportData');
   await flushReal(6); // export handler awaits the mirror first
   await app.click('#andMnuInstallHtml');
+  await app.click('#andMnuRevertHtml');
   await app.click('#andMnuSaveHtml');
   await app.click('#andMnuFactoryReset');
   await app.click('#andMnuSysCheck');
   const calls = app.bridge.__calls;
   const expect = {
     refreshApp: 1, importBackup: 1, exportBackup: 1, importHtmlFile: 1,
-    exportCurrentHtml: 1, factoryResetUserData: 1, systemCheck: 1,
+    revertHtmlFile: 1, exportCurrentHtml: 1, factoryResetUserData: 1, systemCheck: 1,
   };
   for (const [name, n] of Object.entries(expect)) {
     check('B7.' + name + ' called', findBy(calls, name).length === n, String(n), String(findBy(calls, name).length));

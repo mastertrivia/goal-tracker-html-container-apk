@@ -106,6 +106,7 @@ function makeBridge(win, opts = {}) {
     // v4.11 App & Data menu (moved out of the removed top-bar menu)
     refreshApp: () => rec('refreshApp', []),
     importHtmlFile: () => rec('importHtmlFile', []),
+    revertHtmlFile: () => rec('revertHtmlFile', []),
     exportCurrentHtml: () => rec('exportCurrentHtml', []),
     factoryResetUserData: () => rec('factoryResetUserData', []),
     systemCheck: () => rec('systemCheck', []),

@@ -227,6 +227,28 @@ body.bomb-danger{background-color:#EF4444;}
   .col-stack .break-card .bomb-row{flex-wrap:nowrap;justify-content:center;}
   .col-stack .break-time{font-size:clamp(20px,6.5vw,32px);min-width:0;line-height:1.1;}
   .col-stack .streak-num{font-size:clamp(28px,8.5vw,41px);}
+  /* Bomb OFF L-shape: while Bomb Mode is disabled, the Study control buttons live in
+     this card directly under Day Streak, sharing the Study card's exact white styling. */
+  .bomb-off-btn-slot{display:flex;flex-direction:column;justify-content:center;padding:12px;}
+  .bomb-off-btn-slot .btn-row{width:100%;}
+  /* JOINED L-shape: the negative margin cancels the grid's 14px column gap AND covers
+     the Study card's 1px border, so the two white surfaces fuse into ONE continuous L
+     (no seam line — the junction corners are squared so the card wraps flush). */
+  #homeTimerGrid .bomb-off-btn-slot{
+    width:calc(100% + 16px);max-width:none;
+    margin-left:-16px;
+    border-left:none;
+    border-top-left-radius:12px;border-bottom-left-radius:0; /* soft-round the sharp L elbow */
+    /* same shadow as every card, but cast RIGHTWARD only (x-offset >= blur/2) so it
+       can never bleed left onto the Study card and draw a line at the joint */
+    box-shadow:14px 10px 28px rgba(91,79,232,.10),4px 2px 8px rgba(33,29,69,.04);
+  }
+  #homeTimerGrid.bomb-off #pomoCard{border-bottom-right-radius:0;} /* close the L's bottom elbow */
+  @media (max-width:420px){
+    /* Single-column fallback: no horizontal L here — render a normal separated card. */
+    #homeTimerGrid .bomb-off-btn-slot{width:100%;max-width:100%;margin-left:0;border-left:var(--card-border);border-top-left-radius:22px;border-bottom-left-radius:22px;box-shadow:var(--shadow);}
+    #homeTimerGrid.bomb-off #pomoCard{border-bottom-right-radius:22px;}
+  }
 
   /* REALITY CHECK — compact rating layer linked to the existing Pomodoro Log. */
   .rc-card{margin-bottom:10px;padding:11px 14px 12px;position:relative;}
@@ -1717,7 +1739,7 @@ body.bomb-danger{background-color:#EF4444;}
             <div class="goal-campaign-nums"><span id="studySessionDone">0</span> <span class="of">/ <span id="studySessionTotal">0</span> study</span></div>
           </div>
         </div>
-        <div class="btn-row">
+        <div class="btn-row" id="pomoBtnRow">
           <button class="tbtn start" id="btnStart"><svg viewBox="0 0 24 24"><path d="M6 4v16l14-8z"/></svg><span>START</span></button>
           <button class="tbtn pause" id="btnPause" disabled><svg viewBox="0 0 24 24"><rect x="5" y="3.5" width="5" height="17" rx="1.8"/><rect x="14" y="3.5" width="5" height="17" rx="1.8"/></svg><span>PAUSE</span></button>
           <button class="tbtn stop" id="btnStop" disabled><svg viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="15" height="15" rx="3"/></svg><span>STOP</span></button>
@@ -1734,6 +1756,11 @@ body.bomb-danger{background-color:#EF4444;}
           <div class="streak-bar-track" id="streakBarTrack"><div class="streak-bar-fill" id="streakBarFill" style="width:0%"></div></div>
           <div class="streak-rule" id="streakRule"></div>
         </div>
+
+        <!-- Bomb OFF L-shape slot: while Bomb Mode is disabled, the Study control
+             buttons (START/PAUSE/STOP) relocate into this card, directly under
+             Day Streak, with the Study card's exact white styling. -->
+        <div class="card bomb-off-btn-slot" id="bombOffBtnSlot" style="display:none;"></div>
 
         <!-- Bomb Timer - Counts idle time between productive activities; explosion resets the streak -->
         <div class="card break-card" id="bombTimerCard" onclick="showToast('Start any new activity to stop the bomb timer.')">
@@ -1817,6 +1844,13 @@ body.bomb-danger{background-color:#EF4444;}
     <div class="plain-card" id="manualModeNotice" style="display:none;margin-bottom:14px;padding:9px 14px;">
       <div style="font-size:10px;font-weight:800;letter-spacing:.05em;color:var(--primary);text-transform:uppercase;">Manual Task Mode is ON</div>
       <div class="subtext" style="margin:2px 0 0;font-size:10px;">Log completed time directly from your tasks.</div>
+    </div>
+
+    <!-- Bomb Timer disabled notice - subtle, low-priority footer line at the very bottom
+         of Home (styled after the Tasks section lock banner). Visible only while Bomb Mode is OFF. -->
+    <div id="bombOffFooterNote" style="display:none;align-items:center;gap:8px;background:var(--card,#fff);border:1px solid var(--border);border-radius:12px;padding:8px 14px;font-size:10.5px;font-weight:600;color:var(--text-dim);line-height:1.5;opacity:.8;margin-bottom:14px;">
+      <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--text-dim);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;" aria-hidden="true"><circle cx="10.5" cy="14.5" r="5.5"/><path d="M15.2 9.8l1.6-1.6M18.6 6.4l1.5-1.5M17.4 9.1l2.1-.3-.3 2.1"/></svg>
+      <span>Bomb Timer Mode Disabled. Enable from Settings.</span>
     </div>
   </div>
 
@@ -2737,6 +2771,10 @@ body.bomb-danger{background-color:#EF4444;}
           </div>
           <div class="and-row" id="andMnuInstallHtml" role="button" tabindex="0">
             <div class="ar-txt"><div class="ar-t1">📥 Install NEW HTML File</div><div class="ar-t2">Select a new HTML app file and install it as the app's interface. User data is preserved.</div></div>
+            <div class="gl-chev">›</div>
+          </div>
+          <div class="and-row" id="andMnuRevertHtml" role="button" tabindex="0">
+            <div class="ar-txt"><div class="ar-t1">↩️ Revert to original HTML</div><div class="ar-t2">Replace a custom-installed HTML interface with the original one bundled in the app. User data is preserved.</div></div>
             <div class="gl-chev">›</div>
           </div>
           <div class="and-row" id="andMnuSaveHtml" role="button" tabindex="0">
@@ -7448,7 +7486,8 @@ function applyLabels(){
   const L = STATE.settings.labels;
   document.getElementById('lblSelectTask').textContent = L.taskSection;
   // lblStreak is handled by renderHome() based on bomb mode, so skip it here to prevent flickering
-  document.getElementById('lblBreak').textContent = L.breakTimer.toUpperCase();
+  const lblBreakEl = document.getElementById('lblBreak'); // detached while Bomb Mode is OFF
+  if(lblBreakEl) lblBreakEl.textContent = L.breakTimer.toUpperCase();
   document.getElementById('lblTelegram').textContent = L.telegram;
   // Master toggle hides the whole Home Telegram card; otherwise refresh only the pending-report pill.
   // Button state is driven by input event and programmatic showTgMessage/clearTgMessage calls only (no polling).
@@ -7899,6 +7938,49 @@ function updateStudySessionCounterLive(){
   fitStudySessionCounter();
 }
 
+// ── Bomb OFF Home layout (L-shape) ──────────────────────────────────────────────
+// Bomb Timer ON: the original grid renders untouched. Bomb Timer OFF: the Bomb card
+// is REMOVED from the document entirely (it takes no space) and the Study control
+// buttons relocate into #bombOffBtnSlot — a card directly under Day Streak that
+// shares the Study card's white styling, forming the L-shape. The SAME DOM nodes are
+// moved (all event listeners survive), and switching back restores the exact
+// original structure and positions.
+let BOMB_HOME_LAYOUT_ON = null;
+let BOMB_HOME_CARD_SHELTERED = null; // detached Bomb card node kept alive while OFF
+function applyBombHomeLayout(){
+  const grid=document.getElementById('homeTimerGrid');
+  const slot=document.getElementById('bombOffBtnSlot');
+  const btnRow=document.getElementById('pomoBtnRow');
+  const pomoCard=document.getElementById('pomoCard');
+  const streakCard=document.getElementById('streakCard');
+  const footer=document.getElementById('bombOffFooterNote');
+  if(!grid||!slot||!btnRow||!pomoCard||!streakCard)return;
+  const on=bombModeOn(STATE);
+  if(BOMB_HOME_LAYOUT_ON===on)return; // already in this mode — leave the DOM alone
+  BOMB_HOME_LAYOUT_ON=on;
+  if(on){
+    // Restore the EXACT original structure (same positions as the static markup).
+    // getElementById can not find a detached node, so the sheltered reference is used.
+    const bombCard=BOMB_HOME_CARD_SHELTERED;
+    if(!bombCard)return;
+    BOMB_HOME_CARD_SHELTERED = null;
+    grid.classList.remove('bomb-off');
+    if(footer)footer.style.display='none';
+    slot.style.display='none';
+    if(bombCard.parentNode!==streakCard.parentNode)streakCard.after(bombCard);
+    if(btnRow.parentNode!==pomoCard)pomoCard.appendChild(btnRow);
+  }else{
+    const bombCard=document.getElementById('bombTimerCard');
+    if(!bombCard)return;
+    BOMB_HOME_CARD_SHELTERED = bombCard; // node kept alive for exact restore
+    bombCard.remove(); // detached from the document — takes no space
+    grid.classList.add('bomb-off'); // enables the joined L-shape CSS (seamless fusion)
+    if(footer)footer.style.display='';
+    slot.appendChild(btnRow);
+    slot.style.display='';
+  }
+}
+
 function renderHome(){
   updateRevisionTabVisibility();
   updateStudySessionCounterVisibility();
@@ -7914,6 +7996,7 @@ function renderHome(){
   document.getElementById('manualModeNotice').style.display = manual ? '' : 'none';
   document.getElementById('currentActivityCard').style.display = (manual && !keepStatusCard) ? 'none' : '';
   document.getElementById('homeTimerGrid').style.display = manual ? 'none' : '';
+  applyBombHomeLayout(); // Bomb OFF: L-shape (buttons under Day Streak, Bomb card removed)
   renderCurrentActivity();
   if(ringTimerHandle){ clearInterval(ringTimerHandle); ringTimerHandle = null; }
   // Initialize bomb boundary-crossing tracker: ensures explosions only fire once per cycle
@@ -7932,7 +8015,7 @@ function renderHome(){
     renderPomoIdlePreview();
     // No productive activity is running: restore the normal green START button.
     btnStart.classList.remove('complete'); btnStart.classList.add('start');
-    document.querySelector('#pomoCard .btn-row')?.classList.remove('done-mode');
+    document.getElementById('pomoBtnRow')?.classList.remove('done-mode');
     btnStart.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 4v16l14-8z"/></svg><span>START</span>';
     // Disable Start while the Good Morning gate is active — Unlock is the only exit
     btnStart.disabled = isGoodMorningLocked() && !isSleepActive();
@@ -7992,7 +8075,7 @@ function renderHome(){
     document.getElementById('pomoTime').textContent = '00:00';
     document.getElementById('pomoSub').textContent = 'REVIEW PENDING';
     btnStart.classList.remove('complete'); btnStart.classList.add('start');
-    document.querySelector('#pomoCard .btn-row')?.classList.remove('done-mode');
+    document.getElementById('pomoBtnRow')?.classList.remove('done-mode');
     btnStart.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 4v16l14-8z"/></svg><span>START</span>';
     btnStart.disabled = true; btnPause.disabled = true; btnStop.disabled = true;
     openReviewModal();
@@ -8011,12 +8094,12 @@ function renderHome(){
     // completion confirmation; the activity is stopped only after that confirmation.
     if(at.taskId!=null && CACHED_TASKS.some(t=>t.id===at.taskId)){
       btnStart.classList.remove('start'); btnStart.classList.add('complete');
-      document.querySelector('#pomoCard .btn-row')?.classList.add('done-mode');
+      document.getElementById('pomoBtnRow')?.classList.add('done-mode');
       btnStart.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9.5 17.5 20 6"/></svg><span>DONE</span>';
       btnStart.disabled = false;
     } else {
       btnStart.classList.remove('complete'); btnStart.classList.add('start');
-      document.querySelector('#pomoCard .btn-row')?.classList.remove('done-mode');
+      document.getElementById('pomoBtnRow')?.classList.remove('done-mode');
       btnStart.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 4v16l14-8z"/></svg><span>START</span>';
       btnStart.disabled = true;
     }
@@ -8099,16 +8182,19 @@ function renderHome(){
   const breakNote = document.getElementById('breakNote');
   const bombEmoji = document.getElementById('bombEmoji');
   if(!bombModeOn(STATE)){
-    // Bomb Challenge Mode OFF — the card stays (same icon/layout) but the countdown is replaced with a
-    // disabled label; no danger background, no ticking, no lifelines. Just a soft "Enable from Settings" hint.
+    // Bomb Challenge Mode OFF — applyBombHomeLayout() has REMOVED the card from the
+    // document (the buttons live in the L-shape slot under Day Streak instead), so
+    // these element lookups are null here. The detached node keeps its last visuals;
+    // everything below is a guarded no-op.
     document.body.classList.remove('bomb-danger');
-    bombEmoji.classList.remove('ticking');
-    breakTimeEl.style.display = 'none';
-    breakBarFill.style.width = '0%';
-    breakNote.textContent = 'Bomb Timer Mode Disabled';
-    const subEl = document.getElementById('breakNoteSub');
-    subEl.textContent = 'Enable from Settings';
-    subEl.style.display = '';
+    if(breakTimeEl&&breakBarFill&&breakNote&&bombEmoji){
+      bombEmoji.classList.remove('ticking');
+      breakTimeEl.style.display = 'none';
+      breakBarFill.style.width = '0%';
+      breakNote.textContent = 'Bomb Timer Mode Disabled';
+      const subEl = document.getElementById('breakNoteSub');
+      if(subEl){ subEl.textContent = 'Enable from Settings'; subEl.style.display = ''; }
+    }
   } else if(bombIsTicking(STATE)){
     // Bomb is actively counting down. Two cases share these visuals:
     //  (a) bomb running — the bomb is the active timer, OR
@@ -10309,7 +10395,11 @@ function renderSleepExtraCard(){
   const thought=document.getElementById('thoughtCard');
   if(!card) return;
   const sleeping=isSleepActive();
-  if(thought) thought.style.display=sleeping?'none':'';
+  // The Home Thoughts card is also owned by the Thought Logger toggle. renderHeader()
+  // calls this every second, so it must never resurrect a card the feature toggle
+  // has turned off (sleep state alone does not decide visibility anymore).
+  const thoughtsOn = STATE?.settings?.thoughtsEnabled!==false;
+  if(thought) thought.style.display=(sleeping||!thoughtsOn)?'none':'';
   card.style.display=sleeping?'':'none';
   if(!sleeping) return;
   const e=STATE?.extraStudy;
@@ -15529,6 +15619,7 @@ function andBindSettings(){
     AND.call('exportBackup');
   };
   if(el('andMnuInstallHtml')) el('andMnuInstallHtml').onclick = ()=> AND.call('importHtmlFile');
+  if(el('andMnuRevertHtml')) el('andMnuRevertHtml').onclick = ()=> AND.call('revertHtmlFile'); // native ORIGINAL confirm + bundled restore; data untouched
   if(el('andMnuSaveHtml')) el('andMnuSaveHtml').onclick = ()=> AND.call('exportCurrentHtml');
   if(el('andMnuFactoryReset')) el('andMnuFactoryReset').onclick = ()=> AND.call('factoryResetUserData');
   if(el('andMnuSysCheck')) el('andMnuSysCheck').onclick = ()=> AND.call('systemCheck');

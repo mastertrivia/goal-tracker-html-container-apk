@@ -40,6 +40,27 @@
   shifted twice. Ancient xsmall/small/medium/large values migrate through the
   same shift.
 - **On-device debug readout kept** (baseline marker now at Level 8).
+- **Home Thoughts card can no longer be resurrected while OFF:**
+  `renderSleepExtraCard()` (ticked every second from `renderHeader()`) used to
+  reset the card's visibility to visible whenever the Sleep window was inactive,
+  flipping it back on moments after the toggle hid it (vanish on touch, reappear
+  after ~1s). It now respects `thoughtsEnabled` alongside the sleep state.
+- **Import User Data confirmation word: `RESTORE` → `IMPORT`.**
+- **NEW setting: "↩️ Revert to original HTML"** (right under Install NEW HTML
+  File in Android Shell Settings → App & Data). Deletes a custom-installed HTML
+  interface and restores the bundled original (native typed confirmation —
+  **type ORIGINAL**; no dialog when nothing custom is installed). User data
+  directories are never touched; exposed as `AndroidBridge.revertHtmlFile()`.
+- **NEW: conditional Home layout for Bomb Timer OFF (L-shape):** while Bomb
+  Mode is disabled the Bomb card is REMOVED from the DOM (takes no space) and
+  the Study control buttons (START/PAUSE/STOP) relocate into a card directly
+  under Day Streak that is fused FLUSH against the Study card (negative-margin
+  join covering the 1px border, squared junction corners, closed bottom
+  elbow) — one continuous white L surface, no seam line. A subtle footer line (tiny bomb SVG + "Bomb Timer Mode Disabled. Enable
+  from Settings.", styled after the Tasks lock banner) sits at the very bottom
+  of Home. Toggling in Settings moves the SAME DOM nodes (listeners intact —
+  verified by test) and re-enabling restores the EXACT original structure.
+  Bomb ON renders 100% identical to before.
 - **Native/version:** `versionName "4.12"`, `versionCode 22`,
   `JsBridge.getShellVersion()` → `"4.12"`.
 

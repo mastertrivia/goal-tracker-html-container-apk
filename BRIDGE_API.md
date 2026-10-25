@@ -197,7 +197,7 @@ source of truth; keep IndexedDB only as a working cache.
 
 ### Backup (whole-dataset, via system file picker)
 - `AndroidBridge.exportBackup()` — void; v4.11: shows the native typed-confirmation dialog ("Export User Data"), then opens a "save file" dialog and writes ALL keys into one JSON file (FNV-1a checksum attached).
-- `AndroidBridge.importBackup()` — void; v4.11: shows the native typed-confirmation dialog ("Import User Data"), then opens a picker. The file is fully validated (app id, JSON shape, state structure, checksum) BEFORE any stored file is written — a bad file shows "Import failed: …" and changes nothing. On success the `backupRestored` event fires.
+- `AndroidBridge.importBackup()` — void; v4.11: shows the native typed-confirmation dialog ("Import User Data" — type **IMPORT** to confirm), then opens a picker. The file is fully validated (app id, JSON shape, state structure, checksum) BEFORE any stored file is written — a bad file shows "Import failed: …" and changes nothing. On success the `backupRestored` event fires.
 
 ### App & Data menu (v4.11 — replaced the top-bar three-dot menu)
 Each method opens the SAME native confirmation dialog the old menu used, then
@@ -205,6 +205,7 @@ performs its action. Triggered from Settings → Android Shell Settings → App 
 
 - `AndroidBridge.refreshApp()` — void; confirm ("Refresh App") → reloads the HTML. No user data is touched.
 - `AndroidBridge.importHtmlFile()` — void; typed confirm ("INSTALL") → file picker; the HTML/ZIP is staged and validated before it replaces the current app. User data preserved.
+- `AndroidBridge.revertHtmlFile()` — void; native typed-confirmation (type "ORIGINAL"), then deletes a custom-installed HTML interface and restores the bundled one (`html_user_imported` flag reset). User data directories are never touched. No-ops with a toast when the bundled HTML is already active.
 - `AndroidBridge.exportCurrentHtml()` — void; confirm ("Save Current HTML File") → saves the CURRENTLY running `index.html` (bundled or custom-installed) as `goal-tracker-app.html`.
 - `AndroidBridge.factoryResetUserData()` — void; typed confirm ("FACTORY RESET") → deletes user data only (storage, alarms, flags, sounds); the current HTML file is preserved. Keeps `auto-backup-before-reset.json`.
 - `AndroidBridge.systemCheck()` — void; opens the native System Check dialog (full diagnostics + "Export as file").

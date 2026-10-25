@@ -195,6 +195,12 @@ class JsBridge(private val activity: MainActivity) {
         safeUi("importHtmlFile") { activity.showImportHtmlFlow() }
     }
 
+    /** Revert a custom-installed HTML interface to the bundled original (typed confirm first). */
+    @JavascriptInterface
+    fun revertHtmlFile() {
+        safeUi("revertHtmlFile") { activity.showRevertHtmlFlow() }
+    }
+
     /** Export the CURRENTLY running index.html to a user-chosen file. */
     @JavascriptInterface
     fun exportCurrentHtml() {

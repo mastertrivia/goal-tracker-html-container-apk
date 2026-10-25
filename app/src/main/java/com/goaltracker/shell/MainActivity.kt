@@ -698,6 +698,55 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * "Revert to original HTML" - swaps a custom-installed HTML interface
+     * back for the bundled original. User data lives in a separate directory and
+     * is never touched; the typed confirmation (ORIGINAL) guards against an
+     * accidental tap losing the custom interface.
+     */
+    fun showRevertHtmlFlow() {
+        if (!htmlPrefs.getBoolean("html_user_imported", false)) {
+            toast("Original HTML is already active - nothing to revert", force = true)
+            return
+        }
+        ConfirmDialog.show(
+            activity = this,
+            accent = ConfirmDialog.RED,
+            icon = "\u21A9\uFE0F",
+            heading = "Revert to original HTML",
+            english = "Replace the custom-installed HTML with the original interface " +
+                "bundled inside the app. Only the interface changes - your user " +
+                "data (Tasks, History, Goals, Timers, Settings) is not touched.",
+            hinglish = "Custom HTML hata kar app ki original interface wapas aa " +
+                "jayegi. Sirf interface badlega - aapka poora data bilkul safe rahega.",
+            summary = listOf(
+                ConfirmDialog.SummaryLine("HTML", "Replaced with original"),
+                ConfirmDialog.SummaryLine("User Data", "Preserved"),
+            ),
+            confirmLabel = "Revert",
+            requiredWord = "ORIGINAL",
+        ) {
+            revertToOriginalHtml()
+        }
+    }
+
+    /** Restores the bundled HTML over a custom install. Data directories untouched. */
+    private fun revertToOriginalHtml() {
+        try {
+            appDir.deleteRecursively()
+            copyBundledApp()
+            htmlPrefs.edit().putBoolean("html_user_imported", false).apply()
+            toast("Original HTML restored - user data kept", force = true)
+            loadApp()
+        } catch (e: Exception) {
+            ErrorLog.log(this, "revertToOriginalHtml", e.message ?: "unknown")
+            // Never leave the user without an interface.
+            if (!File(appDir, "index.html").exists()) copyBundledApp()
+            toast("Revert failed: ${e.message}", force = true)
+            loadApp()
+        }
+    }
+
     fun showExportBackupFlow() {
         ConfirmDialog.show(
             activity = this,
@@ -734,7 +783,7 @@ class MainActivity : AppCompatActivity() {
                 ConfirmDialog.SummaryLine("User Data", "Restored"),
             ),
             confirmLabel = "Restore",
-            requiredWord = "RESTORE",
+            requiredWord = "IMPORT",
         ) {
             launchImportBackup()
         }

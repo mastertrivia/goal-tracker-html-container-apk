@@ -136,6 +136,19 @@ async function tt3_confirmedTurnOffHidesEverywhereKeepsRecords() {
   const toggle = app.$('#setThoughtsEnabled');
   check('TT3.8 toggle shows OFF', !!toggle && toggle.checked === false, 'false', toggle ? toggle.checked : 'missing');
 
+  // Regression: renderHeader() ticks every second and calls renderSleepExtraCard(),
+  // which used to set thoughtCard.style.display='' while awake — resurrecting the
+  // card after it had been hidden (vanish on touch, reappear a moment later).
+  if(typeof app.win.renderHeader === 'function') app.win.renderHeader();
+  if(typeof app.win.renderSleepExtraCard === 'function') app.win.renderSleepExtraCard();
+  await flushReal(5);
+  check('TT3.10 Home card STILL hidden after header tick', app.$('#thoughtCard').style.display === 'none', 'none', app.$('#thoughtCard').style.display || '\"\"');
+
+  // Even a direct sleep-state transition (awake tick) must not bring it back.
+  if(typeof app.win.updateThoughtCooldownUI === 'function') app.win.updateThoughtCooldownUI();
+  await flushReal(5);
+  check('TT3.11 Home card STILL hidden after cooldown UI refresh', app.$('#thoughtCard').style.display === 'none', 'none', app.$('#thoughtCard').style.display || '\"\"');
+
   // Records are KEPT (the whole point of the confirmation).
   const counts = st && st.thoughtCountsByDay ? st.thoughtCountsByDay[DAY] : null;
   check('TT3.9 saved thought records kept in state', !!counts && counts.tc_fear === 3 && counts.tc_study === 2, '{"tc_fear":3,"tc_study":2}', JSON.stringify(counts));
