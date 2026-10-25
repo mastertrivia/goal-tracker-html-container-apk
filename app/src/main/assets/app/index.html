@@ -235,13 +235,20 @@ body.bomb-danger{background-color:#EF4444;}
      the Study card's 1px border, so the two white surfaces fuse into ONE continuous L
      (no seam line — the junction corners are squared so the card wraps flush). */
   #homeTimerGrid .bomb-off-btn-slot{
+    position:relative;overflow:visible;
     width:calc(100% + 16px);max-width:none;
     margin-left:-16px;
     border-left:none;
-    border-top-left-radius:12px;border-bottom-left-radius:0; /* soft-round the sharp L elbow */
+    border-top-left-radius:0;border-bottom-left-radius:0;
     /* same shadow as every card, but cast RIGHTWARD only (x-offset >= blur/2) so it
        can never bleed left onto the Study card and draw a line at the joint */
     box-shadow:14px 10px 28px rgba(91,79,232,.10),4px 2px 8px rgba(33,29,69,.04);
+  }
+  /* Rounded L elbow: white fillet tangent to the Study card's edge and this card's
+     top edge, so the channel between the cards ends in a smooth sweep (the mock). */
+  #homeTimerGrid .bomb-off-btn-slot::after{
+    content:'';position:absolute;left:0;top:-16px;width:16px;height:16px;pointer-events:none;
+    background:radial-gradient(circle at 100% 0,transparent 0 16px,var(--card,#fff) 16px);
   }
   #homeTimerGrid.bomb-off #pomoCard{border-bottom-right-radius:0;} /* close the L's bottom elbow */
   @media (max-width:420px){
