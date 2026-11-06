@@ -250,6 +250,12 @@ body.bomb-danger{background-color:#EF4444;}
     content:'';position:absolute;left:0;top:-16px;width:16px;height:16px;pointer-events:none;
     background:radial-gradient(circle at 100% 0,transparent 0 16px,var(--card,#fff) 16px);
   }
+  /* Deterministic flush (anti-drift): make the right column a grid whose last row is 1fr,
+     so the slot ALWAYS stretches to the column's full height. Both the slot and the Study
+     card are stretch items of the same grid row, so their bottoms meet at one shared
+     baseline no matter what either column's content height does (toggles, touch
+     re-renders, long task labels, session counter) — the notch can never reappear. */
+  #homeTimerGrid.bomb-off .col-stack{display:grid;grid-template-rows:auto 1fr;}
   #homeTimerGrid.bomb-off #pomoCard{border-bottom-right-radius:0;} /* close the L's bottom elbow */
   @media (max-width:420px){
     /* Single-column fallback: no horizontal L here — render a normal separated card. */

@@ -61,6 +61,18 @@
   of Home. Toggling in Settings moves the SAME DOM nodes (listeners intact —
   verified by test) and re-enabling restores the EXACT original structure.
   Bomb ON renders 100% identical to before.
+- **Anti-drift fix — the L-shape can no longer fall out of alignment:** the
+  button card previously had a content-only height, so its bottom only met the
+  Study card's baseline by coincidence of the two columns' content heights —
+  after a Bomb toggle (or any touch re-render), content changes made the card
+  end short of the Study card (a visible notch, varying in size). The right
+  column is now a CSS grid whose last row stretches the button card to the
+  shared row baseline, so both bottoms meet structurally — flush for ANY
+  content (long task labels, session counter, streak-card switch), on every
+  toggle and touch. Verified in real Chromium: flush across boot → OFF → ON →
+  OFF → touch cycles and with both columns artificially made taller/shorter
+  (notch = 0 in every case); Bomb-ON geometry byte-identical to before; the
+  narrow single-column fallback unchanged.
 - **Native/version:** `versionName "4.12"`, `versionCode 22`,
   `JsBridge.getShellVersion()` → `"4.12"`.
 
