@@ -60,7 +60,60 @@ class TimerService : Service() {
         // Re-render cadence. 500ms keeps the seconds digit visually accurate
         // without meaningful battery cost (setOnlyAlertOnce avoids buzzing).
         private const val TICK_MS = 500L
+
+        /**
+         * The live session countdown HTML last pushed for the timer notification.
+         *
+         * Used by AlarmReceiver to validate a session-end alarm at fire time. The
+         * notification's "mmss" clock IS that alarm's countdown: the HTML derives both from
+         * the same value (caComputeView().segRemainSec), so it is an independent, live copy of
+         * the alarm's own deadline. It is persisted as an ABSOLUTE deadline (monotonic + wall),
+         * so it stays correct even though the WebView that scheduled the alarm is dead.
+         *
+         * Returns null when there is nothing to validate against (no live timer state, or a
+         * bomb-only notification that has no session clock).
+         */
+        fun peekSessionClock(context: Context): SessionClock? {
+            val json = try {
+                context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                    .getString(KEY_STATE, null)
+            } catch (_: Exception) {
+                null
+            } ?: return null
+            return try {
+                val o = JSONObject(json)
+                if (!o.optBoolean("running", false)) return null
+                val arr = o.optJSONArray("clocks") ?: return null
+                for (i in 0 until arr.length()) {
+                    val c = arr.getJSONObject(i)
+                    if (c.optString("fmt") != "mmss") continue
+                    if (!c.optBoolean("ticking", true)) {
+                        return SessionClock(
+                            paused = true,
+                            remainMs = c.optLong("frozenMs", 0).coerceAtLeast(0)
+                        )
+                    }
+                    val remainElapsed = c.optLong("endElapsed", 0) - SystemClock.elapsedRealtime()
+                    val remain = if (remainElapsed in -1000..(48L * 3600_000L)) {
+                        remainElapsed
+                    } else {
+                        // Likely a reboot: fall back to the wall-clock deadline.
+                        c.optLong("endWall", 0) - System.currentTimeMillis()
+                    }
+                    return SessionClock(
+                        paused = o.optBoolean("paused", false),
+                        remainMs = remain.coerceAtLeast(0)
+                    )
+                }
+                null
+            } catch (_: Exception) {
+                null
+            }
+        }
     }
+
+    /** Snapshot of the live session countdown used for alarm fire-time validation. */
+    data class SessionClock(val paused: Boolean, val remainMs: Long)
 
     /** One dynamic value inside the template, e.g. the MM:SS clock. */
     private data class Clock(

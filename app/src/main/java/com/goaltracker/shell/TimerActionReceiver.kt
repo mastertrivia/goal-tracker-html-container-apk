@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import org.json.JSONObject
 
 /**
  * Receives taps on notification action buttons (timer Pause/Resume/Stop and
@@ -26,9 +27,12 @@ class TimerActionReceiver : BroadcastReceiver() {
         /**
          * Set by MainActivity in onResume, cleared in onPause.
          * When present, events reach the WebView immediately.
+         *
+         * The argument is the same JSON payload the pending queue stores: the action plus
+         * the wall-clock time of the tap (see [deliver]).
          */
         @Volatile
-        var liveDelivery: ((action: String) -> Unit)? = null
+        var liveDelivery: ((payloadJson: String) -> Unit)? = null
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -99,12 +103,28 @@ class TimerActionReceiver : BroadcastReceiver() {
         }
     }
 
+    /**
+     * Hands the tap to the HTML, live or queued.
+     *
+     * The payload carries WHEN the button was pressed, not just what was pressed. A queued tap
+     * can be replayed minutes later, and the HTML anchors pause/resume bookkeeping to this
+     * timestamp: using replay time instead would credit the whole dead window to the running
+     * session and shift the countdown (plus every alarm deadline derived from it).
+     */
     private fun deliver(context: Context, action: String) {
+        val payload = try {
+            JSONObject()
+                .put("action", action)
+                .put("at", System.currentTimeMillis())
+                .toString()
+        } catch (_: Exception) {
+            "\"$action\""
+        }
         val live = liveDelivery
         if (live != null) {
-            live(action)
+            live(payload)
         } else {
-            PendingEvents.add(context, "timerAction", "\"$action\"")
+            PendingEvents.add(context, "timerAction", payload)
         }
     }
 }

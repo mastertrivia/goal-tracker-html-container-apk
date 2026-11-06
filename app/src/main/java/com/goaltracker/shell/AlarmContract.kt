@@ -22,6 +22,15 @@ object AlarmContract {
     const val EXTRA_SOUND_SLOT = "soundSlot"
     const val EXTRA_DURATION_MS = "durationMs"
 
+    /** Must match AND_ALARM_SESSION in the HTML app. */
+    const val SESSION_ALARM_ID = 9101
+
+    /**
+     * How far the live session clock may disagree with a fired alarm before we treat the
+     * alarm as a stale snapshot. Absorbs bridge/render latency only, not a real desync.
+     */
+    const val STALE_TOLERANCE_MS = 5_000L
+
     fun clampDuration(ms: Long): Long = ms.coerceIn(MIN_DURATION_MS, MAX_DURATION_MS)
 
     fun normalizeSlot(slot: String?): String = when (slot) {

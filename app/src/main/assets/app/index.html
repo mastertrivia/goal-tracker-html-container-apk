@@ -6567,11 +6567,23 @@ async function startExtraStudySession(durationMinutes){
   // No navigation — the Extra Study Timer starts and stops directly inside the Goals page.
   render();
 }
+// The wall-clock instant a pause/resume really happened. A notification Pause/Resume tap is
+// queued natively while the WebView is dead (PendingEvents) and replayed minutes later, so the
+// tap time travels with the event. Using replay-time Date.now() would credit the whole dead
+// window to the running session and shift the countdown (and every alarm deadline derived
+// from it). Clamped to [now - 24h, now] so a bogus/future stamp can never create time.
+function pauseResumeWallNow(anchorWallMs){
+  const now = Date.now();
+  const a = Number(anchorWallMs);
+  if(!Number.isFinite(a) || a <= 0) return now;
+  return Math.min(now, Math.max(now - 24*3600*1000, a));
+}
 // Toggles pause/resume on the active Study/Routine/Health timer (does nothing to the Bomb)
-async function pauseResumeSession(){
+async function pauseResumeSession(anchorWallMs){
   let state = await getState();
   const at = state.activeTimer;
   if(!at || at.type==='bomb') return;
+  const actionWallTs = pauseResumeWallNow(anchorWallMs);
   if(at.pausedAt){
     // RESUME. In Bomb Mode the bomb was ticking during the pause — bank the burned time and re-freeze
     // (single owner: BombEngine.onSessionResume), then restore the activity's own pause bookkeeping.
@@ -6579,7 +6591,7 @@ async function pauseResumeSession(){
     // Use wall-clock pause duration (wallPausedAt is Date.now()-based) so this remains
     // correct across page reloads — monotonicNow() epoch resets on every page load, so
     // (monotonicNow() - at.pausedAt) would be wrong if the app reloaded while paused.
-    const wallPauseDurMs = Date.now() - (at.wallPausedAt || Date.now());
+    const wallPauseDurMs = Math.max(0, actionWallTs - (at.wallPausedAt || actionWallTs));
     const pauseDurMs = at.wallPausedAt ? wallPauseDurMs : (monotonicNow() - at.pausedAt);
     at.accumulatedPause = (at.accumulatedPause||0) + pauseDurMs;
     at.wallAccumulatedPauseMs = (at.wallAccumulatedPauseMs||0) + wallPauseDurMs;
@@ -6587,17 +6599,17 @@ async function pauseResumeSession(){
     at.wallPausedAt = null;
     // Start a fresh timeline segment from this moment.
     at.segmentStartTs    = monotonicNow();
-    at.wallSegmentStartTs = Date.now();
+    at.wallSegmentStartTs = actionWallTs;
   } else {
     // PAUSE. The activity freezes, but in Bomb Mode the bomb must immediately start ticking — it
     // treats a pause exactly like the activity going inactive (single owner: BombEngine.onSessionPause).
     at.pausedAt = monotonicNow();
-    at.wallPausedAt = Date.now(); // wall-clock counterpart so effectiveElapsedMs stays accurate across reloads
+    at.wallPausedAt = actionWallTs; // wall-clock counterpart so effectiveElapsedMs stays accurate across reloads
     BombEngine.onSessionPause(state);
     // Commit the completed segment to the timeline immediately, exactly as stopSession would.
     // Use wallSegmentStartTs (Date.now()-based) — NOT segmentStartTs (performance.now()-based).
-    const segStart = at.wallSegmentStartTs || at.wallStartTs || Date.now();
-    const segEndTs = Date.now();
+    const segStart = at.wallSegmentStartTs || at.wallStartTs || actionWallTs;
+    const segEndTs = actionWallTs;
     const segDurSec = Math.max(0, (segEndTs - segStart) / 1000);
     if(segDurSec >= 1){
       await addTimelineEntry({ category: at.type, task: at.task, topic: at.topic||null, startTs: segStart, endTs: segEndTs, duration: segDurSec, segmentKey: activeSegmentKey(at, segStart) });
@@ -6606,6 +6618,12 @@ async function pauseResumeSession(){
   await syncActiveTaskProgress(state); // checkpoint the task's consumed/remaining time on every pause/resume
   await saveState(state);
   render();
+  // The OS session alarm is an absolute snapshot of the segment boundary taken by
+  // andSyncAlarms(). Pause/resume MOVES that boundary, so re-sync it right now: the 1-second
+  // observer cannot be relied on here, because the app is usually backgrounded the moment a
+  // notification button is tapped (Android then throttles the WebView, leaving the old alarm
+  // armed - it rings while the session still has time left).
+  try{ andSyncAlarms(); }catch(e){ console.warn('[pause/resume] alarm sync failed', e); }
 }
 // Completes the live activity-stop portion of the Home "DONE" shortcut. Unlike stopSession(),
 // this does NOT raise the manual-STOP notification/toast; the caller is already inside the
@@ -15367,7 +15385,9 @@ window.onAndroidEvent = function(name, payload){
     if(name==='timerAction'){
       // ADD button on the session-complete notification → open the SAME Pomodoro-Log reflection
       // "+" popup used in History → Study Task Progress, pre-targeted at the completed session.
-      if(payload==='reviewAdd'){
+      // v4.13: the payload may now be {action, at} (see TimerActionReceiver), so the review
+      // action has to be read from the unwrapped value too - a bare string still works.
+      if((payload && typeof payload==='object' ? payload.action : payload)==='reviewAdd'){
         AND.call('cancelNotification', AND_NOTIF_REVIEW);
         andOpenReflection(andLoadReviewTarget());
         andSaveReviewTarget(null);
@@ -15375,9 +15395,16 @@ window.onAndroidEvent = function(name, payload){
       }
       const at = STATE && STATE.activeTimer;
       if(!at || at.type==='bomb') return;
-      if(payload==='pause' && !at.pausedAt) pauseResumeSession();
-      else if(payload==='resume' && at.pausedAt) pauseResumeSession();
-      else if(payload==='stop') stopSession();
+      // Newer shells send {action, at} so a queued tap keeps the time it was pressed;
+      // an older shell (and the review path above) still sends the bare action string.
+      let action = payload, actionAt = 0;
+      if(payload && typeof payload==='object'){
+        action = payload.action;
+        actionAt = Number(payload.at)||0;
+      }
+      if(action==='pause' && !at.pausedAt) pauseResumeSession(actionAt);
+      else if(action==='resume' && at.pausedAt) pauseResumeSession(actionAt);
+      else if(action==='stop') stopSession();
     } else if(name==='notificationPermission'){
       andPermission = payload;
       if(payload==='denied') showToast('Notifications are blocked — enable them in Android Settings.');

@@ -374,8 +374,8 @@ class MainActivity : AppCompatActivity() {
         // While we're visible, notification button taps reach JS instantly.
         // (If we're not visible, TimerActionReceiver queues them and JS
         // drains the queue via getPendingEvents() on next load.)
-        TimerActionReceiver.liveDelivery = { action ->
-            notifyJs("timerAction", "\"$action\"")
+        TimerActionReceiver.liveDelivery = { payloadJson ->
+            notifyJs("timerAction", payloadJson)
         }
         // ---- Freeze-on-resume fix (v2.4 regression) ----
         // The HTML UI is driven entirely by setInterval timers. While the app
