@@ -175,6 +175,22 @@ class JsBridge(private val activity: MainActivity) {
         safeUi("exportBackup") { activity.showExportBackupFlow() }
     }
 
+    /**
+     * Folder every export is written into, as chosen in Settings.
+     * @return the folder label (e.g. "GoalTracker"), or "" for the default flow
+     * (save-file picker, then the picker-free Downloads fallback).
+     */
+    @JavascriptInterface
+    fun getExportFolder(): String = safe("getExportFolder", "") {
+        activity.exportFolderLabel() ?: ""
+    }
+
+    /** Opens the system folder picker so the user can change the export target. */
+    @JavascriptInterface
+    fun chooseExportFolder() {
+        safeUi("chooseExportFolder") { activity.chooseExportFolder() }
+    }
+
     /** Native typed-confirmation dialog first, then the file picker (v4.11). */
     @JavascriptInterface
     fun importBackup() {
@@ -841,7 +857,7 @@ class JsBridge(private val activity: MainActivity) {
     // ---------------- Misc ----------------
 
     @JavascriptInterface
-    fun getShellVersion(): String = "4.12"
+    fun getShellVersion(): String = "4.13"
 
     // ---------------- Manual fallback ----------------
 

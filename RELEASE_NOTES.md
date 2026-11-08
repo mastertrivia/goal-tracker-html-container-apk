@@ -4,6 +4,29 @@
 
 ---
 
+## v4.13 — 2026-11-08
+
+**Dated export file names · Export folder · Export Backup Reminder**
+
+- **Dated export file names:** every export now carries today's date —
+  `goal-tracker-backup-08-11-2026.json` and `goal-tracker-app-08-11-2026.html` —
+  on every route (chosen folder, JSON picker, generic picker, Downloads).
+  A second export on the same day becomes `… (2)` instead of overwriting the first.
+- **Export folder (Settings → App & Data):** pick a folder once with the system
+  picker and every later backup / HTML save is written straight into it, with no
+  picker at all. If Android ever revokes that permission the app clears the
+  setting, says so, and falls back to the picker instead of failing silently.
+- **Export Backup Reminder:** choose the reminder days and the hour (default
+  Monday, Wednesday, Friday at 9:00 AM). It shows at most once per app day,
+  follows the Day Boundary ("Sleep Start Time"), never appears on top of another
+  dialog or the bomb lock screen, and its Cancel button stays disabled for the
+  first 10 seconds so it cannot be dismissed by reflex. Its settings live in
+  their own storage key, so restoring a backup can never silently disable or
+  re-arm the reminder. **Export Backup** in the reminder runs the same verified
+  export path as the Settings row (mirror first, then the native flow).
+
+---
+
 ## v4.12 — 2026-10-24
 
 **Thought Logging off-switch fixed · shared typed-confirm dialog · Display Size remapped to 1–9**
