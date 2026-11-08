@@ -59,8 +59,37 @@ jobs:
             git push
           fi
 
+      # The Gradle wrapper downloads its own distribution from GitHub's release CDN on
+      # every fresh runner. That endpoint answers 5xx intermittently, and when it does
+      # ./gradlew dies within seconds with the distribution URL as its only error
+      # (exit 1, no compiler output). Caching the unpacked distribution means later
+      # runs never touch that CDN at all.
+      - name: Cache the Gradle distribution
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/wrapper/dists
+          key: gradle-wrapper-8.2-bin
+
+      # Even with the cache, a first run (or an evicted cache) can still hit the CDN.
+      # Retry with a cleared dists directory, so a half-written download can never
+      # poison the next attempt.
       - name: Build signed release APK
-        run: ./gradlew assembleRelease --no-daemon --stacktrace
+        run: |
+          for attempt in 1 2 3; do
+            echo "::group::Gradle attempt $attempt"
+            if ./gradlew assembleRelease --no-daemon --stacktrace; then
+              echo "::endgroup::"
+              echo "Build succeeded on attempt $attempt"
+              exit 0
+            fi
+            echo "::endgroup::"
+            rm -rf "$HOME/.gradle/wrapper/dists"
+            if [ "$attempt" -lt 3 ]; then
+              sleep $((attempt * 15))
+            fi
+          done
+          echo "Gradle build failed after 3 attempts"
+          exit 1
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
