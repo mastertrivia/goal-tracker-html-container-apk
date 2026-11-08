@@ -2767,7 +2767,7 @@ body.bomb-danger{background-color:#EF4444;}
 /* v4.13: Export Folder row + Export Backup Reminder (Settings -> App & Data).
    Colours come from the app's own tokens, so dark/light both follow the theme. */
 .and-inline-btn{width:auto;margin:0;padding:10px 16px;font-size:13px;flex:0 0 auto;align-self:center;}
-.and-reminder-block{border-top:1px solid var(--border);margin-top:6px;padding-top:14px;}
+.and-reminder-block{margin-top:6px;padding-top:4px;} /* the row above already draws the divider */
 .and-reminder-block .ar-t1{margin-bottom:4px;}
 .gt-day-pills{display:flex;flex-wrap:wrap;gap:6px;width:100%;margin:8px 0 6px;}
 .gt-day-pill{position:relative;flex:1 1 auto;min-width:38px;cursor:pointer;}
@@ -2775,17 +2775,13 @@ body.bomb-danger{background-color:#EF4444;}
 .gt-day-pill span{display:flex;align-items:center;justify-content:center;width:100%;min-width:0;padding:9px 4px;border:1px solid var(--border-strong);border-radius:999px;background:var(--card);color:var(--text-dim);font-size:11px;font-weight:700;white-space:nowrap;}
 .gt-day-pill input:checked+span{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 2px 6px rgba(91,79,232,.28);}
 .gt-day-pill input:focus-visible+span{outline:2px solid var(--primary);outline-offset:2px;}
-#andReminderOverlay .sheet{max-width:420px;text-align:center;}
-#andReminderOverlay .gt-rem-icon{width:64px;height:64px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:grid;place-items:center;margin:0 auto 12px;}
-#andReminderOverlay .gt-rem-icon svg{width:32px;height:32px;}
+#andReminderOverlay .d-icon svg{width:26px;height:26px;}
+#andReminderOverlay h3{margin:0;font-size:17px;}
 #andReminderOverlay .gt-rem-badge{display:inline-block;margin-top:8px;padding:4px 12px;border-radius:999px;background:var(--primary-light);color:var(--primary);font-size:11px;font-weight:800;}
-#andReminderOverlay .gt-rem-msg{margin:14px 0 18px;color:var(--text-dim);font-size:14px;font-weight:600;}
-#andReminderOverlay .gt-rem-actions{display:flex;gap:10px;}
-#andReminderOverlay .gt-rem-actions .btn-full{margin:0;}
-#andReminderOverlay .gt-rem-cancel{flex:1 1 32%;}
-#andReminderOverlay .gt-rem-cancel:disabled{opacity:.65;cursor:default;}
-#andReminderOverlay .gt-rem-export{flex:1 1 68%;}
-@media(max-width:380px){#andReminderOverlay .gt-rem-actions{flex-direction:column;}}
+#andReminderOverlay .gt-rem-msg{margin:12px 0 0;color:var(--text-dim);font-size:14px;font-weight:600;line-height:1.5;}
+#andReminderOverlay .d-btn-row{margin-top:18px;}
+#andReminderOverlay .d-btn span{font-size:11px;font-weight:600;opacity:.85;white-space:nowrap;}
+#andReminderOverlay .d-btn:disabled{opacity:.65;cursor:default;box-shadow:none;background:var(--bg);color:var(--text-dim);}
 </style>
 <div id="andBridgeUI" style="display:none;">
         <!-- App & Data — the old three-dot top-bar menu, moved into the shell (v4.11).
@@ -3592,18 +3588,19 @@ body.bomb-danger{background-color:#EF4444;}
 </div>
 
 <!-- Add/Edit Task Modal - Create or update a reusable task (name, category, icon, color, duration) -->
-<!-- v4.13: Export Backup Reminder. Deliberately its own overlay (not a GT modal):
-     it must not be dismissable by tapping outside, and Cancel stays disabled for
-     the first 10 seconds, so the reminder cannot be swiped away by reflex. -->
+<!-- v4.13: Export Backup Reminder. Its own overlay (not a GT modal) because it must
+     not be dismissable by tapping outside, and Cancel stays disabled for the first
+     10 seconds, so the reminder cannot be swiped away by reflex. Uses the app's
+     standard .dialog component so it looks like every other centered dialog. -->
 <div class="overlay center-modal" id="andReminderOverlay" role="dialog" aria-modal="true" aria-labelledby="andReminderTitle">
-  <div class="sheet">
-    <div class="gt-rem-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M7.5 18.5A4.5 4.5 0 0 1 8 9.6 6 6 0 0 1 19.4 11a3.9 3.9 0 0 1-.4 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 12v8m0 0-3-3m3 3 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <h2 id="andReminderTitle">Export Backup</h2>
+  <div class="dialog">
+    <div class="d-icon info" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M7.5 18.5A4.5 4.5 0 0 1 8 9.6 6 6 0 0 1 19.4 11a3.9 3.9 0 0 1-.4 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 12v8m0 0-3-3m3 3 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h3 id="andReminderTitle">Export Backup</h3>
     <span class="gt-rem-badge">Reminder</span>
     <p class="gt-rem-msg">Do you want to export the backup?</p>
-    <div class="gt-rem-actions">
-      <button type="button" class="btn-full ghost gt-rem-cancel" id="andReminderCancel" disabled>Cancel <span id="andReminderCountdown">(10s)</span></button>
-      <button type="button" class="btn-full primary gt-rem-export" id="andReminderExport">Export Backup</button>
+    <div class="d-btn-row">
+      <button type="button" class="d-btn cancel" id="andReminderCancel" disabled>Cancel <span id="andReminderCountdown">(10s)</span></button>
+      <button type="button" class="d-btn primary" id="andReminderExport">Export Backup</button>
     </div>
   </div>
 </div>
