@@ -2767,8 +2767,6 @@ body.bomb-danger{background-color:#EF4444;}
 /* v4.13: Export Folder row + Export Backup Reminder (Settings -> App & Data).
    Colours come from the app's own tokens, so dark/light both follow the theme. */
 .and-inline-btn{width:auto;margin:0;padding:10px 16px;font-size:13px;flex:0 0 auto;align-self:center;}
-.and-reminder-block{margin-top:6px;padding-top:4px;} /* the row above already draws the divider */
-.and-reminder-block .ar-t1{margin-bottom:4px;}
 .gt-day-pills{display:flex;flex-wrap:wrap;gap:6px;width:100%;margin:8px 0 6px;}
 .gt-day-pill{position:relative;flex:1 1 auto;min-width:38px;cursor:pointer;}
 .gt-day-pill input{position:absolute;opacity:0;pointer-events:none;}
@@ -2806,20 +2804,6 @@ body.bomb-danger{background-color:#EF4444;}
             <div class="ar-txt"><div class="ar-t1">📁 Export Folder</div><div class="ar-t2" id="andExportFolderLabel">Downloads (default) — every export asks where to save it.</div></div>
             <button type="button" class="btn-full ghost and-inline-btn" id="andMnuChooseFolder">Change</button>
           </div>
-          <div class="and-reminder-block">
-            <div class="ar-t1">⏰ Export Backup Reminder</div>
-            <div class="subtext">Get a periodic reminder to export a backup, so your progress history is never lost to a cleared browser or a new device.</div>
-            <div class="field">
-              <label>REMIND ON</label>
-              <div id="andReminderDays" class="gt-day-pills"></div>
-              <p class="subtext" id="andReminderDaysHelp" aria-live="polite">Pick one, several or all seven days. The reminder appears once per app day.</p>
-            </div>
-            <div class="field">
-              <label for="andReminderTime">REMIND AFTER</label>
-              <select id="andReminderTime" class="task-select"></select>
-              <p class="subtext">The new app day starts at “Sleep Start Time” (Day Boundary); before that hour yesterday's schedule still applies.</p>
-            </div>
-          </div>
           <div class="and-row" id="andMnuInstallHtml" role="button" tabindex="0">
             <div class="ar-txt"><div class="ar-t1">📥 Install NEW HTML File</div><div class="ar-t2">Select a new HTML app file and install it as the app's interface. User data is preserved.</div></div>
             <div class="gl-chev">›</div>
@@ -2841,6 +2825,25 @@ body.bomb-danger{background-color:#EF4444;}
             <div class="gl-chev">›</div>
           </div>
           <div class="subtext" id="andBackupInfo" style="margin-bottom:0;margin-top:10px;"></div>
+        </div>
+
+        <!-- Export Backup Reminder (v4.13). Its own card, directly after the App &
+             Data card and before Bridge Status: the reminder is a setting block, not
+             one of the App & Data action rows, and it uses the card's own <h3> so its
+             heading matches every other card. -->
+        <div class="plain-card" id="cardExportReminder">
+          <h3>Export Backup Reminder</h3>
+          <div class="subtext" style="margin-top:0;">Get a periodic reminder to export a backup, so your progress history is never lost to a cleared browser or a new device.</div>
+          <div class="field" style="margin-top:14px;">
+            <label>REMIND ON</label>
+            <div id="andReminderDays" class="gt-day-pills" role="group" aria-label="Reminder days"></div>
+            <p class="subtext" id="andReminderDaysHelp" aria-live="polite">Pick one, several or all seven days. The reminder appears once per app day.</p>
+          </div>
+          <div class="field" style="margin-bottom:2px;">
+            <label for="andReminderTime">REMIND AFTER</label>
+            <select id="andReminderTime" class="task-select"></select>
+            <p class="subtext" style="margin-bottom:2px;">The new app day starts at “Sleep Start Time” (Day Boundary); before that hour yesterday's schedule still applies.</p>
+          </div>
         </div>
 
         <!-- Bridge status -->
@@ -15608,72 +15611,97 @@ function andRenderSettings(){
 /* ==========================================================================
    v4.13 — EXPORT FOLDER + EXPORT BACKUP REMINDER (ported from the Recall app)
    ==========================================================================
-   Both features exist in the Recall revision tracker and were ported here with
-   Goal Tracker's own names, storage keys and day-boundary rules.
-
    Export folder: the native side owns it (Settings -> App & Data -> Change ->
    system folder picker). This code only shows which folder is active and asks
    the shell to change it; every export route then writes straight into it.
 
    Reminder: a periodic nudge to export a backup, because users rarely open
-   Settings on their own. Settings live in their OWN localStorage key (never
-   inside the app state) so restoring a backup - which replaces the whole state -
+   Settings on their own. Its settings live in their OWN localStorage key (never
+   inside the app state), so restoring a backup - which replaces the whole state -
    can never silently enable, disable or re-arm the reminder. It shows at most
    once per app day, uses the same Day Boundary as the rest of the app, and only
-   after the configured hour. Cancel is disabled for the first 10 seconds. */
+   after the configured hour. Cancel is disabled for the first 10 seconds.
+
+   The live copy of the settings is held in memory (gtReminderCache) and every
+   write re-reads nothing: the card, the summary line and the reminder decision
+   all use the same object. Change events are delegated from the two containers
+   (never inline onchange= attributes, which silently failed to fire on device),
+   and every change confirms itself with a toast, because these settings save
+   immediately - there is no Save button to press. */
 const GT_REMINDER_KEY = 'gt_export_backup_reminder_v1';
 const GT_REMINDER_DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const GT_REMINDER_DAYNAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const GT_REMINDER_DEFAULT = { days:[1,3,5], time:9 };
+let gtReminderCache = null;
 let gtReminderCountdown = null;
 
 function gtEl(id){ return document.getElementById(id); }
 
-function gtReminderRead(){
-  try{ return JSON.parse(localStorage.getItem(GT_REMINDER_KEY) || 'null'); }catch(e){ return null; }
-}
-function gtReminderWrite(next){
-  try{ localStorage.setItem(GT_REMINDER_KEY, JSON.stringify(next)); return true; }
-  catch(e){ console.warn('[reminder] could not save settings', e); return false; }
-}
-/* Everything read back from localStorage is coerced: a value written by another
+/* Anything read back from storage is coerced: a value written by another
    version (or by hand) must never reach a comparison in a shape it doesn't fit. */
-function gtGetReminderSettings(){
-  const raw = gtReminderRead() || {};
-  const days = Array.isArray(raw.days)
-    ? raw.days.map(Number).filter(n=>Number.isInteger(n) && n>=0 && n<=6)
+function gtCoerceReminder(raw){
+  const src = (raw && typeof raw === 'object') ? raw : {};
+  const days = Array.isArray(src.days)
+    ? src.days.map(Number).filter(n=>Number.isInteger(n) && n>=0 && n<=6)
     : [];
-  const time = Math.round(Number(raw.time));
+  const time = Math.round(Number(src.time));
   return {
     days: days.length ? Array.from(new Set(days)).sort((a,b)=>a-b) : GT_REMINDER_DEFAULT.days.slice(),
     time: (Number.isInteger(time) && time>=0 && time<=23) ? time : GT_REMINDER_DEFAULT.time,
-    lastShown: (typeof raw.lastShown === 'string') ? raw.lastShown : ''
+    lastShown: (typeof src.lastShown === 'string') ? src.lastShown : ''
   };
+}
+function gtReminderReadRaw(){
+  try{ return JSON.parse(localStorage.getItem(GT_REMINDER_KEY) || 'null'); }catch(e){ return null; }
+}
+function gtReminderWriteRaw(cfg){
+  try{ localStorage.setItem(GT_REMINDER_KEY, JSON.stringify(cfg)); return true; }
+  catch(e){ console.warn('[reminder] could not save settings', e); return false; }
+}
+/* The one source of truth for this session. Callers get a copy so no caller can
+   mutate the cache by accident. */
+function gtReminderSnapshot(){
+  if(!gtReminderCache) gtReminderCache = gtCoerceReminder(gtReminderReadRaw());
+  return { days: gtReminderCache.days.slice(), time: gtReminderCache.time, lastShown: gtReminderCache.lastShown };
+}
+/* Persist a change: memory first (so the UI is instantly correct even if the
+   device refuses the write), then storage, then re-render, then confirm. */
+function gtPersistReminder(next, toastMsg){
+  gtReminderCache = gtCoerceReminder(next);
+  const saved = gtReminderWriteRaw(gtReminderCache);
+  gtRenderReminderSettings();
+  if(toastMsg){
+    showToast(saved ? toastMsg : toastMsg + ' — but this device would not store it.');
+  }
+  return saved;
 }
 function gtFmtReminderHour(h){ return (h%12 || 12) + ':00 ' + (h<12 ? 'AM' : 'PM'); }
 function gtUpdateReminderHelp(){
   const help = gtEl('andReminderDaysHelp'); if(!help) return;
-  const cfg = gtGetReminderSettings();
+  const cfg = gtReminderSnapshot();
   help.textContent = 'Selected: ' + cfg.days.map(i=>GT_REMINDER_DAYNAMES[i]).join(', ') +
     '. The reminder appears once per app day after ' + gtFmtReminderHour(cfg.time) + '.';
 }
 function gtRenderReminderSettings(){
   const host = gtEl('andReminderDays');
   if(host){
-    const sel = new Set(gtGetReminderSettings().days);
+    const cfg = gtReminderSnapshot();
+    const sel = new Set(cfg.days);
+    // No inline handlers: the change event is delegated from the container (see
+    // gtBindReminderCard), so re-rendering this HTML can never strand a listener.
     host.innerHTML = GT_REMINDER_DAYS.map((d,i)=>
       '<label class="gt-day-pill"><input type="checkbox" value="' + i + '"' +
-      (sel.has(i) ? ' checked' : '') + ' onchange="gtSaveReminderDays()"><span>' + d + '</span></label>'
+      (sel.has(i) ? ' checked' : '') + '><span>' + d + '</span></label>'
     ).join('');
   }
-  const sel = gtEl('andReminderTime');
-  if(sel){
-    if(!sel.options.length){
+  const select = gtEl('andReminderTime');
+  if(select){
+    if(!select.options.length){
       let html = '';
       for(let h=0; h<24; h++) html += '<option value="' + h + '">' + gtFmtReminderHour(h) + '</option>';
-      sel.innerHTML = html;
+      select.innerHTML = html;
     }
-    sel.value = String(gtGetReminderSettings().time);
+    select.value = String(gtReminderSnapshot().time);
   }
   gtUpdateReminderHelp();
 }
@@ -15682,29 +15710,37 @@ function gtSaveReminderDays(){
   const days = Array.from(host.querySelectorAll('input[type=checkbox]:checked'))
     .map(x=>Number(x.value)).filter(n=>Number.isInteger(n) && n>=0 && n<=6);
   if(!days.length){
-    // Never allow "no days": that would silently disable the reminder.
+    // Never allow "no days" (that would silently disable the reminder): put the
+    // pill the user just cleared straight back and say why.
     gtRenderReminderSettings();
     showToast('Pick at least one day for the Export Backup reminder.');
     return;
   }
-  const cur = gtGetReminderSettings();
-  cur.days = Array.from(new Set(days)).sort((a,b)=>a-b);
-  gtReminderWrite(cur);
-  gtUpdateReminderHelp();
+  const cfg = gtReminderSnapshot();
+  cfg.days = Array.from(new Set(days)).sort((a,b)=>a-b);
+  gtPersistReminder(cfg, 'Reminder days saved: ' + cfg.days.map(i=>GT_REMINDER_DAYS[i]).join(', '));
 }
 function gtSaveReminderTime(){
-  const sel = gtEl('andReminderTime'); if(!sel) return;
-  const t = Math.round(Number(sel.value));
-  const cur = gtGetReminderSettings();
-  if(Number.isInteger(t) && t>=0 && t<=23) cur.time = t;
-  gtReminderWrite(cur);
-  gtUpdateReminderHelp();
+  const select = gtEl('andReminderTime'); if(!select) return;
+  const t = Math.round(Number(select.value));
+  const cfg = gtReminderSnapshot();
+  if(!(Number.isInteger(t) && t>=0 && t<=23)){ gtRenderReminderSettings(); return; }
+  cfg.time = t;
+  gtPersistReminder(cfg, 'Reminder time saved: ' + gtFmtReminderHour(t));
+}
+/* Bind once per page: the containers outlive every innerHTML re-render. */
+function gtBindReminderCard(){
+  const host = gtEl('andReminderDays');
+  if(host && !host._gtReminderBound){ host._gtReminderBound = true; host.addEventListener('change', gtSaveReminderDays); }
+  const select = gtEl('andReminderTime');
+  if(select && !select._gtReminderBound){ select._gtReminderBound = true; select.addEventListener('change', gtSaveReminderTime); }
+  gtRenderReminderSettings();
 }
 /* Due = a selected weekday (in app-day terms), at or after the later of the
    configured hour and the Day Boundary hour. The boundary is handled exactly
    like appDayKey(): before the boundary hour, yesterday is still "today". */
 function gtReminderDue(){
-  const cfg = gtGetReminderSettings();
+  const cfg = gtReminderSnapshot();
   const boundary = Math.max(0, Math.min(23, Number(getDayResetHour()) || 0));
   const now = new Date();
   const appDay = new Date(now.getTime() - boundary*3600*1000);
@@ -15721,10 +15757,10 @@ function gtMaybeShowBackupReminder(){
     if(document.querySelector('.overlay.show')) return;  // never stack on top of another modal
     if(!gtReminderDue()) return;
     const today = appDayKey();
-    const cfg = gtGetReminderSettings();
+    const cfg = gtReminderSnapshot();
     if(cfg.lastShown === today) return;                 // at most once per app day
     cfg.lastShown = today;
-    if(!gtReminderWrite(cfg)) return;                   // storage unavailable: stay silent, never nag
+    if(!gtPersistReminder(cfg, '')) return;             // storage refused: do not nag
     gtShowBackupReminder();
   }catch(e){ console.warn('[reminder] skipped', e); }
 }
@@ -15751,8 +15787,8 @@ function gtShowBackupReminder(){
 }
 function gtCloseBackupReminder(){
   gtStopReminderCountdown();
-  const back = gtEl('andReminderOverlay'); if(!back) return;
-  back.classList.remove('show');
+  const back = gtEl('andReminderOverlay');
+  if(back && back.classList.contains('show')) back.classList.remove('show');
 }
 function gtCancelBackupReminder(){
   // The 10s guard lives in the function too, not only on the button, so no stray
@@ -15760,8 +15796,10 @@ function gtCancelBackupReminder(){
   const btn = gtEl('andReminderCancel');
   if(btn && btn.disabled) return;
   const back = gtEl('andReminderOverlay');
-  if(back && back.classList.contains('show')) gtCloseBackupReminder();
-  showToast('Reminder dismissed — you can export any time from Settings.');
+  if(back && back.classList.contains('show')){
+    gtCloseBackupReminder();
+    showToast('Reminder dismissed — you can export any time from Settings.');
+  }
 }
 async function gtConfirmExportBackup(){
   gtCloseBackupReminder();
@@ -15913,8 +15951,7 @@ function andBindSettings(){
   };
   if(el('andReminderCancel')) el('andReminderCancel').onclick = gtCancelBackupReminder;
   if(el('andReminderExport')) el('andReminderExport').onclick = gtConfirmExportBackup;
-  if(el('andReminderTime')) el('andReminderTime').onchange = gtSaveReminderTime;
-  gtRenderReminderSettings();
+  gtBindReminderCard();   // delegated listeners + first render (survives re-renders)
   gtRenderExportFolder();
   // Diagnostics — Error Log only (System Check moved into the App & Data menu)
   const out = el('andDiagOut'), acts = el('andDiagActions');

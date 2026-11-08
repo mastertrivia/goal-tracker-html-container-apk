@@ -23,7 +23,11 @@
   first 10 seconds so it cannot be dismissed by reflex. Its settings live in
   their own storage key, so restoring a backup can never silently disable or
   re-arm the reminder. **Export Backup** in the reminder runs the same verified
-  export path as the Settings row (mirror first, then the native flow).
+  export path as the Settings row (mirror first, then the native flow). It has
+  its own card in Settings → Android application (below System Check, above
+  Bridge Status), its day selection and hour save the moment they change and
+  confirm with a toast, and the "Selected: …" summary updates as you tap the
+  pills.
 
 ---
 
